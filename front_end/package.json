@@ -1,0 +1,51 @@
+{
+  "name": "study-buddy",
+  "version": "1.0.0",
+  "description": "App to help me choose what topics to re-visit",
+  "repository": "https://github.com/dchege711/study_buddy",
+  "private": true,
+  "scripts": {
+    "start": "node app.js",
+  },
+  "author": "Chege Gitau",
+  "contributors": [
+    {
+      "name": "Chege Gitau",
+      "email": "d.chege711@gmail.com"
+    }
+  ],
+  "cloud-repo-tools": {
+    "requiresKeyFile": true,
+    "requiresProjectId": true,
+    "test": {
+      "app": {
+        "args": [
+          "app.js"
+        ],
+        "msg": "Hello, world!"
+      }
+    }
+  },
+  "license": "Apache-2.0",
+  "semistandard": {
+    "globals": [
+      "after",
+      "afterEach",
+      "before",
+      "beforeEach",
+      "describe",
+      "it"
+    ]
+  },
+  "dependencies": {
+    "express": "4.16.2"
+  },
+  "devDependencies": {
+    "@google-cloud/nodejs-repo-tools": "2.1.1",
+    "ava": "0.23.0",
+    "supertest": "3.0.0"
+  },
+  "engines": {
+    "node": ">=4.3.2"
+  }
+}
