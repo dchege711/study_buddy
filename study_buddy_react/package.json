@@ -2,6 +2,7 @@
     "name": "studdy_buddy_react",
     "version": "0.1.0",
     "description": "Guides users on what content to review",
+    "author": "Chege Gitau",
     "private": true,
     "dependencies": {
         "react": "^16.2.0",
@@ -30,7 +31,6 @@
         "eject": "react-scripts eject",
         "init-cloudsql": "src/GoogleSQLClient.js"
     },
-    "author": "Chege Gitau",
     "cloud-repo-tools": {
         "requiresKeyFile": true,
         "requiresProjectId": true,
