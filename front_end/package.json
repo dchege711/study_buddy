@@ -5,7 +5,7 @@
   "repository": "https://github.com/dchege711/study_buddy",
   "private": true,
   "scripts": {
-    "start": "node app.js",
+    "start": "node app.js"
   },
   "author": "Chege Gitau",
   "contributors": [
@@ -38,7 +38,10 @@
     ]
   },
   "dependencies": {
-    "express": "4.16.2"
+    "express": "4.16.2",
+    "@google-cloud/datastore": "1.1.0",
+    "body-parser": "1.18.2",
+    "mysql": "2.15.0"
   },
   "devDependencies": {
     "@google-cloud/nodejs-repo-tools": "2.1.1",
