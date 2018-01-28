@@ -1,9 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './css/w3.css';
-// const logInTemplate = require('./templates/logInTemplate')
 
-class LogIn extends React.Component {
+export default class LogIn extends React.Component {
+    
+    // eslint-disable-next-line
+    const myUserName = process.env.STUDY_BUDDY_USERNAME
+    // eslint-disable-next-line
+    const myPassword = process.env.STUDY_BUDDY_PASSWORD
     
     constructor(props) {
         super(props);
@@ -23,8 +26,15 @@ class LogIn extends React.Component {
     }
     
     handleSubmit(event) {
-        // To-Do: Validate that the user is legit
         event.preventDefault();
+        
+        // To-Do: Validate that the user is legit
+        if (this.state.username === myUserName && this.state.password === myPassword) {
+            ReactDOM.render(<SuccessLogin />, document.getElementById("root"));
+        } else {
+            ReactDOM.render(<SuccessLogin />, document.getElementById("root"));
+        }
+        
     }
     
     render() {
@@ -47,10 +57,3 @@ class LogIn extends React.Component {
         )
     }
 }
-
-// ========================================
-
-ReactDOM.render(
-    <LogIn />,
-    document.getElementById('root')
-);
