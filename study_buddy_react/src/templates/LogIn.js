@@ -1,12 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import SuccessLogin from './SuccessLogin'
+
+const myUserName = process.env.STUDY_BUDDY_USERNAME
+const myPassword = process.env.STUDY_BUDDY_PASSWORD
 
 export default class LogIn extends React.Component {
-    
-    // eslint-disable-next-line
-    const myUserName = process.env.STUDY_BUDDY_USERNAME
-    // eslint-disable-next-line
-    const myPassword = process.env.STUDY_BUDDY_PASSWORD
     
     constructor(props) {
         super(props);

@@ -2,11 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './css/w3.css';
 
-import SuccessLogin from './templates/SuccessLogin'
-import LogIn from './tenplates/LogIn.js'
-
-
-
+import LogIn from './templates/LogIn.js'
 
 // ========================================
 
