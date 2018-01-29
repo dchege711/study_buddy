@@ -1,4 +1,4 @@
-{
+module.exports = {
     "GCLOUD_PROJECT": process.env.STUDY_BUDDY_GCLOUD_PROJECT_ID,
     "DATA_BACKEND": "cloudsql",
     "MYSQL_USER": process.env.STUDY_BUDDY_GCLOUD_SQL_DB_USERNAME,

@@ -2,21 +2,18 @@
 
 // Credits to https://github.com/GoogleCloudPlatform/nodejs-getting-started/
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-
 const extend = require('lodash').assign;
 const mysql = require('mysql');
 const config = require('../config');
 const databaseName = 'c13u_study_buddy'
 
 const options = {
-    user: config.get('MYSQL_USER'),
-    password: config.get('MYSQL_PASSWORD'),
+    user: config.MYSQL_USER,
+    password: config.MYSQL_PASSWORD,
     database: databaseName
 };
 
-options.socketPath = `/cloudsql/${config.get('INSTANCE_CONNECTION_NAME')}`;
+options.socketPath = `/cloudsql/${config.INSTANCE_CONNECTION_NAME}`;
 const connection = mysql.createConnection(options);
 
 function create(data, callBack) {
@@ -73,6 +70,7 @@ function createSchema(config) {
             \`id\` INT UNSIGNED NOT NULL AUTO_INCREMENT,
             \`title\` VARCHAR(255) NULL,
             \`description\` TEXT NULL,
+            \`tags\` VARCHAR(255) NULL,
             \`addDate\` VARCHAR(255) NULL,
             \`createdBy\` VARCHAR(255) NULL,
             \`createdById\` VARCHAR(255) NULL,
