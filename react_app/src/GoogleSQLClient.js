@@ -5,7 +5,7 @@
 const extend = require('lodash').assign;
 const mysql = require('mysql');
 const config = require('../config');
-const databaseName = 'c13u_study_buddy'
+const databaseName = 'c13u_study_buddy';
 
 const options = {
     user: config.MYSQL_USER,
