@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './css/w3.css';
+import './css/main.css';
 
 import LogIn from './LogIn.js'
 

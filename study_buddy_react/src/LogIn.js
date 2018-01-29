@@ -50,7 +50,7 @@ export default class LogIn extends React.Component {
                     placeholder="Enter Password" onChange={this.handleInputChange} />
                 </label>
                 
-                <input type="submit" value="Submit" />
+                <input type="submit" value="Login" />
                 
             </form>
         )
