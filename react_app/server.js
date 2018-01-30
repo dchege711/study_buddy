@@ -6,8 +6,8 @@ var express = require('express');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 
-var config = require('./config');
-var CardController = require('./controllers/CardController');
+var config = require('./src/config');
+var CardController = require('./src/controllers/CardController');
 
 var app = express();
 var router = express.Router();
@@ -60,7 +60,7 @@ router.route('/delete-card').post(function(request, response) {
     CardController.delete(request, response);
 });
 
-app.use('/api', router);
+app.use('/', router);
 
 app.listen(port, function() {
     console.log(`API is running on port ${port}`);

@@ -29,11 +29,9 @@ export default class LogIn extends React.Component {
         
         // To-Do: Validate that the user is legit
         if (this.state.username === myUserName && this.state.password === myPassword) {
-            ReactDOM.render(<MongoDBClient
-                url='/read-card' />, document.getElementById("root"));
+            ReactDOM.render(<MongoDBClient />, document.getElementById("root"));
         } else {
-            ReactDOM.render(<MongoDBClient
-                url='/read-card' />, document.getElementById("root"));
+            ReactDOM.render(<MongoDBClient />, document.getElementById("root"));
         }
         
     }

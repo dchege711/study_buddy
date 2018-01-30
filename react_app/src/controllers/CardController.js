@@ -1,4 +1,5 @@
 var Card = require('../models/Card');
+// eslint-disable-next-line
 var bodyParser = require('body-parser');
 
 exports.create = function(request, response) {

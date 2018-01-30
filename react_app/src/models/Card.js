@@ -4,7 +4,10 @@ var cardSchema = new mongoose.Schema({
     title: String,
     description: String,
     tags: String,
-    createdById: Number,
+    createdById: {
+        type: Number,
+        default: 1
+    },
     urgency: Number,
     lastReviewed: {
         type: Date,

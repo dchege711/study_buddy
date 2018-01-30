@@ -1,5 +1,6 @@
 import React from 'react';
 import './css/main.css';
+import './css/w3.css';
 var axios = require('axios');
 
 class MongoDBClient extends React.Component {
@@ -7,17 +8,17 @@ class MongoDBClient extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            title: "",
-            description: "",
-            tags: "",
+            "title": "Default Title",
+            description: "Default Description",
+            tags: "#default",
             createdById: 0,
-            urgency: 0,
+            urgency: 50,
             isNew: false
         }
         // Binding is necessary to make this work in the callback
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.initializeCard();
+        // this.initializeCard();
     }
     
     initializeCard() {
@@ -47,20 +48,24 @@ class MongoDBClient extends React.Component {
     
     render() {
         return (
-            <div class="w3-card">
-                <header class="w3-container w3-blue">
-                    <h5>{this.state.card.title}</h5>
+            <div className="w3-card">
+                <header className="w3-container w3-blue">
+                    <h5>{this.state.title}</h5>
                 </header>
                 
                 <label>Description
-                    <input type="text" name="description" value={this.state.card.description}
+                    <input type="text" name="description" value={this.state.description}
                     onChange={this.handleInputChange} />
                 </label>
                 
                 <label>Urgency
                     <input type="number" name="urgency" 
-                    value={this.state.card.urgency} onChange={this.handleInputChange} />
+                    value={this.state.urgency} onChange={this.handleInputChange} />
                 </label>
+                
+                <input type="submit" name="update" 
+                    onChange={this.handleSubmit} />
+                
                 
             </div>
         )
