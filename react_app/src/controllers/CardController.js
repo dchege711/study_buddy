@@ -1,46 +1,49 @@
 var Card = require('../models/Card');
 
-exports.create = function(cardData, callBack) {
+exports.create = function(request, response) {
     var card = new Card({
-        title: cardData.title,
-        description: cardData.description,
-        tags: cardData.tags,
-        createdById: cardData.createdById,
-        urgency: cardData.urgency
+        title: request.body.title,
+        description: request.body.description,
+        tags: request.body.tags,
+        createdById: request.body.createdById,
+        urgency: request.body.urgency
     });
     
-    card.save(function(error, data) {
+    card.save(function(error, confirmation) {
         if (error) {
             console.log(error);
         } else {
-            callBack(data);
+            response.send(confirmation);
         }
     });
 }
 
-exports.read = function(id, callBack) {
+exports.read = function(request, response) {
+    var id = request.body.id;
     if (id === null) {
-        Card.find({}, function(error, data) {
+        Card.find({}, function(error, card) {
             if (error) {
                 console.log(error);
             } else {
-                callBack(data);
+                response.send(card);
             }
         });
     } else {
         Card.findOne({
             _id: id
-        }, function(error, data) {
+        }, function(error, card) {
             if (error) {
                 console.log(error);
             } else {
-                callBack(data);
+                response.send(card);
             }
         });
     }
 }
 
-exports.update = function(id, data, callBack) {
+exports.update = function(request, response) {
+    var id = request.body.id;
+    var data = request.body.data;
     Card.findById(id, function(error, card) {
         if (error) {
             console.log(error);
@@ -48,23 +51,23 @@ exports.update = function(id, data, callBack) {
             Object.keys(data).forEach(key => {
                 card.key = data.key;
             });
-            card.save(function(error, data) {
+            card.save(function(error, confirmation) {
                 if (error) {
                     console.log(error);
                 } else {
-                    callBack(data);
+                    response.send(confirmation);
                 }
             });
         }
     });
 }
 
-exports.delete = function(id, callBack) {
-    Card.remove({_id: id}, function(error, confirmation) {
+exports.delete = function(request, response) {
+    Card.remove({_id: request.body.id}, function(error, confirmation) {
         if (error) {
             console.log(error);
         } else {
-            callBack(confirmation);
+            response.send(confirmation);
         }
     });
 }
