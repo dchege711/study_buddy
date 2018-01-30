@@ -10,6 +10,7 @@
         "express": "4.16.2",
         "lodash": "4.17.4",
         "mongodb": "^3.0.2",
+        "mongoose": "^5.0.2",
         "mysql": "2.15.0",
         "nconf": "0.10.0",
         "prompt": "1.0.0",
