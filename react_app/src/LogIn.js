@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import SuccessLogin from './SuccessLogin'
+import MongoDBClient from './MongoDBClient'
 
 const myUserName = process.env.STUDY_BUDDY_USERNAME
 const myPassword = process.env.STUDY_BUDDY_PASSWORD
@@ -29,9 +29,9 @@ export default class LogIn extends React.Component {
         
         // To-Do: Validate that the user is legit
         if (this.state.username === myUserName && this.state.password === myPassword) {
-            ReactDOM.render(<SuccessLogin />, document.getElementById("root"));
+            ReactDOM.render(<MongoDBClient />, document.getElementById("root"));
         } else {
-            ReactDOM.render(<SuccessLogin />, document.getElementById("root"));
+            ReactDOM.render(<MongoDBClient />, document.getElementById("root"));
         }
         
     }

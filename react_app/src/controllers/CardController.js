@@ -19,15 +19,25 @@ exports.create = function(cardData, callBack) {
 }
 
 exports.read = function(id, callBack) {
-    Card.findOne({
-        _id: id
-    }, function(error, data) {
-        if (error) {
-            console.log(error);
-        } else {
-            callBack(data);
-        }
-    });
+    if (id === null) {
+        Card.find({}, function(error, data) {
+            if (error) {
+                console.log(error);
+            } else {
+                callBack(data);
+            }
+        });
+    } else {
+        Card.findOne({
+            _id: id
+        }, function(error, data) {
+            if (error) {
+                console.log(error);
+            } else {
+                callBack(data);
+            }
+        });
+    }
 }
 
 exports.update = function(id, data, callBack) {

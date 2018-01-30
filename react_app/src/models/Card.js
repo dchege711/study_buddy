@@ -5,16 +5,16 @@ var cardSchema = new mongoose.Schema({
     description: String,
     tags: String,
     createdById: Number,
+    urgency: Number,
     lastReviewed: {
         type: Date,
         default: Date.now
-    },
-    urgency: Number
-    
-}, {
-    timestamps: true,
-    autoIndex: false,
-    collection: "c13u_study_buddy"
-});
+    }}, 
+    {
+        timestamps: true,
+        autoIndex: false,
+        collection: "c13u_study_buddy"
+    }
+);
 
 module.exports = mongoose.model('Card', cardSchema);
