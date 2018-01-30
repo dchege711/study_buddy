@@ -1,55 +1,27 @@
-const MongoClient = require('mongodb').MongoClient;
 const config = require('../config');
 const assert = require('assert');
+const collectionName = 'c13u_study_buddy';
 
-const databaseName = 'c13u_study_buddy';
-const url = config.MONGO_URI;
+var mongoose = require('mongoose');
+var cards = require('./controllers/CardController')
 
-
-const db = MongoClient.connect(url, function(err, client) {
-    assert.equal(null, err);
-    console.log("Connected successfully to server");
-    db = client.db(dbName);
+mongoose.connect(config.MONGO_URI);
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'Connection Error:'));
+db.once('open', function() {
+    console.log("Connected to the database successfully!");
 });
 
-console.log(db);
-
-var Collection = {
-    
-    collection: db.collection('dummy_collection'),
-    
-    collectionName: function(name) {
-        this.collection = db.collection(name);
-    },
-    
-    create: function(data, callBack) {
-        this.collection.insertOne(data, function(error, response) {
-            if (error) {
-                callBack(error);
-                return;
-            }
-            assert.equal(1, response.insertedCount);
-            this.read(response.insertedId);
-        });
-    },
-    
-    read: function(id, callBack) {
-        this.collection.find({
-            "_id": id
-        }).limit(1).toArray(function(error, doc) {
-            assert.equal(null, error);
-        });
-    },
-    
-    update: function(id, data, callBack) {
-        return null
-    },
-    
-    _delete: function(id, callBack) {
-        return null;
+var newCard = {
+    body: {
+        "title": "Random Walks Pt. 2",
+        "description": "We're now getting somewhere!",
+        "tags": "#probability",
+        "createdById": "1",
+        "status": 67
     }
-};
-
-module.exports = {
-    Collection: Collection
 }
+
+cards.create(newCard, function(data) {
+    console.log(data);
+});
