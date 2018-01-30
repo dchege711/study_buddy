@@ -1,21 +1,26 @@
 const MongoClient = require('mongodb').MongoClient;
+const config = require('../config');
 const assert = require('assert');
-const databaseName = 'c13u_study_buddy';
-const mongoURL = config.MONGO_URI;
 
-MongoClient.connect(url, function(err, client) {
+const databaseName = 'c13u_study_buddy';
+const url = config.MONGO_URI;
+
+
+const db = MongoClient.connect(url, function(err, client) {
     assert.equal(null, err);
     console.log("Connected successfully to server");
-    const db = client.db(dbName);
+    db = client.db(dbName);
 });
 
-function getCollection(collectionName) {
-    return db.collection(collectionName);
-}
+console.log(db);
 
 var Collection = {
     
-    collection: null;
+    collection: db.collection('dummy_collection'),
+    
+    collectionName: function(name) {
+        this.collection = db.collection(name);
+    },
     
     create: function(data, callBack) {
         this.collection.insertOne(data, function(error, response) {
@@ -26,7 +31,7 @@ var Collection = {
             assert.equal(1, response.insertedCount);
             this.read(response.insertedId);
         });
-    }
+    },
     
     read: function(id, callBack) {
         this.collection.find({
@@ -34,11 +39,11 @@ var Collection = {
         }).limit(1).toArray(function(error, doc) {
             assert.equal(null, error);
         });
-    }
+    },
     
     update: function(id, data, callBack) {
         return null
-    }
+    },
     
     _delete: function(id, callBack) {
         return null;

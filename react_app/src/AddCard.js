@@ -1,6 +1,8 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+const dbClient = require('./MongoDBClient');
 
-export default class AddCard extends React.Component {
-    
+const myCollection = dbClient.Collection;
+
+item = {
+    "key_1": "Please make it to Heroku"
 }
+myCollection.create(item, {});
