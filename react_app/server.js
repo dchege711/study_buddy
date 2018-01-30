@@ -7,14 +7,19 @@ var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 
 var config = require('./config');
-var Card = require('./models/Card');
+var CardController = require('./controllers/CardController');
 
 var app = express();
 var router = express.Router();
 
 var port = process.env.PORT || 3000;
 
-mongoose.connect(config.MONGO_URI)
+mongoose.connect(config.MONGO_URI);
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'Connection Error:'));
+db.once('open', function() {
+    console.log("Connected to the database successfully!");
+});
 
 app.use(bodyParser.urlencoded({
     extended: true
@@ -37,6 +42,22 @@ app.use(function(req, res, next) {
 
 router.get('/', function(request, response) {
     response.json({message: "This is what you get when you route to /"});
+});
+
+router.route('/read-card').get(function(request, response) {
+    CardController.read(request, response);
+});
+
+router.route('/add-card').post(function(request, response) {
+    CardController.create(request, response);
+});
+
+router.route('/update-card').post(function(request, response) {
+    CardController.update(request, response);
+});
+
+router.route('/delete-card').post(function(request, response) {
+    CardController.delete(request, response);
 });
 
 app.use('/api', router);

@@ -1,4 +1,5 @@
 var Card = require('../models/Card');
+var bodyParser = require('body-parser');
 
 exports.create = function(request, response) {
     var card = new Card({
@@ -13,7 +14,7 @@ exports.create = function(request, response) {
         if (error) {
             console.log(error);
         } else {
-            response.send(confirmation);
+            response.json(confirmation);
         }
     });
 }
@@ -25,7 +26,7 @@ exports.read = function(request, response) {
             if (error) {
                 console.log(error);
             } else {
-                response.send(card);
+                response.json(card);
             }
         });
     } else {
@@ -35,7 +36,7 @@ exports.read = function(request, response) {
             if (error) {
                 console.log(error);
             } else {
-                response.send(card);
+                response.json(card);
             }
         });
     }
@@ -55,7 +56,7 @@ exports.update = function(request, response) {
                 if (error) {
                     console.log(error);
                 } else {
-                    response.send(confirmation);
+                    response.json(confirmation);
                 }
             });
         }
@@ -67,7 +68,7 @@ exports.delete = function(request, response) {
         if (error) {
             console.log(error);
         } else {
-            response.send(confirmation);
+            response.json(confirmation);
         }
     });
 }

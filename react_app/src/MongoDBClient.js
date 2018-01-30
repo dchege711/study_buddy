@@ -1,21 +1,11 @@
 import React from 'react';
 import './css/main.css';
+var axios = require('axios');
 
-var mongoose = require('mongoose');
-var cards = require('./controllers/CardController')
-
-mongoose.connect(process.env.MLAB_HEALTH_DB_URI);
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'Connection Error:'));
-db.once('open', function() {
-    console.log("Connected to the database successfully!");
-});
-
-export default class MongoDBClient extends React.Component {
+class MongoDBClient extends React.Component {
     
     constructor(props) {
         super(props);
-        this.setCard();
         this.state = {
             title: "",
             description: "",
@@ -27,18 +17,21 @@ export default class MongoDBClient extends React.Component {
         // Binding is necessary to make this work in the callback
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.initializeCard();
     }
     
-    setCard() {
-        return cards.read(null, function(card) {
-            this.setState({
-                title: card.title,
-                description: card.description,
-                tags: card.tags,
-                urgency: card.urgency,
-                createdById: card.createdById,
-                isNew: false
+    initializeCard() {
+        axios.get("/read-card", {
+            id: null
+        }).then(function(response) {
+            var card = JSON.parse(response);
+            Object.keys(card).forEach(key => {
+                this.setState({
+                    key: card.key
+                });
             });
+        }).catch(function(error) {
+            console.log(error);
         });
     }
     
@@ -73,3 +66,5 @@ export default class MongoDBClient extends React.Component {
         )
     }
 }
+
+export default MongoDBClient;
