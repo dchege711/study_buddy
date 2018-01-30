@@ -1,14 +1,10 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import './css/main.css';
-
-const config = require('../config');
-const assert = require('assert');
 
 var mongoose = require('mongoose');
 var cards = require('./controllers/CardController')
 
-mongoose.connect(config.MONGO_URI);
+mongoose.connect(process.env.MLAB_HEALTH_DB_URI);
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'Connection Error:'));
 db.once('open', function() {
@@ -36,12 +32,12 @@ export default class MongoDBClient extends React.Component {
     setCard() {
         return cards.read(null, function(card) {
             this.setState({
-                title: card.title;
-                description: card.description;
-                tags: card.tags;
-                urgency: card.urgency;
-                createdById: card.createdById;
-                isNew: false; 
+                title: card.title,
+                description: card.description,
+                tags: card.tags,
+                urgency: card.urgency,
+                createdById: card.createdById,
+                isNew: false
             });
         });
     }
