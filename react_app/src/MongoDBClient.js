@@ -8,7 +8,8 @@ class MongoDBClient extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            "title": "Default Title",
+            id: null,
+            title: "Default Title",
             description: "Default Description",
             tags: "#default",
             createdById: 0,
@@ -18,15 +19,21 @@ class MongoDBClient extends React.Component {
         // Binding is necessary to make this work in the callback
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
-        // this.initializeCard();
+        this.initializeCard();
     }
     
     initializeCard() {
-        axios.get("/read-card", {
-            id: null
+        axios({
+            method: "get",
+            url: "/read-card",
+            data: {
+                id: null
+            }
         }).then(function(response) {
+            console.log("Receiving card.." + response);
             var card = JSON.parse(response);
             Object.keys(card).forEach(key => {
+                console.log("Setting " + key);
                 this.setState({
                     key: card.key
                 });
@@ -63,7 +70,7 @@ class MongoDBClient extends React.Component {
                     value={this.state.urgency} onChange={this.handleInputChange} />
                 </label>
                 
-                <input type="submit" name="update" value="Update Card" 
+                <input type="submit" name="update" value="Update" 
                     onChange={this.handleSubmit} />
                 
                 

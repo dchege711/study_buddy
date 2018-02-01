@@ -1,4 +1,5 @@
 var Card = require('../models/Card');
+var config = require('../config');
 var mongoose = require('mongoose');
 
 exports.create = function(payload, callBack) {
@@ -26,11 +27,12 @@ exports.create = function(payload, callBack) {
 
 exports.read = function(payload, callBack) {
     var id = payload["id"];
+    console.log("Reading card..." + id);
     mongoose.connect(config.MONGO_URI);
     var db = mongoose.connection;
     db.on('error', console.error.bind(console, 'Connection Error:'));
     db.once('open', function() {
-        if (id === null) {
+        if (id === null || id === undefined) {
             Card.find({}, function(error, card) {
                 if (error) {
                     console.log(error);
