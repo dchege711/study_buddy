@@ -1,11 +1,5 @@
 var Card = require('../models/Card');
-
-mongoose.connect(config.MONGO_URI);
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'Connection Error:'));
-db.once('open', function() {
-    console.log("Connected to the database successfully!");
-});
+var mongoose = require('mongoose');
 
 exports.create = function(payload, callBack) {
     var card = new Card({

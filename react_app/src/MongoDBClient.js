@@ -63,7 +63,7 @@ class MongoDBClient extends React.Component {
                     value={this.state.urgency} onChange={this.handleInputChange} />
                 </label>
                 
-                <input type="submit" name="update" 
+                <input type="submit" name="update" value="Update Card" 
                     onChange={this.handleSubmit} />
                 
                 
