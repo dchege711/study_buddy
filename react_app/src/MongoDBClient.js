@@ -25,7 +25,7 @@ class MongoDBClient extends React.Component {
     initializeCard() {
         axios({
             method: "get",
-            url: "/read-card",
+            url: "http://localhost:2000/read-card",
             data: {
                 id: null
             }

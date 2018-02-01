@@ -10,6 +10,7 @@ export default class LogIn extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            response: "",
             username: "",
             password: ""
         }
