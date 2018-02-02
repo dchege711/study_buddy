@@ -27,7 +27,7 @@ exports.create = function(payload, callBack) {
 
 exports.read = function(payload, callBack) {
     var id = payload["id"];
-    console.log("Reading card..." + id);
+    console.log("Reading card... id = " + id);
     mongoose.connect(config.MONGO_URI);
     var db = mongoose.connection;
     db.on('error', console.error.bind(console, 'Connection Error:'));

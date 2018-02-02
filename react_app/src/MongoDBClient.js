@@ -2,36 +2,39 @@ import React from 'react';
 import './css/main.css';
 import './css/w3.css';
 var axios = require('axios');
+var ReactToExpress = require('./ReactToExpress');
 
 class MongoDBClient extends React.Component {
     
     constructor(props) {
         super(props);
         this.state = {
-            id: null,
+            _id: null,
             title: "Default Title",
             description: "Default Description",
             tags: "#default",
             createdById: 0,
+            createdAt: "",
+            updatedAt: "",
             urgency: 50,
             isNew: false
         }
         // Binding is necessary to make this work in the callback
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.initializeCard();
+        // this.initializeCard();
     }
     
     initializeCard() {
         axios({
             method: "get",
-            url: "http://localhost:2000/read-card",
+            url: "/read-card",
             data: {
                 id: null
             }
         }).then(function(response) {
-            console.log("Receiving card.." + response);
             var card = JSON.parse(response);
+            console.log("Receiving card.." + card);
             Object.keys(card).forEach(key => {
                 console.log("Setting " + key);
                 this.setState({
@@ -42,6 +45,16 @@ class MongoDBClient extends React.Component {
             console.log(error);
         });
     }
+    
+    // initializeCard() {
+    //     ReactToExpress.getDataFromURL(
+    //         "/read-card", 
+    //         {id: null}, 
+    //         function(responseData) {
+    //             console.log(responseData);
+    //         }
+    //     );
+    // }
     
     handleInputChange(event) {
         this.setState({

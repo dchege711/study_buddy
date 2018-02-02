@@ -21,8 +21,13 @@ app.get('/', function(request, response) {
 app.get('/read-card', function(request, response) {
     console.log("Received GET request for read-card");
     CardController.read(request.body, function(card) {
+        console.log("Received card..." + card);
         response.json(card);
     });
+});
+
+app.get('/ping', function(request, response) {
+    response.json({"title": "Pong!"});
 });
 
 app.post('/add-card', function(request, response) {
