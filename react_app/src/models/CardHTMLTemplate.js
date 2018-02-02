@@ -1,3 +1,5 @@
+import React from 'react';
+
 function CardHTMLTemplate(props) {
     return (
         <div className="w3-card">

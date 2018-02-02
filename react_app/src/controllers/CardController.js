@@ -1,4 +1,4 @@
-var Card = require('../models/Card');
+_idvar Card = require('../models/Card');
 var config = require('../config');
 var mongoose = require('mongoose');
 
@@ -26,13 +26,13 @@ exports.create = function(payload, callBack) {
 }
 
 exports.read = function(payload, callBack) {
-    var id = payload["id"];
-    console.log("Reading card... id = " + id);
+    var _id = payload["_id"];
+    console.log("Reading card... _id = " + _id);
     mongoose.connect(config.MONGO_URI);
     var db = mongoose.connection;
     db.on('error', console.error.bind(console, 'Connection Error:'));
     db.once('open', function() {
-        if (id === null || id === undefined) {
+        if (_id === null || _id === undefined) {
             Card.find({}, function(error, card) {
                 if (error) {
                     console.log(error);
@@ -42,7 +42,7 @@ exports.read = function(payload, callBack) {
             });
         } else {
             Card.findOne({
-                _id: id
+                _id: _id
             }, function(error, card) {
                 if (error) {
                     console.log(error);
@@ -55,13 +55,13 @@ exports.read = function(payload, callBack) {
 }
 
 exports.update = function(payload, callBack) {
-    var id = payload["id"];
+    var _id = payload["_id"];
     var data = payload["data"];
     mongoose.connect(config.MONGO_URI);
     var db = mongoose.connection;
     db.on('error', console.error.bind(console, 'Connection Error:'));
     db.once('open', function() {
-        Card.findById(id, function(error, card) {
+        Card.findById(_id, function(error, card) {
             if (error) {
                 console.log(error);
             } else {
@@ -85,7 +85,7 @@ exports.delete = function(payload, callBack) {
     var db = mongoose.connection;
     db.on('error', console.error.bind(console, 'Connection Error:'));
     db.once('open', function() {
-        Card.remove({_id: payload["id"]}, function(error, confirmation) {
+        Card.remove({_id: payload["_id"]}, function(error, confirmation) {
             if (error) {
                 console.log(error);
             } else {

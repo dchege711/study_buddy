@@ -6,7 +6,8 @@ class ReactToExpress extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            url: "/"
+            url: "/read-card",
+            method: "get"
         }
         this.getDataFromURL = this.getDataFromURL.bind(this);
     }

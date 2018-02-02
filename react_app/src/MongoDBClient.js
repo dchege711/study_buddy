@@ -1,8 +1,10 @@
 import React from 'react';
 import './css/main.css';
 import './css/w3.css';
+import CardHTMLTemplate from './models/CardHTMLTemplate.js';
+// import ReactToExpress from './ReactToExpress.js';
+
 var axios = require('axios');
-var ReactToExpress = require('./ReactToExpress');
 
 class MongoDBClient extends React.Component {
     
@@ -22,39 +24,42 @@ class MongoDBClient extends React.Component {
         // Binding is necessary to make this work in the callback
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
-        // this.initializeCard();
+        this.updateCardContents = this.updateCardContents.bind(this);
+        this.initializeCard = this.initializeCard.bind(this);
+        this.initializeCard();
+        
     }
     
     initializeCard() {
-        axios({
-            method: "get",
-            url: "/read-card",
-            data: {
-                id: null
+        axios.get('/read-card', {
+            params: {
+                _id: null
             }
-        }).then(function(response) {
-            var card = JSON.parse(response);
-            console.log("Receiving card.." + card);
+        })
+        .then(function (response) {
+            var card = response["data"][0];
             Object.keys(card).forEach(key => {
-                console.log("Setting " + key);
+                
                 this.setState({
-                    key: card.key
+                    key: card[key]
                 });
+                console.log(key + " --> " + card[key]);
             });
-        }).catch(function(error) {
+            this.updateCardContents(response["data"][0]);
+        })
+        .catch(function (error) {
             console.log(error);
         });
     }
     
-    // initializeCard() {
-    //     ReactToExpress.getDataFromURL(
-    //         "/read-card", 
-    //         {id: null}, 
-    //         function(responseData) {
-    //             console.log(responseData);
-    //         }
-    //     );
-    // }
+    updateCardContents(newCard) {
+        console.log("updateCardContents was called");
+        Object.keys(newCard).forEach(key => {
+            this.setState({
+                key: newCard[key]
+            });
+        });
+    }
     
     handleInputChange(event) {
         this.setState({
@@ -68,26 +73,13 @@ class MongoDBClient extends React.Component {
     
     render() {
         return (
-            <div className="w3-card">
-                <header className="w3-container w3-blue">
-                    <h5>{this.state.title}</h5>
-                </header>
-                
-                <label>Description
-                    <input type="text" name="description" value={this.state.description}
-                    onChange={this.handleInputChange} />
-                </label>
-                
-                <label>Urgency
-                    <input type="number" name="urgency" 
-                    value={this.state.urgency} onChange={this.handleInputChange} />
-                </label>
-                
-                <input type="submit" name="update" value="Update" 
-                    onChange={this.handleSubmit} />
-                
-                
-            </div>
+            <CardHTMLTemplate 
+                title={this.state.title}
+                description={this.state.description}
+                handleInputChange={this.handleInputChange}
+                urgency={this.state.urgency}
+                handleSubmit={this.handleSubmit}
+            />        
         )
     }
 }
