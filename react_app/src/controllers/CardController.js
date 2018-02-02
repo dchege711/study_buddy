@@ -1,4 +1,4 @@
-_idvar Card = require('../models/Card');
+var Card = require('../models/Card');
 var config = require('../config');
 var mongoose = require('mongoose');
 

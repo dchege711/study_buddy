@@ -2,62 +2,43 @@ import React from 'react';
 import './css/main.css';
 import './css/w3.css';
 import CardHTMLTemplate from './models/CardHTMLTemplate.js';
-// import ReactToExpress from './ReactToExpress.js';
 
 var axios = require('axios');
 
-class MongoDBClient extends React.Component {
+class CardClient extends React.Component {
     
     constructor(props) {
         super(props);
         this.state = {
-            _id: null,
-            title: "Default Title",
-            description: "Default Description",
-            tags: "#default",
-            createdById: 0,
-            createdAt: "",
-            updatedAt: "",
-            urgency: 50,
-            isNew: false
+            _id: null, title: "", description: "", tags: "", isNew: false,
+            createdById: 0, createdAt: "", updatedAt: "", urgency: 50
         }
-        // Binding is necessary to make this work in the callback
+        
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.updateCardContents = this.updateCardContents.bind(this);
-        this.initializeCard = this.initializeCard.bind(this);
-        this.initializeCard();
-        
     }
     
-    initializeCard() {
+    updateCardContents(newCard) {
+        Object.keys(newCard).forEach(key => {
+            this.setState({
+                [key]: newCard[key]
+            });
+        });
+    }
+    
+    componentDidMount() {
         axios.get('/read-card', {
             params: {
                 _id: null
             }
         })
-        .then(function (response) {
+        .then((response) => {
             var card = response["data"][0];
-            Object.keys(card).forEach(key => {
-                
-                this.setState({
-                    key: card[key]
-                });
-                console.log(key + " --> " + card[key]);
-            });
-            this.updateCardContents(response["data"][0]);
+            this.updateCardContents(card);
         })
         .catch(function (error) {
             console.log(error);
-        });
-    }
-    
-    updateCardContents(newCard) {
-        console.log("updateCardContents was called");
-        Object.keys(newCard).forEach(key => {
-            this.setState({
-                key: newCard[key]
-            });
         });
     }
     
@@ -84,4 +65,4 @@ class MongoDBClient extends React.Component {
     }
 }
 
-export default MongoDBClient;
+export default CardClient;

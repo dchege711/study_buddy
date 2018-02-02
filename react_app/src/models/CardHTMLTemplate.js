@@ -8,7 +8,7 @@ function CardHTMLTemplate(props) {
             </header>
         
             <label>Description
-                <input type="text" name="description" value={props.description}
+                <textarea name="description" value={props.description}
                 onChange={props.handleInputChange} />
             </label>
         
@@ -19,8 +19,7 @@ function CardHTMLTemplate(props) {
         
             <input type="submit" name="update" value="Update" 
                 onChange={props.handleSubmit} />
-        
-        
+
         </div>
     )
 }

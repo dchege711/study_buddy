@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import MongoDBClient from './MongoDBClient'
+import CardClient from './CardClient'
 
 function UpdatedNavBar(props) {
     return (
@@ -22,7 +22,7 @@ class SuccessLogin extends React.Component {
         );
         
         ReactDOM.render(
-            <MongoDBClient />, document.getElementById("root")
+            <CardClient />, document.getElementById("root")
         );    
     }
     
