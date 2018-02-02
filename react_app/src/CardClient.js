@@ -15,6 +15,7 @@ const emptyCard = {
         urgency: false
     }
 };
+const keysToUploadToDB = ["title", "description", "tags", "urgency"];
 
 class CardClient extends React.Component {
     
@@ -34,6 +35,7 @@ class CardClient extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.updateCardContents = this.updateCardContents.bind(this);
         this.resetContents = this.resetContents.bind(this);
+        this.makeHttpRequest = this.makeHttpRequest.bind(this);
     }
     
     updateCardContents(newCard) {
@@ -47,22 +49,31 @@ class CardClient extends React.Component {
         this.setState(emptyCard);
     }
     
-    componentDidMount() {
-        axios.get('/read-card', {
-            params: {
-                _id: null
-            }
-        })
-        .then((response) => {
-            var card = response["data"][0];
-            this.updateCardContents(card);
-        })
-        .catch(function (error) {
+    makeHttpRequest(method, url, data, callBack) {
+        axios({
+            method: method,
+            url: url,
+            data: data
+        }).then((response) => {
+            callBack(response);
+        }).catch((error) => {
             console.log(error);
         });
     }
     
+    componentDidMount() {
+        this.makeHttpRequest(
+            "get", "/read-card",
+            { _id: null },
+            (response) => {
+                var card = response["data"][0];
+                this.updateCardContents(card);
+            }
+        );
+    }
+    
     handleInputChange(event) {
+        console.log("handleInputChange() was called");
         var key_in_state_variables = event.target.name;
         var changes = this.state.changedItems;
         changes[key_in_state_variables] = true;
@@ -73,37 +84,33 @@ class CardClient extends React.Component {
     }
     
     handleSubmit(event) {
-        event.preventDefault();
-        
-        // Add a new card to the database
+        console.log("handleSubmit was called");
+        var url;
+        var data = {};
         if (this.state.isNew) {
-            axios.post('/add-card', {
-                params: this.state
-            })
-            .then((response) => {
-                console.log(response["data"][0]);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
+            url = "/add-card";
+            for (let i = 0; i < keysToUploadToDB.length; i++) {
+                data[keysToUploadToDB[i]] = this.state[keysToUploadToDB[i]];
+            }
         } else {
-            var updatedValues = {};
-            updatedValues["_id"] = this.state._id;
+            url = "/update-card";
+            data["_id"] = this.state._id;
             Object.keys(this.state.changedItems).forEach(key => {
                 if (this.state.changedItems[key]) {
-                    updatedValues[key] = this.state.key;
+                    data[key] = this.state.key;
                 }
             });
-            axios.post('/update-card', {
-                params: updatedValues
-            })
-            .then((response) => {
-                console.log(response["data"][0]);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
         }
+        
+        this.makeHttpRequest(
+            "post", url, data,
+            (response) => {
+                var card = response["data"][0];
+                console.log(card);
+            }
+        );
+        
+        event.preventDefault();
     }
     
     render() {

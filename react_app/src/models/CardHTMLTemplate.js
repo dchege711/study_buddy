@@ -18,7 +18,7 @@ function CardHTMLTemplate(props) {
             </label>
         
             <input type="submit" name="update" value={props.submitLabel} 
-                onChange={props.handleSubmit} />
+                onClick={props.handleSubmit} />
                 
             <button className="w3-button w3-aqua" value="+" 
                 onClick={props.resetContents} />

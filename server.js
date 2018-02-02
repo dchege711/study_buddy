@@ -17,18 +17,21 @@ app.get('/', function(request, response) {
 });
 
 app.get('/read-card', function(request, response) {
+    console.log("GET request at /read-card");
     CardController.read(request.body, function(card) {
         response.json(card);
     });
 });
 
 app.post('/add-card', function(request, response) {
+    console.log("POST request at /add-card. Data: " + request.body);
     CardController.create(request.body, function(confirmation) {
         
     });
 });
 
 app.post('/update-card', function(request, response) {
+    console.log("POST request at /add-card. Data: " + request.body);
     CardController.update(request.body, function(confirmation) {
         
     });
