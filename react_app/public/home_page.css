@@ -1,12 +1,11 @@
-body {
-    background-color: "#78dbed";
-    color: black;
-}
-
 #root {
-    margin: 30% 30%
+    margin: 20% 20%
     border-color: "#277482";
     border-style: ridge;
+}
+
+.study-buddy-theme-color {
+    background: linear-gradient(darkturquoise, blue);;
 }
 
 .white-background {
@@ -26,12 +25,16 @@ body {
     max-width: 100%;
 }
 
+.input-area-padded {
+    min-width: 70%;
+    max-width: 90%;
+}
+
 ul.topnav {
     list-style-type: none;
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background-color: "#a09e95";
 }
 
 ul.topnav li {float: left;}
@@ -41,7 +44,6 @@ ul.topnav li a {
     color: white;
     text-align: center;
     padding: 14px 16px;
-    background-color: #4CAF50;
     text-decoration: none;
 }
 

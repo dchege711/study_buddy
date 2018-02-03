@@ -10,9 +10,9 @@ function CardHTMLTemplate(props) {
                 </button>
             </div>
         
-            <div className="w3-blue w3-center w3-container">
-                <label style={{width:"70%", padding:"10px 5px 20px 5px"}}>
-                    <input type="text" name="title" value={props.title} style={{width:"inherit"}}
+            <div className="w3-blue w3-center w3-container" style={{padding:"1% 20% 1% 20%"}}>
+                <label className="input-area-padded">
+                    <input type="text" name="title" value={props.title}
                     className="w3-input w3-threequarter" onChange={props.handleInputChange} />
                 </label>
             </div>
@@ -40,9 +40,10 @@ function CardHTMLTemplate(props) {
                 
             </div>
         
-            <div className="w3-container">
-                <input type="submit" name="update" className="w3-input w3-center"
-                    value={props.submitLabel} onClick={props.handleSubmit} 
+            <div className="w3-container" style={{padding:"1% 30% 1% 30%"}}>
+                <input type="submit" name="update"  
+                    className="w3-input" value={props.submitLabel} 
+                    onClick={props.handleSubmit} 
                 />
                 
             </div>
