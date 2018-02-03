@@ -1,6 +1,4 @@
 import React from 'react';
-import './css/main.css';
-import './css/w3.css';
 import CardHTMLTemplate from './models/CardHTMLTemplate.js';
 
 var axios = require('axios');
