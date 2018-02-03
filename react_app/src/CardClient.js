@@ -127,6 +127,7 @@ class CardClient extends React.Component {
                 description={this.state.description}
                 handleInputChange={this.handleInputChange}
                 urgency={this.state.urgency}
+                tags={this.state.tags}
                 handleSubmit={this.handleSubmit}
                 submitLabel={submitLabel}
                 resetContents={this.resetContents}
