@@ -26,20 +26,20 @@ app.get('/read-card', function(request, response) {
 app.post('/add-card', function(request, response) {
     console.log("POST request at /add-card. Data: " + request.body);
     CardController.create(request.body, function(confirmation) {
-        
+        response.json(confirmation);
     });
 });
 
 app.post('/update-card', function(request, response) {
     console.log("POST request at /add-card. Data: " + request.body);
     CardController.update(request.body, function(confirmation) {
-        
+        response.json(confirmation);
     });
 });
 
 app.post('/delete-card', function(request, response) {
     CardController.delete(request.body, function(confirmation) {
-        
+        response.json(confirmation);
     });
 });
 

@@ -30,9 +30,9 @@ export default class LogIn extends React.Component {
         
         // To-Do: Validate that the user is legit
         if (this.state.username === myUserName && this.state.password === myPassword) {
-            ReactDOM.render(<SuccessLogin />, document.getElementById("root"));
+            ReactDOM.render(<SuccessLogin />, document.getElementById("card"));
         } else {
-            ReactDOM.render(<SuccessLogin />, document.getElementById("root"));
+            ReactDOM.render(<SuccessLogin />, document.getElementById("card"));
         }
         
     }

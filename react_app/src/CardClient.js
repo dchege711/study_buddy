@@ -120,7 +120,6 @@ class CardClient extends React.Component {
         } else {
             submitLabel = "Update Card";
         }
-        console.log("render() called");
         return (
             <CardHTMLTemplate 
                 title={this.state.title}
