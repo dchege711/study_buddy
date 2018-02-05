@@ -16,8 +16,8 @@ app.get('/', function(request, response) {
     response.sendFile(path.resolve(__dirname, 'public', 'index.html'));
 });
 
-app.get('/read-card', function(request, response) {
-    console.log("GET request at /read-card");
+app.post('/read-card', function(request, response) {
+    console.log("POST request at /read-card");
     CardController.read(request.body, function(card) {
         response.json(card);
     });

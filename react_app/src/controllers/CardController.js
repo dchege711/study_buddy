@@ -28,7 +28,8 @@ exports.create = function(payload, callBack) {
 
 exports.read = function(payload, callBack) {
     var _id = payload["_id"];
-    console.log("CardController.read() called for _id = " + _id);
+    console.log("CardController.read() was called for the payload below");
+    console.log(payload);
     mongoose.connect(config.MONGO_URI);
     var db = mongoose.connection;
     db.on('error', console.error.bind(console, 'Connection Error:'));
@@ -39,6 +40,7 @@ exports.read = function(payload, callBack) {
                     console.log(error);
                 } else {
                     callBack(card);
+                    mongoose.disconnect();
                 }
             });
         } else {

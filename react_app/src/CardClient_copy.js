@@ -28,7 +28,7 @@ class CardClient extends React.Component {
                 tags: false,
                 urgency: false
             },
-            card: null
+            viewedCards: null
         };
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
