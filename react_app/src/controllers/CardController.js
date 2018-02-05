@@ -20,6 +20,7 @@ exports.create = function(payload, callBack) {
                 console.log(error);
             } else {
                 callBack(confirmation);
+                mongoose.disconnect();
             }
         });
     });
@@ -27,7 +28,7 @@ exports.create = function(payload, callBack) {
 
 exports.read = function(payload, callBack) {
     var _id = payload["_id"];
-    console.log("Reading card... _id = " + _id);
+    console.log("CardController.read() called for _id = " + _id);
     mongoose.connect(config.MONGO_URI);
     var db = mongoose.connection;
     db.on('error', console.error.bind(console, 'Connection Error:'));
@@ -48,6 +49,7 @@ exports.read = function(payload, callBack) {
                     console.log(error);
                 } else {
                     callBack(card);
+                    mongoose.disconnect();
                 }
             });
         }
@@ -57,7 +59,7 @@ exports.read = function(payload, callBack) {
 exports.update = function(payload, callBack) {
     var _id = payload["_id"];
     
-    console.log("Update received...");
+    console.log("The following payload was received by CardController.update()...");
     console.log(payload);
     delete payload._id;
     
@@ -70,10 +72,11 @@ exports.update = function(payload, callBack) {
             if (error) {
                 console.log(error);
             } else {
-                console.log("Fetched card after getting it by id");
-                console.log(card);
+                if (card === null || card === undefined) {
+                    console.log("The provided ID didn't match any documents");
+                    return
+                }
                 Object.keys(payload).forEach(key => {
-                    console.log("Setting " + key + " to " + payload[key]);
                     card[key] = payload[key];
                 });
                 card.save(function(error, confirmation) {
@@ -81,6 +84,7 @@ exports.update = function(payload, callBack) {
                         console.log(error);
                     } else {
                         callBack(confirmation);
+                        mongoose.disconnect();
                     }
                 });
             }
@@ -98,6 +102,7 @@ exports.delete = function(payload, callBack) {
                 console.log(error);
             } else {
                 callBack(confirmation);
+                mongoose.disconnect();
             }
         });
     });

@@ -1,11 +1,11 @@
 import React from 'react';
-import CardClient from './CardClient'
+import AppManager from './AppManager'
 
 class SuccessLogin extends React.Component {
     
     render() {
         return (
-            <CardClient />
+            <AppManager />
         );
     }
     

@@ -4,4 +4,4 @@ import React from 'react';
 // import LogIn from './LogIn';
 import SuccessLogin from './SuccessLogin'
 
-ReactDOM.render(<SuccessLogin />, document.getElementById('root'));
+ReactDOM.render(<SuccessLogin />, document.getElementById("card"));
