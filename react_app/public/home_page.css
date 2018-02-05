@@ -5,7 +5,11 @@
 }
 
 .study-buddy-theme-color {
-    background: linear-gradient(darkturquoise, blue);;
+    background: linear-gradient(darkturquoise, blue);
+}
+
+.card-header {
+    background: linear-gradient(silver, black);
 }
 
 .white-background {

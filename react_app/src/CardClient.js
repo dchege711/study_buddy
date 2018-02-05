@@ -1,6 +1,4 @@
 import React from 'react';
-import './css/main.css';
-import './css/w3.css';
 import CardHTMLTemplate from './models/CardHTMLTemplate.js';
 
 var axios = require('axios');
@@ -29,7 +27,8 @@ class CardClient extends React.Component {
                 description: false,
                 tags: false,
                 urgency: false
-            }
+            },
+            viewedCards: null
         };
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -73,7 +72,6 @@ class CardClient extends React.Component {
     }
     
     handleInputChange(event) {
-        console.log("handleInputChange() was called");
         var key_in_state_variables = event.target.name;
         var changes = this.state.changedItems;
         changes[key_in_state_variables] = true;
@@ -84,10 +82,9 @@ class CardClient extends React.Component {
     }
     
     handleSubmit(event) {
-        console.log("handleSubmit was called");
         var url;
         var data = {};
-        if (this.state.isNew) {
+        if (this.state.isNew === true) {
             url = "/add-card";
             for (let i = 0; i < keysToUploadToDB.length; i++) {
                 data[keysToUploadToDB[i]] = this.state[keysToUploadToDB[i]];
@@ -97,18 +94,24 @@ class CardClient extends React.Component {
             data["_id"] = this.state._id;
             Object.keys(this.state.changedItems).forEach(key => {
                 if (this.state.changedItems[key]) {
-                    data[key] = this.state.key;
+                    data[key] = this.state[key];
                 }
             });
         }
-        
+        console.log(url + " and " + this.state.isNew);
         this.makeHttpRequest(
             "post", url, data,
             (response) => {
-                var card = response["data"][0];
+                var card = response["data"];
+                console.log("Response after handleSubmit sent POST request to " + url);
                 console.log(card);
+                this.updateCardContents(card);
             }
         );
+        
+        this.setState({
+            isNew: false
+        });
         
         event.preventDefault();
     }

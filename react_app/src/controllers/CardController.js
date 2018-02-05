@@ -56,7 +56,12 @@ exports.read = function(payload, callBack) {
 
 exports.update = function(payload, callBack) {
     var _id = payload["_id"];
+    
+    console.log("Update received...");
+    console.log(payload);
     delete payload._id;
+    
+    
     mongoose.connect(config.MONGO_URI);
     var db = mongoose.connection;
     db.on('error', console.error.bind(console, 'Connection Error:'));
@@ -65,8 +70,11 @@ exports.update = function(payload, callBack) {
             if (error) {
                 console.log(error);
             } else {
+                console.log("Fetched card after getting it by id");
+                console.log(card);
                 Object.keys(payload).forEach(key => {
-                    card.key = payload.key;
+                    console.log("Setting " + key + " to " + payload[key]);
+                    card[key] = payload[key];
                 });
                 card.save(function(error, confirmation) {
                     if (error) {

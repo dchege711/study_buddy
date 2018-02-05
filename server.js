@@ -31,8 +31,9 @@ app.post('/add-card', function(request, response) {
 });
 
 app.post('/update-card', function(request, response) {
-    console.log("POST request at /add-card. Data: " + request.body);
+    console.log("POST request at /update-card. Data: " + request.body);
     CardController.update(request.body, function(confirmation) {
+        console.log("Responding with: " + confirmation);
         response.json(confirmation);
     });
 });
