@@ -14,6 +14,7 @@ const emptyCard = {
     }
 };
 const keysToUploadToDB = ["title", "description", "tags", "urgency"];
+const metadata_id = "5a77c6d0734d1d3bd58d1198";
 
 class AppManager extends React.Component {
     
@@ -28,13 +29,20 @@ class AppManager extends React.Component {
                 tags: false,
                 urgency: false
             },
-            viewedCards: null
+            metadata: null, ids_in_visitation_order: null, 
+            currentIndex: 0
         };
+        
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.updateCardContents = this.updateCardContents.bind(this);
+        this.updateCardFromID = this.updateCardFromID.bind(this);
         this.resetContents = this.resetContents.bind(this);
         this.makeHttpRequest = this.makeHttpRequest.bind(this);
+        this.fetchNextCard = this.fetchNextCard.bind(this);
+        this.fetchPreviousCard = this.fetchPreviousCard.bind(this);
+        this.advanceIndex = this.advanceIndex.bind(this);
+        this.backTrackIndex = this.backTrackIndex.bind(this);
     }
     
     updateCardContents(newCard) {
@@ -42,6 +50,18 @@ class AppManager extends React.Component {
         this.setState({
             isNew: false
         });
+    }
+    
+    updateCardFromID(id) {
+        this.makeHttpRequest(
+            "post", "/read-card",
+            { 
+                _id: id 
+            },
+            (response) => {
+                this.updateCardContents(response["data"]);
+            }
+        );
     }
     
     resetContents() {
@@ -61,14 +81,47 @@ class AppManager extends React.Component {
     }
     
     componentDidMount() {
+        // Fetch the metadata about all the available cards
         this.makeHttpRequest(
             "post", "/read-card",
-            { _id: null },
+            {_id: metadata_id},
             (response) => {
-                var card = response["data"][0];
-                this.updateCardContents(card);
+                // Sort this such that the most urgent cards appear first
+                var metadata = response["data"]["stats"];
+                var keys = Object.keys(metadata);
+                keys.sort(
+                    function(a, b) {
+                        return metadata[b]["urgency"] - metadata[a]["urgency"];
+                    }
+                );
+                
+                this.setState({
+                    metadata: metadata,
+                    ids_in_visitation_order: keys ,
+                    currentIndex: 0
+                });
+                
+                // Set the contents of the card being viewed
+                this.updateCardFromID(
+                    this.state.ids_in_visitation_order[this.state.currentIndex] 
+                );
             }
-        );
+        )
+    }
+    
+    advanceIndex() {
+        var newIndex = (this.state.currentIndex + 1) % this.state.ids_in_visitation_order.length;
+        this.setState({
+            currentIndex: newIndex
+        });
+    }
+    
+    backTrackIndex() {
+        var newIndex = (this.state.currentIndex - 1)
+        if (newIndex < 0) newIndex = this.state.ids_in_visitation_order.length - 1;
+        this.setState({
+            currentIndex: newIndex
+        });
     }
     
     handleInputChange(event) {
@@ -79,6 +132,22 @@ class AppManager extends React.Component {
             [key_in_state_variables]: event.target.value,
             changedItems: changes
         });
+    }
+    
+    fetchPreviousCard() {
+        this.backTrackIndex();
+        this.updateCardFromID(
+            this.state.ids_in_visitation_order[this.state.currentIndex] 
+        );
+        console.log("Fetch previous " + this.state.currentIndex);
+    }
+    
+    fetchNextCard() {
+        this.advanceIndex();
+        this.updateCardFromID(
+            this.state.ids_in_visitation_order[this.state.currentIndex] 
+        );
+        console.log("Fetch next " + this.state.currentIndex);
     }
     
     handleSubmit(event) {
@@ -98,14 +167,37 @@ class AppManager extends React.Component {
                 }
             });
         }
-        console.log(url + " and " + this.state.isNew);
+        
+        // Update the card's contents in the database
         this.makeHttpRequest(
             "post", url, data,
             (response) => {
                 var card = response["data"];
-                console.log("Response after handleSubmit sent POST request to " + url);
-                console.log(card);
                 this.updateCardContents(card);
+                
+                // Update the stats about the card's contents in the metadata entry
+                let newMetadata = this.state.metadata;
+                newMetadata[this.state._id]["urgency"] = this.state.urgency;
+                this.setState({
+                    metadata: newMetadata
+                });
+                
+                console.log(newMetadata[this.state._id]);
+                console.log(this.state.metadata[this.state._id]);
+                
+                this.makeHttpRequest(
+                    "post", "/update-card", 
+                    {
+                        _id: metadata_id,
+                        stats: "Nothing",
+                        createdById: 0,
+                        new_field: newMetadata
+                    },
+                    (response) => {
+                        console.log(response["data"]);
+                    }
+                );
+                
             }
         );
         
@@ -133,6 +225,8 @@ class AppManager extends React.Component {
                 handleSubmit={this.handleSubmit}
                 submitLabel={submitLabel}
                 resetContents={this.resetContents}
+                fetchNextCard={this.fetchNextCard}
+                fetchPreviousCard={this.fetchPreviousCard}
             />        
         )
     }
