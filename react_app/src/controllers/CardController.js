@@ -20,6 +20,7 @@ exports.create = function(payload, callBack) {
                 console.log(error);
             } else {
                 callBack(confirmation);
+                mongoose.disconnect();
             }
         });
     });
@@ -27,7 +28,8 @@ exports.create = function(payload, callBack) {
 
 exports.read = function(payload, callBack) {
     var _id = payload["_id"];
-    console.log("Reading card... _id = " + _id);
+    console.log("CardController.read() was called for the payload below");
+    console.log(payload);
     mongoose.connect(config.MONGO_URI);
     var db = mongoose.connection;
     db.on('error', console.error.bind(console, 'Connection Error:'));
@@ -38,6 +40,7 @@ exports.read = function(payload, callBack) {
                     console.log(error);
                 } else {
                     callBack(card);
+                    mongoose.disconnect();
                 }
             });
         } else {
@@ -48,6 +51,7 @@ exports.read = function(payload, callBack) {
                     console.log(error);
                 } else {
                     callBack(card);
+                    mongoose.disconnect();
                 }
             });
         }
@@ -56,7 +60,12 @@ exports.read = function(payload, callBack) {
 
 exports.update = function(payload, callBack) {
     var _id = payload["_id"];
+    
+    console.log("The following payload was received by CardController.update()...");
+    console.log(payload);
     delete payload._id;
+    
+    
     mongoose.connect(config.MONGO_URI);
     var db = mongoose.connection;
     db.on('error', console.error.bind(console, 'Connection Error:'));
@@ -65,14 +74,19 @@ exports.update = function(payload, callBack) {
             if (error) {
                 console.log(error);
             } else {
+                if (card === null || card === undefined) {
+                    console.log("The provided ID didn't match any documents");
+                    return
+                }
                 Object.keys(payload).forEach(key => {
-                    card.key = payload.key;
+                    card[key] = payload[key];
                 });
                 card.save(function(error, confirmation) {
                     if (error) {
                         console.log(error);
                     } else {
                         callBack(confirmation);
+                        mongoose.disconnect();
                     }
                 });
             }
@@ -90,6 +104,7 @@ exports.delete = function(payload, callBack) {
                 console.log(error);
             } else {
                 callBack(confirmation);
+                mongoose.disconnect();
             }
         });
     });

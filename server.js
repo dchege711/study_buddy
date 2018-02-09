@@ -16,8 +16,8 @@ app.get('/', function(request, response) {
     response.sendFile(path.resolve(__dirname, 'public', 'index.html'));
 });
 
-app.get('/read-card', function(request, response) {
-    console.log("GET request at /read-card");
+app.post('/read-card', function(request, response) {
+    console.log("POST request at /read-card");
     CardController.read(request.body, function(card) {
         response.json(card);
     });
@@ -26,20 +26,21 @@ app.get('/read-card', function(request, response) {
 app.post('/add-card', function(request, response) {
     console.log("POST request at /add-card. Data: " + request.body);
     CardController.create(request.body, function(confirmation) {
-        
+        response.json(confirmation);
     });
 });
 
 app.post('/update-card', function(request, response) {
-    console.log("POST request at /add-card. Data: " + request.body);
+    console.log("POST request at /update-card. Data: " + request.body);
     CardController.update(request.body, function(confirmation) {
-        
+        console.log("Responding with: " + confirmation);
+        response.json(confirmation);
     });
 });
 
 app.post('/delete-card', function(request, response) {
     CardController.delete(request.body, function(confirmation) {
-        
+        response.json(confirmation);
     });
 });
 
