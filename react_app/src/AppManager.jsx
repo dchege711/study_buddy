@@ -1,5 +1,5 @@
 import React from 'react';
-import CardHTMLTemplate from './models/CardHTMLTemplate.js';
+import CardHTMLTemplate from './models/CardHTMLTemplate';
 
 var axios = require('axios');
 
