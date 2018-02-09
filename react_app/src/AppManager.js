@@ -189,9 +189,7 @@ class AppManager extends React.Component {
                     "post", "/update-card", 
                     {
                         _id: metadata_id,
-                        stats: "Nothing",
-                        createdById: 0,
-                        new_field: newMetadata
+                        stats: newMetadata
                     },
                     (response) => {
                         console.log(response["data"]);
