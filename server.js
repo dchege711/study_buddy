@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 // I deleted this line...
 // app.use(express.static(__dirname + '/react_app/public'));
 // ..so that I could have this instead
-app.use(express.static(path.join(__dirname + 'react_app/build')));
+app.use(express.static(path.join(__dirname + '/react_app/build')));
 
 app.get('/', function(request, response) {
     // response.sendFile(path.resolve(__dirname, 'public', 'index.html'));
