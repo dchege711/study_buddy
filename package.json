@@ -7,7 +7,7 @@
   "license": "ISC",
   "homepage": "https://github.com/dchege711/study_buddy#readme",
   "engines": {
-    "node": ">=4.3.2"
+    "node": "5.6.0"
   },
   "dependencies": {
     "concurrently": "^3.5.1",
