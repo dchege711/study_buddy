@@ -39,7 +39,7 @@
         "eject": "react-scripts eject",
         "init-cloudsql": "src/GoogleSQLClient.js"
     },
-    "proxy": "http://localhost:3001/",
+    "proxy": "http://localhost:5000/",
     "cloud-repo-tools": {
         "requiresKeyFile": true,
         "requiresProjectId": true,
