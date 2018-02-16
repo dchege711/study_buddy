@@ -5,7 +5,7 @@ var bodyParser = require('body-parser');
 var CardController = require('./react_app/src/controllers/CardController');
 
 var app = express();
-var port = process.env.PORT || 5000;
+var port = process.env.PORT || 3001;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
