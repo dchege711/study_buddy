@@ -12,7 +12,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
-    "heroku-postbuild": "cd react_app && npm install --only=dev && npm install && npm start"
+    "heroku-postbuild": "cd react_app && npm install --only=dev && npm install && npm run build"
   },
   "repository": {
     "type": "git",
