@@ -1,19 +1,21 @@
-// https://medium.com/@bryantheastronaut/react-getting-started-the-mern-stack-tutorial-feat-es6-de1a2886be50
-
 var express = require('express');
 var bodyParser = require('body-parser');
 var CardController = require('./react_app/src/controllers/CardController');
 
 var app = express();
-var port = process.env.PORT || 3001;
+var port = process.env.PORT || 5000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-app.use(express.static(__dirname + '/react_app/public'));
+// I deleted this line...
+// app.use(express.static(__dirname + '/react_app/public'));
+// ..so that I could have this instead
+app.use(express.static(path.join(__dirname, 'react_app/build')));
 
 app.get('/', function(request, response) {
-    response.sendFile(path.resolve(__dirname, 'public', 'index.html'));
+    // response.sendFile(path.resolve(__dirname, 'public', 'index.html'));
+    response.sendFile(path.join(__dirname + "/react_app/build/index.html"));
 });
 
 app.post('/read-card', function(request, response) {
