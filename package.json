@@ -13,12 +13,13 @@
     "concurrently": "^3.5.1",
     "express": "^4.16.2",
     "nodemon": "^1.14.11",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "sjcl": "^1.0.7"
   },
   "devDependencies": {},
   "scripts": {
     "start": "node server.js",
-    "heroku-postbuild": "cd react_app && npm install --only=dev && npm install && npm run build"
+    "heroku-postbuild": "cd client_side_react && npm install --only=dev && npm install && npm run build"
   },
   "repository": {
     "type": "git",
