@@ -1,7 +1,6 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
 
-// import LogIn from './LogIn';
-import SuccessLogin from './SuccessLogin'
+import LogIn from './LogIn';
 
-ReactDOM.render(<SuccessLogin />, document.getElementById("card"));
+ReactDOM.render(<LogIn />, document.getElementById("card"));
