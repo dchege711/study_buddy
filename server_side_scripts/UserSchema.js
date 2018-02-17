@@ -1,10 +1,13 @@
 var mongoose = require('mongoose');
 
-var userSchema = new mongoose.Schema({
-    username: String,
-    salt: Array,
-    hash: Array,
-    idInApp: Number,
+var userSchema = new mongoose.Schema(
+    {
+        username: String,
+        salt: Array,
+        hash: Array,
+        idInApp: Number,
+        email: String
+    },
     {
         timestamps: true,
         autoIndex: false,

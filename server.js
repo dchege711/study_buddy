@@ -2,6 +2,7 @@ var express = require('express');
 var path = require('path');
 var bodyParser = require('body-parser');
 var CardsDB = require('./server_side_scripts/CardsMongoDB');
+var LogInUtilities = require('./server_side_scripts/LogInUtilities');
 
 var app = express();
 var port = process.env.PORT || 5000;
@@ -9,14 +10,25 @@ var port = process.env.PORT || 5000;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// I deleted this line...
-// app.use(express.static(__dirname + '/react_app/public'));
-// ..so that I could have this instead
 app.use(express.static(path.join(__dirname + '/client_side_react/build')));
 
 app.get('/', function(request, response) {
     // response.sendFile(path.resolve(__dirname, 'public', 'index.html'));
     response.sendFile(path.join(__dirname + "/client_side_react/build/index.html"));
+});
+
+app.post('/register-user', function(request, response) {
+    console.log("POST request at /register-user");
+    LogInUtilities.registerUserAndPassword(request.body, function(confirmation) {
+        response.json(confirmation);
+    });
+});
+
+app.post('/login', function(request, response) {
+    console.log("POST request at /login");
+    LogInUtilities.authenticateUser(request.body, function(confirmation) {
+        response.json(confirmation);
+    });
 });
 
 app.post('/read-card', function(request, response) {
