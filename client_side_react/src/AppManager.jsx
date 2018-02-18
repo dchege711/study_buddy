@@ -196,7 +196,7 @@ class AppManager extends React.Component {
                     "post", "/update-card", 
                     {
                         _id: metadata_id,
-                        stats: [newMetadata]
+                        stats: [newMetadata] // mongoose doesn't readily accept dicts
                     },
                     (response) => {
                         var newMetadata = response["data"]["stats"][0];
