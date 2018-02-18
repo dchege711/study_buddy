@@ -17,9 +17,11 @@ export default class LogIn extends React.Component {
     constructor(props) {
         super(props);
         this.state = emptyLogInInfo;
-        // Binding is necessary to make this work in the callback
         this.handleInputChange = this.handleInputChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleLogIn = this.handleLogIn.bind(this);
+        this.handleNewSignUpRequest = this.handleNewSignUpRequest.bind(this);
+        this.handleSubmittedSignup = this.handleSubmittedSignup.bind(this);
+        this.handleLogInRequest = this.handleLogInRequest.bind(this);
     }
     
     handleInputChange(event) {
@@ -28,48 +30,50 @@ export default class LogIn extends React.Component {
         });
     }
     
-    handleSubmit(event) {
-        event.preventDefault();
-        event.persist();
-        
-        var eventValue = event.target.value;
-        console.log(event.target);
-        if (eventValue === "LogIn") {
-            ReactDOM.render(<AppManager />, document.getElementById("card"));
-        } else if (eventValue === "Sign me up!") {
-            return;
-        } else if (eventValue === "Or Sign Up...") {
-            ReactDOM.render(
-                <SignUpPage 
-                    handleSubmit={this.handleSubmit}
-                    username={this.state.username}
-                    emailAddress={this.state.emailAddress}
-                    password={this.state.password}
-                    repeatPassword={this.state.repeatPassword}
-                    handleInputChange={this.handleInputChange}
-                />, document.getElementById("card")
-            );
-        } else if (eventValue === "Back to LogIn Page") {
-            ReactDOM.render(
-                <LogInPage 
-                    handleSubmit={this.handleSubmit}
-                    username={this.state.username}
-                    password={this.state.password}
-                    handleInputChange={this.handleInputChange}
-                />, document.getElementById("card")
-            );
-        }
+    handleLogInRequest(event) {
+        ReactDOM.render(
+            <LogInPage 
+                handleLogIn={this.handleLogIn}
+                username={this.state.username}
+                password={this.state.password}
+                handleInputChange={this.handleInputChange}
+                handleNewSignUpRequest={this.handleNewSignUpRequest}
+            />, document.getElementById("card")
+        )
+    }
+    
+    handleNewSignUpRequest(event) {
+        ReactDOM.render(
+            <SignUpPage
+                username={this.state.username}
+                emailAddress={this.state.emailAddress}
+                password={this.state.password}
+                repeatPassword={this.state.repeatPassword}
+                handleInputChange={this.handleInputChange}
+                handleLogInRequest={this.handleLogInRequest}
+                handleSubmittedSignup={this.handleSubmittedSignup}
+            />, document.getElementById("card")
+        );
+    }
+    
+    handleLogIn(event) {
+        console.log("handleLogIn() was called");
+        ReactDOM.render(<AppManager />, document.getElementById("card"));
+    }
+    
+    handleSubmittedSignup(event) {
+        ReactDOM.render(<AppManager />, document.getElementById("card"));
     }
     
     render() {
         return (
-            // <LogInPage 
-            //     handleSubmit={this.handleSubmit}
-            //     username={this.state.username}
-            //     password={this.state.password}
-            //     handleInputChange={this.handleInputChange}
-            // />
-            <AppManager />
+            <LogInPage 
+                username={this.state.username}
+                password={this.state.password}
+                handleInputChange={this.handleInputChange}
+                handleNewSignUpRequest={this.handleNewSignUpRequest}
+                handleLogIn={this.handleLogIn}
+            />
         )
     }
 }
