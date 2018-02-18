@@ -5,6 +5,7 @@ var cardSchema = new mongoose.Schema({
     description: String,
     tags: String,
     urgency: Number,
+    stats: Array,
     createdById: {
         type: Number,
         default: 1

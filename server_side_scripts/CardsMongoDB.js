@@ -65,7 +65,6 @@ exports.update = function(payload, callBack) {
     console.log(payload);
     delete payload._id;
     
-    
     mongoose.connect(config.MONGO_URI);
     var db = mongoose.connection;
     db.on('error', console.error.bind(console, 'Connection Error:'));

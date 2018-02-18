@@ -48,7 +48,6 @@ app.post('/add-card', function(request, response) {
 app.post('/update-card', function(request, response) {
     console.log("POST request at /update-card. Data: " + request.body);
     CardsDB.update(request.body, function(confirmation) {
-        console.log("Responding with: " + confirmation);
         response.json(confirmation);
     });
 });

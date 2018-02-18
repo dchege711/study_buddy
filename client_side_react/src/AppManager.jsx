@@ -5,7 +5,7 @@ var axios = require('axios');
 
 const emptyCard = {
     _id: null, title: "", description: "", tags: "", isNew: true,
-    createdById: 0, createdAt: "", updatedAt: "", urgency: 50,
+    createdById: 0, createdAt: "", updatedAt: "", urgency: 5,
     changedItems: {
         title: false,
         description: false,
@@ -22,7 +22,7 @@ class AppManager extends React.Component {
         super(props);
         this.state = {
             _id: null, title: "", description: "", tags: "", isNew: true,
-            createdById: 0, createdAt: "", updatedAt: "", urgency: 50,
+            createdById: 0, createdAt: "", updatedAt: "", urgency: 5,
             changedItems: {
                 title: false,
                 description: false,
@@ -43,6 +43,7 @@ class AppManager extends React.Component {
         this.fetchPreviousCard = this.fetchPreviousCard.bind(this);
         this.advanceIndex = this.advanceIndex.bind(this);
         this.backTrackIndex = this.backTrackIndex.bind(this);
+        this.reorderCardVisitations = this.reorderCardVisitations.bind(this);
     }
     
     updateCardContents(newCard) {
@@ -87,26 +88,33 @@ class AppManager extends React.Component {
             {_id: metadata_id},
             (response) => {
                 // Sort this such that the most urgent cards appear first
-                var metadata = response["data"]["stats"];
-                var keys = Object.keys(metadata);
-                keys.sort(
-                    function(a, b) {
-                        return metadata[b]["urgency"] - metadata[a]["urgency"];
-                    }
-                );
-                
-                this.setState({
-                    metadata: metadata,
-                    ids_in_visitation_order: keys ,
-                    currentIndex: 0
+                var metadata = response["data"]["stats"][0];
+                this.reorderCardVisitations(metadata, function() {
+                    return;
                 });
-                
                 // Set the contents of the card being viewed
                 this.updateCardFromID(
                     this.state.ids_in_visitation_order[this.state.currentIndex] 
                 );
             }
         )
+    }
+    
+    reorderCardVisitations(metadata, callBack) {
+        var keys = Object.keys(metadata);
+        keys.sort(
+            function(a, b) {
+                return metadata[b]["urgency"] - metadata[a]["urgency"];
+            }
+        );
+        
+        this.setState({
+            metadata: metadata,
+            ids_in_visitation_order: keys ,
+            currentIndex: 0
+        });
+        
+        callBack();
     }
     
     advanceIndex() {
@@ -139,7 +147,6 @@ class AppManager extends React.Component {
         this.updateCardFromID(
             this.state.ids_in_visitation_order[this.state.currentIndex] 
         );
-        console.log("Fetch previous " + this.state.currentIndex);
     }
     
     fetchNextCard() {
@@ -147,7 +154,6 @@ class AppManager extends React.Component {
         this.updateCardFromID(
             this.state.ids_in_visitation_order[this.state.currentIndex] 
         );
-        console.log("Fetch next " + this.state.currentIndex);
     }
     
     handleSubmit(event) {
@@ -176,23 +182,27 @@ class AppManager extends React.Component {
                 this.updateCardContents(card);
                 
                 // Update the stats about the card's contents in the metadata entry
-                let newMetadata = this.state.metadata;
-                newMetadata[this.state._id]["urgency"] = this.state.urgency;
+                console.log("Received " + card["title"]);
+                console.log("The id = " + card["_id"] + "and urgency = " + card["urgency"]);
+                
+                var newMetadata = this.state.metadata;
+                newMetadata[card["_id"]] = {"urgency": card["urgency"]};
+                console.log(newMetadata);
                 this.setState({
                     metadata: newMetadata
                 });
-                
-                console.log(newMetadata[this.state._id]);
-                console.log(this.state.metadata[this.state._id]);
                 
                 this.makeHttpRequest(
                     "post", "/update-card", 
                     {
                         _id: metadata_id,
-                        stats: newMetadata
+                        stats: [newMetadata]
                     },
                     (response) => {
-                        console.log(response["data"]);
+                        var newMetadata = response["data"]["stats"][0];
+                        this.reorderCardVisitations(newMetadata, function() {
+                            console.log("Set new metadata!");
+                        });
                     }
                 );
                 
