@@ -82,7 +82,7 @@ exports.authenticateUser = function(payload, callBack) {
                 console.log(error);
             } else {
                 if (user === null) {
-                    callBack("Fail");
+                    callBack(false);
                     return;
                 }
                 var saltOnFile = user["salt"];
@@ -96,9 +96,9 @@ exports.authenticateUser = function(payload, callBack) {
                         } 
                     }
                     if (thereIsAMatch) {
-                        callBack("Success");
+                        callBack(true);
                     } else {
-                        callBack("Fail");
+                        callBack(false);
                     }
                 });
             }
