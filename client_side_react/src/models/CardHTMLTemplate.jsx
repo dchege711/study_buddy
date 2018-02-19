@@ -28,7 +28,7 @@ function CardHTMLTemplate(props) {
                 
                 <label className="input-area"><strong>Tags</strong>
                     <textarea name="tags" value={props.tags}
-                    className="w3-input" onChange={props.handleInputChange} />
+                    className="w3-input" onChange={props.handleInputChange}/>
                 </label>
                 
                 <br />

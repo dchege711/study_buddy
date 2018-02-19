@@ -25,9 +25,29 @@
             You need to enable JavaScript to run this app.
         </noscript>
         
+        <script>
+            // Resize the text areas so that the user can see everything at once.
+            // Credits: https://stackoverflow.com/a/25621277/7812406
+            var textAreas = document.getElementsByTagName('textarea');
+            
+            for (var i = 0; i < textAreas.length; i++) {
+                textAreas[i].setAttribute('style', 'height:' + (textAreas[i].scrollHeight) + 'px;overflow-y:hidden;');
+                textAreas[i].addEventListener("input", resizeTextBox, false);
+                console.log("Found " + textAreas.length + "text areas");
+            }
+
+            function resizeTextBox() {
+                var element = document.getElementById("my_text_area");
+                element.style.height = 'auto';
+                element.style.height = (element.scrollHeight) + 'px';
+            }
+        </script>
+        
         <ul class="topnav study-buddy-theme-color" id="topnavitems">
             <li><a href="/">Study Buddy</a></li>
         </ul>
+        
+        <!-- <textarea id="my_text_area" oninput="return resizeTextBox()" style="height:20px;"></textarea> -->
         
         <div id="card" class="padding-small">    
             <!-- To be filled by the CardClient class -->        
