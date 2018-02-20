@@ -1,6 +1,6 @@
 ## Study Buddy
 
-![Idea for Version 1.0.0](https://github.com/dchege711/study_buddy/blob/master/images/version_1.png)
+![Idea for Version 1.0.0](https://github.com/dchege711/study_buddy/blob/master/images/version_1.png =200x200)
 
 * Changes made to initial design:
     * The web client runs on ReactJS, but still on Heroku.
@@ -16,6 +16,6 @@
 
 ### Appearance:
 
-![Study Buddy LogIn Page](https://github.com/dchege711/study_buddy/blob/master/images/login_page.png)
-![Study Buddy Card Example](https://github.com/dchege711/study_buddy/blob/master/images/sample_card.png)
-![Study Buddy Create Card](https://github.com/dchege711/study_buddy/blob/master/images/adding_new_card.png)
+![Study Buddy LogIn Page](https://github.com/dchege711/study_buddy/blob/master/images/login_page.png =200x200)
+![Study Buddy Card Example](https://github.com/dchege711/study_buddy/blob/master/images/sample_card.png =200x200)
+![Study Buddy Create Card](https://github.com/dchege711/study_buddy/blob/master/images/adding_new_card.png =200x200)
