@@ -1,5 +1,6 @@
 import React from 'react';
 import CardHTMLTemplate from './models/CardHTMLTemplate';
+import ReadOnlyCardTemplate from './models/ReadOnlyCardTemplate';
 
 var axios = require('axios');
 
@@ -11,7 +12,7 @@ const emptyCard = {
         description: false,
         tags: false,
         urgency: false
-    }
+    }, editableDescription:true
 };
 const keysToUploadToDB = ["title", "description", "tags", "urgency"];
 const metadata_id = "5a77c6d0734d1d3bd58d1198";
@@ -30,7 +31,7 @@ class AppManager extends React.Component {
                 urgency: false
             },
             metadata: null, ids_in_visitation_order: null, 
-            currentIndex: 0
+            currentIndex: 0, editableDescription:false
         };
         
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -44,12 +45,20 @@ class AppManager extends React.Component {
         this.advanceIndex = this.advanceIndex.bind(this);
         this.backTrackIndex = this.backTrackIndex.bind(this);
         this.reorderCardVisitations = this.reorderCardVisitations.bind(this);
+        this.setEditableDesc = this.setEditableDesc.bind(this);
+    }
+    
+    setEditableDesc() {
+        this.setState({
+            editableDescription: true
+        });
     }
     
     updateCardContents(newCard) {
         this.setState(newCard);
         this.setState({
-            isNew: false
+            isNew: false,
+            editableDescription: false
         });
     }
     
@@ -223,20 +232,39 @@ class AppManager extends React.Component {
         } else {
             submitLabel = "Update Card";
         }
-        return (
-            <CardHTMLTemplate 
-                title={this.state.title}
-                description={this.state.description}
-                handleInputChange={this.handleInputChange}
-                urgency={this.state.urgency}
-                tags={this.state.tags}
-                handleSubmit={this.handleSubmit}
-                submitLabel={submitLabel}
-                resetContents={this.resetContents}
-                fetchNextCard={this.fetchNextCard}
-                fetchPreviousCard={this.fetchPreviousCard}
-            />        
-        )
+        
+        if (this.state.editableDescription) {
+            return (
+                <CardHTMLTemplate 
+                    title={this.state.title}
+                    description={this.state.description}
+                    handleInputChange={this.handleInputChange}
+                    urgency={this.state.urgency}
+                    tags={this.state.tags}
+                    handleSubmit={this.handleSubmit}
+                    submitLabel={submitLabel}
+                    resetContents={this.resetContents}
+                    fetchNextCard={this.fetchNextCard}
+                    fetchPreviousCard={this.fetchPreviousCard}
+                />        
+            )
+        } else {
+            return (
+                <ReadOnlyCardTemplate 
+                    title={this.state.title}
+                    description={this.state.description}
+                    handleInputChange={this.handleInputChange}
+                    urgency={this.state.urgency}
+                    tags={this.state.tags}
+                    handleSubmit={this.handleSubmit}
+                    submitLabel={submitLabel}
+                    setEditableDesc={this.setEditableDesc}
+                    resetContents={this.resetContents}
+                    fetchNextCard={this.fetchNextCard}
+                    fetchPreviousCard={this.fetchPreviousCard}
+                />        
+            )
+        }
     }
 }
 

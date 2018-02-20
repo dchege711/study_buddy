@@ -1,6 +1,6 @@
 import React from 'react';
 
-function CardHTMLTemplate(props) {
+function ReadOnlyCardTemplate(props) {
     return (
         <div className="w3-card">
             
@@ -18,11 +18,19 @@ function CardHTMLTemplate(props) {
             </div>
             
             <div className="w3-container">
-        
-                <label className="input-area"><strong>Description</strong>
-                    <textarea name="description" value={props.description}
-                    className="w3-input" onChange={props.handleInputChange} 
-                    />
+                
+                <label className="w3-container w3-text">
+                    <p>
+                        <strong>Description</strong>
+                            <button className="w3-button w3-hover-white" 
+                                onClick={props.setEditableDesc}>
+                                <i className="fa fa-pencil fa-fw"></i>
+                            </button>
+                        <br />
+                    </p>
+                    <p>
+                        {props.description}
+                    </p> 
                 </label>
                 
                 <br />
@@ -66,4 +74,4 @@ function CardHTMLTemplate(props) {
     )
 }
 
-export default CardHTMLTemplate;
+export default ReadOnlyCardTemplate;
