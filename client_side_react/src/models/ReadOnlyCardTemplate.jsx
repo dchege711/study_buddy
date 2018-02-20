@@ -26,7 +26,15 @@ function ReadOnlyCardTemplate(props) {
             
             <div className="w3-container">
                 
-                {setHTML(props.descriptionTextArea)}
+                <div className="w3-right">
+                    <button className="w3-btn w3-hover-white" onClick={props.setEditableDesc}>
+                        <b><i className="fa fa-pencil fa-fw"></i></b>
+                    </button>
+                </div>
+                
+                <div
+                    dangerouslySetInnerHTML={setHTML(props.descriptionTextArea)}
+                />
                 
                 <br />
                 

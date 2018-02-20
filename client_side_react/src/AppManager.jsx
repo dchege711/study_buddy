@@ -237,19 +237,11 @@ class AppManager extends React.Component {
                 />
             </label>
         } else {
-            descriptionContents = <label className="w3-container">
-                    <p>
-                        <strong>Description</strong>
-                            <button className="w3-button w3-hover-white" 
-                                onClick={this.setEditableDesc}>
-                                <i className="fa fa-pencil fa-fw"></i>
-                            </button>
-                        <br />
-                    </p>
-                    <p>
-                        {this.state.description_markdown}
-                    </p> 
-                </label>
+            descriptionContents = "<label className='w3-container'><p><strong>";
+            descriptionContents += "Description</strong><br /></p><p>";
+            descriptionContents += this.state.description_markdown;
+            descriptionContents += "</p></label>";
+            
         }
         
         if (this.state.editableDescription) {
