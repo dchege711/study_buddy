@@ -16,7 +16,6 @@
 
 ### Appearance:
 
-<img src="https://github.com/dchege711/study_buddy/blob/master/images/login_page.png" width="50">
-![Study Buddy LogIn Page](https://github.com/dchege711/study_buddy/blob/master/images/login_page.png)
-![Study Buddy Card Example](https://github.com/dchege711/study_buddy/blob/master/images/sample_card.png =200x200)
-![Study Buddy Create Card](https://github.com/dchege711/study_buddy/blob/master/images/adding_new_card.png =200x200)
+* <img src="https://github.com/dchege711/study_buddy/blob/master/images/login_page.png" width="200" height="200">
+* <img src="https://github.com/dchege711/study_buddy/blob/master/images/sample_card.png" width="200" height="200">
+* <img src="https://github.com/dchege711/study_buddy/blob/master/images/adding_new_card.png" width="200" height="200">
