@@ -1,10 +1,10 @@
 ## Study Buddy
 
-![Idea for Version 1.0.0](https://github.com/dchege711/study_buddy/blob/master/images/version_1.png =200x200)
+<img src="https://github.com/dchege711/study_buddy/blob/master/images/version_1.png" width="400px" height="400px">
 
 * Changes made to initial design:
     * The web client runs on ReactJS, but still on Heroku.
-    * I'm using mLab's MongoDB service instead of Google Cloud SQL because of costs.
+    * I'm using mLab's MongoDB service instead of Google Cloud SQL because of cost.
     * The backend logic is written in NodeJS, not in Python.
 
 ### Tasks 
@@ -16,6 +16,8 @@
 
 ### Appearance:
 
-* <img src="https://github.com/dchege711/study_buddy/blob/master/images/login_page.png" width="200" height="200">
-* <img src="https://github.com/dchege711/study_buddy/blob/master/images/sample_card.png" width="200" height="200">
-* <img src="https://github.com/dchege711/study_buddy/blob/master/images/adding_new_card.png" width="200" height="200">
+<img src="https://github.com/dchege711/study_buddy/blob/master/images/login_page.png" width="400" height="400">
+
+<img src="https://github.com/dchege711/study_buddy/blob/master/images/sample_card.png" width="400" height="400">
+
+<img src="https://github.com/dchege711/study_buddy/blob/master/images/adding_new_card.png" width="400" height="400">
