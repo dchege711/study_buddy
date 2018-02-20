@@ -14,6 +14,15 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" href='https://fonts.googleapis.com/css?family=Montserrat'>
         
+        <!-- 
+        This script only works on TeX that is not printed by ReactJS.
+        I think React preserves the state of its rendered components and doesn't
+        allow outside scripts to take effects. It's possible that when I call apply
+        CSS, React handles that under the hood. There's no under the hood support for TeX, yet.
+        <script type="text/javascript" async
+            src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+        </script> -->
+        
         <title>Study Buddy</title>
         <base href="/" />
         
@@ -40,6 +49,8 @@
         
         <script>
             // Resize the text areas so that the user can see everything at once.
+            // Not being used. The text is first shown as a paragraph before it
+            // becomes editable
             function resizeTextBox() {
                 var element = window.event.srcElement;
                 element.style.height = 'auto';
@@ -50,6 +61,13 @@
         <ul class="topnav study-buddy-theme-color" id="topnavitems">
             <li><a href="/">Study Buddy</a></li>
         </ul>
+        
+        <!-- I failed at trying to add TeX support within the cards. 
+        <div>
+            <p>
+                <p>TeX is working \(ax^2 + bx + c = 0\) over here $$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$</p>
+            </p>
+        </div> -->
         
         <div id="card" class="padding-small">    
             <!-- To be filled by the CardClient class -->        
