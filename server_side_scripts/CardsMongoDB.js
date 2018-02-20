@@ -1,11 +1,15 @@
 var Card = require('./CardSchema');
 var config = require('../config');
 var mongoose = require('mongoose');
+var showdown = require('showdown');
+
+var converter = new showdown.Converter();
 
 exports.create = function(payload, callBack) {
     var card = new Card({
         title: payload["title"],
         description: payload["description"],
+        description_markdown: converter.makeHtml(payload["description"]),
         tags: payload["tags"],
         createdById: payload["createdById"],
         urgency: payload["urgency"]
@@ -28,8 +32,6 @@ exports.create = function(payload, callBack) {
 
 exports.read = function(payload, callBack) {
     var _id = payload["_id"];
-    console.log("CardController.read() was called for the payload below");
-    console.log(payload);
     mongoose.connect(config.MONGO_URI);
     var db = mongoose.connection;
     db.on('error', console.error.bind(console, 'Connection Error:'));
@@ -60,9 +62,6 @@ exports.read = function(payload, callBack) {
 
 exports.update = function(payload, callBack) {
     var _id = payload["_id"];
-    
-    console.log("The following payload was received by CardController.update()...");
-    console.log(payload);
     delete payload._id;
     
     mongoose.connect(config.MONGO_URI);
@@ -80,6 +79,8 @@ exports.update = function(payload, callBack) {
                 Object.keys(payload).forEach(key => {
                     card[key] = payload[key];
                 });
+                
+                card["description_markdown"] = converter.makeHtml(card["description"]),
                 card.save(function(error, confirmation) {
                     if (error) {
                         console.log(error);

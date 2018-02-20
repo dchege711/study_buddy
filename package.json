@@ -15,6 +15,7 @@
     "mongoose": "^5.0.6",
     "nodemon": "^1.14.11",
     "path": "^0.12.7",
+    "showdown": "^1.8.6",
     "sjcl": "^1.0.7"
   },
   "devDependencies": {},

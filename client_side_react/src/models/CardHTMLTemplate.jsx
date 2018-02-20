@@ -1,6 +1,7 @@
 import React from 'react';
 
 function CardHTMLTemplate(props) {
+    
     return (
         <div className="w3-card">
             
@@ -19,11 +20,7 @@ function CardHTMLTemplate(props) {
             
             <div className="w3-container">
         
-                <label className="input-area"><strong>Description</strong>
-                    <textarea name="description" value={props.description}
-                    className="w3-input" onChange={props.handleInputChange} 
-                    />
-                </label>
+                {props.descriptionTextArea}
                 
                 <br />
                 

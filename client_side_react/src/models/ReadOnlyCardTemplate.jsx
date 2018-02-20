@@ -1,6 +1,13 @@
 import React from 'react';
 
 function ReadOnlyCardTemplate(props) {
+    
+    function setHTML(text) {
+        return {
+            __html: text
+        }
+    }
+    
     return (
         <div className="w3-card">
             
@@ -19,19 +26,7 @@ function ReadOnlyCardTemplate(props) {
             
             <div className="w3-container">
                 
-                <label className="w3-container w3-text">
-                    <p>
-                        <strong>Description</strong>
-                            <button className="w3-button w3-hover-white" 
-                                onClick={props.setEditableDesc}>
-                                <i className="fa fa-pencil fa-fw"></i>
-                            </button>
-                        <br />
-                    </p>
-                    <p>
-                        {props.description}
-                    </p> 
-                </label>
+                {setHTML(props.descriptionTextArea)}
                 
                 <br />
                 

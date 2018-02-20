@@ -7,7 +7,7 @@ var axios = require('axios');
 const emptyCard = {
     _id: null, title: "", description: "", tags: "", isNew: true,
     createdById: 0, createdAt: "", updatedAt: "", urgency: 5,
-    changedItems: {
+    description_markdown: "", changedItems: {
         title: false,
         description: false,
         tags: false,
@@ -24,7 +24,7 @@ class AppManager extends React.Component {
         this.state = {
             _id: null, title: "", description: "", tags: "", isNew: true,
             createdById: 0, createdAt: "", updatedAt: "", urgency: 5,
-            changedItems: {
+            description_markdown: "", changedItems: {
                 title: false,
                 description: false,
                 tags: false,
@@ -190,13 +190,8 @@ class AppManager extends React.Component {
                 var card = response["data"];
                 this.updateCardContents(card);
                 
-                // Update the stats about the card's contents in the metadata entry
-                console.log("Received " + card["title"]);
-                console.log("The id = " + card["_id"] + "and urgency = " + card["urgency"]);
-                
                 var newMetadata = this.state.metadata;
                 newMetadata[card["_id"]] = {"urgency": card["urgency"]};
-                console.log(newMetadata);
                 this.setState({
                     metadata: newMetadata
                 });
@@ -210,7 +205,7 @@ class AppManager extends React.Component {
                     (response) => {
                         var newMetadata = response["data"]["stats"][0];
                         this.reorderCardVisitations(newMetadata, function() {
-                            console.log("Set new metadata!");
+                            return;
                         });
                     }
                 );
@@ -233,6 +228,30 @@ class AppManager extends React.Component {
             submitLabel = "Update Card";
         }
         
+        var descriptionContents;
+        if (this.state.editableDescription) {
+            descriptionContents = <label 
+                className="input-area"><strong>Description</strong>
+                <textarea name="description" value={this.state.description}
+                className="w3-input" onChange={this.handleInputChange} 
+                />
+            </label>
+        } else {
+            descriptionContents = <label className="w3-container">
+                    <p>
+                        <strong>Description</strong>
+                            <button className="w3-button w3-hover-white" 
+                                onClick={this.setEditableDesc}>
+                                <i className="fa fa-pencil fa-fw"></i>
+                            </button>
+                        <br />
+                    </p>
+                    <p>
+                        {this.state.description_markdown}
+                    </p> 
+                </label>
+        }
+        
         if (this.state.editableDescription) {
             return (
                 <CardHTMLTemplate 
@@ -243,6 +262,7 @@ class AppManager extends React.Component {
                     tags={this.state.tags}
                     handleSubmit={this.handleSubmit}
                     submitLabel={submitLabel}
+                    descriptionTextArea={descriptionContents}
                     resetContents={this.resetContents}
                     fetchNextCard={this.fetchNextCard}
                     fetchPreviousCard={this.fetchPreviousCard}
@@ -258,6 +278,7 @@ class AppManager extends React.Component {
                     tags={this.state.tags}
                     handleSubmit={this.handleSubmit}
                     submitLabel={submitLabel}
+                    descriptionTextArea={descriptionContents}
                     setEditableDesc={this.setEditableDesc}
                     resetContents={this.resetContents}
                     fetchNextCard={this.fetchNextCard}
