@@ -1,6 +1,6 @@
 ## Study Buddy
 
-<img src="https://github.com/dchege711/study_buddy/blob/master/images/version_1.png" width="400px" height="400px">
+<img src="https://github.com/dchege711/study_buddy/blob/master/images/version_1.png" width="700px" height="400px">
 
 * Changes made to initial design:
     * The web client runs on ReactJS, but still on Heroku.
