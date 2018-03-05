@@ -53,7 +53,6 @@ CardsDB.read({}, function(cards) {
     }
 
     // Save the graph's structure into the DB
-    // tagMetadata["node_information"] = [tagsAndIds];
     var tagMetadata = new Metadata({
         "title": "_tags_metadata_",
         "description": "Stores information about the cards graph",
