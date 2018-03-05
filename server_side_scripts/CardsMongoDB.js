@@ -30,6 +30,26 @@ exports.create = function(payload, callBack) {
     });
 }
 
+exports.saveThisCard = function(card, callBack) {
+    mongoose.connect(config.MONGO_URI);
+    var db = mongoose.connection;
+    db.on('error', console.error.bind(console, 'Connection Error:'));
+    db.once('open', function () {
+        console.log("Now saving card...");
+        console.log(card);
+        card.save(function (error, confirmation) {
+            console.log("I'm in the callback");
+            if (error) {
+                console.log(error);
+            } else {
+                console.log(confirmarion);
+                callBack(confirmation);
+                mongoose.disconnect();
+            }
+        });
+    });
+}
+
 exports.read = function(payload, callBack) {
     var _id = payload["_id"];
     mongoose.connect(config.MONGO_URI);
