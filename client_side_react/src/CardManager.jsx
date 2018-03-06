@@ -28,15 +28,15 @@ class CardManager extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            _id: props.card._id,
-            title: props.card.title,
-            description: props.card.description,
-            tags: props.card.tags,
-            createdById: props.card.createdById,
-            createdAt: props.card.createdAt,
-            updatedAt: props.card.updatedAt,
-            urgency: props.card.urgency,
-            description_markdown: props.card.description_markdown,
+            // _id: props.card._id,
+            // title: props.card.title,
+            // description: props.card.description,
+            // tags: props.card.tags,
+            // createdById: props.card.createdById,
+            // createdAt: props.card.createdAt,
+            // updatedAt: props.card.updatedAt,
+            // urgency: props.card.urgency,
+            // description_markdown: props.card.description_markdown,
             isNew: false,
             editableDescription: false,
             titleChanged: false,
@@ -51,6 +51,10 @@ class CardManager extends React.Component {
         this.resetContents = this.resetContents.bind(this);
         this.makeHttpRequest = this.makeHttpRequest.bind(this);
         this.setEditableDesc = this.setEditableDesc.bind(this);
+    }
+
+    componentDidMount() {
+        this.resetContents();
     }
     
     /**

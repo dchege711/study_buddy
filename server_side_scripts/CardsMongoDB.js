@@ -129,3 +129,23 @@ exports.delete = function(payload, callBack) {
         });
     });
 }
+
+
+/*
+reorderCardVisitations(metadata, callBack) {
+    var keys = Object.keys(metadata);
+    keys.sort(
+        function(a, b) {
+            return metadata[b]["urgency"] - metadata[a]["urgency"];
+        }
+    );
+    
+    this.setState({
+        metadata: metadata,
+        ids_in_visitation_order: keys ,
+        currentIndex: 0
+    });
+    
+    callBack();
+}
+*/
