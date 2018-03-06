@@ -5,15 +5,13 @@ import ReadOnlyCardTemplate from './models/ReadOnlyCardTemplate';
 var axios = require('axios');
 
 const emptyCard = {
-    _id: null, title: "", description: "", tags: "", isNew: true,
-    createdById: 0, createdAt: "", updatedAt: "", urgency: 5,
-    description_markdown: "", changedItems: {
-        title: false,
-        description: false,
-        tags: false,
-        urgency: false
-    }, editableDescription:true
+    _id: null, title: "", description: "", 
+    tags: "", createdById: 0, createdAt: "", 
+    updatedAt: "", urgency: 5,
+    description_markdown: "", 
 };
+
+const keysToUploadToDB = ["title", "description", "tags", "urgency"];
 
 /**
  * @description Controls the card that is displayed within the app. 
@@ -30,15 +28,21 @@ class CardManager extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            _id: null, title: "", description: "", tags: "", isNew: true,
-            createdById: 0, createdAt: "", updatedAt: "", urgency: 5,
-            description_markdown: "", editableDescription:false, 
-            changedItems: {
-                title: false,
-                description: false,
-                tags: false,
-                urgency: false
-            }
+            _id: props.card._id,
+            title: props.card.title,
+            description: props.card.description,
+            tags: props.card.tags,
+            createdById: props.card.createdById,
+            createdAt: props.card.createdAt,
+            updatedAt: props.card.updatedAt,
+            urgency: props.card.urgency,
+            description_markdown: props.card.description_markdown,
+            isNew: false,
+            editableDescription: false,
+            titleChanged: false,
+            descriptionChanged: false,
+            tagsChanged: false,
+            urgencyChanged: false
         };
         
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -63,19 +67,31 @@ class CardManager extends React.Component {
      * @param {Object} newCard The card that should be displayed by the CardManager
      */
     updateCardContents(newCard) {
-        this.setState(newCard);
         this.setState({
+            _id: newCard._id,
+            title: newCard.title,
+            description: newCard.description,
+            tags: newCard.tags,
+            createdById: newCard.createdById,
+            createdAt: newCard.createdAt,
+            updatedAt: newCard.updatedAt,
+            urgency: newCard.urgency,
+            description_markdown: newCard.description_markdown,
             isNew: false,
             editableDescription: false
         });
     }
     
     /**
-     * @description Reset the contents of the card template. Useful for 
-     * creating new cards
+     * @description Reset the contents of the card template. 
+     * Useful for creating new cards
      */
     resetContents() {
-        this.setState(emptyCard);
+        this.updateCardContents(emptyCard);
+        this.setState({
+            isNew: true,
+            editableDescription: true
+        })
     }
     
     /**
@@ -104,11 +120,9 @@ class CardManager extends React.Component {
      */
     handleInputChange(event) {
         var key_in_state_variables = event.target.name;
-        var changes = this.state.changedItems;
-        changes[key_in_state_variables] = true;
         this.setState({
             [key_in_state_variables]: event.target.value,
-            changedItems: changes
+            [key_in_state_variables + "Changed"]: true
         });
     }
     
@@ -140,31 +154,19 @@ class CardManager extends React.Component {
             (response) => {
                 var card = response["data"];
                 this.updateCardContents(card);
-                
-                // Update the metadata
-                this.makeHttpRequest(
-                    "post", "/update-metadata", 
-                    {
-                        _id: metadata_id,
-                        card_metadata: {
-                            urgency: card["urgency"],
-                            card_id: card["_id"],
-                            card_tags: card["tags"]
-                        }
-                    },
-                    (response) => {
-                        console.log("Card update process completed");
-                    }
-                ); 
+
+                // Notify the parent function that this card has been modified
+                this.props.cardHasBeenModified({
+                    urgency: card["urgency"],
+                    card_id: card["_id"],
+                    card_tags: card["tags"]
+                }); 
             }
         );
         
         this.setState({
             isNew: false
         });
-
-        // Notify the parent function that this card has been modified
-        props.cardHasBeenModified();
 
         event.preventDefault();
     }
@@ -208,8 +210,8 @@ class CardManager extends React.Component {
                     submitLabel={submitLabel}
                     descriptionTextArea={descriptionContents}
                     resetContents={this.resetContents}
-                    fetchNextCard={this.fetchNextCard}
-                    fetchPreviousCard={this.fetchPreviousCard}
+                    fetchNextCard={this.props.fetchNextCard}
+                    fetchPreviousCard={this.props.fetchPreviousCard}
                 />        
             )
         } else {
@@ -225,8 +227,8 @@ class CardManager extends React.Component {
                     descriptionTextArea={descriptionContents}
                     setEditableDesc={this.setEditableDesc}
                     resetContents={this.resetContents}
-                    fetchNextCard={this.fetchNextCard}
-                    fetchPreviousCard={this.fetchPreviousCard}
+                    fetchNextCard={this.props.fetchNextCard}
+                    fetchPreviousCard={this.props.fetchPreviousCard}
                 />        
             )
         }
