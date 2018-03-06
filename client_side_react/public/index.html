@@ -25,6 +25,13 @@
         
         <title>Study Buddy</title>
         <base href="/" />
+
+        <script src="%PUBLIC_URL%/jquery.js"></script>
+        <script>
+            $(document).change(function() {
+                $("#sidebar").css("margin-top", $("#topnavitems").height());
+            });
+        </script>
         
     </head>
     
@@ -35,7 +42,7 @@
         </noscript>
 
         <!-- Sidebar that houses tag information -->
-        <div class="sidenav study-buddy-theme-color" id="app_side_bar">
+        <div class="sidenav study-buddy-theme-color" id="sidebar">
         
         </div>
         

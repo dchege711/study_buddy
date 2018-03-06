@@ -71,8 +71,9 @@ ul.topnav li.right {float: right;}
 
 .sidenav {
     height: 100%;
-    width: 160px;
+    width: 30%;
     position: fixed;
+    font-size: 1.8vmin;
     z-index: 1;
     top: 0;
     left: 0;
@@ -82,20 +83,22 @@ ul.topnav li.right {float: right;}
 }
 
 .sidenav a {
-    padding: 6px 8px 6px 16px;
+    padding: 1px 3px 1px 3px;
     text-decoration: none;
-    font-size: 25px;
-    color: #b6b3b3;
+    color: #ffffff;
     display: block;
 }
 
-.sidenav a:hover {
-    background-color: "#eb90ed";
+button.link {
+    background:none;
     color: white;
+    text-decoration: none;
+    cursor: pointer;
+    border:none; 
 }
 
 .main {
-    margin-left: 160px; /* Same as the width of the sidenav */
+    margin-left: 30%; /* Same as the width of the sidenav */
     padding: 0px 10px;
 }
 
