@@ -1,6 +1,8 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import CardHTMLTemplate from './models/CardHTMLTemplate';
 import ReadOnlyCardTemplate from './models/ReadOnlyCardTemplate';
+import SideBarManager from './SideBarManager';
 
 var axios = require('axios');
 
@@ -91,6 +93,9 @@ class AppManager extends React.Component {
     }
     
     componentDidMount() {
+        // Fetch data on the available tags
+        ReactDOM.render(<SideBarManager />, document.getElementById("sidebar"));
+
         // Fetch the metadata about all the available cards
         this.makeHttpRequest(
             "post", "/read-card",

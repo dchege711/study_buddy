@@ -35,7 +35,8 @@
 }
 
 .topnav {
-    z-index: 1; /* Stay on top of the sidebar */
+    position: fixed;
+    width: 100%;
 }
 
 ul.topnav {

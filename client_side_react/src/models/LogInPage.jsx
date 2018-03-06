@@ -1,20 +1,15 @@
-/*
- * LogInPage.jsx
- *
- * Shows the login page for returning Study Buddy users
- * This component is controlled by LogIn.jsx
- *
- * Props needed:
- *
- * username, password
- * handleInputChange, handleLogIn, handleNewSignUpRequest
- *
- * Author: Chege Gitau
- *
+/**
+ * @description This component is controlled by LogIn.jsx
+ * @author Chege Gitau
  */
 
 import React from 'react';
 
+/**
+ * @param {object} props userName, handleInputChange(), password, handleLogIn
+ * handleNewSignupRequest
+ * @returns {JSX.Element} The Login page for returning users
+ */
 function LogInPage(props) {
     return (
         <div className="w3-container w3-center w3-padding-16">
