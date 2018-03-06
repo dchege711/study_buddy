@@ -94,6 +94,7 @@ class AppManager extends React.Component {
     
     componentDidMount() {
         // Fetch data on the available tags
+        document.getElementById("sidebar").hidden = false;
         ReactDOM.render(<SideBarManager />, document.getElementById("sidebar"));
 
         // Fetch the metadata about all the available cards

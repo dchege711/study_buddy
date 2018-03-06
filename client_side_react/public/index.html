@@ -14,6 +14,19 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" href='https://fonts.googleapis.com/css?family=Montserrat'>
         
+        <style>
+            .pre {
+                border-left: 6px green;
+                font-family: Consolas,"courier new";
+                font-size:16px;
+                width:auto;
+                background-color:#fff;
+                padding:8px 12px;
+                border-left:4px solid #4CAF50;
+                word-wrap:break-word
+            }
+        </style>
+
         <!-- 
         This script only works on TeX that is not printed by ReactJS.
         I think React preserves the state of its rendered components and doesn't
@@ -30,6 +43,7 @@
         <script>
             $(document).change(function() {
                 $("#sidebar").css("margin-top", $("#topnavitems").height());
+                $(".main").css("padding-top", $("#topnavitems").height());
             });
         </script>
         
@@ -42,9 +56,7 @@
         </noscript>
 
         <!-- Sidebar that houses tag information -->
-        <div class="sidenav study-buddy-theme-color" id="sidebar">
-        
-        </div>
+        <div class="sidenav study-buddy-theme-color" id="sidebar"></div>
         
         <ul class="topnav study-buddy-theme-color" id="topnavitems">
             <li class="w3-right"><a href="/">Study Buddy</a></li>
@@ -52,9 +64,7 @@
         
         <div class="main">
 
-            <div id="card" class="padding-small">
-                <!-- To be filled by the CardClient class -->
-            </div>
+            <div id="card" class="padding-small"></div>
 
         </div>
         
