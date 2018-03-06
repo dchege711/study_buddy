@@ -42,7 +42,7 @@ exports.saveThisCard = function(card, callBack) {
             if (error) {
                 console.log(error);
             } else {
-                console.log(confirmarion);
+                console.log(confirmation);
                 callBack(confirmation);
                 mongoose.disconnect();
             }

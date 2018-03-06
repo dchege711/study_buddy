@@ -10,6 +10,7 @@
 var mongoose = require("mongoose");
 var CardsDB = require("./CardsMongoDB");
 var Metadata = require("./MetadataCardSchema");
+var Card = require("./CardSchema");
 
 var tagsAndIds = {};
 var connections = {};
@@ -31,9 +32,9 @@ CardsDB.read({}, function(cards) {
             // Accumulate all the cards that have this tag
             sanitizedTags.forEach(function(value, key, set) {
                 if (tagsAndIds[value] == undefined) {
-                    tagsAndIds[value] = new Set();
+                    tagsAndIds[value] = [];
                 }
-                tagsAndIds[value].add(cards[i]._id);
+                tagsAndIds[value].push(cards[i]["_id"]);
             });
             
             // Infer the connections between the tags by common elements
@@ -58,14 +59,26 @@ CardsDB.read({}, function(cards) {
         "description": "Stores information about the cards graph",
         "createdById": 1,
         "stats": [],
-        "node_information": [1, 2],
-        "link_information": [3, 4]
+        "node_information": [tagsAndIds],
+        "link_information": [connections]
     });
 
-    // console.log(tagMetadata);
+    
+    // Why is this necessary for saveThisCardToWork?
+    var card = new Card({
+        title: "Nothing",
+        description: "description",
+        description_markdown: "description",
+        tags: "tags",
+        urgency: 10
+    });
+
+    CardsDB.create(card, function(confirmation) {
+        console.log(confirmation);
+    });
     
     CardsDB.saveThisCard(tagMetadata, function(confirmation){
         console.log(confirmation);
-    }); 
+    });
 
 });
