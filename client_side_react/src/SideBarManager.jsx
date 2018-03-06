@@ -68,6 +68,13 @@ class SideBarManager extends React.Component {
         return this.state.tags[tag];
     }
 
+    /**
+     * @description Make a HTTP request to the provided URL
+     * @param {string} method The HTTP method to use, e.g. "post"
+     * @param {string} url The URL to which the request will be made
+     * @param {Object} data The payload that will be sent to the URL
+     * @param {function} callBack The function that handles the response
+     */
     makeHttpRequest(method, url, data, callBack) {
         axios({
             method: method,
