@@ -26,19 +26,6 @@
         <title>Study Buddy</title>
         <base href="/" />
         
-        <style>    
-            pre {
-                border-left: 6px green;
-                font-family: Consolas,"courier new";
-                font-size:16px;
-                width:auto;
-                background-color:#fff;
-                padding:8px 12px;
-                border-left:4px solid #4CAF50;
-                word-wrap:break-word
-            }
-        </style>
-        
     </head>
     
     <body>
@@ -46,32 +33,24 @@
         <noscript>
             You need to enable JavaScript to run this app.
         </noscript>
+
+        <!-- Sidebar that houses tag information -->
+        <div class="sidenav study-buddy-theme-color" id="app_side_bar">
         
-        <script>
-            // Resize the text areas so that the user can see everything at once.
-            // Not being used. The text is first shown as a paragraph before it
-            // becomes editable
-            function resizeTextBox() {
-                var element = window.event.srcElement;
-                element.style.height = 'auto';
-                element.style.height = (element.scrollHeight) + 'px';
-            }
-        </script>
+        </div>
         
         <ul class="topnav study-buddy-theme-color" id="topnavitems">
-            <li><a href="/">Study Buddy</a></li>
+            <li class="w3-right"><a href="/">Study Buddy</a></li>
         </ul>
         
-        <!-- I failed at trying to add TeX support within the cards. 
-        <div>
-            <p>
-                <p>TeX is working \(ax^2 + bx + c = 0\) over here $$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$</p>
-            </p>
-        </div> -->
-        
-        <div id="card" class="padding-small">    
-            <!-- To be filled by the CardClient class -->        
+        <div class="main">
+
+            <div id="card" class="padding-small">
+                <!-- To be filled by the CardClient class -->
+            </div>
+
         </div>
+        
         
     </body>
 </html>
