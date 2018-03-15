@@ -5,7 +5,7 @@ import ReadOnlyCardTemplate from './models/ReadOnlyCardTemplate';
 var axios = require('axios');
 
 const emptyCard = {
-    _id: null, title: "", description: "", 
+    _id: "", title: "", description: "", 
     tags: "", createdById: 0, createdAt: "", 
     updatedAt: "", urgency: 5,
     description_markdown: "", 
@@ -27,16 +27,22 @@ class CardManager extends React.Component {
      */
     constructor(props) {
         super(props);
+        var currentCard;
+        if (props.card === null || props.card === undefined) {
+            currentCard = emptyCard;
+        } else {
+            currentCard = props.card;
+        }
         this.state = {
-            // _id: props.card._id,
-            // title: props.card.title,
-            // description: props.card.description,
-            // tags: props.card.tags,
-            // createdById: props.card.createdById,
-            // createdAt: props.card.createdAt,
-            // updatedAt: props.card.updatedAt,
-            // urgency: props.card.urgency,
-            // description_markdown: props.card.description_markdown,
+            _id: currentCard._id,
+            title: currentCard.title,
+            description: currentCard.description,
+            tags: currentCard.tags,
+            createdById: currentCard.createdById,
+            createdAt: currentCard.createdAt,
+            updatedAt: currentCard.updatedAt,
+            urgency: currentCard.urgency,
+            description_markdown: currentCard.description_markdown,
             isNew: false,
             editableDescription: false,
             titleChanged: false,
@@ -51,8 +57,13 @@ class CardManager extends React.Component {
         this.resetContents = this.resetContents.bind(this);
         this.makeHttpRequest = this.makeHttpRequest.bind(this);
         this.setEditableDesc = this.setEditableDesc.bind(this);
+        this.receiveNextCard = this.receiveNextCard.bind(this);
+        this.receivePreviousCard = this.receivePreviousCard.bind(this);
     }
 
+    /**
+     * Invoked immediately after a component is mounted.
+     */
     componentDidMount() {
         this.resetContents();
     }
@@ -83,6 +94,24 @@ class CardManager extends React.Component {
             description_markdown: newCard.description_markdown,
             isNew: false,
             editableDescription: false
+        });
+    }
+
+    /**
+     * @description Request whoever owns me for the next card in line.
+     */
+    receiveNextCard() {
+        this.props.fetchNextCard((card) => {
+            this.updateCardContents(card);
+        });
+    }
+
+    /**
+     * @description Request whoever owns me for the previous card in line
+     */
+    receivePreviousCard() {
+        this.props.fetchPreviousCard((card) => {
+            this.updateCardContents(card);
         });
     }
     
@@ -214,8 +243,8 @@ class CardManager extends React.Component {
                     submitLabel={submitLabel}
                     descriptionTextArea={descriptionContents}
                     resetContents={this.resetContents}
-                    fetchNextCard={this.props.fetchNextCard}
-                    fetchPreviousCard={this.props.fetchPreviousCard}
+                    fetchNextCard={this.receiveNextCard}
+                    fetchPreviousCard={this.receivePreviousCard}
                 />        
             )
         } else {
@@ -231,8 +260,8 @@ class CardManager extends React.Component {
                     descriptionTextArea={descriptionContents}
                     setEditableDesc={this.setEditableDesc}
                     resetContents={this.resetContents}
-                    fetchNextCard={this.props.fetchNextCard}
-                    fetchPreviousCard={this.props.fetchPreviousCard}
+                    fetchNextCard={this.receiveNextCard}
+                    fetchPreviousCard={this.receivePreviousCard}
                 />        
             )
         }

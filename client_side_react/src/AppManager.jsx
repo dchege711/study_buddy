@@ -12,26 +12,51 @@ class AppManager extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            cachedCards: null, ids_in_visitation_order: null, 
-            currentIndex: 0,
+            cachedCards: {}, ids_in_visitation_order: null, 
+            currentIndex: null
         };
         
         this.updateCardFromID = this.updateCardFromID.bind(this);
+        this.getCardFromID = this.getCardFromID.bind(this);
         this.makeHttpRequest = this.makeHttpRequest.bind(this);
         this.fetchNextCard = this.fetchNextCard.bind(this);
         this.fetchPreviousCard = this.fetchPreviousCard.bind(this);
-        this.cardHasBeenModified = this.cardHasBeenModified.bind(this);
+        this.cardHasBeenModified = this.cardHasBeenModified.bind(this); 
+        this.organizeCards = this.organizeCards.bind(this);
   
     }
     
     updateCardFromID(id) {
         this.makeHttpRequest(
             "post", "/read-card",
-            { 
-                _id: id 
-            },
+            { _id: id },
             (response) => {
-                this.updateCardContents(response["data"]);
+                CardManager.updateCardContents(response["data"]);
+            }
+        );
+    }
+
+    /**
+     * Fetch the card that has this ID from the database.
+     * Cache the card in the state variable.
+     * 
+     * @param {string} id The id of the card to be fetched
+     * @param {*} callBack A function that takes a card object as a parameter
+     */
+    getCardFromID(id, callBack) {
+        this.makeHttpRequest(
+            "post", "/read-card",
+            { _id: id },
+            (response) => {
+                callBack(response["data"]);
+                // Cache the card for faster viewing next time
+                let newCachedCards = this.state.cachedCards;
+                newCachedCards[id] = response["data"];
+                this.setState({
+                    currentIndex: 0,
+                    cachedCards: newCachedCards
+                })
+                
             }
         );
     }
@@ -56,28 +81,66 @@ class AppManager extends React.Component {
         // Fetch the metadata about all the available cards
         this.makeHttpRequest(
             "post", "/read-card",
-            {_id: metadata_id},
+            { _id: metadata_id },
             (response) => {
                 // Set the contents of the card being viewed
-                this.updateCardFromID(
-                    this.state.ids_in_visitation_order[this.state.currentIndex] 
-                );
+                this.organizeCards(response["data"]["stats"][0]);
             }
         )
     }
-    
-    fetchPreviousCard() {
-        this.backTrackIndex();
-        this.updateCardFromID(
-            this.state.ids_in_visitation_order[this.state.currentIndex] 
+
+    /**
+     * @description Organize the cards from the database.
+     * 
+     * @param {JSON} cardStats A list of the available cards with 
+     * sortable attributes.
+     * @param {function} callBack The function to be called upon 
+     * completion.
+     */
+    organizeCards(cardStats) {
+        // Sort the cards using their urgency attribute
+        var keys = Object.keys(cardStats);
+        keys.sort(
+            function (a, b) {
+                return cardStats[b]["urgency"] - cardStats[a]["urgency"];
+            }
         );
+        this.setState({
+            ids_in_visitation_order: keys 
+        })
     }
     
-    fetchNextCard() {
-        this.advanceIndex();
-        this.updateCardFromID(
-            this.state.ids_in_visitation_order[this.state.currentIndex] 
-        );
+    fetchPreviousCard() {
+        
+    }
+    
+    /**
+     * @description Fetch the next card to be displayed.
+     * @param {function} callBack Function that takes a card as a param
+     */
+    fetchNextCard(callBack) {
+        console.log("Fetching the next card..." + this.state.currentIndex);
+        if (this.state.currentIndex === null) {
+            let cardID = this.state.ids_in_visitation_order[0];
+            this.getCardFromID(
+                cardID, function (card) {
+                    callBack(card);
+            });
+            this.setState({ currentIndex: 0 });
+
+        } else {
+            let newIndex = (this.state.currentIndex + 1) % this.state.currentIndex.length;
+            let cardID = this.state.ids_in_visitation_order[newIndex];
+            if (this.state.cachedCards.hasOwnProperty(cardID)) {
+                callBack(this.state.cachedCards[cardID])
+            } else {
+                this.getCardFromID(cardID, function(card) {
+                    callBack(card);
+                });
+            }
+            this.setState({currentIndex: newIndex});
+            
+        }
     }
 
     cardHasBeenModified(changes) {
@@ -85,7 +148,11 @@ class AppManager extends React.Component {
     }
     
     render() {
-        return (<CardManager />)
+        return (<CardManager 
+            card={null} 
+            fetchNextCard={this.fetchNextCard}
+            fetchPreviousCard={this.fetchPreviousCard}
+        />)
     }
 }
 

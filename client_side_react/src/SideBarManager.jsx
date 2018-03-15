@@ -24,6 +24,7 @@ class SideBarManager extends React.Component {
             { _id: graph_metadata_id}, 
             (response) => {
                 this.updateTagsList(response["data"]["node_information"][0]);
+                // this.fetchCardIdsUnderTag(null);
             }
         );
     }
@@ -60,12 +61,23 @@ class SideBarManager extends React.Component {
 
     /**
      * @description Return the ids of the cards that are found under this tag.
-     * @param {string} tag The #tag for this topic.
+     * @param {Array} tags The tags for the desired topics. Null array means all tags.
      * @returns {Array} Array of card ids that have the specified tag.
      * 
     */
-    fetchCardIdsUnderTag(tag) {
-        return this.state.tags[tag];
+    fetchCardIdsUnderTag(tags) {
+        if (tags === null) tags = Object.keys(this.state.tags);
+
+        var cardIDs = new Set();
+        tags.forEach(function(tag, index, array) {
+            this.state.tags[tag].forEach(function(id, index_, tag_) {
+                console.log("id " + id);
+                if (cardIDs.has(id) === false) {
+                    cardIDs.add(id);
+                }
+            });
+        });
+        return Array.from(cardIDs);
     }
 
     /**

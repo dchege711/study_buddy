@@ -4,6 +4,8 @@ var bodyParser = require('body-parser');
 var CardsDB = require('./server_side_scripts/CardsMongoDB');
 var LogInUtilities = require('./server_side_scripts/LogInUtilities');
 
+const debugMode = false;
+
 var app = express();
 var port = process.env.PORT || 5000;
 
@@ -19,41 +21,72 @@ app.get('/', function(request, response) {
 
 app.post('/register-user', function(request, response) {
     console.log("POST request at /register-user");
+    if (debugMode) {
+        console.log(request.body);
+    }
+    
     LogInUtilities.registerUserAndPassword(request.body, function(confirmation) {
+        if (debugMode) console.log(confirmation);
         response.json(confirmation);
     });
 });
 
 app.post('/login', function(request, response) {
     console.log("POST request at /login");
+    if (debugMode) {
+        console.log(request.body);
+    }
+
     LogInUtilities.authenticateUser(request.body, function(confirmation) {
+        if (debugMode) console.log(confirmation);
         response.json(confirmation);
     });
 });
 
 app.post('/read-card', function(request, response) {
     console.log("POST request at /read-card");
+    if (debugMode) {
+        console.log(request.body);
+    }
+    
     CardsDB.read(request.body, function(card) {
+        if (debugMode) console.log(card);
         response.json(card);
     });
 });
 
 app.post('/add-card', function(request, response) {
-    console.log("POST request at /add-card. Data: " + request.body);
+    console.log("POST request at /add-card.");
+    if (debugMode) {
+        console.log(request.body);
+    }
+    
     CardsDB.create(request.body, function(confirmation) {
+        if (debugMode) console.log(confirmation);
         response.json(confirmation);
     });
 });
 
 app.post('/update-card', function(request, response) {
-    console.log("POST request at /update-card. Data: " + request.body);
+    console.log("POST request at /update-card.");
+    if (debugMode) {
+        console.log(request.body);
+    }
+    
     CardsDB.update(request.body, function(confirmation) {
+        if (debugMode) console.log(confirmation);
         response.json(confirmation);
     });
 });
 
 app.post('/delete-card', function(request, response) {
+    console.log("POST request at /delete-card");
+    if (debugMode) {
+        console.log(request.body);
+    }
+    
     CardsDB.delete(request.body, function(confirmation) {
+        if (debugMode) console.log(confirmation);
         response.json(confirmation);
     });
 });
