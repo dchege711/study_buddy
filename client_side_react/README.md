@@ -1,8 +1,10 @@
 ### Study Buddy (Client Side)
 
 ### Fixes to make
-* Warning: A component is changing a controlled input of type text to be uncontrolled. Input elements should not switch from controlled to uncontrolled (or vice versa). Decide between using a controlled or uncontrolled input element for the lifetime of the component.
-* The counts in the left panel tags aren't incrementing :-/
+* :x: The counts in the left panel tags aren't incrementing :-/
+* :x: Decide where changes to metadata should be done. Should you leave that to the server, or should AppManager handle metadata and send an upload at the end?
+* :x: Implement a PQ in AppManager.cardHasBeenModified. Or is it more efficient to do this at the server?
+* :white_checkmark: Although CardManager is controlled, make it somewhat autonomous.
 
 #### To-Do Items
 * Have some artwork to fill in the blank space in the login page.

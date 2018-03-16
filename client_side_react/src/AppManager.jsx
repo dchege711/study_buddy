@@ -6,6 +6,7 @@ import CardManager from './CardManager';
 var axios = require('axios');
 
 const metadata_id = "5a77c6d0734d1d3bd58d1198";
+const debug = true;
 
 class AppManager extends React.Component {
     
@@ -13,27 +14,17 @@ class AppManager extends React.Component {
         super(props);
         this.state = {
             cachedCards: {}, ids_in_visitation_order: null, 
-            currentIndex: null
+            currentIndex: null, currentCard: null
         };
         
-        this.updateCardFromID = this.updateCardFromID.bind(this);
         this.getCardFromID = this.getCardFromID.bind(this);
+        this.renderNextCard = this.renderNextCard.bind(this);
         this.makeHttpRequest = this.makeHttpRequest.bind(this);
         this.fetchNextCard = this.fetchNextCard.bind(this);
         this.fetchPreviousCard = this.fetchPreviousCard.bind(this);
         this.cardHasBeenModified = this.cardHasBeenModified.bind(this); 
         this.organizeCards = this.organizeCards.bind(this);
   
-    }
-    
-    updateCardFromID(id) {
-        this.makeHttpRequest(
-            "post", "/read-card",
-            { _id: id },
-            (response) => {
-                CardManager.updateCardContents(response["data"]);
-            }
-        );
     }
 
     /**
@@ -49,14 +40,6 @@ class AppManager extends React.Component {
             { _id: id },
             (response) => {
                 callBack(response["data"]);
-                // Cache the card for faster viewing next time
-                let newCachedCards = this.state.cachedCards;
-                newCachedCards[id] = response["data"];
-                this.setState({
-                    currentIndex: 0,
-                    cachedCards: newCachedCards
-                })
-                
             }
         );
     }
@@ -110,48 +93,87 @@ class AppManager extends React.Component {
         })
     }
     
+    /**
+     * @description Fetch the previous card in the sequence
+     */
     fetchPreviousCard() {
-        
+        // Get the appropriate index into the list of cards
+        var newIndex;
+        var numIDs = this.state.ids_in_visitation_order.length;
+        if (this.state.currentIndex === null) {
+            newIndex = numIDs - 1;
+        } else {
+            newIndex = (this.state.currentIndex - 1) % numIDs;
+            // In JS and Java, -2 % 5 = -2, while in Python, -2 % 5 = 3
+            if (newIndex < 0) newIndex = numIDs + newIndex;
+        }
+        this.renderNextCard(newIndex);
     }
     
     /**
      * @description Fetch the next card to be displayed.
-     * @param {function} callBack Function that takes a card as a param
      */
-    fetchNextCard(callBack) {
-        console.log("Fetching the next card..." + this.state.currentIndex);
+    fetchNextCard() {
+        // Get the appropriate index into the list of cards
+        var newIndex;
         if (this.state.currentIndex === null) {
-            let cardID = this.state.ids_in_visitation_order[0];
-            this.getCardFromID(
-                cardID, function (card) {
-                    callBack(card);
-            });
-            this.setState({ currentIndex: 0 });
-
+            newIndex = 0;
         } else {
-            let newIndex = (this.state.currentIndex + 1) % this.state.currentIndex.length;
-            let cardID = this.state.ids_in_visitation_order[newIndex];
-            if (this.state.cachedCards.hasOwnProperty(cardID)) {
-                callBack(this.state.cachedCards[cardID])
-            } else {
-                this.getCardFromID(cardID, function(card) {
-                    callBack(card);
-                });
-            }
-            this.setState({currentIndex: newIndex});
-            
+            newIndex = (this.state.currentIndex + 1) % this.state.ids_in_visitation_order.length;
+        }
+        this.renderNextCard(newIndex);
+    }
+
+    /**
+     * Set the state variables to trigger the render() function.
+     * Try fetching the card from cache before requesting it from the
+     * server.
+     * 
+     * @param {int} newIndex The index of the card id in the array of ids
+     */
+    renderNextCard(newIndex) {
+
+        // Look for the card...
+        var cardID = this.state.ids_in_visitation_order[newIndex];
+        if (debug) console.log("Looking for " + newIndex + ", id = " + cardID);
+        if (this.state.cachedCards[cardID] !== undefined) {
+            if (debug) console.log("Found this card in the cache... " + this.state.cachedCards[cardID]["title"]);
+            this.setState({
+                currentCard: this.state.cachedCards[cardID],
+                currentIndex: newIndex
+            });
+        } else {
+            this.setState({ currentIndex: newIndex });
+            this.getCardFromID(cardID, (card) => {
+                let newCachedCards = this.state.cachedCards;
+                newCachedCards[cardID] = card;
+                if (debug) console.log("Got this card from the server... " + card.title);
+                this.setState({
+                    currentIndex: newIndex,
+                    cachedCards: newCachedCards,
+                    currentCard: card
+                })
+            });
         }
     }
 
+    /**
+     * @description Once a card has been updated, set the metadata
+     * to match the current changes.
+     * 
+     * @param {JSON} changes Expected keys: _id, urgency, tags 
+     */
     cardHasBeenModified(changes) {
-
+        // Todo: Use a priority queue because the number of cards 
+        // might grow substantially
     }
     
     render() {
         return (<CardManager 
-            card={null} 
+            card={this.state.currentCard} 
             fetchNextCard={this.fetchNextCard}
             fetchPreviousCard={this.fetchPreviousCard}
+            cardHasBeenModified={this.cardHasBeenModified}
         />)
     }
 }

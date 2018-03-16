@@ -3,6 +3,7 @@ import CardHTMLTemplate from './models/CardHTMLTemplate';
 import ReadOnlyCardTemplate from './models/ReadOnlyCardTemplate';
 
 var axios = require('axios');
+const debug = true;
 
 const emptyCard = {
     _id: "", title: "", description: "", 
@@ -29,8 +30,10 @@ class CardManager extends React.Component {
         super(props);
         var currentCard;
         if (props.card === null || props.card === undefined) {
+            console.log("CardManager initialized with empty card.");
             currentCard = emptyCard;
         } else {
+            console.log("CardManager initialized with " + props.card.title);
             currentCard = props.card;
         }
         this.state = {
@@ -57,15 +60,24 @@ class CardManager extends React.Component {
         this.resetContents = this.resetContents.bind(this);
         this.makeHttpRequest = this.makeHttpRequest.bind(this);
         this.setEditableDesc = this.setEditableDesc.bind(this);
-        this.receiveNextCard = this.receiveNextCard.bind(this);
-        this.receivePreviousCard = this.receivePreviousCard.bind(this);
     }
 
     /**
-     * Invoked immediately after a component is mounted.
+     * @description Invoked after CardManager is already propped, but before it 
+     * receives new props. But this results in a lag between the first click
+     * and the first card's appearance.
+     * 
+     * To do: Read the docs more closely for a better fix.
      */
-    componentDidMount() {
-        this.resetContents();
+    componentWillReceiveProps() {
+        if (this.props.card === null || this.props.card === undefined) {
+            console.log("CardManager initialized with empty card.");
+            this.updateCardContents(emptyCard);
+        } else {
+            console.log("CardManager initialized with " + this.props.card.title);
+            this.updateCardContents(this.props.card);
+        }
+        
     }
     
     /**
@@ -96,24 +108,6 @@ class CardManager extends React.Component {
             editableDescription: false
         });
     }
-
-    /**
-     * @description Request whoever owns me for the next card in line.
-     */
-    receiveNextCard() {
-        this.props.fetchNextCard((card) => {
-            this.updateCardContents(card);
-        });
-    }
-
-    /**
-     * @description Request whoever owns me for the previous card in line
-     */
-    receivePreviousCard() {
-        this.props.fetchPreviousCard((card) => {
-            this.updateCardContents(card);
-        });
-    }
     
     /**
      * @description Reset the contents of the card template. 
@@ -123,7 +117,7 @@ class CardManager extends React.Component {
         this.updateCardContents(emptyCard);
         this.setState({
             isNew: true,
-            editableDescription: true
+            editableDescription: false
         })
     }
     
@@ -152,6 +146,7 @@ class CardManager extends React.Component {
      * @param {React.SyntheticEvent} event The event that has encountered a change
      */
     handleInputChange(event) {
+        if (debug) console.log("handleInputChange() called by " + event.target.name);
         var key_in_state_variables = event.target.name;
         this.setState({
             [key_in_state_variables]: event.target.value,
@@ -166,6 +161,7 @@ class CardManager extends React.Component {
     handleSubmit(event) {
         var url;
         var data = {};
+        if (debug) console.log("Updating card...");
         if (this.state.isNew === true) {
             url = "/add-card";
             for (let i = 0; i < keysToUploadToDB.length; i++) {
@@ -174,11 +170,14 @@ class CardManager extends React.Component {
         } else {
             url = "/update-card";
             data["_id"] = this.state._id;
-            Object.keys(this.state.changedItems).forEach(key => {
-                if (this.state.changedItems[key]) {
-                    data[key] = this.state[key];
-                }
-            });
+            for (let i = 0; i < keysToUploadToDB.length; i++) {
+                if (this.state[keysToUploadToDB[i] + "Changed"]) {
+                    data[keysToUploadToDB[i]] = this.state[keysToUploadToDB[i]];
+                }        
+            }
+        }
+        if (debug) {
+            console.log(data);
         }
         
         // Update the card's contents in the database
@@ -208,7 +207,7 @@ class CardManager extends React.Component {
      * @returns {JSX.Element} Return a representation of the current card.
      */
     render() {
-        var submitLabel = "";
+        var submitLabel;
         if (this.state.isNew) {
             submitLabel = "Add Card";
         } else {
@@ -231,38 +230,38 @@ class CardManager extends React.Component {
             
         }
         
-        if (this.state.editableDescription) {
+        if (this.state.editableDescription === true) {
             return (
-                <CardHTMLTemplate 
+                <CardHTMLTemplate
                     title={this.state.title}
                     description={this.state.description}
-                    handleInputChange={this.handleInputChange}
                     urgency={this.state.urgency}
                     tags={this.state.tags}
-                    handleSubmit={this.handleSubmit}
                     submitLabel={submitLabel}
                     descriptionTextArea={descriptionContents}
+                    handleInputChange={this.handleInputChange}
+                    handleSubmit={this.handleSubmit}
                     resetContents={this.resetContents}
-                    fetchNextCard={this.receiveNextCard}
-                    fetchPreviousCard={this.receivePreviousCard}
-                />        
+                    fetchNextCard={this.props.fetchNextCard}
+                    fetchPreviousCard={this.props.fetchPreviousCard}
+                />
             )
         } else {
             return (
-                <ReadOnlyCardTemplate 
+                <ReadOnlyCardTemplate
                     title={this.state.title}
                     description={this.state.description}
-                    handleInputChange={this.handleInputChange}
-                    urgency={this.state.urgency}
-                    tags={this.state.tags}
-                    handleSubmit={this.handleSubmit}
                     submitLabel={submitLabel}
                     descriptionTextArea={descriptionContents}
+                    urgency={this.state.urgency}
+                    tags={this.state.tags}
+                    handleInputChange={this.handleInputChange}
+                    handleSubmit={this.handleSubmit}
                     setEditableDesc={this.setEditableDesc}
                     resetContents={this.resetContents}
-                    fetchNextCard={this.receiveNextCard}
-                    fetchPreviousCard={this.receivePreviousCard}
-                />        
+                    fetchNextCard={this.props.fetchNextCard}
+                    fetchPreviousCard={this.props.fetchPreviousCard}
+                />
             )
         }
     }
