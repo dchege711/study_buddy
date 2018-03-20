@@ -15,6 +15,13 @@
 
 import React from 'react';
 
+/**
+ * To-do: 
+ * Ensure that the username is unique and alphanumeric and underscore
+ * only. No spaces or other characters.
+ * 
+ */
+
 function SignUpPage(props) {
     return (
         <div className="w3-center w3-padding-16">

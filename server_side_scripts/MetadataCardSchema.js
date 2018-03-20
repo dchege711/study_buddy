@@ -11,7 +11,7 @@ var metadataSchema = new mongoose.Schema({
     {
         timestamps: true,
         autoIndex: false,
-        collection: "c13u_study_buddy"
+        collection: "c13u_study_buddy_metadata"
     }
 );
 

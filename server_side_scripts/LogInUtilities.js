@@ -1,6 +1,7 @@
 var stanfordCrypto = require('sjcl');
 var config = require("../config");
 var User = require("./UserSchema");
+var Metadata = require("./MetadataCardSchema");
 var mongoose = require('mongoose');
 
 getSaltAndHash = function(password, callBack) {
@@ -30,7 +31,7 @@ getIdInApp = function(callBack) {
                     if (error) {
                         console.log(error);
                     } else {
-                        mongoose.disconnect();
+                        db.close();
                         callBack(newUserID);
                     }
                 });
@@ -39,10 +40,21 @@ getIdInApp = function(callBack) {
     });
 }
 
+/**
+ * Register a new user using the provided password.
+ * 
+ * @param {JSON} payload Expected keys: `username`, `password`
+ * @param {function} callBack Function that takes a JSON param w/ `success`, 
+ * `internal_error` and `message` as keys. 
+ */
 exports.registerUserAndPassword = function(payload, callBack) {
     var username = payload["username"];
     var password = payload["password"];
     var email = payload["email"];
+
+    // Apologies for the nesting nightmare below
+    // Be the change that you wish to see in the world ;-)
+
     getSaltAndHash(password, function(salt, hash) {
         getIdInApp(function(userId) {
             var user = new User({
@@ -52,17 +64,61 @@ exports.registerUserAndPassword = function(payload, callBack) {
                 idInApp: userId,
                 email: email
             });
+
             console.log("Saving new user: " + email);
             mongoose.connect(config.MONGO_URI);
             var db = mongoose.connection;
             db.on('error', console.error.bind(console, 'Connection Error:'));
             db.once('open', function() {
-                user.save(function(error, confirmation) {
+                User.findOne({ email: user.email }, (error, existingUser) => {
                     if (error) {
-                        console.log(error);
+                        callBack({
+                            "success": false,
+                            "internal_error": true,
+                            "message": error
+                        });
+                        db.close();
+                        return;
                     } else {
-                        console.log("Account successfully created!");
-                        callBack(confirmation);
+                        // Check what mongoose returns if a document doesn't exist
+                        if (existingUser) {
+                            // Send an email to them notifying them of suspicious activity
+                            db.close();
+                            return;
+                        } else {
+                            // Save the new user's account and send enough info to log them in
+                            user.save(function (error, savedUser) {
+                                if (error) {
+                                    callBack({
+                                        "success": false, "internal_error": true, "message": error
+                                    });
+                                    db.close();
+                                } else {
+                                    // Prepare the metadata document for this user
+                                    var tagMetadata = new Metadata({
+                                        "title": "_tags_metadata_",
+                                        "description": "Stores information about the cards belonging to this user",
+                                        "createdById": savedUser.idInApp,
+                                        "stats": [],
+                                        "node_information": [],
+                                        "link_information": []
+                                    });
+                                    tagMetadata.save((error, savedMetadata) => {
+                                        if (error) {
+                                            callBack({
+                                                "success": false, "internal_error": true,
+                                                "message": error
+                                            });
+                                        } else {
+                                            callBack({
+                                                "success": true, "internal_error": false,
+                                                "message": savedUser.idInApp
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        }
                     }
                 });
             });    
@@ -70,9 +126,18 @@ exports.registerUserAndPassword = function(payload, callBack) {
     });
 }
 
+/**
+ * Authenticate a user that is trying to log in.
+ * 
+ * @param {JSON} payload Expected keys: `username`, `password`
+ * @param {function} callBack Accepts JSON param w/ `success`, `internal_error`
+ *  and `message` as keys
+ */
 exports.authenticateUser = function(payload, callBack) {
+
     var username = payload["username"];
     var password = payload["password"];
+
     mongoose.connect(config.MONGO_URI);
     var db = mongoose.connection;
     db.on('error', console.error.bind(console, 'Connection Error:'));
@@ -81,10 +146,17 @@ exports.authenticateUser = function(payload, callBack) {
             if (error) {
                 console.log(error);
             } else {
-                if (user === null) {
-                    callBack(false);
+                // Case 1: The user doesn't exist
+                if (!user) {
+                    callBack({
+                        "success": false, "internal_error": false,
+                        "message": "Incorrect username and/or password"
+                    });
+                    db.close();
                     return;
                 }
+
+                // Otherwise try authenticating the user
                 var saltOnFile = user["salt"];
                 var hashOnFile = user["hash"];
                 getHash(password, saltOnFile, function(calculatedHash) {
@@ -95,10 +167,23 @@ exports.authenticateUser = function(payload, callBack) {
                             break;
                         } 
                     }
+
+                    // Case 2: The user has provided correct credentials
                     if (thereIsAMatch) {
-                        callBack(true);
+                        callBack({
+                            "success": true, "internal_error": false,
+                            "message": user.idInApp
+                        });
+                        db.close();
+                        return;
                     } else {
-                        callBack(false);
+                        // Case 3: The user provided wrong credentials
+                        callBack({
+                            "success": false, "internal_error": true,
+                            "message": "Incorrect username and/or password"
+                        });
+                        db.close();
+                        return;
                     }
                 });
             }

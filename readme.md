@@ -8,9 +8,9 @@
     * The backend logic is written in NodeJS, not in Python.
 
 ### Tasks 
-* Implement the email address as the unique identifier.
-* Learn how to do email verification.
-* Time the login denials and set the response times so that one can't distinguish between false usernames and false passwords.
+* Have a cleaner way of updating a user's metadata.
+* Client-side username verification and validation for new users.
+* Implement the email address as the unique identifier. Use email verification to validate accounts.
 * :white_check_mark: Implement the log-in process on the server side.
 * :white_check_mark: Figure out how to use config variables in ReactJS scripts, e.g. accessing metadata (Did this on server side)
 

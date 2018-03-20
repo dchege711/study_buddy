@@ -14,6 +14,20 @@ exports.create = function(payload, callBack) {
         createdById: payload["createdById"],
         urgency: payload["urgency"]
     });
+
+    // To do: Store the metadata ID under user's details.
+    if (card.title === "_tags_metadata_" || card.title === "_metadata_") {
+        return;
+    }
+
+    /*
+     * How many cards before we need a new metadata JSON?
+     * 
+     * (400 + 150 * num_id_metadata) * 5 bytes/char <= 16MB
+     * num_id_metadata <= 21330. So let's say 15,000 cards max
+     * 
+     * Will that ever happen, probably not!
+     */
     
     mongoose.connect(config.MONGO_URI);
     var db = mongoose.connection;
@@ -31,6 +45,11 @@ exports.create = function(payload, callBack) {
 }
 
 exports.saveThisCard = function(card, callBack) {
+    // To do: Store the metadata ID under user's details.
+    if (card.title === "_tags_metadata_" || card.title === "_metadata_") {
+        return;
+    }
+
     mongoose.connect(config.MONGO_URI);
     var db = mongoose.connection;
     db.on('error', console.error.bind(console, 'Connection Error:'));
@@ -45,6 +64,37 @@ exports.saveThisCard = function(card, callBack) {
                 console.log(confirmation);
                 callBack(confirmation);
                 mongoose.disconnect();
+            }
+        });
+    });
+}
+
+var updateMetadata = function(modifications) {
+    mongoose.connect(config.MONGO_URI);
+    var db = mongoose.connection;
+    db.on('error', console.error.bind(console, 'Connection Error:'));
+    db.once('open', function () {
+        Card.findOne({"title": "_tags_metadata_"}, function (error, card) {
+            if (error) {
+                console.log(error);
+            } else {
+                if (card === null || card === undefined) {
+                    console.log("{title: _tags_metadata_} didn't match any documents");
+                    return;
+                }
+                Object.keys(payload).forEach(key => {
+                    card[key] = payload[key];
+                });
+
+                card["description_markdown"] = converter.makeHtml(card["description"]),
+                    card.save(function (error, confirmation) {
+                        if (error) {
+                            console.log(error);
+                        } else {
+                            callBack(confirmation);
+                            mongoose.disconnect();
+                        }
+                    });
             }
         });
     });
@@ -100,7 +150,13 @@ exports.update = function(payload, callBack) {
                     card[key] = payload[key];
                 });
                 
-                card["description_markdown"] = converter.makeHtml(card["description"]),
+                card["description_markdown"] = converter.makeHtml(card["description"]);
+                
+                // To do: Store the metadata ID under user's details.
+                if (card.title === "_tags_metadata_" || card.title === "_metadata_") {
+                    return;
+                }
+
                 card.save(function(error, confirmation) {
                     if (error) {
                         console.log(error);
@@ -129,23 +185,3 @@ exports.delete = function(payload, callBack) {
         });
     });
 }
-
-
-/*
-reorderCardVisitations(metadata, callBack) {
-    var keys = Object.keys(metadata);
-    keys.sort(
-        function(a, b) {
-            return metadata[b]["urgency"] - metadata[a]["urgency"];
-        }
-    );
-    
-    this.setState({
-        metadata: metadata,
-        ids_in_visitation_order: keys ,
-        currentIndex: 0
-    });
-    
-    callBack();
-}
-*/

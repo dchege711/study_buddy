@@ -15,7 +15,7 @@ function FailedLogInPage(props) {
     return (
         <div className="w3-container w3-center w3-padding-16">
             <p>
-                Oops! Unsucessful login attempt.
+                dangerouslySetInnerHTML={setHTML(props.failureMessage)}
             </p>
             
             <br />

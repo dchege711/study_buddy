@@ -117,14 +117,16 @@ export default class LogIn extends React.Component {
                 password: this.state.password
             },
             (response) => {
-                var successfulLogIn = response["data"];
-                if (successfulLogIn === true) {
-                    ReactDOM.render(<AppManager />, document.getElementById("card"));
+                if (response["data"]["success"] === true) {
+                    ReactDOM.render(
+                        <AppManager idInApp={response["data"]["message"]} />, 
+                        document.getElementById("card"));
                 } else {
                     ReactDOM.render(
                         <FailedLogInPage
                             handleLogInRequest={this.handleLogInRequest}
-                            handleNewSignUpRequest={this.handleNewSignUpRequest} 
+                            handleNewSignUpRequest={this.handleNewSignUpRequest}
+                            failureMessage={response["data"]["message"]} 
                         />, document.getElementById("card")
                     );
                 }
@@ -139,7 +141,29 @@ export default class LogIn extends React.Component {
      * an attribute.
      */
     handleSubmittedSignup(event) {
-        ReactDOM.render(<AppManager />, document.getElementById("card"));
+        this.makeHttpRequest(
+            "post", "/register-user",
+            {
+                username: this.state.username,
+                password: this.state.password,
+                email: this.state.emailAddress
+            }, (response) => {
+                if (response["data"]["success"]) {
+                    ReactDOM.render(
+                        <AppManager idInApp={response["data"]["message"]}/>, 
+                        document.getElementById("card")
+                    );
+                } else {
+                    ReactDOM.render(
+                        <FailedLogInPage
+                            handleLogInRequest={this.handleLogInRequest}
+                            handleNewSignUpRequest={this.handleNewSignUpRequest}
+                            failureMessage={response["data"]["message"]}
+                        />, document.getElementById("card")
+                    );
+                }
+            }
+        )
     }
     
     /** 
