@@ -1,6 +1,6 @@
 var stanfordCrypto = require('sjcl');
 var config = require("../config");
-var User = require("./userSchema");
+var User = require("./UserSchema");
 var mongoose = require('mongoose');
 
 getSaltAndHash = function(password, callBack) {
