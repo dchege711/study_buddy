@@ -11,6 +11,10 @@ import React from 'react';
  * @returns {JSX.Element} The Login page for returning users
  */
 function LogInPage(props) {
+
+    // Hide the sidebar panel
+    document.getElementById("sidebar").hidden = true;
+
     return (
         <div className="w3-container w3-center w3-padding-16">
             <label className="w3-center">Username<br /><br />

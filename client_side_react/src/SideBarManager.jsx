@@ -2,6 +2,7 @@ import React from 'react';
 
 var axios = require('axios');
 const graph_metadata_id = "5a9cf84bbd98043c9e7f2404";
+const debug = true;
 
 class SideBarManager extends React.Component {
 
@@ -69,6 +70,8 @@ class SideBarManager extends React.Component {
         if (tags === null) tags = Object.keys(this.state.tags);
 
         var cardIDs = new Set();
+        if (debug) console.log("Called fetchCardIdsUnderTag");
+        if (debug) console.log(tags);
         tags.forEach(function(tag, index, array) {
             this.state.tags[tag].forEach(function(id, index_, tag_) {
                 console.log("id " + id);
