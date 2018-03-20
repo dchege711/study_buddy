@@ -14,7 +14,7 @@ class AppManager extends React.Component {
         super(props);
         this.state = {
             cachedCards: {}, ids_in_visitation_order: null, 
-            currentIndex: null, currentCard: null
+            currentIndex: null, currentCard: null, cardStats: null
         };
         
         this.getCardFromID = this.getCardFromID.bind(this);
@@ -24,6 +24,7 @@ class AppManager extends React.Component {
         this.fetchPreviousCard = this.fetchPreviousCard.bind(this);
         this.cardHasBeenModified = this.cardHasBeenModified.bind(this); 
         this.organizeCards = this.organizeCards.bind(this);
+        this.applyFilter = this.applyFilter.bind(this);
   
     }
 
@@ -59,7 +60,10 @@ class AppManager extends React.Component {
     componentDidMount() {
         // Fetch data on the available tags
         document.getElementById("sidebar").hidden = false;
-        ReactDOM.render(<SideBarManager />, document.getElementById("sidebar"));
+        ReactDOM.render(
+            <SideBarManager applyFilter={this.applyFilter}
+            />, document.getElementById("sidebar")
+        );
 
         // Fetch the metadata about all the available cards
         this.makeHttpRequest(
@@ -67,6 +71,9 @@ class AppManager extends React.Component {
             { _id: metadata_id },
             (response) => {
                 // Set the contents of the card being viewed
+                this.setState({
+                    cardStats: response["data"]["stats"][0]
+                })
                 this.organizeCards(response["data"]["stats"][0]);
             }
         )
@@ -77,8 +84,6 @@ class AppManager extends React.Component {
      * 
      * @param {JSON} cardStats A list of the available cards with 
      * sortable attributes.
-     * @param {function} callBack The function to be called upon 
-     * completion.
      */
     organizeCards(cardStats) {
         // Sort the cards using their urgency attribute
@@ -89,8 +94,27 @@ class AppManager extends React.Component {
             }
         );
         this.setState({
-            ids_in_visitation_order: keys 
+            ids_in_visitation_order: keys,
+            currentIndex: null
         })
+    }
+
+    /**
+     * Filters out the cards that are not relevant to the user.
+     * This filter occurs at the side bar panel.
+     * 
+     * @param {Set} relevantIDs The new IDs that should be in the queue
+     */
+    applyFilter(relevantIDs) {
+        if (debug) console.log("The filter is being applied");
+        if (debug) console.log(relevantIDs);
+        var newCardStats = {}
+        relevantIDs.forEach((id, id_copy, setReadOnly) => {
+            newCardStats[id] = {
+                "urgency": this.state.cardStats[id]["urgency"]
+            }
+        });
+        this.organizeCards(newCardStats);
     }
     
     /**

@@ -4,6 +4,8 @@ var axios = require('axios');
 const graph_metadata_id = "5a9cf84bbd98043c9e7f2404";
 const debug = true;
 
+var selectedTags = new Set();
+
 class SideBarManager extends React.Component {
 
     constructor(props) {
@@ -12,11 +14,11 @@ class SideBarManager extends React.Component {
             tags: {},
             tagsHTML: null
         };
-
         this.makeHttpRequest = this.makeHttpRequest.bind(this);
         this.refreshTags = this.refreshTags.bind(this);
+        this.selectThisTag = this.selectThisTag.bind(this);
         this.updateTags = this.updateTagsList.bind(this);
-        this.fetchCardIdsUnderTag = this.fetchCardIdsUnderTag.bind(this);
+        this.applyFilter = this.applyFilter.bind(this);
     }
 
     refreshTags() {
@@ -48,7 +50,7 @@ class SideBarManager extends React.Component {
 
         var newTagsHTML = Object.keys(nodeData).map((tag) =>
             <ul key={tag.toString()}>
-                <button className="link" onClick={() => this.fetchCardIdsUnderTag(tag)}>
+                <button id={tag.toString()} className="link" onClick={() => this.selectThisTag(tag)}>
                     #{tag} ({nodeData[tag].length})
                 </button>
             </ul>
@@ -61,26 +63,50 @@ class SideBarManager extends React.Component {
     }
 
     /**
+     * Toggle whether this tag has been selected.
+     * @param {string} tag The tag that was selected. 
+     */
+    selectThisTag(tag) {
+        var tagElement = document.getElementById(tag);
+        if (selectedTags.has(tag)) {
+            selectedTags.delete(tag);
+            tagElement.removeAttribute("style");
+        } else {
+            selectedTags.add(tag);
+            tagElement.style.fontSize = "larger";
+            tagElement.style.backgroundColor = "white";
+            tagElement.style.color = "black";
+        }
+    }
+
+    /**
      * @description Return the ids of the cards that are found under this tag.
-     * @param {Array} tags The tags for the desired topics. Null array means all tags.
      * @returns {Array} Array of card ids that have the specified tag.
      * 
     */
-    fetchCardIdsUnderTag(tags) {
-        if (tags === null) tags = Object.keys(this.state.tags);
+    applyFilter() {
+        if (selectedTags.size === 0) {
+            selectedTags = new Set(Object.keys(this.state.tags));
+        }
+        
+        if (debug) console.log("Called fetchCardIdsUnderTag");
+        if (debug) console.log(selectedTags);
 
         var cardIDs = new Set();
-        if (debug) console.log("Called fetchCardIdsUnderTag");
-        if (debug) console.log(tags);
-        tags.forEach(function(tag, index, array) {
-            this.state.tags[tag].forEach(function(id, index_, tag_) {
-                console.log("id " + id);
+        var allTags = this.state.tags;
+        
+        selectedTags.forEach(function(tag, tag_copy, allSelected) {
+            allTags[tag].forEach(function(id, index_, tag_) {
                 if (cardIDs.has(id) === false) {
                     cardIDs.add(id);
                 }
             });
         });
-        return Array.from(cardIDs);
+
+        if (debug) console.log(cardIDs);
+
+        // Tell the AppManager to refresh the cards being shown.
+        this.props.applyFilter(cardIDs);
     }
 
     /**
@@ -108,7 +134,13 @@ class SideBarManager extends React.Component {
 
     render() {
         return (
+            [
+            <div key="apply_filter_button" className="w3-container w3-center w3-padding-16">
+                <input className="w3-center w3-button:hover w3-padding-small"
+                    type="submit" value="Apply Filter" onClick={this.applyFilter} />
+            </div>,
             this.state.tagsHTML
+            ]
         )
     }
 }
