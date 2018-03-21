@@ -3,10 +3,10 @@ var mongoose = require('mongoose');
 var metadataSchema = new mongoose.Schema({
     title: String,
     node_information: Array,
-    link_information: Array,
     description: String,
     stats: Array,
-    createdById: Number
+    createdById: Number,
+    metadataIndex: Number,
 },
     {
         timestamps: true,

@@ -25,7 +25,6 @@ class AppManager extends React.Component {
         this.cardHasBeenModified = this.cardHasBeenModified.bind(this); 
         this.organizeCards = this.organizeCards.bind(this);
         this.applyFilter = this.applyFilter.bind(this);
-  
     }
 
     /**

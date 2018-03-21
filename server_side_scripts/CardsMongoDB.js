@@ -2,9 +2,18 @@ var Card = require('./CardSchema');
 var config = require('../config');
 var mongoose = require('mongoose');
 var showdown = require('showdown');
+var MetadataDB = require('./MetadataMongoDB');
 
 var converter = new showdown.Converter();
 
+/**
+ * Create a new card and add it to the user's current cards.
+ * 
+ * @param {JSON} payload Expected keys: `title`, `description`, 
+ * `tags`, `createdById`, `urgency`, and `idInApp`
+ * @param {Function} callBack Takes a JSON with `success`, 
+ * `internal_error` and `message` as keys.
+ */
 exports.create = function(payload, callBack) {
     var card = new Card({
         title: payload["title"],
@@ -14,11 +23,6 @@ exports.create = function(payload, callBack) {
         createdById: payload["createdById"],
         urgency: payload["urgency"]
     });
-
-    // To do: Store the metadata ID under user's details.
-    if (card.title === "_tags_metadata_" || card.title === "_metadata_") {
-        return;
-    }
 
     /*
      * How many cards before we need a new metadata JSON?
@@ -33,17 +37,25 @@ exports.create = function(payload, callBack) {
     var db = mongoose.connection;
     db.on('error', console.error.bind(console, 'Connection Error:'));
     db.once('open', function() {
-        card.save(function(error, confirmation) {
+        card.save(function(error, savedCard) {
             if (error) {
-                console.log(error);
+                callBack({
+                    "success": false, "internal_error": true,
+                    "message": error
+                })
+                db.close();
             } else {
-                callBack(confirmation);
-                mongoose.disconnect();
+                // Update the metadata object with this card's details
+                MetadataDB.update(savedCard, callBack);
+                db.close();
             }
         });
     });
 }
 
+/*
+ * Delete this method if nothing breaks.
+ * 
 exports.saveThisCard = function(card, callBack) {
     // To do: Store the metadata ID under user's details.
     if (card.title === "_tags_metadata_" || card.title === "_metadata_") {
@@ -63,124 +75,117 @@ exports.saveThisCard = function(card, callBack) {
             } else {
                 console.log(confirmation);
                 callBack(confirmation);
-                mongoose.disconnect();
+                db.close();
             }
         });
     });
 }
+*/
 
-var updateMetadata = function(modifications) {
-    mongoose.connect(config.MONGO_URI);
-    var db = mongoose.connection;
-    db.on('error', console.error.bind(console, 'Connection Error:'));
-    db.once('open', function () {
-        Card.findOne({"title": "_tags_metadata_"}, function (error, card) {
-            if (error) {
-                console.log(error);
-            } else {
-                if (card === null || card === undefined) {
-                    console.log("{title: _tags_metadata_} didn't match any documents");
-                    return;
-                }
-                Object.keys(payload).forEach(key => {
-                    card[key] = payload[key];
-                });
-
-                card["description_markdown"] = converter.makeHtml(card["description"]),
-                    card.save(function (error, confirmation) {
-                        if (error) {
-                            console.log(error);
-                        } else {
-                            callBack(confirmation);
-                            mongoose.disconnect();
-                        }
-                    });
-            }
-        });
-    });
-}
-
+/**
+ * Read a card(s) from the database.
+ * 
+ * @param {JSON} payload Must contain `idInApp` as one of the keys. 
+ * If `_id` is not one of the keys, fetch all the user's cards.
+ * @param {Function} callBack Takes a JSON with `success`, `internal_error` 
+ * and `message` as keys.
+ */
 exports.read = function(payload, callBack) {
     var _id = payload["_id"];
     mongoose.connect(config.MONGO_URI);
     var db = mongoose.connection;
     db.on('error', console.error.bind(console, 'Connection Error:'));
     db.once('open', function() {
-        if (_id === null || _id === undefined) {
-            Card.find({}, function(error, card) {
-                if (error) {
-                    console.log(error);
-                } else {
-                    callBack(card);
-                    mongoose.disconnect();
-                }
+        if (_id === undefined) {
+            var cursor = Card.find({ createdById: payload["userIDInApp"]}).cursor();
+            var allRelevantCards = [];
+            cursor.on("data", (card) => {
+                allRelevantCards.push(card);
+            });
+            cursor.on("close", () => {
+                callBack({
+                    "success": true, "internal_error": false,
+                    "message": allRelevantCards
+                })
+                db.close();
             });
         } else {
-            Card.findOne({
-                _id: _id
-            }, function(error, card) {
+            Card.findById(_id, function(error, card) {
                 if (error) {
-                    console.log(error);
+                    callBack({
+                        "success": false, "internal_error": true,
+                        "message": error
+                    })
+                    db.close();
                 } else {
-                    callBack(card);
-                    mongoose.disconnect();
+                    callBack({
+                        "success": true, "internal_error": false,
+                        "message": card
+                    })
+                    db.close();
                 }
             });
         }
     });
 }
 
-exports.update = function(payload, callBack) {
-    var _id = payload["_id"];
-    delete payload._id;
+/**
+ * Update an existing card.
+ * 
+ * @param {JSON} cardJSON The entire card as a JSON object
+ * @param {Function} callBack Takes a JSON with `success`,
+ * `internal_error` and `message` as keys.
+ */
+exports.update = function(cardJSON, callBack) {
+    var _id = cardJSON["_id"];
+    cardJSON["description_markdown"] = converter.makeHtml(cardJSON["description"]);
+    delete cardJSON._id;
     
     mongoose.connect(config.MONGO_URI);
     var db = mongoose.connection;
     db.on('error', console.error.bind(console, 'Connection Error:'));
     db.once('open', function() {
-        Card.findById(_id, function(error, card) {
-            if (error) {
-                console.log(error);
-            } else {
-                if (card === null || card === undefined) {
-                    console.log("The provided ID didn't match any documents");
-                    return
+        Card.findByIdAndUpdate(
+            _id, {$set: cardJSON}, {new: true}, 
+            (error, updatedCard) => {
+                if (error) {
+                    callBack({
+                        "success": false, "internal_error": true,
+                        "message": error
+                    })
+                    db.close();
+                } else {
+                    MetadataDB.update(updatedCard, callBack);
+                    db.close();
                 }
-                Object.keys(payload).forEach(key => {
-                    card[key] = payload[key];
-                });
-                
-                card["description_markdown"] = converter.makeHtml(card["description"]);
-                
-                // To do: Store the metadata ID under user's details.
-                if (card.title === "_tags_metadata_" || card.title === "_metadata_") {
-                    return;
-                }
-
-                card.save(function(error, confirmation) {
-                    if (error) {
-                        console.log(error);
-                    } else {
-                        callBack(confirmation);
-                        mongoose.disconnect();
-                    }
-                });
             }
-        });
+        );
     });
 }
 
+/**
+ * Remove this card from the database.
+ * 
+ * @param {JSON} payload The card to be removed
+ * @param {Function} callBack Takes a JSON with `success`,
+ * `internal_error` and `message` as keys.
+ */
 exports.delete = function(payload, callBack) {
     mongoose.connect(config.MONGO_URI);
     var db = mongoose.connection;
     db.on('error', console.error.bind(console, 'Connection Error:'));
     db.once('open', function() {
-        Card.remove({_id: payload["_id"]}, function(error, confirmation) {
+        Card.findByIdAndRemove(
+            payload["_id"], (error, removedCard) => {
             if (error) {
-                console.log(error);
+                callBack({
+                    "success": false, "internal_error": true,
+                    "message": error
+                })
+                db.close();
             } else {
-                callBack(confirmation);
-                mongoose.disconnect();
+                MetadataDB.remove(removedCard, callBack);
+                db.close();
             }
         });
     });

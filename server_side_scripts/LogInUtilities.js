@@ -1,7 +1,7 @@
 var stanfordCrypto = require('sjcl');
 var config = require("../config");
 var User = require("./UserSchema");
-var Metadata = require("./MetadataCardSchema");
+var MetadataDB = require("./MetadataMongoDB");
 var mongoose = require('mongoose');
 
 getSaltAndHash = function(password, callBack) {
@@ -25,8 +25,8 @@ getIdInApp = function(callBack) {
             if (error) {
                 console.log(error);
             } else {
-                var newUserID = user["idInApp"] + 1;
-                user["idInApp"] = newUserID;
+                var newUserID = user["userIDInApp"] + 1;
+                user["userIDInApp"] = newUserID;
                 user.save(function(error, confirmation) {
                     if (error) {
                         console.log(error);
@@ -61,7 +61,7 @@ exports.registerUserAndPassword = function(payload, callBack) {
                 username: username,
                 salt: salt,
                 hash: hash,
-                idInApp: userId,
+                userIDInApp: userId,
                 email: email
             });
 
@@ -94,28 +94,7 @@ exports.registerUserAndPassword = function(payload, callBack) {
                                     });
                                     db.close();
                                 } else {
-                                    // Prepare the metadata document for this user
-                                    var tagMetadata = new Metadata({
-                                        "title": "_tags_metadata_",
-                                        "description": "Stores information about the cards belonging to this user",
-                                        "createdById": savedUser.idInApp,
-                                        "stats": [],
-                                        "node_information": [],
-                                        "link_information": []
-                                    });
-                                    tagMetadata.save((error, savedMetadata) => {
-                                        if (error) {
-                                            callBack({
-                                                "success": false, "internal_error": true,
-                                                "message": error
-                                            });
-                                        } else {
-                                            callBack({
-                                                "success": true, "internal_error": false,
-                                                "message": savedUser.idInApp
-                                            });
-                                        }
-                                    });
+                                    MetadataDB.create(savedUser.userIDInApp, callBack);
                                 }
                             });
                         }
@@ -172,7 +151,7 @@ exports.authenticateUser = function(payload, callBack) {
                     if (thereIsAMatch) {
                         callBack({
                             "success": true, "internal_error": false,
-                            "message": user.idInApp
+                            "message": user.userIDInApp
                         });
                         db.close();
                         return;

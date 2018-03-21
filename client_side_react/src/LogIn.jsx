@@ -119,7 +119,7 @@ export default class LogIn extends React.Component {
             (response) => {
                 if (response["data"]["success"] === true) {
                     ReactDOM.render(
-                        <AppManager idInApp={response["data"]["message"]} />, 
+                        <AppManager userIDInApp={response["data"]["message"]} />, 
                         document.getElementById("card"));
                 } else {
                     ReactDOM.render(
@@ -150,7 +150,7 @@ export default class LogIn extends React.Component {
             }, (response) => {
                 if (response["data"]["success"]) {
                     ReactDOM.render(
-                        <AppManager idInApp={response["data"]["message"]}/>, 
+                        <AppManager userIDInApp={response["data"]["message"]}/>, 
                         document.getElementById("card")
                     );
                 } else {
