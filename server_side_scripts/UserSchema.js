@@ -1,12 +1,26 @@
+/**
+ * @description Prepare a model for representing users in the database.
+ * 
+ */
+
 var mongoose = require('mongoose');
 
 var userSchema = new mongoose.Schema(
     {
-        username: String,
+        username: {
+            type: String,
+            unique: [true, "This username is already taken"],
+        },
         salt: Array,
         hash: Array,
-        userIDInApp: Number,
-        email: String
+        userIDInApp: {
+            type: Number,
+            unique: true
+        },
+        email: {
+            type: String,
+            unique: true
+        }
     },
     {
         timestamps: true,

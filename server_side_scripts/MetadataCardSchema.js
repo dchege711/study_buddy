@@ -1,3 +1,7 @@
+/**
+ * @description Prepare a model for representing metadata in the database.
+ */
+
 var mongoose = require('mongoose');
 
 var metadataSchema = new mongoose.Schema({
