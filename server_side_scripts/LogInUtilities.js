@@ -4,6 +4,11 @@ var User = require("./UserSchema");
 var MetadataDB = require("./MetadataMongoDB");
 var mongoose = require('mongoose');
 
+// Note: Reconnecting to MongoDB is slow. Share the connection!
+mongoose.connect(config.MONGO_URI);
+var db = mongoose.connection;
+db.on("error", console.error.bind(console, "Connection Error:"));
+
 getSaltAndHash = function(password, callBack) {
     // 8 words = 32 bytes = 256 bits, a paranoia of 7
     var salt = stanfordCrypto.random.randomWords(8, 7);
@@ -17,9 +22,6 @@ getHash = function(password, salt, callBack) {
 }
 
 getIdInApp = function(callBack) {
-    mongoose.connect(config.MONGO_URI);
-    var db = mongoose.connection;
-    db.on('error', console.error.bind(console, 'Connection Error:'));
     db.once('open', function() {
         User.findById({_id: config.USER_METADATA_ID}, function(error, user) {
             if (error) {
@@ -30,8 +32,7 @@ getIdInApp = function(callBack) {
                 user.save(function(error, confirmation) {
                     if (error) {
                         console.log(error);
-                    } else {
-                        db.close();
+                    } else { 
                         callBack(newUserID);
                     }
                 });
@@ -66,9 +67,6 @@ exports.registerUserAndPassword = function(payload, callBack) {
             });
 
             if (debug) console.log("Saving new user: " + email);
-            mongoose.connect(config.MONGO_URI);
-            var db = mongoose.connection;
-            db.on('error', console.error.bind(console, 'Connection Error:'));
             db.once('open', function() {
                 User.findOne({ email: user.email }, (error, existingUser) => {
                     if (error) {
@@ -76,14 +74,12 @@ exports.registerUserAndPassword = function(payload, callBack) {
                             "success": false,
                             "internal_error": true,
                             "message": error
-                        });
-                        db.close();
+                        });        
                         return;
                     } else {
                         // Check what mongoose returns if a document doesn't exist. Ans: []
                         if (existingUser) {
-                            // Send an email to them notifying them of suspicious activity
-                            db.close();
+                            // Send an email to them notifying them of suspicious activity            
                             return;
                         } else {
                             // Save the new user's account and send enough info to log them in
@@ -91,8 +87,7 @@ exports.registerUserAndPassword = function(payload, callBack) {
                                 if (error) {
                                     callBack({
                                         "success": false, "internal_error": true, "message": error
-                                    });
-                                    db.close();
+                                    });                   
                                 } else {
                                     MetadataDB.create({
                                         userIDInApp: savedUser.userIDInApp
@@ -119,9 +114,6 @@ exports.authenticateUser = function(payload, callBack) {
     var username = payload["username"];
     var password = payload["password"];
 
-    mongoose.connect(config.MONGO_URI);
-    var db = mongoose.connection;
-    db.on('error', console.error.bind(console, 'Connection Error:'));
     db.once('open', function() {
         User.findOne({ username: username}, function(error, user) {
             if (error) {
@@ -132,8 +124,7 @@ exports.authenticateUser = function(payload, callBack) {
                     callBack({
                         "success": false, "internal_error": false,
                         "message": "Incorrect username and/or password"
-                    });
-                    db.close();
+                    });   
                     return;
                 }
 
@@ -154,8 +145,7 @@ exports.authenticateUser = function(payload, callBack) {
                         callBack({
                             "success": true, "internal_error": false,
                             "message": user["userIDInApp"]
-                        });
-                        db.close();
+                        });        
                         return;
                     } else {
                         // Case 3: The user provided wrong credentials
@@ -163,7 +153,6 @@ exports.authenticateUser = function(payload, callBack) {
                             "success": false, "internal_error": false,
                             "message": "Incorrect username and/or password"
                         });
-                        db.close();
                         return;
                     }
                 });
@@ -171,3 +160,11 @@ exports.authenticateUser = function(payload, callBack) {
         });
     }); 
 }
+
+// Close the MongoDB connection before closing the application.
+process.on("SIGINT", function () {
+    db.close(function () {
+        console.log("Mongoose connection closed from CardsMongoDB.js");
+        process.exit(0);
+    });
+})

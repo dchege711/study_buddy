@@ -3,6 +3,11 @@ var Card = require('./CardSchema');
 var config = require('../config');
 var mongoose = require('mongoose');
 
+// Note: Reconnecting to MongoDB is slow. Share the connection!
+mongoose.connect(config.MONGO_URI);
+var db = mongoose.connection;
+db.on("error", console.error.bind(console, "Connection Error:"));
+
 /**
  * 
  * @param {JSON} payload Must contain `userIDInApp` as a key
@@ -19,9 +24,6 @@ exports.create = function (payload, callBack) {
         "node_information": {}
     });
 
-    mongoose.connect(config.MONGO_URI);
-    var db = mongoose.connection;
-    db.on('error', console.error.bind(console, 'Connection Error:'));
     db.once('open', function () {
         tagMetadata.markModified("stats");
         tagMetadata.markModified("node_information");
@@ -65,7 +67,7 @@ var updateMetadata = function (modifications) {
                             console.log(error);
                         } else {
                             callBack(confirmation);
-                            db.close();
+            
                         }
                     });
             }
@@ -81,9 +83,6 @@ var updateMetadata = function (modifications) {
  */
 exports.read = function (payload, callBack) {
     var userIDInApp = payload["userIDInApp"];
-    mongoose.connect(config.MONGO_URI);
-    var db = mongoose.connection;
-    db.on('error', console.error.bind(console, 'Connection Error:'));
     db.once('open', function () {
         var cursor = Metadata.find({ createdById: userIDInApp}).cursor();
         var metadataResults = [];
@@ -108,9 +107,6 @@ exports.update = function (savedCard, callBack) {
     if (savedCard.metadataIndex === undefined) {
         savedCard.metadataIndex = 0;
     }
-    mongoose.connect(config.MONGO_URI);
-    var db = mongoose.connection;
-    db.on('error', console.error.bind(console, 'Connection Error:'));
     db.once('open', function () {
         Metadata.findOne(
             {
@@ -122,8 +118,7 @@ exports.update = function (savedCard, callBack) {
                     callBack({
                         "success": false, "internal_error": true,
                         "message": error
-                    });
-                    db.close();
+                    });    
                 } else {
                     metadataDoc["stats"][0][savedCard["_id"]]["urgency"] = savedCard["urgency"];
                     savedCard["tags"].forEach(tag => {
@@ -135,14 +130,12 @@ exports.update = function (savedCard, callBack) {
                             callBack({
                                 "success": false, "internal_error": true,
                                 "message": error
-                            });
-                            db.close();
+                            });           
                         } else {
                             callBack({
                                 "success": true, "internal_error": false,
                                 "message": savedCard
-                            });
-                            db.close();
+                            });    
                         }
                     });
                 }
@@ -159,9 +152,6 @@ exports.update = function (savedCard, callBack) {
  */
 exports.delete = function (payload, callBack) {
     var userIDInApp = payload["userIDInApp"];
-    mongoose.connect(config.MONGO_URI);
-    var db = mongoose.connection;
-    db.on('error', console.error.bind(console, 'Connection Error:'));
     db.once('open', function () {
         Metadata.deleteMany(
             { createdById: userIDInApp }, 
@@ -171,14 +161,20 @@ exports.delete = function (payload, callBack) {
                     "success": false, "internal_error": true,
                     "message": error
                 });
-                db.close();
             } else {
                 callBack({
                     "success": true, "internal_error": false,
                     "message": deleteConfirmation
                 });
-                db.close();
             }
         });
     });
 }
+
+// Close the MongoDB connection before closing the application.
+process.on("SIGINT", function () {
+    db.close(function () {
+        console.log("Mongoose connection closed from CardsMongoDB.js");
+        process.exit(0);
+    });
+})
