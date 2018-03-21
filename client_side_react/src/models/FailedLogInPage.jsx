@@ -8,15 +8,26 @@
 import React from 'react';
 
 /**
+ * Set text as HTML
+ * 
+ * @param {String} text The message that should be displayed as HTML 
+ */
+function setHTML(text) {
+    return {
+        __html: text
+    }
+}
+
+/**
  * @param {function} props handleLogInRequest(), handleNewSignUpRequest()
  * @returns {JSX.Element} The 'unsuccessful login page.
  */
 function FailedLogInPage(props) {
     return (
         <div className="w3-container w3-center w3-padding-16">
-            <p>
+            <div
                 dangerouslySetInnerHTML={setHTML(props.failureMessage)}
-            </p>
+            />
             
             <br />
             <br />

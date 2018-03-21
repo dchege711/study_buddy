@@ -151,14 +151,14 @@ exports.authenticateUser = function(payload, callBack) {
                     if (thereIsAMatch) {
                         callBack({
                             "success": true, "internal_error": false,
-                            "message": user.userIDInApp
+                            "message": user["userIDInApp"]
                         });
                         db.close();
                         return;
                     } else {
                         // Case 3: The user provided wrong credentials
                         callBack({
-                            "success": false, "internal_error": true,
+                            "success": false, "internal_error": false,
                             "message": "Incorrect username and/or password"
                         });
                         db.close();

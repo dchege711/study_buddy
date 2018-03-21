@@ -4,7 +4,11 @@ var bodyParser = require('body-parser');
 var CardsDB = require('./server_side_scripts/CardsMongoDB');
 var LogInUtilities = require('./server_side_scripts/LogInUtilities');
 
-const debugMode = false;
+// https://nodejs.org/docs/latest/api/events.html#events_emitter_setmaxlisteners_n
+// var myEmmiter = new MyEmmiter();
+// myEmmiter.setMaxListeners(Infinity);
+
+const debugMode = true;
 
 var app = express();
 var port = process.env.PORT || 5000;

@@ -5,7 +5,7 @@ var userSchema = new mongoose.Schema(
         username: String,
         salt: Array,
         hash: Array,
-        idInApp: Number,
+        userIDInApp: Number,
         email: String
     },
     {
