@@ -60,8 +60,10 @@ class AppManager extends React.Component {
         // Fetch data on the available tags
         document.getElementById("sidebar").hidden = false;
         ReactDOM.render(
-            <SideBarManager applyFilter={this.applyFilter}
-            />, document.getElementById("sidebar")
+            <SideBarManager 
+            userIDInApp={this.props.userIDInApp}
+            applyFilter={this.applyFilter}/>, 
+            document.getElementById("sidebar")
         );
 
         // Fetch the metadata about all the available cards

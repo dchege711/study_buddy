@@ -6,11 +6,8 @@ var cardSchema = new mongoose.Schema({
     description_markdown: String,
     tags: String,
     urgency: Number,
-    stats: Array,
-    createdById: {
-        type: Number,
-        default: 1
-    },
+    metadataIndex: Number,
+    createdById: Number,
     lastReviewed: {
         type: Date,
         default: Date.now

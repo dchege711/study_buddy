@@ -65,7 +65,7 @@ exports.registerUserAndPassword = function(payload, callBack) {
                 email: email
             });
 
-            console.log("Saving new user: " + email);
+            if (debug) console.log("Saving new user: " + email);
             mongoose.connect(config.MONGO_URI);
             var db = mongoose.connection;
             db.on('error', console.error.bind(console, 'Connection Error:'));
@@ -80,7 +80,7 @@ exports.registerUserAndPassword = function(payload, callBack) {
                         db.close();
                         return;
                     } else {
-                        // Check what mongoose returns if a document doesn't exist
+                        // Check what mongoose returns if a document doesn't exist. Ans: []
                         if (existingUser) {
                             // Send an email to them notifying them of suspicious activity
                             db.close();
@@ -94,7 +94,9 @@ exports.registerUserAndPassword = function(payload, callBack) {
                                     });
                                     db.close();
                                 } else {
-                                    MetadataDB.create(savedUser.userIDInApp, callBack);
+                                    MetadataDB.create({
+                                        userIDInApp: savedUser.userIDInApp
+                                    }, callBack);
                                 }
                             });
                         }

@@ -2,6 +2,7 @@ var express = require('express');
 var path = require('path');
 var bodyParser = require('body-parser');
 var CardsDB = require('./server_side_scripts/CardsMongoDB');
+var MetadataDB = require('./server_side_scripts/MetadataMongoDB');
 var LogInUtilities = require('./server_side_scripts/LogInUtilities');
 
 // https://nodejs.org/docs/latest/api/events.html#events_emitter_setmaxlisteners_n
@@ -56,6 +57,18 @@ app.post('/read-card', function(request, response) {
     CardsDB.read(request.body, function(card) {
         if (debugMode) console.log(card);
         response.json(card);
+    });
+});
+
+app.post('/read-metadata', function (request, response) {
+    console.log("POST request at /read-metadata");
+    if (debugMode) {
+        console.log(request.body);
+    }
+
+    MetadataDB.read(request.body, function (metadata) {
+        if (debugMode) console.log(metadata);
+        response.json(metadata);
     });
 });
 

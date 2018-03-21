@@ -117,7 +117,6 @@ export default class LogIn extends React.Component {
                 password: this.state.password
             },
             (response) => {
-                console.log(response["data"]["message"]);
                 if (response["data"]["success"] === true) {
                     ReactDOM.render(
                         <AppManager userIDInApp={response["data"]["message"]} />, 

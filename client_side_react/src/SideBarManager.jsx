@@ -1,7 +1,6 @@
 import React from 'react';
 
 var axios = require('axios');
-const graph_metadata_id = "5a9cf84bbd98043c9e7f2404";
 const debug = true;
 
 var selectedTags = new Set();
@@ -23,11 +22,11 @@ class SideBarManager extends React.Component {
 
     refreshTags() {
         this.makeHttpRequest(
-            "post", "/read-card",
-            { _id: graph_metadata_id}, 
+            "post", "/read-metadata",
+            { createdById: this.props.userIDInApp}, 
             (response) => {
+                console.log(response["data"]);
                 this.updateTagsList(response["data"]["node_information"][0]);
-                // this.fetchCardIdsUnderTag(null);
             }
         );
     }

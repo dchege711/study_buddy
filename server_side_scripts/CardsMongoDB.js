@@ -85,7 +85,7 @@ exports.saveThisCard = function(card, callBack) {
 /**
  * Read a card(s) from the database.
  * 
- * @param {JSON} payload Must contain `idInApp` as one of the keys. 
+ * @param {JSON} payload Must contain `userIDInApp` as one of the keys.
  * If `_id` is not one of the keys, fetch all the user's cards.
  * @param {Function} callBack Takes a JSON with `success`, `internal_error` 
  * and `message` as keys.
@@ -103,26 +103,26 @@ exports.read = function(payload, callBack) {
                 allRelevantCards.push(card);
             });
             cursor.on("close", () => {
+                db.close();
                 callBack({
                     "success": true, "internal_error": false,
                     "message": allRelevantCards
                 })
-                db.close();
             });
         } else {
             Card.findById(_id, function(error, card) {
                 if (error) {
+                    db.close();
                     callBack({
                         "success": false, "internal_error": true,
                         "message": error
                     })
-                    db.close();
                 } else {
+                    db.close();
                     callBack({
                         "success": true, "internal_error": false,
                         "message": card
                     })
-                    db.close();
                 }
             });
         }

@@ -3,22 +3,28 @@ var Card = require('./CardSchema');
 var config = require('../config');
 var mongoose = require('mongoose');
 
-exports.create = function (userIDInApp, callBack) {
+/**
+ * 
+ * @param {JSON} payload Must contain `userIDInApp` as a key
+ * @param {Function} callBack Takes a JSON with `success`,
+ * `internal_error` and `message` as keys.
+ */
+exports.create = function (payload, callBack) {
+    var userIDInApp = payload["userIDInApp"];
     // Prepare the metadata document for this user
     var tagMetadata = new Metadata({
-        "title": "_tags_metadata_",
-        "description": "Stores information about the cards belonging to this user",
         "createdById": userIDInApp,
         "metadataIndex": 0,
-        "stats": [],
-        "node_information": [],
-        "link_information": []
+        "stats": {},
+        "node_information": {}
     });
 
     mongoose.connect(config.MONGO_URI);
     var db = mongoose.connection;
     db.on('error', console.error.bind(console, 'Connection Error:'));
     db.once('open', function () {
+        tagMetadata.markModified("stats");
+        tagMetadata.markModified("node_information");
         tagMetadata.save((error, savedMetadata) => {
             if (error) {
                 callBack({
@@ -28,7 +34,7 @@ exports.create = function (userIDInApp, callBack) {
             } else {
                 callBack({
                     "success": true, "internal_error": false,
-                    "message": userIDInApp
+                    "message": savedMetadata
                 });
             }
         });
@@ -70,10 +76,11 @@ var updateMetadata = function (modifications) {
 /**
  * Read all the metadata associated with a user's cards.
  * 
- * @param {Number} userIDInApp The app ID of the user
+ * @param {JSON} payload Must contain `userIDInApp` as a key
  * @param {Function} callBack Function that takes an array of JSON `Metadata` objects 
  */
-exports.read = function (userIDInApp, callBack) {
+exports.read = function (payload, callBack) {
+    var userIDInApp = payload["userIDInApp"];
     mongoose.connect(config.MONGO_URI);
     var db = mongoose.connection;
     db.on('error', console.error.bind(console, 'Connection Error:'));
@@ -94,7 +101,8 @@ exports.read = function (userIDInApp, callBack) {
  * is usually called by CardsMongoDB.update().  
  * 
  * @param {mongoose.Model} savedCard The card that has just been saved
- * @param {Function} callBack The function to call on success
+ * @param {Function} callBack Takes a JSON with `success`,
+ * `internal_error` and `message` as keys.
  */
 exports.update = function (savedCard, callBack) {
     if (savedCard.metadataIndex === undefined) {
@@ -145,10 +153,12 @@ exports.update = function (savedCard, callBack) {
 
 /**
  * Delete the metadata associated with the user.
- * @param {Number} userIDInApp The ID of the user in the app
- * @param {Function} callBack 
+ * @param {JSON} payload Must contain `userIDInApp` as a key
+ * @param {Function} callBack Takes a JSON with `success`,
+ * `internal_error` and `message` as keys.
  */
-exports.delete = function (userIDInApp, callBack) {
+exports.delete = function (payload, callBack) {
+    var userIDInApp = payload["userIDInApp"];
     mongoose.connect(config.MONGO_URI);
     var db = mongoose.connection;
     db.on('error', console.error.bind(console, 'Connection Error:'));

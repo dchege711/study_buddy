@@ -1,10 +1,8 @@
 var mongoose = require('mongoose');
 
 var metadataSchema = new mongoose.Schema({
-    title: String,
-    node_information: Array,
-    description: String,
-    stats: Array,
+    node_information: mongoose.SchemaTypes.Mixed,
+    stats: mongoose.SchemaTypes.Mixed,
     createdById: Number,
     metadataIndex: Number,
 },
