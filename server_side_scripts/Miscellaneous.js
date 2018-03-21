@@ -1,48 +1,60 @@
+require('./MongooseClient');
+
 var CardsDB = require('./CardsMongoDB');
 var MetadataDB = require('./MetadataMongoDB');
 
 /**
- * Add the metadataIndex field to every card
+ * @description Add metadata for the specified user
+ */
+var addAndPopulateMetadata = function(userIDInApp) {
+    MetadataDB.create(
+        {
+            "userIDInApp": userIDInApp,
+            "metadataIndex": 0
+        }, (response) => {
+        console.log(response["message"]);
+        populateMetadata(1);
+    });
+}
+
+/**
+ * @description Delete metadata for the specified user
+ */
+var deleteMetadata = function (userIDInApp) {
+    MetadataDB.delete(
+        {
+            "userIDInApp": userIDInApp
+        }, (response) => {
+            console.log(response["message"]);
+        });
+}
+
+/**
+ * Add the metadataIndex field to every card that the user owns.
  * 
  * @param {Number} userIDInApp The app ID of the user owning the cards
  */
-var addMetadataIndex = function(userIDInApp) {
+var populateMetadata = function(userIDInApp) {
     CardsDB.read(
         {
             "userIDInApp": userIDInApp
         }, (response) => {
             cards = response["message"];
-            // cards.forEach(card => {
-            //     if (card.title === "_metadata_" || card.title === "_tags_metadata_") {
-            //         // Do nothing
-            //     } else {
-            //         console.log(card.title);
-            //         // card["metadataIndex"] = 0;
-            //         // CardsDB.update(card, (response) => {
-            //         //     console.log(response["message"]);
-            //         // });
-            //     }
-            // }); 
-
-            var card = cards[0];
-            console.log("Updating " + card.title);
-            if (card.title === "_metadata_" || card.title === "_tags_metadata_") {
-                console.log("Did nothing");
-            } else {
-                card["metadataIndex"] = 0;
-                CardsDB.update(card, (response) => {
-                    console.log(response["message"]);
-                });
-            }
+            cards.forEach(card => {
+                if (card.title === "_metadata_" || card.title === "_tags_metadata_") {
+                    // Do nothing
+                } else {
+                    card["metadataIndex"] = 0;
+                    CardsDB.update(card, (response) => {
+                        console.log(response["message"]["title"]);
+                    });
+                }
+            }); 
         }
     );
 }
 
-
-// Store node information as described in MetadataMongoDB.js
-
-// Next:
-
 if (require.main === module) {
-    addMetadataIndex(1);
+    addAndPopulateMetadata(1);
+    //deleteMetadata(1);
 }

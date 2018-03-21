@@ -5,10 +5,10 @@
 var mongoose = require('mongoose');
 
 var metadataSchema = new mongoose.Schema({
-    node_information: mongoose.SchemaTypes.Mixed,
-    stats: mongoose.SchemaTypes.Mixed,
     createdById: Number,
     metadataIndex: Number,
+    node_information: mongoose.SchemaTypes.Mixed,
+    stats: mongoose.SchemaTypes.Mixed,
 },
     {
         timestamps: true,

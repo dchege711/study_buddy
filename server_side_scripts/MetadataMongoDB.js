@@ -1,5 +1,5 @@
-var Metadata = require('./MetadataCardSchema');
-var Card = require('./CardSchema');
+var Metadata = require('./models/MetadataCardSchema');
+var Card = require('./models/CardSchema');
 var config = require('../config');
 var mongoose = require('mongoose');
 
@@ -9,37 +9,62 @@ var mongoose = require('mongoose');
 
 /**
  * 
- * @param {JSON} payload Must contain `userIDInApp` as a key
+ * @param {JSON} payload Must contain `userIDInApp` and `metadataIndex` as keys
  * @param {Function} callBack Takes a JSON with `success`,
  * `internal_error` and `message` as keys.
  */
 exports.create = function (payload, callBack) {
-    var userIDInApp = payload["userIDInApp"];
-    // Prepare the metadata document for this user
-    var tagMetadata = new Metadata({
-        "createdById": userIDInApp,
-        "metadataIndex": 0,
-        "stats": {},
-        "node_information": {}
-    });
+    if (payload["userIDInApp"] === undefined || payload["metadataIndex"] === undefined) {
+        callBack({
+            "success": false, "internal_error": false,
+            "message": "Please provide a userIDInApp and a metadataIndex."
+        });
+        return;
+    }
 
-    db.on('open', function () {
-        tagMetadata.markModified("stats");
-        tagMetadata.markModified("node_information");
-        tagMetadata.save((error, savedMetadata) => {
-            if (error) {
+    // Do not overwrite. Only create new metadata.
+    Metadata.count(
+        { 
+            "createdById": payload["userIDInApp"],
+            "metadataIndex": payload["metadataIndex"]
+        }, function(error, count) {
+            if (count >= 1) {
                 callBack({
-                    "success": false, "internal_error": true,
-                    "message": error
+                    "success": false, "internal_error": false,
+                    "message": "This metadata document already exists."
                 });
+                return;
             } else {
-                callBack({
-                    "success": true, "internal_error": false,
-                    "message": savedMetadata
+
+                // Metadata.create forgets to include `stats` and 
+                // `node_information`. Scrap that, even after using 
+                // `markModified`, nothing happens. :-/
+                var tagMetadata = new Metadata({
+                    "createdById": payload["userIDInApp"],
+                    "metadataIndex": 0,
+                    "stats": {},
+                    "node_information": {}
+                });
+
+                tagMetadata.markModified("stats");
+                tagMetadata.markModified("node_information");
+
+                tagMetadata.save(function(error, savedMetadata) {
+                    if (error) {
+                        callBack({
+                            "success": false, "internal_error": true,
+                            "message": error
+                        });
+                    } else {
+                        callBack({
+                            "success": true, "internal_error": false,
+                            "message": savedMetadata
+                        });
+                    }
                 });
             }
-        });
-    });
+        }
+    );
 }
 
 
@@ -82,7 +107,7 @@ var updateMetadata = function (modifications) {
  */
 exports.read = function (payload, callBack) {
     var userIDInApp = payload["userIDInApp"];
-    db.on('open', function () {
+//    db.on('open', function () {
         var cursor = Metadata.find({ createdById: userIDInApp}).cursor();
         var metadataResults = [];
         cursor.on("data", (metadataDoc) => {
@@ -91,7 +116,7 @@ exports.read = function (payload, callBack) {
         cursor.on("close", () => {
             callBack(metadataResults);
         });
-    });
+//    });
 }
 
 /**
@@ -106,41 +131,80 @@ exports.update = function (savedCard, callBack) {
     if (savedCard.metadataIndex === undefined) {
         savedCard.metadataIndex = 0;
     }
-    db.on('open', function () {
-        Metadata.findOne(
-            {
-                createdById: savedCard.createdById,
-                metadataIndex: savedCard.metadataIndex
-            }, 
-            (error, metadataDoc) => {
-                if (error) {
-                    callBack({
-                        "success": false, "internal_error": true,
-                        "message": error
-                    });    
-                } else {
-                    metadataDoc["stats"][0][savedCard["_id"]]["urgency"] = savedCard["urgency"];
-                    savedCard["tags"].forEach(tag => {
-                        metadata["node_information"][0][tag][savedCard["_id"]] = savedCard["urgency"];
-                    })
+    Metadata.findOne(
+        {
+            createdById: savedCard.createdById,
+            metadataIndex: savedCard.metadataIndex
+        }, 
+        (error, metadataDoc) => {
+            if (error) {
+                callBack({
+                    "success": false, "internal_error": true,
+                    "message": error
+                });    
+            } else {
+                var urgency = savedCard.urgency;
+                var cardID = savedCard._id;
 
-                    metadataDoc.save(function (error, savedMetadata) {
-                        if (error) {
-                            callBack({
-                                "success": false, "internal_error": true,
-                                "message": error
-                            });           
-                        } else {
-                            callBack({
-                                "success": true, "internal_error": false,
-                                "message": savedCard
-                            });    
-                        }
-                    });
+                if (metadataDoc["stats"] === undefined) {
+                    metadataDoc["stats"] = {}
                 }
+
+                if (metadataDoc["node_information"] === undefined) {
+                    metadataDoc["node_information"] = {}
+                } 
+                
+                
+                // Save this card in the stats field where it only appears once
+                if (metadataDoc["stats"][cardID] === undefined) {
+                    metadataDoc["stats"][cardID] = {};
+                }
+                metadataDoc["stats"][cardID]["urgency"] = urgency;
+
+                // We need to mark the nested path, `stats` by itself is wacky.
+                var modifiedPath = "stats." + cardID + ".urgency";
+                metadataDoc.markModified(modifiedPath);
+
+                // Save the card's id in each tag that it has
+                savedCard.tags.split("#").forEach(tag => {
+                    if (tag !== "") {
+                        if (metadataDoc["node_information"][tag] === undefined) {
+                            metadataDoc["node_information"][tag] = {};
+                        }
+
+                        if (metadataDoc["node_information"][tag][cardID] === undefined) {
+                            metadataDoc["node_information"][tag][cardID] = {}
+                        }
+
+                        metadataDoc["node_information"][tag][cardID]["urgency"] = urgency;
+                        modifiedPath = "node_information." + tag + "." + cardID + ".urgency";
+                        metadataDoc.markModified(modifiedPath);
+                    }
+                });
+
+                // This is needed for fields that have SchemaTypes.Mixed
+                
+                metadataDoc.markModified("node_information");
+
+                // Save this metadata document and return the card that has
+                // caused us all this trouble. We assume that the caller is more
+                // interested in the Card since they called Card.save()
+                metadataDoc.save(function (error, savedMetadata) {
+                    if (error) {
+                        callBack({
+                            "success": false, "internal_error": true,
+                            "message": error
+                        });           
+                    } else {
+                        callBack({
+                            "success": true, "internal_error": false,
+                            "message": savedCard
+                        });    
+                    }
+                });
             }
-        );
-    });
+        }
+    );
 }
 
 /**
@@ -151,29 +215,19 @@ exports.update = function (savedCard, callBack) {
  */
 exports.delete = function (payload, callBack) {
     var userIDInApp = payload["userIDInApp"];
-    db.on('open', function () {
-        Metadata.deleteMany(
-            { createdById: userIDInApp }, 
-            (error, deleteConfirmation) => {
-            if (error) {
-                callBack({
-                    "success": false, "internal_error": true,
-                    "message": error
-                });
-            } else {
-                callBack({
-                    "success": true, "internal_error": false,
-                    "message": deleteConfirmation
-                });
-            }
-        });
+    Metadata.deleteMany(
+        { createdById: userIDInApp }, 
+        (error, deleteConfirmation) => {
+        if (error) {
+            callBack({
+                "success": false, "internal_error": true,
+                "message": error
+            });
+        } else {
+            callBack({
+                "success": true, "internal_error": false,
+                "message": deleteConfirmation
+            });
+        }
     });
 }
-
-// Close the MongoDB connection before closing the application.
-process.on("SIGINT", function () {
-    db.close(function () {
-        console.log("Mongoose connection closed from CardsMongoDB.js");
-        process.exit(0);
-    });
-})

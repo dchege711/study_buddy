@@ -1,6 +1,6 @@
 var stanfordCrypto = require('sjcl');
 var config = require("../config");
-var User = require("./UserSchema");
+var User = require("./models/UserSchema");
 var MetadataDB = require("./MetadataMongoDB");
 var mongoose = require('mongoose');
 

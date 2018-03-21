@@ -8,7 +8,7 @@ var mongoose = require("mongoose");
 var config = require('../config');
 
 // Already 5 by default, but I might need to increase it one day...
-mongoose.connect(config.MONGO_URI, {poolSize: 5});
+mongoose.connect(config.MONGO_URI, {poolSize: 12});
 
 // Get Mongoose to use the global promise library.
 mongoose.Promise = global.Promise;
@@ -38,7 +38,7 @@ db.on("error", console.error.bind(console, "Connection Error:"));
 // Close the MongoDB connection before closing the application.
 process.on("SIGINT", function () {
     db.close(function () {
-        console.log("Mongoose connection closed from CardsMongoDB.js");
+        console.log("Mongoose connection closed from MongooseClient.js");
         process.exit(0);
     });
 })

@@ -1,4 +1,4 @@
-var Card = require('./CardSchema');
+var Card = require('./models/CardSchema');
 var config = require('../config');
 var mongoose = require('mongoose');
 var showdown = require('showdown');
@@ -7,9 +7,9 @@ var MetadataDB = require('./MetadataMongoDB');
 var converter = new showdown.Converter();
 
 // Note: Reconnecting to MongoDB is slow. Share the connection!
-mongoose.connect(config.MONGO_URI);
-var db = mongoose.connection;
-db.on("error", console.error.bind(console, "Connection Error:"));
+// mongoose.connect(config.MONGO_URI);
+// var db = mongoose.connection;
+// db.on("error", console.error.bind(console, "Connection Error:"));
 
 /**
  * Create a new card and add it to the user's current cards.
@@ -37,7 +37,7 @@ exports.create = function(payload, callBack) {
      * 
      * Will that ever happen, probably not!
      */
-    db.once('open', function() {
+    // db.once('open', function() {
         card.save(function(error, savedCard) {
             if (error) {
                 callBack({
@@ -49,7 +49,7 @@ exports.create = function(payload, callBack) {
                 MetadataDB.update(savedCard, callBack);
             }
         });
-    });
+    // });
 }
 
 /*
@@ -91,7 +91,7 @@ exports.saveThisCard = function(card, callBack) {
  */
 exports.read = function(payload, callBack) {
     var _id = payload["_id"];
-    db.once('open', function() {
+    // db.once('open', function() {
         if (_id === undefined) {
             var cursor = Card.find({ createdById: payload["userIDInApp"]}).cursor();
             var allRelevantCards = [];
@@ -119,7 +119,7 @@ exports.read = function(payload, callBack) {
                 }
             });
         }
-    });
+    // });
 }
 
 /**
@@ -133,29 +133,19 @@ exports.update = function(cardJSON, callBack) {
     var _id = cardJSON["_id"];
     cardJSON["description_markdown"] = converter.makeHtml(cardJSON["description"]);
     delete cardJSON._id;
-    console.log("DB should be opening soon...");
-    // mongoose.connect(config.MONGO_URI);
-    // var db = mongoose.connection;
-    // db.on("error", console.error.bind(console, "Connection Error:"));
-    db.
-    db.on('open', function() {
-        console.log("About to call findByIdAndUpdate()...")
-        Card.findByIdAndUpdate(
-            _id, {$set: cardJSON}, {overwrite: true}, 
-            (error, updatedCard) => {
-                console.log("Currently in CardsDB.findByID callBack...");
-                if (error) {
-                    callBack({
-                        "success": false, "internal_error": true,
-                        "message": error
-                    })
-                } else {
-                    console.log("Waiting for MetadataDB...");
-                    MetadataDB.update(updatedCard, callBack);
-                }
+    Card.findByIdAndUpdate(
+        _id, {$set: cardJSON}, {overwrite: true}, 
+        (error, updatedCard) => {
+            if (error) {
+                callBack({
+                    "success": false, "internal_error": true,
+                    "message": error
+                })
+            } else {
+                MetadataDB.update(updatedCard, callBack);
             }
-        );
-    });
+        }
+    );
 }
 
 /**
@@ -166,7 +156,7 @@ exports.update = function(cardJSON, callBack) {
  * `internal_error` and `message` as keys.
  */
 exports.delete = function(payload, callBack) {
-    db.once('open', function() {
+    // db.once('open', function() {
         Card.findByIdAndRemove(
             payload["_id"], (error, removedCard) => {
             if (error) {
@@ -178,13 +168,13 @@ exports.delete = function(payload, callBack) {
                 MetadataDB.remove(removedCard, callBack);
             }
         });
-    });
+    // });
 }
 
 // Close the MongoDB connection before closing the application.
-process.on("SIGINT", function() {
-    db.close(function() {
-        console.log("Mongoose connection closed from CardsMongoDB.js");
-        process.exit(0);
-    });
-})
+// process.on("SIGINT", function() {
+//     db.close(function() {
+//         console.log("Mongoose connection closed from CardsMongoDB.js");
+//         process.exit(0);
+//     });
+// })
