@@ -5,9 +5,7 @@ var CardsDB = require('./server_side_scripts/CardsMongoDB');
 var MetadataDB = require('./server_side_scripts/MetadataMongoDB');
 var LogInUtilities = require('./server_side_scripts/LogInUtilities');
 
-// https://nodejs.org/docs/latest/api/events.html#events_emitter_setmaxlisteners_n
-// var myEmmiter = new MyEmmiter();
-// myEmmiter.setMaxListeners(Infinity);
+require("./server_side_scripts/MongooseClient");
 
 const debugMode = true;
 

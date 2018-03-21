@@ -133,16 +133,24 @@ exports.update = function(cardJSON, callBack) {
     var _id = cardJSON["_id"];
     cardJSON["description_markdown"] = converter.makeHtml(cardJSON["description"]);
     delete cardJSON._id;
-    db.once('open', function() {
+    console.log("DB should be opening soon...");
+    // mongoose.connect(config.MONGO_URI);
+    // var db = mongoose.connection;
+    // db.on("error", console.error.bind(console, "Connection Error:"));
+    db.
+    db.on('open', function() {
+        console.log("About to call findByIdAndUpdate()...")
         Card.findByIdAndUpdate(
-            _id, {$set: cardJSON}, {new: true}, 
+            _id, {$set: cardJSON}, {overwrite: true}, 
             (error, updatedCard) => {
+                console.log("Currently in CardsDB.findByID callBack...");
                 if (error) {
                     callBack({
                         "success": false, "internal_error": true,
                         "message": error
                     })
                 } else {
+                    console.log("Waiting for MetadataDB...");
                     MetadataDB.update(updatedCard, callBack);
                 }
             }

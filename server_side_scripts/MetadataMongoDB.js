@@ -3,10 +3,9 @@ var Card = require('./CardSchema');
 var config = require('../config');
 var mongoose = require('mongoose');
 
-// Note: Reconnecting to MongoDB is slow. Share the connection!
-mongoose.connect(config.MONGO_URI);
-var db = mongoose.connection;
-db.on("error", console.error.bind(console, "Connection Error:"));
+// mongoose.connect(config.MONGO_URI);
+// var db = mongoose.connection;
+// db.on("error", console.error.bind(console, "Connection Error:"));
 
 /**
  * 
@@ -24,7 +23,7 @@ exports.create = function (payload, callBack) {
         "node_information": {}
     });
 
-    db.once('open', function () {
+    db.on('open', function () {
         tagMetadata.markModified("stats");
         tagMetadata.markModified("node_information");
         tagMetadata.save((error, savedMetadata) => {
@@ -83,7 +82,7 @@ var updateMetadata = function (modifications) {
  */
 exports.read = function (payload, callBack) {
     var userIDInApp = payload["userIDInApp"];
-    db.once('open', function () {
+    db.on('open', function () {
         var cursor = Metadata.find({ createdById: userIDInApp}).cursor();
         var metadataResults = [];
         cursor.on("data", (metadataDoc) => {
@@ -107,7 +106,7 @@ exports.update = function (savedCard, callBack) {
     if (savedCard.metadataIndex === undefined) {
         savedCard.metadataIndex = 0;
     }
-    db.once('open', function () {
+    db.on('open', function () {
         Metadata.findOne(
             {
                 createdById: savedCard.createdById,
@@ -152,7 +151,7 @@ exports.update = function (savedCard, callBack) {
  */
 exports.delete = function (payload, callBack) {
     var userIDInApp = payload["userIDInApp"];
-    db.once('open', function () {
+    db.on('open', function () {
         Metadata.deleteMany(
             { createdById: userIDInApp }, 
             (error, deleteConfirmation) => {
