@@ -9,6 +9,7 @@ var userSchema = new mongoose.Schema(
     {
         username: {
             type: String,
+            required: true,
             unique: [true, "This username is already taken"],
         },
         salt: Array,
@@ -19,6 +20,7 @@ var userSchema = new mongoose.Schema(
         },
         email: {
             type: String,
+            required: true,
             unique: true
         }
     },
@@ -28,5 +30,9 @@ var userSchema = new mongoose.Schema(
         collection: "study_buddy_users"
     }
 );
+
+userSchema.virtual("url").get(function() {
+    return "/study-buddy/user/" + this._id;
+});
 
 module.exports = mongoose.model('User', userSchema);

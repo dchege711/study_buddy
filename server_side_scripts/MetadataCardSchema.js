@@ -17,4 +17,8 @@ var metadataSchema = new mongoose.Schema({
     }
 );
 
+metadataSchema.virtual("url").get(function () {
+    return "/study-buddy/metadata/" + this._id;
+});
+
 module.exports = mongoose.model('Metadata', metadataSchema);

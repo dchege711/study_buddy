@@ -36,6 +36,10 @@ var cardSchema = new mongoose.Schema({
     }
 );
 
+cardSchema.virtual("url").get(function () {
+    return "/study-buddy/card/" + this._id;
+});
+
 /*
  * The schema has now been compiled into a mongoose model. I can now use it
  * find, create, update and delete objects of the Card type.
