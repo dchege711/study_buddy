@@ -4,10 +4,7 @@ var User = require("./models/UserSchema");
 var MetadataDB = require("./MetadataMongoDB");
 var mongoose = require('mongoose');
 
-// Note: Reconnecting to MongoDB is slow. Share the connection!
-mongoose.connect(config.MONGO_URI);
-var db = mongoose.connection;
-db.on("error", console.error.bind(console, "Connection Error:"));
+var debug = true;
 
 getSaltAndHash = function(password, callBack) {
     // 8 words = 32 bytes = 256 bits, a paranoia of 7
@@ -22,22 +19,20 @@ getHash = function(password, salt, callBack) {
 }
 
 getIdInApp = function(callBack) {
-    db.once('open', function() {
-        User.findById({_id: config.USER_METADATA_ID}, function(error, user) {
-            if (error) {
-                console.log(error);
-            } else {
-                var newUserID = user["userIDInApp"] + 1;
-                user["userIDInApp"] = newUserID;
-                user.save(function(error, confirmation) {
-                    if (error) {
-                        console.log(error);
-                    } else { 
-                        callBack(newUserID);
-                    }
-                });
-            }
-        });
+    User.findById({_id: config.USER_METADATA_ID}, function(error, user) {
+        if (error) {
+            console.log(error);
+        } else {
+            var newUserID = user["userIDInApp"] + 1;
+            user["userIDInApp"] = newUserID;
+            user.save(function(error, confirmation) {
+                if (error) {
+                    console.log(error);
+                } else { 
+                    callBack(newUserID);
+                }
+            });
+        }
     });
 }
 
@@ -67,38 +62,36 @@ exports.registerUserAndPassword = function(payload, callBack) {
             });
 
             if (debug) console.log("Saving new user: " + email);
-            db.once('open', function() {
-                User.findOne({ email: user.email }, (error, existingUser) => {
-                    if (error) {
-                        callBack({
-                            "success": false,
-                            "internal_error": true,
-                            "message": error
-                        });        
+            User.findOne({ email: user.email }, (error, existingUser) => {
+                if (error) {
+                    callBack({
+                        "success": false,
+                        "internal_error": true,
+                        "message": error
+                    });        
+                    return;
+                } else {
+                    // Check what mongoose returns if a document doesn't exist. Ans: []
+                    if (existingUser) {
+                        // Send an email to them notifying them of suspicious activity            
                         return;
                     } else {
-                        // Check what mongoose returns if a document doesn't exist. Ans: []
-                        if (existingUser) {
-                            // Send an email to them notifying them of suspicious activity            
-                            return;
-                        } else {
-                            // Save the new user's account and send enough info to log them in
-                            user.save(function (error, savedUser) {
-                                if (error) {
-                                    callBack({
-                                        "success": false, "internal_error": true, "message": error
-                                    });                   
-                                } else {
-                                    MetadataDB.create({
-                                        userIDInApp: savedUser.userIDInApp
-                                    }, callBack);
-                                }
-                            });
-                        }
+                        // Save the new user's account and send enough info to log them in
+                        user.save(function (error, savedUser) {
+                            if (error) {
+                                callBack({
+                                    "success": false, "internal_error": true, "message": error
+                                });                   
+                            } else {
+                                MetadataDB.create({
+                                    userIDInApp: savedUser.userIDInApp
+                                }, callBack);
+                            }
+                        });
                     }
-                });
-            });    
-        });
+                }
+            });
+        });    
     });
 }
 
@@ -114,57 +107,47 @@ exports.authenticateUser = function(payload, callBack) {
     var username = payload["username"];
     var password = payload["password"];
 
-    db.once('open', function() {
-        User.findOne({ username: username}, function(error, user) {
-            if (error) {
-                console.log(error);
-            } else {
-                // Case 1: The user doesn't exist
-                if (!user) {
+    User.findOne({ username: username}, function(error, user) {
+        if (error) {
+            console.log(error);
+        } else {
+            // Case 1: The user doesn't exist
+            if (!user) {
+                callBack({
+                    "success": false, "internal_error": false,
+                    "message": "Incorrect username and/or password"
+                });   
+                return;
+            }
+
+            // Otherwise try authenticating the user
+            var saltOnFile = user["salt"];
+            var hashOnFile = user["hash"];
+            getHash(password, saltOnFile, function(calculatedHash) {
+                var thereIsAMatch = true;
+                for (let i = 0; i < calculatedHash.length; i++) {
+                    if (calculatedHash[i] !== hashOnFile[i]) {
+                        thereIsAMatch = false;
+                        break;
+                    } 
+                }
+
+                // Case 2: The user has provided correct credentials
+                if (thereIsAMatch) {
+                    callBack({
+                        "success": true, "internal_error": false,
+                        "message": user.userIDInApp
+                    });        
+                    return;
+                } else {
+                    // Case 3: The user provided wrong credentials
                     callBack({
                         "success": false, "internal_error": false,
                         "message": "Incorrect username and/or password"
-                    });   
+                    });
                     return;
                 }
-
-                // Otherwise try authenticating the user
-                var saltOnFile = user["salt"];
-                var hashOnFile = user["hash"];
-                getHash(password, saltOnFile, function(calculatedHash) {
-                    var thereIsAMatch = true;
-                    for (let i = 0; i < calculatedHash.length; i++) {
-                        if (calculatedHash[i] !== hashOnFile[i]) {
-                            thereIsAMatch = false;
-                            break;
-                        } 
-                    }
-
-                    // Case 2: The user has provided correct credentials
-                    if (thereIsAMatch) {
-                        callBack({
-                            "success": true, "internal_error": false,
-                            "message": user["userIDInApp"]
-                        });        
-                        return;
-                    } else {
-                        // Case 3: The user provided wrong credentials
-                        callBack({
-                            "success": false, "internal_error": false,
-                            "message": "Incorrect username and/or password"
-                        });
-                        return;
-                    }
-                });
-            }
-        });
-    }); 
-}
-
-// Close the MongoDB connection before closing the application.
-process.on("SIGINT", function () {
-    db.close(function () {
-        console.log("Mongoose connection closed from CardsMongoDB.js");
-        process.exit(0);
+            });
+        }
     });
-})
+}

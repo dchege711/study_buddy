@@ -4,11 +4,14 @@
 
 var mongoose = require('mongoose');
 
+// Using SchemaTypes.Mixed produces unreliable write results
+// It's better to include the dictionary in an array.
+
 var metadataSchema = new mongoose.Schema({
     createdById: Number,
     metadataIndex: Number,
-    node_information: mongoose.SchemaTypes.Mixed,
-    stats: mongoose.SchemaTypes.Mixed,
+    node_information: Array,
+    stats: Array,
 },
     {
         timestamps: true,

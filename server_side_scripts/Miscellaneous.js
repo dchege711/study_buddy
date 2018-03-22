@@ -20,12 +20,13 @@ var addAndPopulateMetadata = function(userIDInApp) {
 /**
  * @description Delete metadata for the specified user
  */
-var deleteMetadata = function (userIDInApp) {
+var deleteMetadata = function (userIDInApp, callBack) {
     MetadataDB.delete(
         {
             "userIDInApp": userIDInApp
         }, (response) => {
             console.log(response["message"]);
+            callBack(userIDInApp);
         });
 }
 
@@ -40,21 +41,14 @@ var populateMetadata = function(userIDInApp) {
             "userIDInApp": userIDInApp
         }, (response) => {
             cards = response["message"];
-            cards.forEach(card => {
-                if (card.title === "_metadata_" || card.title === "_tags_metadata_") {
-                    // Do nothing
-                } else {
-                    card["metadataIndex"] = 0;
-                    CardsDB.update(card, (response) => {
-                        console.log(response["message"]["title"]);
-                    });
-                }
-            }); 
+            MetadataDB.update(cards, (response) => {
+                console.log(response["message"]);
+            });
         }
     );
 }
 
 if (require.main === module) {
-    addAndPopulateMetadata(1);
-    //deleteMetadata(1);
+    deleteMetadata(1, addAndPopulateMetadata);
+    // addAndPopulateMetadata(1);
 }

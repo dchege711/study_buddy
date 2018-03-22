@@ -3,9 +3,7 @@ var Card = require('./models/CardSchema');
 var config = require('../config');
 var mongoose = require('mongoose');
 
-// mongoose.connect(config.MONGO_URI);
-// var db = mongoose.connection;
-// db.on("error", console.error.bind(console, "Connection Error:"));
+var debug = true;
 
 /**
  * 
@@ -42,12 +40,9 @@ exports.create = function (payload, callBack) {
                 var tagMetadata = new Metadata({
                     "createdById": payload["userIDInApp"],
                     "metadataIndex": 0,
-                    "stats": {},
-                    "node_information": {}
+                    "stats": [],
+                    "node_information": []
                 });
-
-                tagMetadata.markModified("stats");
-                tagMetadata.markModified("node_information");
 
                 tagMetadata.save(function(error, savedMetadata) {
                     if (error) {
@@ -67,38 +62,6 @@ exports.create = function (payload, callBack) {
     );
 }
 
-
-var updateMetadata = function (modifications) {
-    mongoose.connect(config.MONGO_URI);
-    var db = mongoose.connection;
-    db.on('error', console.error.bind(console, 'Connection Error:'));
-    db.once('open', function () {
-        Card.findOne({ "title": "_tags_metadata_" }, function (error, card) {
-            if (error) {
-                console.log(error);
-            } else {
-                if (card === null || card === undefined) {
-                    console.log("{title: _tags_metadata_} didn't match any documents");
-                    return;
-                }
-                Object.keys(payload).forEach(key => {
-                    card[key] = payload[key];
-                });
-
-                card["description_markdown"] = converter.makeHtml(card["description"]),
-                    card.save(function (error, confirmation) {
-                        if (error) {
-                            console.log(error);
-                        } else {
-                            callBack(confirmation);
-            
-                        }
-                    });
-            }
-        });
-    });
-}
-
 /**
  * Read all the metadata associated with a user's cards.
  * 
@@ -107,34 +70,32 @@ var updateMetadata = function (modifications) {
  */
 exports.read = function (payload, callBack) {
     var userIDInApp = payload["userIDInApp"];
-//    db.on('open', function () {
-        var cursor = Metadata.find({ createdById: userIDInApp}).cursor();
-        var metadataResults = [];
-        cursor.on("data", (metadataDoc) => {
-            metadataResults.push(metadataDoc);
-        });
-        cursor.on("close", () => {
-            callBack(metadataResults);
-        });
-//    });
+    var cursor = Metadata.find({ createdById: userIDInApp}).cursor();
+    var metadataResults = [];
+    cursor.on("data", (metadataDoc) => {
+        metadataResults.push(metadataDoc);
+    });
+    cursor.on("close", () => {
+        callBack(metadataResults);
+    });
 }
 
 /**
- * Update the metadata with the new card's details. This method
+ * Update the metadata with the new cards' details. This method
  * is usually called by CardsMongoDB.update().  
  * 
- * @param {mongoose.Model} savedCard The card that has just been saved
+ * @param {Array} savedCards Array of cards
  * @param {Function} callBack Takes a JSON with `success`,
  * `internal_error` and `message` as keys.
  */
-exports.update = function (savedCard, callBack) {
-    if (savedCard.metadataIndex === undefined) {
-        savedCard.metadataIndex = 0;
+exports.update = function (savedCards, callBack) {
+    if (savedCards[0].metadataIndex === undefined) {
+        savedCards[0].metadataIndex = 0;
     }
     Metadata.findOne(
         {
-            createdById: savedCard.createdById,
-            metadataIndex: savedCard.metadataIndex
+            createdById: savedCards[0].createdById,
+            metadataIndex: savedCards[0].metadataIndex
         }, 
         (error, metadataDoc) => {
             if (error) {
@@ -143,52 +104,53 @@ exports.update = function (savedCard, callBack) {
                     "message": error
                 });    
             } else {
-                var urgency = savedCard.urgency;
-                var cardID = savedCard._id;
 
-                if (metadataDoc["stats"] === undefined) {
-                    metadataDoc["stats"] = {}
-                }
+                savedCards.forEach(savedCard => {
+                    var urgency = savedCard.urgency;
+                    var cardID = savedCard._id;
 
-                if (metadataDoc["node_information"] === undefined) {
-                    metadataDoc["node_information"] = {}
-                } 
-                
-                
-                // Save this card in the stats field where it only appears once
-                if (metadataDoc["stats"][cardID] === undefined) {
-                    metadataDoc["stats"][cardID] = {};
-                }
-                metadataDoc["stats"][cardID]["urgency"] = urgency;
-
-                // We need to mark the nested path, `stats` by itself is wacky.
-                var modifiedPath = "stats." + cardID + ".urgency";
-                metadataDoc.markModified(modifiedPath);
-
-                // Save the card's id in each tag that it has
-                savedCard.tags.split("#").forEach(tag => {
-                    if (tag !== "") {
-                        if (metadataDoc["node_information"][tag] === undefined) {
-                            metadataDoc["node_information"][tag] = {};
-                        }
-
-                        if (metadataDoc["node_information"][tag][cardID] === undefined) {
-                            metadataDoc["node_information"][tag][cardID] = {}
-                        }
-
-                        metadataDoc["node_information"][tag][cardID]["urgency"] = urgency;
-                        modifiedPath = "node_information." + tag + "." + cardID + ".urgency";
-                        metadataDoc.markModified(modifiedPath);
+                    if(metadataDoc["stats"].length == 0) {
+                        metadataDoc["stats"].push({});
+                        if (debug) console.log("Created new stats item for " + savedCard.title);
                     }
+
+                    if (metadataDoc["node_information"].length == 0) {
+                        metadataDoc["node_information"].push({});
+                        if (debug) console.log("Created new nodes item for " + savedCard.title);
+                    }
+
+                    metadataStats = metadataDoc["stats"][0];
+                    metadataNodeInfo = metadataDoc["node_information"][0];
+
+                    // Save this card in the stats field where it only appears once
+                    if (metadataStats[cardID] === undefined) {
+                        metadataStats[cardID] = {};
+                    }
+                    metadataStats[cardID]["urgency"] = urgency;
+
+
+
+                    // Save the card's id in each tag that it has
+                    savedCard.tags.split("#").forEach(tag => {
+                        var strippedTag = tag.trim();
+                        if (strippedTag !== "") {
+                            // If we've not seen this tag before, create its node
+                            if (metadataNodeInfo[strippedTag] === undefined) {
+                                metadataNodeInfo[strippedTag] = {};
+                            }
+
+                            // If we've not seen this card under this tag, add it
+                            if (metadataNodeInfo[strippedTag][cardID] === undefined) {
+                                metadataNodeInfo[strippedTag][cardID] = {}
+                            }
+
+                            metadataNodeInfo[strippedTag][cardID]["urgency"] = urgency;
+                        }
+                    });
+
                 });
 
-                // This is needed for fields that have SchemaTypes.Mixed
-                
-                metadataDoc.markModified("node_information");
 
-                // Save this metadata document and return the card that has
-                // caused us all this trouble. We assume that the caller is more
-                // interested in the Card since they called Card.save()
                 metadataDoc.save(function (error, savedMetadata) {
                     if (error) {
                         callBack({
@@ -196,9 +158,11 @@ exports.update = function (savedCard, callBack) {
                             "message": error
                         });           
                     } else {
+                        console.log("Present stats");
+                        console.log(savedMetadata.stats[0]);
                         callBack({
                             "success": true, "internal_error": false,
-                            "message": savedCard
+                            "message": savedMetadata
                         });    
                     }
                 });

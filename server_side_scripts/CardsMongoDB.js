@@ -6,11 +6,6 @@ var MetadataDB = require('./MetadataMongoDB');
 
 var converter = new showdown.Converter();
 
-// Note: Reconnecting to MongoDB is slow. Share the connection!
-// mongoose.connect(config.MONGO_URI);
-// var db = mongoose.connection;
-// db.on("error", console.error.bind(console, "Connection Error:"));
-
 /**
  * Create a new card and add it to the user's current cards.
  * 
@@ -37,19 +32,17 @@ exports.create = function(payload, callBack) {
      * 
      * Will that ever happen, probably not!
      */
-    // db.once('open', function() {
-        card.save(function(error, savedCard) {
-            if (error) {
-                callBack({
-                    "success": false, "internal_error": true,
-                    "message": error
-                })
-            } else {
-                // Update the metadata object with this card's details
-                MetadataDB.update(savedCard, callBack);
-            }
-        });
-    // });
+    card.save(function(error, savedCard) {
+        if (error) {
+            callBack({
+                "success": false, "internal_error": true,
+                "message": error
+            })
+        } else {
+            // Update the metadata object with this card's details
+            MetadataDB.update(savedCard, callBack);
+        }
+    });
 }
 
 /*
@@ -91,35 +84,33 @@ exports.saveThisCard = function(card, callBack) {
  */
 exports.read = function(payload, callBack) {
     var _id = payload["_id"];
-    // db.once('open', function() {
-        if (_id === undefined) {
-            var cursor = Card.find({ createdById: payload["userIDInApp"]}).cursor();
-            var allRelevantCards = [];
-            cursor.on("data", (card) => {
-                allRelevantCards.push(card);
-            });
-            cursor.on("close", () => {
+    if (_id === undefined) {
+        var cursor = Card.find({ createdById: payload["userIDInApp"]}).cursor();
+        var allRelevantCards = [];
+        cursor.on("data", (card) => {
+            allRelevantCards.push(card);
+        });
+        cursor.on("close", () => {
+            callBack({
+                "success": true, "internal_error": false,
+                "message": allRelevantCards
+            })
+        });
+    } else {
+        Card.findById(_id, function(error, card) {
+            if (error) {
+                callBack({
+                    "success": false, "internal_error": true,
+                    "message": error
+                })
+            } else {
                 callBack({
                     "success": true, "internal_error": false,
-                    "message": allRelevantCards
+                    "message": card
                 })
-            });
-        } else {
-            Card.findById(_id, function(error, card) {
-                if (error) {
-                    callBack({
-                        "success": false, "internal_error": true,
-                        "message": error
-                    })
-                } else {
-                    callBack({
-                        "success": true, "internal_error": false,
-                        "message": card
-                    })
-                }
-            });
-        }
-    // });
+            }
+        });
+    }
 }
 
 /**
@@ -142,7 +133,7 @@ exports.update = function(cardJSON, callBack) {
                     "message": error
                 })
             } else {
-                MetadataDB.update(updatedCard, callBack);
+                MetadataDB.update([updatedCard], callBack);
             }
         }
     );
@@ -156,25 +147,15 @@ exports.update = function(cardJSON, callBack) {
  * `internal_error` and `message` as keys.
  */
 exports.delete = function(payload, callBack) {
-    // db.once('open', function() {
-        Card.findByIdAndRemove(
-            payload["_id"], (error, removedCard) => {
-            if (error) {
-                callBack({
-                    "success": false, "internal_error": true,
-                    "message": error
-                })
-            } else {
-                MetadataDB.remove(removedCard, callBack);
-            }
-        });
-    // });
+    Card.findByIdAndRemove(
+        payload["_id"], (error, removedCard) => {
+        if (error) {
+            callBack({
+                "success": false, "internal_error": true,
+                "message": error
+            })
+        } else {
+            MetadataDB.remove(removedCard, callBack);
+        }
+    });
 }
-
-// Close the MongoDB connection before closing the application.
-// process.on("SIGINT", function() {
-//     db.close(function() {
-//         console.log("Mongoose connection closed from CardsMongoDB.js");
-//         process.exit(0);
-//     });
-// })

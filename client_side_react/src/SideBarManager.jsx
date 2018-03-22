@@ -23,10 +23,9 @@ class SideBarManager extends React.Component {
     refreshTags() {
         this.makeHttpRequest(
             "post", "/read-metadata",
-            { createdById: this.props.userIDInApp}, 
+            { userIDInApp: this.props.userIDInApp}, 
             (response) => {
-                console.log(response["data"]);
-                this.updateTagsList(response["data"]["node_information"][0]);
+                this.updateTagsList(response["data"][0]["node_information"]);
             }
         );
     }
@@ -47,10 +46,11 @@ class SideBarManager extends React.Component {
             newTags[key] = nodeData[key];
         }
 
+        if (debug) console.log(nodeData);
         var newTagsHTML = Object.keys(nodeData).map((tag) =>
             <ul key={tag.toString()}>
                 <button id={tag.toString()} className="link" onClick={() => this.selectThisTag(tag)}>
-                    #{tag} ({nodeData[tag].length})
+                    #{tag} ({nodeData[tag].size})
                 </button>
             </ul>
         );
