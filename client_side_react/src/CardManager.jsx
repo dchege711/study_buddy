@@ -180,9 +180,6 @@ class CardManager extends React.Component {
                 }        
             }
         }
-        if (debug) {
-            console.log(data);
-        }
         
         // Update the card's contents in the database
         this.makeHttpRequest(

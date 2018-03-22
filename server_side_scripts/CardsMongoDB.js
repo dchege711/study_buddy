@@ -5,6 +5,7 @@ var showdown = require('showdown');
 var MetadataDB = require('./MetadataMongoDB');
 
 var converter = new showdown.Converter();
+var debug = true;
 
 /**
  * Create a new card and add it to the user's current cards.
@@ -126,7 +127,54 @@ exports.update = function(cardJSON, callBack) {
     if (cardJSON.hasOwnProperty("description")) {
         cardJSON["description_markdown"] = converter.makeHtml(cardJSON["description"]);
     }
-    delete cardJSON._id;
+
+    // findByIdAndUpdate will give me the old, not the updated, document.
+    // I need to find the card, save it, and then call MetadataDB.update if need be
+
+    Card.findById(cardJSON["_id"], function(error, card) {
+        if (error) {
+            callBack({
+                "success": false, "internal_error": true,
+                "message": error
+            });
+        } else {
+            // Overwrite the contents that changed
+            Object.keys(cardJSON).forEach(card_key => {
+                card[card_key] = cardJSON[card_key];
+            });
+            card.save(function(error, savedCard) {
+                if (error) {
+                    callBack({
+                        "success": false, "internal_error": true,
+                        "message": error
+                    });
+                } else {
+                    if (cardJSON.hasOwnProperty("tags") || cardJSON.hasOwnProperty("urgency")) {
+                        MetadataDB.update([savedCard], (response) => {
+                            if (response["success"]) {
+                                callBack({
+                                    "success": true, "internal_error": false,
+                                    "message": savedCard
+                                });
+                            } else {
+                                callBack({
+                                    "success": false, "internal_error": false,
+                                    "message": response["message"]
+                                });
+                            }
+                        });
+                    } else {
+                        callBack({
+                            "success": true, "internal_error": false,
+                            "message": savedCard
+                        });
+                    }
+                }
+            });
+        }
+    });
+
+    /*
     Card.findByIdAndUpdate(
         _id, {$set: cardJSON}, {overwrite: true}, 
         (error, updatedCard) => {
@@ -136,6 +184,7 @@ exports.update = function(cardJSON, callBack) {
                     "message": error
                 })
             } else {
+                if (debug) console.log("Current urgency: " + updatedCard.urgency);
                 MetadataDB.update([updatedCard], (response) => {
                     if (response["success"]) {
                         callBack({
@@ -152,6 +201,7 @@ exports.update = function(cardJSON, callBack) {
             }
         }
     );
+    */
 }
 
 /**

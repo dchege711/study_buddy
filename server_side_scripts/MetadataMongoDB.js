@@ -107,6 +107,11 @@ exports.update = function (savedCards, callBack) {
             } else {
 
                 savedCards.forEach(savedCard => {
+
+                    if (debug) {
+                        console.log("Updating metadata: " + savedCard.title + " urgency -> " + savedCard.urgency);
+                    }
+
                     var urgency = savedCard.urgency;
                     var cardID = savedCard._id;
 
@@ -129,8 +134,6 @@ exports.update = function (savedCards, callBack) {
                     }
                     metadataStats[cardID]["urgency"] = urgency;
 
-
-
                     // Save the card's id in each tag that it has
                     savedCard.tags.split("#").forEach(tag => {
                         var strippedTag = tag.trim();
@@ -151,19 +154,20 @@ exports.update = function (savedCards, callBack) {
 
                 });
 
+                // This is necessary. All that hair pulling can now stop :-/
+                metadataDoc.markModified("stats");
+                metadataDoc.markModified("node_information");
 
-                metadataDoc.save(function (error, savedMetadata) {
+                metadataDoc.save(function (error, savedMetadata, numAffected) {
                     if (error) {
                         callBack({
                             "success": false, "internal_error": true,
                             "message": error
                         });           
                     } else {
-                        console.log("Present stats");
-                        console.log(savedMetadata.stats[0]);
                         callBack({
                             "success": true, "internal_error": false,
-                            "message": savedMetadata
+                            "message": metadataDoc
                         });    
                     }
                 });

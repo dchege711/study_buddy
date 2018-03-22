@@ -73,7 +73,7 @@ app.post('/read-metadata', function (request, response) {
 app.post('/add-card', function(request, response) {
     console.log("POST request at /add-card.");
     if (debugMode) {
-        console.log(Object.keys(request.body));
+        console.log(request.body);
     }
     
     CardsDB.create(request.body, function(confirmation) {
@@ -85,7 +85,7 @@ app.post('/add-card', function(request, response) {
 app.post('/update-card', function(request, response) {
     console.log("POST request at /update-card.");
     if (debugMode) {
-        console.log(Object.keys(request.body));
+        console.log(request.body);
     }
     
     CardsDB.update(request.body, function(confirmation) {

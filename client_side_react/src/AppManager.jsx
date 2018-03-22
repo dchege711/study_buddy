@@ -85,6 +85,8 @@ class AppManager extends React.Component {
      * sortable attributes.
      */
     organizeCards(cardStats) {
+        console.log("organizeCards() using urgency");
+        console.log(cardStats);
         // Sort the cards using their urgency attribute
         var keys = Object.keys(cardStats);
         keys.sort(
