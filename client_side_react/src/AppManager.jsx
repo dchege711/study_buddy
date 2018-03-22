@@ -4,8 +4,6 @@ import SideBarManager from './SideBarManager';
 import CardManager from './CardManager';
 
 var axios = require('axios');
-
-const metadata_id = "5a77c6d0734d1d3bd58d1198";
 const debug = true;
 
 class AppManager extends React.Component {
@@ -39,7 +37,7 @@ class AppManager extends React.Component {
             "post", "/read-card",
             { _id: id },
             (response) => {
-                callBack(response["data"]);
+                callBack(response["data"]["message"]);
             }
         );
     }
@@ -68,14 +66,14 @@ class AppManager extends React.Component {
 
         // Fetch the metadata about all the available cards
         this.makeHttpRequest(
-            "post", "/read-card",
-            { _id: metadata_id },
+            "post", "/read-metadata",
+            { userIDInApp: this.props.userIDInApp },
             (response) => {
                 // Set the contents of the card being viewed
                 this.setState({
-                    cardStats: response["data"]["stats"][0]
+                    cardStats: response["data"][0]["stats"][0]
                 })
-                this.organizeCards(response["data"]["stats"][0]);
+                this.organizeCards(response["data"][0]["stats"][0]);
             }
         )
     }

@@ -82,7 +82,8 @@ exports.read = function (payload, callBack) {
 
 /**
  * Update the metadata with the new cards' details. This method
- * is usually called by CardsMongoDB.update().  
+ * is usually called by CardsMongoDB.update(). An array is needed to prevent
+ * race conditions when updating metadata from more than one card. 
  * 
  * @param {Array} savedCards Array of cards
  * @param {Function} callBack Takes a JSON with `success`,

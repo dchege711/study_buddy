@@ -94,6 +94,10 @@ class CardManager extends React.Component {
      * @param {Object} newCard The card that should be displayed by the CardManager
      */
     updateCardContents(newCard) {
+        if (debug) {
+            console.log("updateCardContents() was called");
+        }
+
         this.setState({
             _id: newCard._id,
             title: newCard.title,
@@ -184,8 +188,7 @@ class CardManager extends React.Component {
         this.makeHttpRequest(
             "post", url, data,
             (response) => {
-                var card = response["data"];
-                this.updateCardContents(card);
+                var card = response["data"]["message"];
 
                 // Notify the parent function that this card has been modified
                 this.props.cardHasBeenModified({

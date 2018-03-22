@@ -116,13 +116,16 @@ exports.read = function(payload, callBack) {
 /**
  * Update an existing card.
  * 
- * @param {JSON} cardJSON The entire card as a JSON object
+ * @param {JSON} cardJSON The parts of the card that have been updated. Must
+ * include the card's `id`
  * @param {Function} callBack Takes a JSON with `success`,
  * `internal_error` and `message` as keys.
  */
 exports.update = function(cardJSON, callBack) {
     var _id = cardJSON["_id"];
-    cardJSON["description_markdown"] = converter.makeHtml(cardJSON["description"]);
+    if (cardJSON.hasOwnProperty("description")) {
+        cardJSON["description_markdown"] = converter.makeHtml(cardJSON["description"]);
+    }
     delete cardJSON._id;
     Card.findByIdAndUpdate(
         _id, {$set: cardJSON}, {overwrite: true}, 
@@ -133,7 +136,19 @@ exports.update = function(cardJSON, callBack) {
                     "message": error
                 })
             } else {
-                MetadataDB.update([updatedCard], callBack);
+                MetadataDB.update([updatedCard], (response) => {
+                    if (response["success"]) {
+                        callBack({
+                            "success": true, "internal_error": false,
+                            "message": updatedCard
+                        })
+                    } else {
+                        callBack({
+                            "success": false, "internal_error": false,
+                            "message": response["message"]
+                        })
+                    }
+                });
             }
         }
     );

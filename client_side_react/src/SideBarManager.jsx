@@ -25,7 +25,7 @@ class SideBarManager extends React.Component {
             "post", "/read-metadata",
             { userIDInApp: this.props.userIDInApp}, 
             (response) => {
-                this.updateTagsList(response["data"][0]["node_information"]);
+                this.updateTagsList(response["data"][0]["node_information"][0]);
             }
         );
     }
@@ -46,11 +46,11 @@ class SideBarManager extends React.Component {
             newTags[key] = nodeData[key];
         }
 
-        if (debug) console.log(nodeData);
+        // Why doesn't nodeData[tag].size work???
         var newTagsHTML = Object.keys(nodeData).map((tag) =>
             <ul key={tag.toString()}>
                 <button id={tag.toString()} className="link" onClick={() => this.selectThisTag(tag)}>
-                    #{tag} ({nodeData[tag].size})
+                    #{tag} ({Object.keys(nodeData[tag]).length})
                 </button>
             </ul>
         );
