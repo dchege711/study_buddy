@@ -8,7 +8,7 @@ const debug = true;
 const emptyCard = {
     _id: "", title: "", description: "", 
     tags: "", createdById: 0, createdAt: "", 
-    updatedAt: "", urgency: 5,
+    updatedAt: "", urgency: "",
     description_markdown: "", 
 };
 
@@ -28,13 +28,15 @@ class CardManager extends React.Component {
      */
     constructor(props) {
         super(props);
-        var currentCard;
+        var currentCard, cardIsNew;
         if (props.card === null || props.card === undefined) {
-            console.log("CardManager initialized with empty card.");
+            console.log("CardManager initialized: Empty Card.");
             currentCard = emptyCard;
+            cardIsNew = true;
         } else {
-            console.log("CardManager initialized with " + props.card.title);
+            console.log("CardManager initialized: " + props.card.title);
             currentCard = props.card;
+            cardIsNew = false;
         }
         this.state = {
             _id: currentCard._id,
@@ -46,7 +48,7 @@ class CardManager extends React.Component {
             updatedAt: currentCard.updatedAt,
             urgency: currentCard.urgency,
             description_markdown: currentCard.description_markdown,
-            isNew: false,
+            isNew: cardIsNew,
             editableDescription: false,
             titleChanged: false,
             descriptionChanged: false,
@@ -70,11 +72,14 @@ class CardManager extends React.Component {
      * To do: Read the docs more closely for a better fix.
      */
     componentWillReceiveProps() {
+        if (debug) {
+            console.log("componentWillReceivedProps()");
+        }
         if (this.props.card === null || this.props.card === undefined) {
-            console.log("CardManager initialized with empty card.");
+            console.log("CardManager: Empty Card");
             this.updateCardContents(emptyCard);
         } else {
-            console.log("CardManager initialized with " + this.props.card.title);
+            console.log("CardManager: " + this.props.card.title);
             this.updateCardContents(this.props.card);
         }
         
@@ -207,6 +212,8 @@ class CardManager extends React.Component {
      * @returns {JSX.Element} Return a representation of the current card.
      */
     render() {
+        if (debug) console.log("CardManager rendered!");
+
         var submitLabel;
         if (this.state.isNew) {
             submitLabel = "Add Card";

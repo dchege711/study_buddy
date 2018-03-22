@@ -14,20 +14,17 @@ class SideBarManager extends React.Component {
             tagsHTML: null
         };
         this.makeHttpRequest = this.makeHttpRequest.bind(this);
-        this.refreshTags = this.refreshTags.bind(this);
         this.selectThisTag = this.selectThisTag.bind(this);
-        this.updateTags = this.updateTagsList.bind(this);
+        this.updateTagsList = this.updateTagsList.bind(this);
         this.applyFilter = this.applyFilter.bind(this);
     }
 
-    refreshTags() {
-        this.makeHttpRequest(
-            "post", "/read-metadata",
-            { userIDInApp: this.props.userIDInApp}, 
-            (response) => {
-                this.updateTagsList(response["data"][0]["node_information"][0]);
-            }
-        );
+    /**
+     * This function is called as soon as SideBarManager is mounted.
+     * 
+     */
+    componentDidMount() {
+        this.updateTagsList(this.props.nodeInformation);
     }
 
     /** 
@@ -38,8 +35,10 @@ class SideBarManager extends React.Component {
       * 
       */ 
     updateTagsList(nodeData) {
-
-        if (nodeData === undefined) return;
+        if (debug) {
+            console.log("updateTagsList() called");
+        }
+        if (nodeData === undefined || nodeData === null) return;
 
         var newTags = {};
         for (var key in nodeData) {
@@ -125,10 +124,6 @@ class SideBarManager extends React.Component {
         }).catch((error) => {
             console.log(error);
         });
-    }
-
-    componentDidMount() {
-        this.refreshTags();
     }
 
     render() {

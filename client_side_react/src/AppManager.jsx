@@ -12,7 +12,8 @@ class AppManager extends React.Component {
         super(props);
         this.state = {
             cachedCards: {}, ids_in_visitation_order: null, 
-            currentIndex: null, currentCard: null, cardStats: null
+            currentIndex: null, currentCard: null, cardStats: null,
+            nodeInformation: null
         };
         
         this.getCardFromID = this.getCardFromID.bind(this);
@@ -23,6 +24,42 @@ class AppManager extends React.Component {
         this.cardHasBeenModified = this.cardHasBeenModified.bind(this); 
         this.organizeCards = this.organizeCards.bind(this);
         this.applyFilter = this.applyFilter.bind(this);
+        this.fetchMetadata = this.fetchMetadata.bind(this);
+        this.renderSideBar = this.renderSideBar.bind(this);
+
+        // Initialization code:
+
+        // Fetch data on the available tags
+        this.fetchMetadata(() => {
+            this.organizeCards(this.state.cardStats);
+            this.renderSideBar();
+        });
+    }
+
+    fetchMetadata(callBack) {
+        // Fetch the metadata about all the available cards
+        this.makeHttpRequest(
+            "post", "/read-metadata",
+            { userIDInApp: this.props.userIDInApp },
+            (response) => {
+                this.setState({
+                    cardStats: response["data"][0]["stats"][0],
+                    nodeInformation: response["data"][0]["node_information"][0]
+                });
+                callBack();
+            }
+        )
+    }
+
+    renderSideBar() {
+        document.getElementById("sidebar").hidden = false;
+        ReactDOM.render(
+            <SideBarManager
+                userIDInApp={this.props.userIDInApp}
+                applyFilter={this.applyFilter}
+                nodeInformation={this.state.nodeInformation} />,
+            document.getElementById("sidebar")
+        );
     }
 
     /**
@@ -53,30 +90,6 @@ class AppManager extends React.Component {
             console.log(error);
         });
     }
-    
-    componentDidMount() {
-        // Fetch data on the available tags
-        document.getElementById("sidebar").hidden = false;
-        ReactDOM.render(
-            <SideBarManager 
-            userIDInApp={this.props.userIDInApp}
-            applyFilter={this.applyFilter}/>, 
-            document.getElementById("sidebar")
-        );
-
-        // Fetch the metadata about all the available cards
-        this.makeHttpRequest(
-            "post", "/read-metadata",
-            { userIDInApp: this.props.userIDInApp },
-            (response) => {
-                // Set the contents of the card being viewed
-                this.setState({
-                    cardStats: response["data"][0]["stats"][0]
-                })
-                this.organizeCards(response["data"][0]["stats"][0]);
-            }
-        )
-    }
 
     /**
      * @description Organize the cards from the database.
@@ -85,9 +98,7 @@ class AppManager extends React.Component {
      * sortable attributes.
      */
     organizeCards(cardStats) {
-        console.log("organizeCards() using urgency");
-        console.log(cardStats);
-        // Sort the cards using their urgency attribute
+        console.log("organizeCards() using urgency...");
         var keys = Object.keys(cardStats);
         keys.sort(
             function (a, b) {
@@ -194,6 +205,7 @@ class AppManager extends React.Component {
     }
     
     render() {
+        if (debug) console.log("AppManager rendered!");
         return (<CardManager 
             card={this.state.currentCard} 
             fetchNextCard={this.fetchNextCard}
