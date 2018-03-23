@@ -2,7 +2,7 @@
 
 #### Functionality
 
-:x: Increment the counts in the sidebar within the app. Actually, finish up cardHasBeenModified() in AppManager.js
+:soon: Increment the counts in the sidebar within the app. Actually, finish up cardHasBeenModified() in AppManager.js
 
 :white_check_mark: Update the metadata once the cards change. (This was moved to the server)
 
@@ -10,22 +10,22 @@
 
 #### Efficiency
 
-:x: To reduce the number of re-renders, store all the changes in a buffer, and then only call SetState() at the very end of the process.
+:soon: To reduce the number of re-renders, store all the changes in a buffer, and then only call SetState() at the very end of the process.
 
-:x: Implement a PQ in AppManager.cardHasBeenModified. Client side PQ seems to be a better idea
+:soon: Implement a PQ in AppManager.cardHasBeenModified. Client side PQ seems to be a better idea
 
 #### Aesthetics
 
-:x: Damn, the login page is ugly. Spice up the CSS.
+:soon: Damn, the login page is ugly. Spice up the CSS.
 
-:x: Code snippets should not overflow past the card's boundaries.
+:soon: Code snippets should not overflow past the card's boundaries.
 
-:x: Have some artwork to fill in the blank space in the login page.
+:soon: Have some artwork to fill in the blank space in the login page.
 
 #### User Experience
 
-:x: Smoothen the next button. Eliminate the lag between the next/previous buttons and the card being displayed.
+:soon: Smoothen the next button. Eliminate the lag between the next/previous buttons and the card being displayed.
 
-:x: When a person applies a filter, reload CardManager to show a card among those that have been chosen.
+:soon: When a person applies a filter, reload CardManager to show a card among those that have been chosen.
 
-:x: Order the tags by their importance (summing up their urgencies is a good way to go)
+:soon: Order the tags by their importance (summing up their urgencies is a good way to go)
