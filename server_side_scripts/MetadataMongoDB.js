@@ -3,7 +3,7 @@ var Card = require('./models/CardSchema');
 var config = require('../config');
 var mongoose = require('mongoose');
 
-var debug = true;
+var debug = false;
 
 /**
  * 

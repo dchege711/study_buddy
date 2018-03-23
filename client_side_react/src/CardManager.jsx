@@ -3,7 +3,7 @@ import CardHTMLTemplate from './models/CardHTMLTemplate';
 import ReadOnlyCardTemplate from './models/ReadOnlyCardTemplate';
 
 var axios = require('axios');
-const debug = true;
+const debug = false;
 
 const emptyCard = {
     _id: "", title: "", description: "", 

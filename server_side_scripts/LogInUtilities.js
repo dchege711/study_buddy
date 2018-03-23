@@ -4,7 +4,7 @@ var User = require("./models/UserSchema");
 var MetadataDB = require("./MetadataMongoDB");
 var mongoose = require('mongoose');
 
-var debug = true;
+var debug = false;
 
 getSaltAndHash = function(password, callBack) {
     // 8 words = 32 bytes = 256 bits, a paranoia of 7

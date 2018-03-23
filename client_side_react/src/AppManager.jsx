@@ -4,7 +4,7 @@ import SideBarManager from './SideBarManager';
 import CardManager from './CardManager';
 
 var axios = require('axios');
-const debug = true;
+const debug = false;
 
 class AppManager extends React.Component {
     

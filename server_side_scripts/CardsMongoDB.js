@@ -5,7 +5,7 @@ var showdown = require('showdown');
 var MetadataDB = require('./MetadataMongoDB');
 
 var converter = new showdown.Converter();
-var debug = true;
+var debug = false;
 
 /**
  * Create a new card and add it to the user's current cards.
