@@ -1,25 +1,31 @@
-### Study Buddy (Client Side)
+### Client Side for Study Buddy
 
-### Fixes to make
-:x: Functionality: *Increment the counts in the sidebar within the app. Actually, finish up cardHasBeenModified() in AppManager.js*
+#### Functionality
 
-:x: Efficiency: *To reduce the number of re-renders, store all the changes in a buffer, and then only call SetState() at the very end of the process.*
+:x: Increment the counts in the sidebar within the app. Actually, finish up cardHasBeenModified() in AppManager.js
 
-:x: Aesthetics: *Damn, the login page is ugly. Bump up the CSS*
+:white_check_mark: Update the metadata once the cards change. (This was moved to the server)
 
-:x: User Experience: *Smoothen the next button. Eliminate the lag between the next/previous buttons and the card being displayed.*
+:white_check_mark: Although CardManager is controlled, make it somewhat autonomous - it should be able to handle all operations on its current card.
 
-:x: User Experience: *When a person applies a filter, reload CardManager to show a card among those that have been chosen.*
+#### Efficiency
 
-:x: User Experience: *Order the tags by their importance (summing up their urgencies is a good way to go)*
+:x: To reduce the number of re-renders, store all the changes in a buffer, and then only call SetState() at the very end of the process.
 
-:x: Efficiency: *Implement a PQ in AppManager.cardHasBeenModified. Client side PQ seems to be a better idea*
+:x: Implement a PQ in AppManager.cardHasBeenModified. Client side PQ seems to be a better idea
 
-:white_check_mark: Functionality: *Decide where changes to metadata should be done. Should you leave that to the server, or should AppManager handle metadata and send an upload at the end?*
+#### Aesthetics
 
-:white_check_mark: Functionality: *Although CardManager is controlled, make it somewhat autonomous - it should be able to handle all operations on its current card.*
+:x: Damn, the login page is ugly. Spice up the CSS.
 
-#### To-Do Items
-* Have some artwork to fill in the blank space in the login page.
-    * <img src="https://github.com/dchege711/study_buddy/blob/master/images/login_whitespace.png" width="700px" height="400px">
-* :white_check_mark: Fix the side bar to go under the navigation bar.
+:x: Code snippets should not overflow past the card's boundaries.
+
+:x: Have some artwork to fill in the blank space in the login page.
+
+#### User Experience
+
+:x: Smoothen the next button. Eliminate the lag between the next/previous buttons and the card being displayed.
+
+:x: When a person applies a filter, reload CardManager to show a card among those that have been chosen.
+
+:x: Order the tags by their importance (summing up their urgencies is a good way to go)
