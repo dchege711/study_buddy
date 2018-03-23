@@ -1,7 +1,7 @@
 import React from 'react';
 
 var axios = require('axios');
-const debug = true;
+const debug = false;
 
 var selectedTags = new Set();
 
@@ -92,9 +92,10 @@ class SideBarManager extends React.Component {
 
         var cardIDs = new Set();
         var allTags = this.state.tags;
+        if (debug) console.log(allTags);
         
         selectedTags.forEach(function(tag, tag_copy, allSelected) {
-            allTags[tag].forEach(function(id, index_, tag_) {
+            Object.keys(allTags[tag]).forEach(function(id, index_, tag_) {
                 if (cardIDs.has(id) === false) {
                     cardIDs.add(id);
                 }
