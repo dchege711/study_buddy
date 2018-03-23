@@ -1,10 +1,23 @@
 ### Study Buddy (Client Side)
 
 ### Fixes to make
-* :x: The counts in the left panel tags aren't incrementing :-/
-* :x: Decide where changes to metadata should be done. Should you leave that to the server, or should AppManager handle metadata and send an upload at the end?
-* :x: Implement a PQ in AppManager.cardHasBeenModified. Or is it more efficient to do this at the server?
-* :white_checkmark: Although CardManager is controlled, make it somewhat autonomous.
+:x: Functionality: *Increment the counts in the sidebar within the app. Actually, finish up cardHasBeenModified() in AppManager.js*
+
+:x: Efficiency: *To reduce the number of re-renders, store all the changes in a buffer, and then only call SetState() at the very end of the process.*
+
+:x: Aesthetics: *Damn, the login page is ugly. Bump up the CSS*
+
+:x: User Experience: *Smoothen the next button. Eliminate the lag between the next/previous buttons and the card being displayed.*
+
+:x: User Experience: *When a person applies a filter, reload CardManager to show a card among those that have been chosen.*
+
+:x: User Experience: *Order the tags by their importance (summing up their urgencies is a good way to go)*
+
+:x: Efficiency: *Implement a PQ in AppManager.cardHasBeenModified. Client side PQ seems to be a better idea*
+
+:white_check_mark: Functionality: *Decide where changes to metadata should be done. Should you leave that to the server, or should AppManager handle metadata and send an upload at the end?*
+
+:white_check_mark: Functionality: *Although CardManager is controlled, make it somewhat autonomous - it should be able to handle all operations on its current card.*
 
 #### To-Do Items
 * Have some artwork to fill in the blank space in the login page.

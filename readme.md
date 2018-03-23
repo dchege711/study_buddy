@@ -10,7 +10,7 @@
 ### Tasks 
 * :white_check_mark: Have a cleaner way of updating a user's metadata.
 * Client-side username verification and validation for new users.
-* Implement the email address as the unique identifier. Use email verification to validate accounts.
+* :white_check_mark: Implement the email address as the unique identifier. Use email verification to validate accounts.
 * :white_check_mark: Implement the log-in process on the server side.
 * :white_check_mark: Figure out how to use config variables in ReactJS scripts, e.g. accessing metadata
 
