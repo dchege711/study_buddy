@@ -35,8 +35,9 @@ class SideBarManager extends React.Component {
       * 
       */ 
     updateTagsList(nodeData) {
-        if (debug) {
+        if (true) {
             console.log("updateTagsList() called");
+            console.log(nodeData);
         }
 
         if (nodeData === undefined || nodeData === null) return;

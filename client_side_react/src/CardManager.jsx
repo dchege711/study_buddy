@@ -12,7 +12,7 @@ const emptyCard = {
     description_markdown: "", 
 };
 
-const keysToUploadToDB = ["title", "description", "tags", "urgency"];
+const keysToUploadToDB = ["title", "description", "tags", "urgency", "createdById"];
 
 /**
  * @description Controls the card that is displayed within the app. 
@@ -128,7 +128,8 @@ class CardManager extends React.Component {
         this.updateCardContents(emptyCard);
         this.setState({
             isNew: true,
-            editableDescription: false
+            editableDescription: true,
+            createdById: this.props.userIDInApp
         })
     }
     
@@ -187,6 +188,7 @@ class CardManager extends React.Component {
                 }        
             }
         }
+        console.log(data);
         
         // Update the card's contents in the database
         this.makeHttpRequest(
