@@ -63,9 +63,9 @@ var populateMetadata = function(userIDInApp) {
 }
 
 if (require.main === module) {
-    // deleteMetadata(1, addAndPopulateMetadata);
+    deleteMetadata(1, addAndPopulateMetadata);
     // addAndPopulateMetadata(1);
-    testMetadataUpdate(function() {
-        process.exit(0);
-    });
+    // testMetadataUpdate(function() {
+    //     process.exit(0);
+    // });
 }

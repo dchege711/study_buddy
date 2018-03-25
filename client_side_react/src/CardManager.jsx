@@ -7,7 +7,7 @@ const debug = false;
 
 const emptyCard = {
     _id: "", title: "", description: "", 
-    tags: "", createdById: 0, createdAt: "", 
+    tags: "", createdAt: "", 
     updatedAt: "", urgency: "",
     description_markdown: "", 
 };
@@ -28,14 +28,16 @@ class CardManager extends React.Component {
      */
     constructor(props) {
         super(props);
-        var currentCard, cardIsNew;
+        var currentCard, cardIsNew, createdById;
         if (props.card === null || props.card === undefined) {
             console.log("CardManager initialized: Empty Card.");
             currentCard = emptyCard;
+            createdById = this.props.userIDInApp
             cardIsNew = true;
         } else {
             console.log("CardManager initialized: " + props.card.title);
             currentCard = props.card;
+            createdById = props.card.createdById
             cardIsNew = false;
         }
         this.state = {
@@ -43,7 +45,7 @@ class CardManager extends React.Component {
             title: currentCard.title,
             description: currentCard.description,
             tags: currentCard.tags,
-            createdById: currentCard.createdById,
+            createdById: createdById,
             createdAt: currentCard.createdAt,
             updatedAt: currentCard.updatedAt,
             urgency: currentCard.urgency,
@@ -194,9 +196,7 @@ class CardManager extends React.Component {
 
                 // Notify the parent function that this card has been modified
                 this.props.cardHasBeenModified({
-                    urgency: card["urgency"],
-                    card_id: card["_id"],
-                    card_tags: card["tags"]
+                    card_id: card["_id"]
                 }); 
             }
         );

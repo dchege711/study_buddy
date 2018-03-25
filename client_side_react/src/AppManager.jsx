@@ -202,6 +202,15 @@ class AppManager extends React.Component {
     cardHasBeenModified(changes) {
         // Todo: Use a priority queue because the number of cards 
         // might grow substantially
+        let cardID = changes["_id"];
+        let newCachedCards = this.state.cachedCards;
+        this.getCardFromID(cardID, (card) => {
+            newCachedCards[cardID] = card;
+            this.setState({
+                cachedCards: newCachedCards,
+                currentCard: card
+            });
+        });
     }
     
     render() {
@@ -211,6 +220,7 @@ class AppManager extends React.Component {
             fetchNextCard={this.fetchNextCard}
             fetchPreviousCard={this.fetchPreviousCard}
             cardHasBeenModified={this.cardHasBeenModified}
+            userIDInApp={this.props.userIDInApp}
         />)
     }
 }
