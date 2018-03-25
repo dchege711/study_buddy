@@ -41,7 +41,19 @@ exports.create = function(payload, callBack) {
             })
         } else {
             // Update the metadata object with this card's details
-            MetadataDB.update(savedCard, callBack);
+            MetadataDB.update([savedCard], (response) => {
+                if (response["success"]) {
+                    callBack({
+                        "success": true, "internal_error": false,
+                        "message": savedCard
+                    });
+                } else {
+                    callBack({
+                        "success": false, "internal_error": false,
+                        "message": response["message"]
+                    });
+                }
+            });
         }
     });
 }

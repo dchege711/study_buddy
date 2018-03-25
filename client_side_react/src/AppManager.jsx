@@ -210,6 +210,12 @@ class AppManager extends React.Component {
                 cachedCards: newCachedCards,
                 currentCard: card
             });
+
+            // Reorganize the side bar with updated info
+            this.fetchMetadata(() => {
+                this.organizeCards(this.state.cardStats);
+                this.renderSideBar();
+            });
         });
     }
     
