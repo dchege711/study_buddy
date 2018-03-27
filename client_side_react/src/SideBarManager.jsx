@@ -17,6 +17,10 @@ class SideBarManager extends React.Component {
         this.selectThisTag = this.selectThisTag.bind(this);
         this.updateTagsList = this.updateTagsList.bind(this);
         this.applyFilter = this.applyFilter.bind(this);
+
+        if (debug) {
+            console.log("SideBarManager initialized...");
+        }
     }
 
     /**
@@ -35,8 +39,8 @@ class SideBarManager extends React.Component {
       * 
       */ 
     updateTagsList(nodeData) {
-        if (true) {
-            console.log("updateTagsList() called");
+        if (debug) {
+            console.log("updateTagsList() called with the following data");
             console.log(nodeData);
         }
 

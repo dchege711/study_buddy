@@ -2,7 +2,9 @@
 
 ### Functionality
 
-:soon: Increment the counts in the sidebar within the app. Actually, finish up cardHasBeenModified() in AppManager.js
+:soon: Increment the counts in the sidebar within the app without the user having to log out first.
+
+    * Calling ReactDOM.render() on an existing component doesn't seem to work. The calls don't get registered.
 
 :white_check_mark: Update the metadata once the cards change. (This was moved to the server)
 
@@ -23,6 +25,7 @@
 :soon: Have some artwork to fill in the blank space in the login page.
 
 :broken_heart: I wasn't able to add TeX support to the cards. 
+
     * <img src="https://github.com/dchege711/study_buddy/blob/master/images/failed_to_support_latex.png" width="400px" height="400px">
     * I think the [MathJAX](https://docs.mathjax.org/en/latest/start.html) only works on TeX that is not printed by ReactJS. 
     * React probably preserves the state of its rendered components and doesn't allow outside scripts to take effects. 

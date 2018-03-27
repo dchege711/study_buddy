@@ -52,6 +52,7 @@ class AppManager extends React.Component {
     }
 
     renderSideBar() {
+        if (debug) console.log("renderSideBar() called");
         document.getElementById("sidebar").hidden = false;
         ReactDOM.render(
             <SideBarManager
@@ -97,8 +98,8 @@ class AppManager extends React.Component {
      * @param {JSON} cardStats A list of the available cards with 
      * sortable attributes.
      */
-    organizeCards(cardStats) {
-        console.log("organizeCards() using urgency...");
+    organizeCards(cardStats, callBack) {
+        if (debug) console.log("organizeCards() using urgency...");
         var keys = Object.keys(cardStats);
         keys.sort(
             function (a, b) {
@@ -197,25 +198,28 @@ class AppManager extends React.Component {
      * @description Once a card has been updated, set the metadata
      * to match the current changes.
      * 
-     * @param {JSON} changes Expected keys: _id, urgency, tags 
+     * @param {JSON} card The modified card's complete JSON
      */
-    cardHasBeenModified(changes) {
+    cardHasBeenModified(card) {
+       
         // Todo: Use a priority queue because the number of cards 
         // might grow substantially
-        let cardID = changes["_id"];
         let newCachedCards = this.state.cachedCards;
-        this.getCardFromID(cardID, (card) => {
-            newCachedCards[cardID] = card;
-            this.setState({
-                cachedCards: newCachedCards,
-                currentCard: card
-            });
+        newCachedCards[card["_id"]] = card;
+        if (debug) {
+            console.log("cardHasBeenModified() called for:");
+            console.log(card);
+        }
+        
+        this.setState({
+            cachedCards: newCachedCards,
+            currentCard: card
+        });
 
-            // Reorganize the side bar with updated info
-            this.fetchMetadata(() => {
-                this.organizeCards(this.state.cardStats);
-                this.renderSideBar();
-            });
+        // Reorganize the side bar with updated info
+        this.fetchMetadata(() => {
+            this.organizeCards(this.state.cardStats);
+            this.renderSideBar();
         });
     }
     

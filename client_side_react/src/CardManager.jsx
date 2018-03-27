@@ -188,18 +188,19 @@ class CardManager extends React.Component {
                 }        
             }
         }
-        console.log(data);
         
         // Update the card's contents in the database
         this.makeHttpRequest(
             "post", url, data,
             (response) => {
                 var card = response["data"]["message"];
+                if (debug) {
+                    console.log("Received this card from makeHttpRequest");
+                    console.log(card);
+                }
 
                 // Notify the parent function that this card has been modified
-                this.props.cardHasBeenModified({
-                    card_id: card["_id"]
-                }); 
+                this.props.cardHasBeenModified(card); 
             }
         );
         
