@@ -5,7 +5,7 @@
 }
 
 .study-buddy-theme-color {
-    background: linear-gradient(darkturquoise, blue);
+    background: black;
 }
 
 .card-header {
@@ -51,6 +51,7 @@ ul.topnav li {float: left;}
 ul.topnav li a {
     display: block;
     color: white;
+    font-size: 20px;
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
@@ -78,7 +79,7 @@ ul.topnav li.right {float: right;}
     z-index: 1;
     top: 0;
     left: 0;
-    background-color: rgb(161, 255, 255);
+    background-color: black;
     overflow-x: hidden;
     padding-top: 20px;
 }
