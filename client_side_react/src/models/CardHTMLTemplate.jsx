@@ -20,7 +20,7 @@ function CardHTMLTemplate(props) {
             
             <div className="w3-container">
         
-                {props.descriptionTextArea}
+                dangerouslySetInnerHtml={props.descriptionTextArea}
                 
                 <br />
                 

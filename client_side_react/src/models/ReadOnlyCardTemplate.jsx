@@ -2,12 +2,6 @@ import React from 'react';
 
 function ReadOnlyCardTemplate(props) {
     
-    function setHTML(text) {
-        return {
-            __html: text
-        }
-    }
-    
     return (
         <div className="w3-card">
             
@@ -25,6 +19,12 @@ function ReadOnlyCardTemplate(props) {
             </div>
             
             <div className="w3-container">
+
+                <p>
+                    {
+                        "Thus, \\(T_n\\) is $$ \\delta $$"
+                    }
+                </p>
                 
                 <div className="w3-right">
                     <button className="w3-btn w3-hover-white" onClick={props.setEditableDesc}>
@@ -33,7 +33,9 @@ function ReadOnlyCardTemplate(props) {
                 </div>
                 
                 <div
-                    dangerouslySetInnerHTML={setHTML(props.descriptionTextArea)}
+                    dangerouslySetInnerHTML={
+                        {__html: props.descriptionTextArea}
+                    }
                 />
                 
                 <br />

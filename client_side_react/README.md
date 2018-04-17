@@ -24,6 +24,8 @@
 
 :soon: Have some artwork to fill in the blank space in the login page.
 
+:soon: Increase the lower padding on the sidebar. Some tags are being left out. Move the 'Apply Filter' button to the navbar so that it's always accessible.
+
 :broken_heart: I wasn't able to add TeX support to the cards. 
 
     * <img src="https://github.com/dchege711/study_buddy/blob/master/images/failed_to_support_latex.png" width="400px" height="400px">

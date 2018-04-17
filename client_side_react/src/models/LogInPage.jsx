@@ -31,6 +31,12 @@ function LogInPage(props) {
                     name="password" value={props.password} placeholder="password" 
                     onChange={props.handleInputChange} />
             </label>
+
+            <p>
+                {
+                    "Therefore, \\(T_n\\) is given by $$ \\delta $$"
+                }
+            </p>
             
             <br />
             <br />
