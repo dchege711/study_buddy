@@ -22,7 +22,7 @@ function ReadOnlyCardTemplate(props) {
 
                 <p>
                     {
-                        "Thus, \\(T_n\\) is $$ \\delta $$"
+                        "\[T_n\ ... \delta \]"
                     }
                 </p>
                 
