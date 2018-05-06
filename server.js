@@ -15,11 +15,11 @@ var port = process.env.PORT || 5000;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-app.use(express.static(path.join(__dirname + '/client_side_react/build')));
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
 app.get('/', function(request, response) {
-    // response.sendFile(path.resolve(__dirname, 'public', 'index.html'));
-    response.sendFile(path.join(__dirname + "/client_side_react/build/index.html"));
+    response.render("pages/login");
 });
 
 app.post('/register-user', function(request, response) {
@@ -107,5 +107,5 @@ app.post('/delete-card', function(request, response) {
 });
 
 app.listen(port, function() {
-    console.log(`API is running on port ${port}`);
+    console.log(`App is running on port ${port}`);
 });

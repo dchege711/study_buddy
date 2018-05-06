@@ -1,6 +1,6 @@
-## Server Side Notes for Study Buddy
+# Study Buddy
 
-### Tasks 
+## Tasks
 
 :white_check_mark: Have a cleaner way of updating a user's metadata. I associated metadata with a userID. Metadata is separate from the cards.
 

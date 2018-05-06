@@ -1,0 +1,25 @@
+{
+  "name": "study_buddy",
+  "version": "1.0.0",
+  "description": "A web application that helps me review content",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dchege711/study_buddy.git"
+  },
+  "keywords": [
+    "study",
+    "flash",
+    "cards"
+  ],
+  "author": "Chege Gitau",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dchege711/study_buddy/issues"
+  },
+  "homepage": "https://github.com/dchege711/study_buddy#readme"
+}
