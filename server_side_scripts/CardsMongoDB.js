@@ -1,10 +1,8 @@
 var Card = require('./models/CardSchema');
 var config = require('../config');
 var mongoose = require('mongoose');
-var showdown = require('showdown');
 var MetadataDB = require('./MetadataMongoDB');
 
-var converter = new showdown.Converter();
 var debug = false;
 
 /**
@@ -19,7 +17,6 @@ exports.create = function(payload, callBack) {
     var card = new Card({
         title: payload["title"],
         description: payload["description"],
-        description_markdown: converter.makeHtml(payload["description"]),
         tags: payload["tags"],
         createdById: payload["createdById"],
         urgency: payload["urgency"]
@@ -136,9 +133,6 @@ exports.read = function(payload, callBack) {
  */
 exports.update = function(cardJSON, callBack) {
     var _id = cardJSON["_id"];
-    if (cardJSON.hasOwnProperty("description")) {
-        cardJSON["description_markdown"] = converter.makeHtml(cardJSON["description"]);
-    }
 
     // findByIdAndUpdate will give me the old, not the updated, document.
     // I need to find the card, save it, and then call MetadataDB.update if need be
