@@ -53,7 +53,10 @@ exports.create = function (payload, callBack) {
                     } else {
                         callBack({
                             "success": true, "internal_error": false,
-                            "message": savedMetadata
+                            "message": {
+                                userIDInApp: payload.userIDInApp,
+                                metadataIndex: payload.metadataIndex
+                            }
                         });
                     }
                 });
