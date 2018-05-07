@@ -72,6 +72,18 @@ app.post('/read-metadata', function (request, response) {
     });
 });
 
+app.post('/tags', function (request, response) {
+    console.log("POST request at /tags");
+    if (debugMode) {
+        console.log(request.body);
+    }
+
+    MetadataDB.readTags(request.body, function (tags) {
+        if (debugMode) console.log(tags);
+        response.json(tags);
+    });
+});
+
 app.post('/add-card', function(request, response) {
     console.log("POST request at /add-card.");
     if (debugMode) {

@@ -11,3 +11,56 @@ footer {
 .hidden {
     display: none;
 }
+
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    padding: 40px 0 0;          
+}
+
+#main_div {
+    flex: 1
+}
+
+.topnav {
+    position: fixed;
+    padding: 10px;
+    width: 100%;
+    background-color: black;
+    color: white;
+    top: 0;
+}
+
+ul.topnav {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+ul.topnav li {
+    display: block;
+    color: white;
+    font-family: "Lobster";
+    font-size: 24px;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+.navbar a:hover {
+    background-color: "#eb90ed";
+    color: white;
+}
+
+.card_borders {
+    border-left: 5px solid blue;
+    border-bottom: thin solid blue;
+}
+
+ul.topnav li a:hover:not(.active) {background-color: #121;}
+
+ul.topnav li.right {float: right;}
+
+ul.topnav li.left {float: left;}

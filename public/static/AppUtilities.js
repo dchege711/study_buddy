@@ -6,7 +6,7 @@
  * @param {Function} callBack Function to call once done. Should take in a JSON
  * argument. 
  */
-function send_form(form_id, url, callBack) {
+function sendForm(form_id, url, callBack) {
     var form = document.getElementById(form_id);
     var elements = document.getElementById(form_id).elements;
 
@@ -22,7 +22,7 @@ function send_form(form_id, url, callBack) {
     }
     delete payload[""];
 
-    send_http_request("POST", url, payload, callBack);
+    sendHTTPRequest("POST", url, payload, callBack);
 }
 
 /**
@@ -33,7 +33,7 @@ function send_form(form_id, url, callBack) {
  * @param {JSON} payload The data that will be sent along with the request
  * @param {Function} callBack The function to call once req is successful
  */
-function send_http_request(method, url, payload, callBack) {
+function sendHTTPRequest(method, url, payload, callBack) {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {

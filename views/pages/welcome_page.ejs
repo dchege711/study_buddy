@@ -3,67 +3,88 @@
     <head>
         <% include ../partials/header.ejs %>
         <script src="/static/AppUtilities.js"></script>
+        <script src="/static/d3.js"></script>
+        <script src="/static/d3.layout.cloud.js"></script>
+        <script src="/static/d3.wordcloud.js"></script>
     </head>
 
-    <body>
-        
-        <div class="w3-container">
+    <body onload="populateWordCloud() ">
 
-            <form class="w3-padding-large w3-center" id="login_form" method="post">
-            
-                <label for="username"> Username: </label>
-                <input class="w3-input" type="text" name="username" 
-                    pattern="[_\-A-Za-z0-9]+" required/>
-            
-                <br />
-                <br />
-            
-                <label for="password"> Password: </label>
-                <input class="w3-input" type="password" name="password" 
-                    minlength="8" required/>
-            
-                <br />
-                <br />
-            
-                <button class="w3-button w3-center w3-green" type="submit" 
-                    onclick="return logInUser()">Log In</button>
-                
-                <button class="w3-button w3-center w3-blue" 
-                    onclick="return displayForm('signup_form')">
-                    ... or Sign Up for a New Account</button>
+        <% include ../partials/navbar.ejs %>
 
-            </form>
+        <div id="main_div">
 
-            <form class="w3-padding-large w3-center hidden" id="signup_form" method="post">
+            <div id="word_cloud_container" 
+                class="w3-container w3-padding-large w3-twothird w3-left">
+                <div id="word_cloud" class="svg-container"></div>
+            </div>
+            
+            <div class="w3-container w3-third w3-padding-large w3-right" 
+                style="position:relative; top:50px">
 
-                <label for="email">Email Address: </label>
-                <input class="w3-input" type="email" name="email" 
-                    required/>
+                <form class="w3-padding-large w3-center" id="login_form" method="post">
+                
+                    <label for="username"> Username: </label>
+                    <input class="w3-input" type="text" name="username" 
+                        pattern="[_\-A-Za-z0-9]+" required/>
+                
+                    <br />
+                    <br />
+                
+                    <label for="password"> Password: </label>
+                    <input class="w3-input" type="password" name="password" 
+                        minlength="8" required/>
+                
+                    <br />
+                    <br />
+                
+                    <button class="w3-button w3-center w3-green" type="submit" 
+                        onclick="return logInUser()">Log In</button>
+                    
+                    <br />
+                    <br />
 
-                <br />
-                <br />
-                
-                <label for="username"> Choose an alphanumeric username: </label>
-                <input class="w3-input" type="text" name="username" 
-                    pattern="[_\-A-Za-z0-9]+" required/>
-                
-                <br />
-                <br />
-                
-                <label for="password"> Choose a password: </label>
-                <input class="w3-input" type="password" name="password" 
-                    minlength="8" required/>
-                
-                <br />
-                <br />
-                
-                <button class="w3-button w3-center w3-green" type="submit" 
-                    onclick="return registerUser()">Sign Up</button>
-                
-                <button class="w3-button w3-center w3-blue" 
-                    onclick="return displayForm('signup_form')">
-                    ... or go back to LogIn</button>
-            </form>
+                    <button class="w3-button w3-center w3-blue" 
+                        onclick="return displayForm('signup_form')">
+                        ... or Sign Up for a New Account</button>
+
+                </form>
+
+                <form class="w3-padding-large w3-center hidden" id="signup_form" method="post">
+
+                    <label for="email">Email Address: </label>
+                    <input class="w3-input" type="email" name="email" 
+                        required/>
+
+                    <br />
+                    <br />
+                    
+                    <label for="username"> Choose an alphanumeric username: </label>
+                    <input class="w3-input" type="text" name="username" 
+                        pattern="[_\-A-Za-z0-9]+" required/>
+                    
+                    <br />
+                    <br />
+                    
+                    <label for="password"> Choose a password: </label>
+                    <input class="w3-input" type="password" name="password" 
+                        minlength="8" required/>
+                    
+                    <br />
+                    <br />
+                    
+                    <button class="w3-button w3-center w3-green" type="submit" 
+                        onclick="return registerUser()">Sign Up</button>
+                    
+                    <br />
+                    <br />
+
+                    <button class="w3-button w3-center w3-blue" 
+                        onclick="return displayForm('login_form')">
+                        ... or go back to LogIn</button>
+                </form>
+
+            </div>
 
         </div>
         
@@ -94,7 +115,7 @@
              * @description Log in the user.
              */
             function logInUser() {
-                send_form("login_form", "/login", (results) => {
+                sendForm("login_form", "/login", (results) => {
                     console.log(results);
                 });
 
@@ -105,12 +126,28 @@
              * @description Register a new user.
              */
             function registerUser() {
-                send_form("signup_form", "/register-user", (results) => {
+                sendForm("signup_form", "/register-user", (results) => {
                     console.log(results);
                 });
 
                 return false;
             }
+
+            /*
+             * Set up the Word Cloud
+             */
+            function populateWordCloud() {
+                var word_cloud_element = document.getElementById("word_cloud");
+                var width = word_cloud_element.clientWidth;
+                var height = 500;
+                sendHTTPRequest("POST", "/tags", {}, (words) => {
+                    d3.wordcloud()
+                        .size([width, height])
+                        .selector("#word_cloud")
+                        .words(words)
+                        .start();
+                })   
+            } 
             
         </script>
 
