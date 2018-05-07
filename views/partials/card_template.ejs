@@ -1,0 +1,63 @@
+<div id="card_container" class="w3-card w3-padding-large card_borders">
+
+    <div class="w3-container w3-right">
+        <button class="w3-btn w3-hover-white" onClick="resetCardContents()">
+            <b>
+                <i class="fa fa-plus-square-o fa-fw"></i>Add New Card</b>
+        </button>
+    </div>
+
+    <div class="card-header w3-center w3-container">
+        <label class="input-area-padded padding-small">
+            <input type="text" id="card_title" name="title" 
+                class="w3-input" />
+        </label>
+    </div>
+
+    <div class="w3-container">
+
+        <div id="card_description" contenteditable="true">
+             When $a \ne 0$, there are two solutions to \(ax^2 + bx + c = 0\) 
+             and they are $$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$
+        </div>
+
+        <br />
+
+        <div>
+            <strong>Tags</strong>
+            <textarea id="card_tags" name="tags" class="w3-input"
+                onchange="handleInputChange('tags')"></textarea>
+        </div>
+
+        <br />
+
+        <label class="input-area">
+            <strong>Urgency</strong>
+            <input id="card_urgency" type="number" name="urgency" 
+                class="w3-input" onChange="handleInputChange('urgency')" />
+        </label>
+    </div>
+
+    <div class="w3-bar w3-padding-16">
+        <button class="w3-left w3-btn w3-round-xxlarge" 
+            onClick="fetchPreviousCard()">
+            <b>
+                <i class="fa fa-chevron-left"></i> Previous</b>
+        </button>
+
+        <button class="w3-right w3-btn w3-round-xxlarge" onClick="fetchNextCard()">
+            <b>
+                <i class="fa fa-chevron-right"></i> Next</b>
+        </button>
+
+    </div>
+
+    <div class="w3-container w3-center">
+
+        <button class="w3-btn w3-round-xxlarge" onClick="saveCard()">
+            <b>Save Card</b>
+        </button>
+
+    </div>
+
+</div>

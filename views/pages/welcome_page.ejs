@@ -39,7 +39,7 @@
                     <br />
                 
                     <button class="w3-button w3-center w3-green" type="submit" 
-                        onclick="return logInUser()">Log In</button>
+                        onclick="return logInUser('login_form', '/login')">Log In</button>
                     
                     <br />
                     <br />
@@ -74,7 +74,7 @@
                     <br />
                     
                     <button class="w3-button w3-center w3-green" type="submit" 
-                        onclick="return registerUser()">Sign Up</button>
+                        onclick="return logInUser('signup_form', '/register-user')">Sign Up</button>
                     
                     <br />
                     <br />
@@ -113,21 +113,19 @@
 
             /*
              * @description Log in the user.
+             * @param {string} formID The ID of the form that has credentials
+             * @param {string} url The URL at which the form will be processed
              */
-            function logInUser() {
-                sendForm("login_form", "/login", (results) => {
-                    console.log(results);
-                });
-
-                return false;
-            }
-            
-            /*
-             * @description Register a new user.
-             */
-            function registerUser() {
-                sendForm("signup_form", "/register-user", (results) => {
-                    console.log(results);
+            function logInUser(formID, url) {
+                sendForm(formID, url, (results) => {
+                    if (results.success) {
+                        localStorage.setItem(
+                            "metadata", JSON.stringify(results.message)
+                        );
+                        window.location = "/home";
+                    } else if (!results.internal_error) {
+                        alert(results.message);
+                    }
                 });
 
                 return false;

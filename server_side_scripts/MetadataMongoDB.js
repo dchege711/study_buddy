@@ -53,10 +53,7 @@ exports.create = function (payload, callBack) {
                     } else {
                         callBack({
                             "success": true, "internal_error": false,
-                            "message": {
-                                userIDInApp: payload.userIDInApp,
-                                metadataIndex: payload.metadataIndex
-                            }
+                            "message": savedMetadata
                         });
                     }
                 });
@@ -79,7 +76,10 @@ exports.read = function (payload, callBack) {
         metadataResults.push(metadataDoc);
     });
     cursor.on("close", () => {
-        callBack(metadataResults);
+        callBack({
+            "success": true, "internal_error": false,
+            "message": metadataResults
+        });
     });
 }
 

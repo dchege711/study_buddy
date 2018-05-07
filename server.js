@@ -60,6 +60,10 @@ app.post('/read-card', function(request, response) {
     });
 });
 
+app.get('/home', function(request, response) {
+    response.render("pages/home.ejs");
+});
+
 app.post('/read-metadata', function (request, response) {
     console.log("POST request at /read-metadata");
     if (debugMode) {

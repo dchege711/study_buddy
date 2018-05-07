@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <% include ../partials/header.ejs %>
+        <script src="/static/AppUtilities.js"></script>
+        
+    </head>
+
+    <body onload="displayCards()">
+
+        <% include ../partials/navbar.ejs %>
+
+        <div id="main_div">
+
+            <div class="w3-container" id="status_bar">
+                <button class="w3-button" onclick="refreshCards()">
+                    <b><i class="fa fa-refresh fa-fw"></i> Apply Filters </b>
+                </button>
+            </div>
+
+            <div class="w3-container">
+
+                <div class="w3-quarter w3-container w3-left">
+                    
+                </div>
+                
+                <div class="w3-threequarter w3-container w3-right">
+                    <% include ../partials/card_template.ejs %>
+                </div>
+
+            </div>
+            
+        </div>
+
+        <footer class="w3-container w3-container w3-black">
+
+            <% include ../partials/footer.ejs %>
+
+        </footer>
+
+        <script type="text/javascript">
+
+            function displayCards() {
+
+            }
+        </script>
+
+    </body>
+
+</html>

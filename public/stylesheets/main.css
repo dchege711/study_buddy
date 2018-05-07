@@ -20,7 +20,8 @@ body {
 }
 
 #main_div {
-    flex: 1
+    flex: 1;
+    padding: 40px 0 0;
 }
 
 .topnav {
@@ -55,8 +56,8 @@ ul.topnav li {
 }
 
 .card_borders {
-    border-left: 5px solid blue;
-    border-bottom: thin solid blue;
+    border-left: 5px solid #2196F3;
+    border-bottom: thin solid #2196F3;
 }
 
 ul.topnav li a:hover:not(.active) {background-color: #121;}

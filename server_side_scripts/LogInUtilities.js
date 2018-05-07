@@ -136,10 +136,7 @@ exports.authenticateUser = function(payload, callBack) {
 
                 // Case 2: The user has provided correct credentials
                 if (thereIsAMatch) {
-                    callBack({
-                        "success": true, "internal_error": false,
-                        "message": user.userIDInApp
-                    });        
+                    MetadataDB.read({ userIDInApp: user.userIDInApp}, callBack);        
                     return;
                 } else {
                     // Case 3: The user provided wrong credentials
