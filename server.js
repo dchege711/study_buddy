@@ -8,19 +8,20 @@ var LogInUtilities = require('./server_side_scripts/LogInUtilities');
 
 require("./server_side_scripts/MongooseClient");
 
-const debugMode = false;
+const debugMode = true;
 
 var app = express();
 var port = process.env.PORT || 5000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 app.get('/', function(request, response) {
-    response.render("pages/login");
+    response.render("pages/welcome_page");
 });
 
 app.post('/register-user', function(request, response) {

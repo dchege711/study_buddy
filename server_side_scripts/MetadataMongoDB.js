@@ -39,7 +39,7 @@ exports.create = function (payload, callBack) {
                 // `markModified`, nothing happens. :-/
                 var tagMetadata = new Metadata({
                     "createdById": payload["userIDInApp"],
-                    "metadataIndex": 0,
+                    "metadataIndex": payload["metadataIndex"],
                     "stats": [],
                     "node_information": []
                 });

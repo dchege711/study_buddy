@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <% include ../partials/header.ejs %>
+        <script src="/static/AppUtilities.js"></script>
+    </head>
+
+    <body onload="displayForm('login_form')">
+        
+        <div class="w3-container">
+
+            <form class="w3-padding-large w3-center" id="login_form" method="post">
+            
+                <label for="username"> Username: </label>
+                <input class="w3-input" type="text" name="username" 
+                    pattern="[_\-A-Za-z0-9]+" required/>
+            
+                <br />
+                <br />
+            
+                <label for="password"> Password: </label>
+                <input class="w3-input" type="password" name="password" 
+                    minlength="8" required/>
+            
+                <br />
+                <br />
+            
+                <button class="w3-button w3-center w3-green" type="submit" 
+                    onclick="return logInUser()">Log In</button>
+                
+                <button class="w3-button w3-center w3-blue" 
+                    onclick="return displayForm('signup_form')">
+                    ... or Sign Up for a New Account</button>
+
+            </form>
+
+            <form class="w3-padding-large w3-center" id="signup_form" method="post">
+
+                <label for="email">Email Address: </label>
+                <input class="w3-input" type="email" name="email" 
+                    required/>
+
+                <br />
+                <br />
+                
+                <label for="username"> Choose an alphanumeric username: </label>
+                <input class="w3-input" type="text" name="username" 
+                    pattern="[_\-A-Za-z0-9]+" required/>
+                
+                <br />
+                <br />
+                
+                <label for="password"> Choose a password: </label>
+                <input class="w3-input" type="password" name="password" 
+                    minlength="8" required/>
+                
+                <br />
+                <br />
+                
+                <button class="w3-button w3-center w3-green" type="submit" 
+                    onclick="return registerUser()">Sign Up</button>
+                
+                <button class="w3-button w3-center w3-blue" 
+                    onclick="return displayForm('signup_form')">
+                    ... or go back to LogIn</button>
+            </form>
+
+        </div>
+        
+        
+        <footer class="w3-container w3-container w3-black">
+            <% include ../partials/footer.ejs %>
+        </footer>
+
+        <script type="text/javascript">
+
+            /*
+             * @description Toggle the form being displayed.
+             * @param {string} form_id The ID of the form to be displayed.
+             * 
+             */
+            function displayForm(form_id) {
+                if (form_id === "signup_form") {
+                    document.getElementById("login_form").style.display = "none";
+                    document.getElementById("signup_form").style.display = "block";
+                } else if (form_id === "login_form") {
+                    document.getElementById("signup_form").style.display = "none";
+                    document.getElementById("login_form").style.display = "block";
+                }
+                return false;
+            }
+
+            /*
+             * @description Log in the user.
+             */
+            function logInUser() {
+                send_form("login_form", "/login", (results) => {
+                    console.log(results);
+                });
+
+                return false;
+            }
+            
+            /*
+             * @description Register a new user.
+             */
+            function registerUser() {
+                send_form("signup_form", "/register-user", (results) => {
+                    console.log(results);
+                });
+
+                return false;
+            }
+            
+        </script>
+
+    </body>
+    
+</html>

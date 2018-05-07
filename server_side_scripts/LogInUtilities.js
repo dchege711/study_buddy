@@ -4,7 +4,7 @@ var User = require("./models/UserSchema");
 var MetadataDB = require("./MetadataMongoDB");
 var mongoose = require('mongoose');
 
-var debug = false;
+var debug = true;
 
 getSaltAndHash = function(password, callBack) {
     // 8 words = 32 bytes = 256 bits, a paranoia of 7
@@ -18,20 +18,21 @@ getHash = function(password, salt, callBack) {
     callBack(hash);
 }
 
+/**
+ * @description Generate a random User ID and make sure it is unique
+ * in the database.
+ */
 getIdInApp = function(callBack) {
-    User.findById({_id: config.USER_METADATA_ID}, function(error, user) {
+    var randomID = Math.floor(Math.random() * 100000000000);
+    User.findOne({userIDInApp: randomID}, function(error, user) {
         if (error) {
             console.log(error);
+        }
+        if (user === null) {
+            callBack(randomID);
         } else {
-            var newUserID = user["userIDInApp"] + 1;
-            user["userIDInApp"] = newUserID;
-            user.save(function(error, confirmation) {
-                if (error) {
-                    console.log(error);
-                } else { 
-                    callBack(newUserID);
-                }
-            });
+            getIdInApp(callBack);
+            return;
         }
     });
 }
@@ -84,7 +85,8 @@ exports.registerUserAndPassword = function(payload, callBack) {
                                 });                   
                             } else {
                                 MetadataDB.create({
-                                    userIDInApp: savedUser.userIDInApp
+                                    userIDInApp: savedUser.userIDInApp,
+                                    metadataIndex: 0
                                 }, callBack);
                             }
                         });
