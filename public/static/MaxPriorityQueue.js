@@ -1,14 +1,22 @@
 /**
  * Implements a max priority queue with a binary heap.
+ * Allows us to maintain a sorted deck of N items in log N time.
  * Adapted from https://algs4.cs.princeton.edu/code/edu/princeton/cs/algs4/MaxPQ.java.html
  */
 maxPQ = function() {
     
+    /**
+     * Holds the class for the max PQ 'class'
+     */
     var pq_object = {};
 
     var pq;
     var n = 0;
 
+    /**
+     * @description Initialize the max PQ data structure.
+     * @param {Array} keys_and_weights Array of (key, weight) tuples
+     */
     pq_object.initialize = function(keys_and_weights) {
         n = keys_and_weights.length;
         pq = Array(n + 1).fill([null, Number.NEGATIVE_INFINITY]);
@@ -24,14 +32,27 @@ maxPQ = function() {
         // console.assert(isMaxHeap(1), "Max Heap invariant has been broken");
     };
 
+    /**
+     * @description Check whether the PQ is empty
+     * @returns {Boolean} `true` if empty, `false` otherwise.
+     */
     pq_object.isEmpty = function() {
         return n === 0;
     };
 
+    /**
+     * @description Return the number of items in the PQ
+     * @returns {Number} The number of items in the PQ
+     */
     pq_object.size = function() {
         return n;
     };
 
+    /**
+     * @description Insert `key_and_weight` into the priority queue.
+     * @param {Array} key_and_weight A tuple representing the key of the value
+     * to be inserted, and its weight relative to what's in the PQ.
+     */
     pq_object.insert = function(key_and_weight) {
         if (n === pq.length - 1) resize(2 * pq.length);
         
@@ -39,8 +60,11 @@ maxPQ = function() {
         pq[n] = key_and_weight;
         swim(n);
         // console.assert(isMaxHeap(1), "Max Heap invariant has been broken");
-    }
+    };
 
+    /**
+     * @description Delete the item that has the most weight in the PQ.
+     */
     pq_object.delMax = function() {
         if (this.isEmpty()) return [null, Number.NEGATIVE_INFINITY];
 
@@ -51,12 +75,18 @@ maxPQ = function() {
         pq[n + 1] = [null, Number.NEGATIVE_INFINITY];
 
         if ((n > 0) && (n === Math.floor((pq.length - 1) / 4))) 
-            resize(Math.floor(pq.length / 4));
+            resize(Math.floor(pq.length / 2));
         // console.assert(isMaxHeap(1), "Max Heap invariant has been broken");
         
         return max;
     };
 
+    /**
+     * @description Increase/descrease the underlying array for the PQ. 
+     * We're currently doubling the size at half capacity, and halving 
+     * at quarter capacity.
+     * @param {Number} capacity The new capacity of the PQ
+     */
     function resize(capacity) {
         // console.assert(capacity > n);
         var newPQ = Array(capacity).fill([null, Number.NEGATIVE_INFINITY]);
@@ -66,6 +96,11 @@ maxPQ = function() {
         pq = newPQ;
     }
 
+    /**
+     * @description Move the item at the k'th index up the PQ in order to 
+     * maintain heap invariant.
+     * @param {Number} k The index of the item that needs to be relocated.
+     */
     function swim(k) {
         // console.assert(isInt(k));
         while (k > 1 && less(Math.floor(k/2), k)) {
@@ -74,6 +109,11 @@ maxPQ = function() {
         }
     }
 
+    /**
+     * @description Move the item at the k'th index down the PQ in order to 
+     * maintain heap invariant.
+     * @param {Number} k The index of the item that needs to be relocated.
+     */
     function sink(k) {
         // console.assert(isInt(k));
         while (2 * k <= n) {
@@ -85,6 +125,13 @@ maxPQ = function() {
         }
     }
 
+    /**
+     * @description Compare the item at index `i` with the one at index `j`.
+     * @param {Number} i The index of the first item
+     * @param {Number} j The index of the second item
+     * @returns {Boolean} `true` if the item at `i` is strictly less than 
+     * the one at `j`.
+     */
     function less(i, j) {
         // console.assert(isInt(i));
         // console.assert(isInt(j));
@@ -92,6 +139,11 @@ maxPQ = function() {
         return pq[i][1] < pq[j][1];
     }
 
+    /**
+     * @description Swap the item at index `i` with the one at index `j`
+     * @param {Number} i The index of the first item
+     * @param {Number} j The index of the second item
+     */
     function exchange(i, j) {
         // console.assert(isInt(i));
         // console.assert(isInt(j));
@@ -101,10 +153,19 @@ maxPQ = function() {
         pq[j] = swap;
     }
 
+    /**
+     * @param {Number} x The number that needs to be checked
+     * @returns {Boolean} `true` if `x` is an integer, `false` otherwise
+     */
     function isInt(x) {
         return Math.floor(x) === x;
     }
 
+    /**
+     * @param {Number} k The index of the item at the root of the (sub)tree
+     * @returns {Boolean} `true` if the subtree rooted at satisfies the heap
+     * order invariant, `false` otherwise.
+     */
     function isMaxHeap(k) {
         if (k > n) return true;
         var left = 2*k;
@@ -114,6 +175,9 @@ maxPQ = function() {
         return isMaxHeap(left) && isMaxHeap(right);
     }
 
+    /**
+     * Return an iterator over all items in the PQ
+     */
     pq_object[Symbol.iterator] = function* () {
         // MDN: Object.assign(...) copies the reference values
         // JSON.parse(JSON.stringify(pq_object)) loses functions.

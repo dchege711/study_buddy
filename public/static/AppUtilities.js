@@ -10,11 +10,6 @@ function sendForm(form_id, url, callBack) {
     var form = document.getElementById(form_id);
     var elements = document.getElementById(form_id).elements;
 
-    // if (form.reportValidity() === false) {
-    //     alert("Please fill out the required fields");
-    //     return;
-    // }
-
     // Send the form to the server for further processing.
     var payload = {};
     for (var i = 0; i < elements.length; i++) {
