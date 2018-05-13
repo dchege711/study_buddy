@@ -6,7 +6,7 @@
 
 :soon: Client-side username verification and validation for new users.
 
-:white_check_mark: Make the email address as the unique identifier. 
+:white_check_mark: Make the email address as the unique identifier.
 
 :soon: Use email verification to validate accounts.
 

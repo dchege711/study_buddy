@@ -39,4 +39,3 @@ function sendHTTPRequest(method, url, payload, callBack) {
     xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     xhttp.send(JSON.stringify(payload));
 }
-

@@ -53,7 +53,7 @@ exports.create = function(payload, callBack) {
             });
         }
     });
-}
+};
 
 /*
  * Delete this method if nothing breaks.
@@ -104,7 +104,7 @@ exports.read = function(payload, callBack) {
             callBack({
                 "success": true, "internal_error": false,
                 "message": allRelevantCards
-            })
+            });
         });
     } else {
         Card.findById(_id, function(error, card) {
@@ -112,16 +112,16 @@ exports.read = function(payload, callBack) {
                 callBack({
                     "success": false, "internal_error": true,
                     "message": error
-                })
+                });
             } else {
                 callBack({
                     "success": true, "internal_error": false,
                     "message": card
-                })
+                });
             }
         });
     }
-}
+};
 
 /**
  * Update an existing card.
@@ -208,7 +208,7 @@ exports.update = function(cardJSON, callBack) {
         }
     );
     */
-}
+};
 
 /**
  * Remove this card from the database.
@@ -229,4 +229,4 @@ exports.delete = function(payload, callBack) {
             MetadataDB.remove(removedCard, callBack);
         }
     });
-}
+};

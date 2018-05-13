@@ -3,7 +3,7 @@
  * Allows us to maintain a sorted deck of N items in log N time.
  * Adapted from https://algs4.cs.princeton.edu/code/edu/princeton/cs/algs4/MaxPQ.java.html
  */
-maxPQ = function() {
+max_PQ = function() {
     
     /**
      * Holds the class for the max PQ 'class'
@@ -29,14 +29,14 @@ maxPQ = function() {
             sink(k);
         }
 
-        // console.assert(isMaxHeap(1), "Max Heap invariant has been broken");
+        // console.assert(is_max_heap(1), "Max Heap invariant has been broken");
     };
 
     /**
      * @description Check whether the PQ is empty
      * @returns {Boolean} `true` if empty, `false` otherwise.
      */
-    pq_object.isEmpty = function() {
+    pq_object.is_empty = function() {
         return n === 0;
     };
 
@@ -59,13 +59,13 @@ maxPQ = function() {
         n = n + 1;
         pq[n] = key_and_weight;
         swim(n);
-        // console.assert(isMaxHeap(1), "Max Heap invariant has been broken");
+        // console.assert(is_max_heap(1), "Max Heap invariant has been broken");
     };
 
     /**
      * @description Delete the item that has the most weight in the PQ.
      */
-    pq_object.delMax = function() {
+    pq_object.del_max = function() {
         if (this.isEmpty()) return [null, Number.NEGATIVE_INFINITY];
 
         var max = pq[1];
@@ -76,7 +76,7 @@ maxPQ = function() {
 
         if ((n > 0) && (n === Math.floor((pq.length - 1) / 4))) 
             resize(Math.floor(pq.length / 2));
-        // console.assert(isMaxHeap(1), "Max Heap invariant has been broken");
+        // console.assert(is_max_heap(1), "Max Heap invariant has been broken");
         
         return max;
     };
@@ -102,7 +102,7 @@ maxPQ = function() {
      * @param {Number} k The index of the item that needs to be relocated.
      */
     function swim(k) {
-        // console.assert(isInt(k));
+        // console.assert(is_int(k));
         while (k > 1 && less(Math.floor(k/2), k)) {
             exchange(k, Math.floor(k/2));
             k = Math.floor(k/2);
@@ -115,7 +115,7 @@ maxPQ = function() {
      * @param {Number} k The index of the item that needs to be relocated.
      */
     function sink(k) {
-        // console.assert(isInt(k));
+        // console.assert(is_int(k));
         while (2 * k <= n) {
             var j = 2 * k;
             if (j < n && less(j, j+1)) j++;
@@ -133,8 +133,8 @@ maxPQ = function() {
      * the one at `j`.
      */
     function less(i, j) {
-        // console.assert(isInt(i));
-        // console.assert(isInt(j));
+        // console.assert(is_int(i));
+        // console.assert(is_int(j));
         // console.log("size: " + n + ": " + i + " -> " + pq[i] + ", " + j + " -> " + pq[j]);
         return pq[i][1] < pq[j][1];
     }
@@ -145,8 +145,8 @@ maxPQ = function() {
      * @param {Number} j The index of the second item
      */
     function exchange(i, j) {
-        // console.assert(isInt(i));
-        // console.assert(isInt(j));
+        // console.assert(is_int(i));
+        // console.assert(is_int(j));
 
         var swap = pq[i];
         pq[i] = pq[j];
@@ -157,7 +157,7 @@ maxPQ = function() {
      * @param {Number} x The number that needs to be checked
      * @returns {Boolean} `true` if `x` is an integer, `false` otherwise
      */
-    function isInt(x) {
+    function is_int(x) {
         return Math.floor(x) === x;
     }
 
@@ -166,13 +166,13 @@ maxPQ = function() {
      * @returns {Boolean} `true` if the subtree rooted at satisfies the heap
      * order invariant, `false` otherwise.
      */
-    function isMaxHeap(k) {
+    function is_max_heap(k) {
         if (k > n) return true;
         var left = 2*k;
         var right = 2*k + 1;
         if (left <= n && less(k, left)) return false;
         if (right <= n && less(k, right)) return false;
-        return isMaxHeap(left) && isMaxHeap(right);
+        return is_max_heap(left) && is_max_heap(right);
     }
 
     /**
@@ -198,6 +198,9 @@ maxPQ = function() {
     return pq_object;
 };
 
+/**
+ * Sanity check...
+ */
 if (typeof require !== "undefined" && require.main === module) {
     var testPQ = maxPQ();
     var keys_and_weights = [
@@ -224,3 +227,6 @@ if (typeof require !== "undefined" && require.main === module) {
         console.log(item);
     }
 }
+
+/* Make the contents available to others */
+module.exports = max_PQ;
