@@ -40,4 +40,5 @@ function sendHTTPRequest(method, url, payload, callBack) {
     xhttp.send(JSON.stringify(payload));
 }
 
-module.exports = {sendHTTPRequest};
+// module is not defined in the browser
+// module.exports = {sendHTTPRequest};

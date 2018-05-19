@@ -4,10 +4,12 @@
     <head>
         <% include ../partials/header.ejs %>
         <script src="/static/AppUtilities.js"></script>
+        <script src="/static/MaxPriorityQueue.js"></script>
+        <script src="/static/CardsManager.js"></script>
         
     </head>
 
-    <body onload="displayCards()">
+    <body onload="fetchCards()">
 
         <% include ../partials/navbar.ejs %>
 
@@ -41,11 +43,46 @@
 
         <script type="text/javascript">
 
-            function displayCards() {
+            function fetchCards() {
 
                 /* Obtain the information on tags */
                 var tags_and_ids = JSON.parse(localStorage.getItem("metadata"))[0].node_information[0];
+                var my_cards_manager = cards_manager(tags_and_ids, localStorage.getItem("user_id"));
+
+                my_cards_manager.initialize(null, () => {
+                    my_cards_manager.next((card) => {
+                        renderCard(card);
+                    });
+                });
+            }
+
+            function renderCard(card) {
+                console.log("Rendering " + card.title);
+                document.getElementById("card_description").innerText = card.description;
+                loadMathJAX();
+            }
+            
+            /**
+             * @description Reload MathJAX to render new LaTEX
+             * http://docs.mathjax.org/en/latest/advanced/dynamic.html
+             */ 
+            function loadMathJAX() {
+                console.log("Reloading MathJAX...");
                 
+                var script = document.getElementById("math_jax_script");
+
+                // Remove any pre-existing MathJAX script
+                if (script) {
+                    script.remove();
+                    script = null;
+                }
+
+                script = document.createElement("script");
+                script.type = "text/javascript";
+                script.id = "math_jax_script";
+                script.src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML";
+                document.getElementsByTagName("head")[0].appendChild(script);
+
             }
 
         </script>

@@ -8,6 +8,8 @@
 
 :white_check_mark: Make the email address as the unique identifier.
 
+:soon: The PQ doesn't preserve order when iterating through previous.
+
 :soon: Use email verification to validate accounts.
 
 :white_check_mark: Implement an authenticated log-in process.

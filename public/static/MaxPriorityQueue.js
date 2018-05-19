@@ -3,7 +3,7 @@
  * Allows us to maintain a sorted deck of N items in log N time.
  * Adapted from https://algs4.cs.princeton.edu/code/edu/princeton/cs/algs4/MaxPQ.java.html
  */
-max_PQ = function() {
+function max_PQ() {
     
     /**
      * Holds the class for the max PQ 'class'
@@ -229,4 +229,4 @@ if (typeof require !== "undefined" && require.main === module) {
 }
 
 /* Make the contents available to others */
-module.exports = max_PQ;
+// module.exports = max_PQ;
