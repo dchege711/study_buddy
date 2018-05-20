@@ -12,6 +12,12 @@ footer {
     display: none;
 }
 
+.side_bar {
+    height: 50px;
+    width: 50px;
+    overflow: scroll;
+}
+
 body {
     display: flex;
     min-height: 100vh;
@@ -60,6 +66,14 @@ ul.topnav li {
 .card_borders {
     border-left: 5px solid #2196F3;
     border-bottom: thin solid #2196F3;
+}
+
+ul.link {
+    background:none;
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+    border:none; 
 }
 
 ul.topnav li a:hover:not(.active) {background-color: #121;}

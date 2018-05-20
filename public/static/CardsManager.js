@@ -11,10 +11,10 @@ function cards_manager(tags_and_ids, user_id) {
     var cards_manager_obj = {};
 
     /* Hold the IDs of the cards that are yet to be viewed */
-    var pq_cards_to_view = max_PQ();
+    var pq_cards_to_view;
 
     /* Hold the IDs of the cards that have already been viewed. */
-    var pq_cards_already_viewed = max_PQ();
+    var pq_cards_already_viewed;
 
     /**
      * @description Initialize Card Manager by preparing a queue of cards.
@@ -22,6 +22,10 @@ function cards_manager(tags_and_ids, user_id) {
      */
     cards_manager_obj.initialize = function(tags_to_use, callback) {
         if (tags_to_use === null) tags_to_use = Object.keys(tags_and_ids);
+
+        // Reset the PQ (God forgive me for all my garbage :-/ )
+        pq_cards_already_viewed = max_PQ();
+        pq_cards_to_view = max_PQ();
 
         // A card may have many tags, so don't repeatedly add it to the PQ
         var already_seen_ids = new Set([]);

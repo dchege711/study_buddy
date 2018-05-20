@@ -17,14 +17,17 @@
         <div id="main_div">
 
             <div class="w3-container" id="status_bar">
-                <button class="w3-button" onclick="filterCards()">
+                <button class="w3-button w3-left" onclick="filterCards()">
                     <b><i class="fa fa-refresh fa-fw"></i> Apply Filters </b>
                 </button>
+
+                <p id="filter_list" class="w3-right w3-container"></p>
+                
             </div>
 
             <div class="w3-container">
 
-                <div class="w3-quarter w3-container w3-left">
+                <div class="w3-quarter w3-container w3-left" id="side_bar">
                     
                 </div>
                 
@@ -57,9 +60,22 @@
             var current_card_id = null;
             var current_user_id = JSON.parse(localStorage.getItem("metadata"))[0]["createdById"];
             var raw_description = null;
+            var selected_tags = new Set([]);
 
             /* Assumes 1 of 2 values: '/update-card' or '/add-card' */
             var post_url;
+
+            /* Load the sidebar */
+            var tags_html = "";
+            Object.keys(tags_and_ids).forEach((tag) => {
+                tags_html += "<ul id='" + tag + 
+                    "' class='link' onclick='selectThisTag(`" + tag + 
+                    "`);'> #" + tag + " (" + Object.keys(tags_and_ids[tag]).length + 
+                    ")</ul>";
+            }); 
+            document.getElementById("side_bar").insertAdjacentHTML(
+                'beforeend', tags_html);
+
 
             function initializeCards() {
                 my_cards_manager.initialize(null, () => {
@@ -78,6 +94,25 @@
             function fetchPreviousCard() {
                 my_cards_manager.previous((card) => {
                     renderCard(card);
+                });
+            }
+
+            function selectThisTag(tag) {
+                selected_tags.add(tag);
+            }
+
+            function filterCards() {
+                // Communicate which cards are being displayed...
+                var status_message = "Filter: ";
+                status_message += Array.from(selected_tags).join(", ");
+                document.getElementById("filter_list").innerHTML = status_message;
+                
+                // Update the cards being displayed
+                my_cards_manager.initialize(selected_tags, () => {
+                    my_cards_manager.next((card) => {
+                        renderCard(card);
+                    });
+                    selected_tags.clear();
                 });
             }
 
@@ -144,7 +179,6 @@
              * Once the user logs in, display the logout button 
              */ 
             function includeInAppButtons() {
-                console.log("Including in app buttons");
                 var nav_bar = document.getElementById("topnavitems");
                 nav_bar.insertAdjacentHTML('beforeend', 
                 '<li><button class="w3-button w3-padding-small top-nav w3-right" onClick="logOut()"><b>Log Out</b></button></li>');
