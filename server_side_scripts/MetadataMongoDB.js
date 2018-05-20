@@ -130,6 +130,13 @@ exports.update = function (savedCards, callBack) {
     if (savedCards[0].metadataIndex === undefined) {
         savedCards[0].metadataIndex = 0;
     }
+
+    if (savedCards[0].createdById === undefined) {
+        callBack({
+            success: false, internal_error: false,
+            message: "Expected the ID of the creator of this card"
+        });
+    }
     Metadata.findOne(
         {
             createdById: savedCards[0].createdById,

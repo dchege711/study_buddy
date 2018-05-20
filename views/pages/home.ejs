@@ -6,10 +6,11 @@
         <script src="/static/AppUtilities.js"></script>
         <script src="/static/MaxPriorityQueue.js"></script>
         <script src="/static/CardsManager.js"></script>
+        <script src="https://cdn.rawgit.com/showdownjs/showdown/1.0.1/dist/showdown.min.js"></script>
         
     </head>
 
-    <body onload="fetchCards()">
+    <body onload="initializeCards()">
 
         <% include ../partials/navbar.ejs %>
 
@@ -43,12 +44,24 @@
 
         <script type="text/javascript">
 
-            function fetchCards() {
+            /* Obtain the information on tags */
+            var tags_and_ids = JSON.parse(localStorage.getItem("metadata"))[0].node_information[0];
+            var my_cards_manager = cards_manager(tags_and_ids, localStorage.getItem("user_id"));
+            var converter = new showdown.Converter();
+            converter.setOption('literalMidWordUnderscores', true);
+            converter.setOption('literalMidWordAsterisks', true);
+            // converter.setOption('backslashEscapesHTMLTags', true);
+            
+            /* Initialize variables that keep track of the state */
+            var changed_items = new Set([]);
+            var current_card_id = null;
+            var current_user_id = JSON.parse(localStorage.getItem("metadata"))[0]["createdById"];
+            var raw_description = null;
 
-                /* Obtain the information on tags */
-                var tags_and_ids = JSON.parse(localStorage.getItem("metadata"))[0].node_information[0];
-                var my_cards_manager = cards_manager(tags_and_ids, localStorage.getItem("user_id"));
+            /* Assumes 1 of 2 values: '/update-card' or '/add-card' */
+            var post_url;
 
+            function initializeCards() {
                 my_cards_manager.initialize(null, () => {
                     my_cards_manager.next((card) => {
                         renderCard(card);
@@ -56,33 +69,83 @@
                 });
             }
 
+            function fetchNextCard() {
+                my_cards_manager.next((card) => {
+                    renderCard(card);
+                });
+            }
+
+            function fetchPreviousCard() {
+                my_cards_manager.previous((card) => {
+                    renderCard(card);
+                });
+            }
+
             function renderCard(card) {
                 console.log("Rendering " + card.title);
-                document.getElementById("card_description").innerText = card.description;
+                document.getElementById("card_title").value = card.title;
+                document.getElementById("card_description").innerHTML = converter.makeHtml(card.description);
+                document.getElementById("card_tags").value = card.tags;
+                document.getElementById("card_urgency").value = card.urgency;
+                
+                // Reset the contents of the current_card variable
+                changed_items = new Set([]);
+                current_card_id = card._id;
+                post_url = "/update-card";
+                raw_description = card.description;
+
                 loadMathJAX();
+            }
+
+            function displayRawCardDescription() {
+                document.getElementById("card_description").innerText = raw_description;
+            }
+
+            function displayNewCard() {
+                console.log("Creating a new card");
+                document.getElementById("card_title").value = "";
+                document.getElementById("card_description").innerHTML = "";
+                document.getElementById("card_tags").value = "";
+                document.getElementById("card_urgency").value = "";
+
+                // Reset the contents of the current_card variable
+                changed_items = new Set([]);
+                current_card_id = null;
+                raw_description = "";
+                post_url = "/add-card";
+            }
+
+            function handleInputChange(element_id) {
+                changed_items.add(element_id);
+            }
+
+            function saveCard() {
+                var payload = {};
+                changed_items.forEach((element_id) => {
+                    payload[element_id.split("card_")[1]] = document.getElementById(element_id).value;
+                });
+                if (current_card_id) {
+                    payload._id = current_card_id;
+                }
+
+                if (changed_items.has("card_description")) {
+                    payload.description = document.getElementById("card_description").innerText;
+                }
+                
+                payload.createdById = current_user_id;
+
+                sendHTTPRequest("POST", post_url, payload, (response) => {
+                    renderCard(response.message);
+                });
+
             }
             
             /**
              * @description Reload MathJAX to render new LaTEX
-             * http://docs.mathjax.org/en/latest/advanced/dynamic.html
+             * http://docs.mathjax.org/en/latest/advanced/typeset.html
              */ 
             function loadMathJAX() {
-                console.log("Reloading MathJAX...");
-                
-                var script = document.getElementById("math_jax_script");
-
-                // Remove any pre-existing MathJAX script
-                if (script) {
-                    script.remove();
-                    script = null;
-                }
-
-                script = document.createElement("script");
-                script.type = "text/javascript";
-                script.id = "math_jax_script";
-                script.src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML";
-                document.getElementsByTagName("head")[0].appendChild(script);
-
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, "card_description"]);
             }
 
         </script>
