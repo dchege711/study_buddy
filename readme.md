@@ -8,10 +8,18 @@
 
 :white_check_mark: Make the email address as the unique identifier.
 
-:soon: The PQ doesn't preserve order when iterating through previous.
+:soon: The PQ doesn't preserve order when iterating through previous().
 
 :soon: Use email verification to validate accounts.
 
 :white_check_mark: Implement an authenticated log-in process.
 
 :white_check_mark: Parse markdown from the card's content.
+
+:white_check_mark: Render LaTEX on the cards.
+
+:soon: Implement the sidebar and filter.
+
+:soon: Prettify the scripts found inside the cards.
+
+:soon: Define a log out procedure and write the required code.
