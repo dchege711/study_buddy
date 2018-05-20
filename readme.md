@@ -22,4 +22,4 @@
 
 :soon: Prettify the scripts found inside the cards.
 
-:soon: Define a log out procedure and write the required code.
+:white_check_mark: Define a log out procedure and write the required code.

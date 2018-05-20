@@ -10,7 +10,7 @@
         
     </head>
 
-    <body onload="initializeCards()">
+    <body onload="initializeCards(); includeInAppButtons();">
 
         <% include ../partials/navbar.ejs %>
 
@@ -138,6 +138,21 @@
                     renderCard(response.message);
                 });
 
+            }
+
+            /**
+             * Once the user logs in, display the logout button 
+             */ 
+            function includeInAppButtons() {
+                console.log("Including in app buttons");
+                var nav_bar = document.getElementById("topnavitems");
+                nav_bar.insertAdjacentHTML('beforeend', 
+                '<li><button class="w3-button w3-padding-small top-nav w3-right" onClick="logOut()"><b>Log Out</b></button></li>');
+            }
+
+            function logOut() {
+                localStorage.clear();
+                window.location = "/";
             }
             
             /**
