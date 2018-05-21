@@ -48,13 +48,20 @@
     </div>
 
     <div class="w3-bar w3-padding-16">
-        <button class="w3-left w3-btn w3-round-xxlarge" 
+        <button class="w3-left w3-third w3-btn w3-round-xxlarge" 
             onClick="fetchPreviousCard()">
             <b>
                 <i class="fa fa-chevron-left"></i> Previous</b>
         </button>
 
-        <button class="w3-right w3-btn w3-round-xxlarge" onClick="fetchNextCard()">
+        <div class="w3-center w3-third">
+            <div class="popup">
+                <span class="popuptext w3-center w3-padding-small" 
+                style="margin-top: 10px;" id="out_of_cards_popup">Out of cards!</span>
+            </div>
+        </div>
+
+        <button class="w3-right w3-btn w3-third w3-round-xxlarge" onClick="fetchNextCard()">
             <b>
                 <i class="fa fa-chevron-right"></i> Next</b>
         </button>

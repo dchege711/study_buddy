@@ -89,14 +89,34 @@
 
             function fetchNextCard() {
                 my_cards_manager.next((card) => {
-                    renderCard(card);
+                    if (card.title !== undefined) {
+                        renderCard(card);
+                    } else {
+                        displayPopUp();
+                    } 
                 });
             }
 
             function fetchPreviousCard() {
                 my_cards_manager.previous((card) => {
-                    renderCard(card);
+                    if (card !== {}) {
+                        renderCard(card);
+                    } else {
+                        displayPopUp();
+                    } 
                 });
+            }
+
+            function displayPopUp() {
+                var popup = document.getElementById("out_of_cards_popup");
+                popup.style.visibility = "visible";
+                window.setTimeout(() => {
+                    makeInvisible("out_of_cards_popup")
+                }, 1500);
+            }
+
+            function makeInvisible(element_id) {
+                document.getElementById(element_id).style.visibility = "hidden";
             }
 
             function selectThisTag(tag) {
