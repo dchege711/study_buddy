@@ -76,6 +76,16 @@ ul.link {
     border:none; 
 }
 
+ul.link.chosen {
+    background: black;
+    color: white;
+    text-decoration: none;
+}
+
+ul.link:hover {
+    text-decoration: underline;
+}
+
 ul.topnav li a:hover:not(.active) {background-color: #121;}
 
 ul.topnav li.right {float: right;}

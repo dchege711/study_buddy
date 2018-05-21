@@ -98,12 +98,17 @@
             }
 
             function selectThisTag(tag) {
-                selected_tags.add(tag);
+                if (selected_tags.has(tag)) {
+                    selected_tags.delete(tag);
+                } else {
+                    selected_tags.add(tag);
+                }                
+                document.getElementById(tag).classList.toggle("chosen");
             }
 
             function filterCards() {
                 // Communicate which cards are being displayed...
-                var status_message = "Filter: ";
+                var status_message = "Now showing: ";
                 status_message += Array.from(selected_tags).join(", ");
                 document.getElementById("filter_list").innerHTML = status_message;
                 
@@ -112,6 +117,10 @@
                     my_cards_manager.next((card) => {
                         renderCard(card);
                     });
+
+                    selected_tags.forEach((tag) => {
+                        document.getElementById(tag).classList.toggle("chosen");
+                    })
                     selected_tags.clear();
                 });
             }
@@ -122,6 +131,7 @@
                 document.getElementById("card_description").innerHTML = converter.makeHtml(card.description);
                 document.getElementById("card_tags").value = card.tags;
                 document.getElementById("card_urgency").value = card.urgency;
+                document.getElementById("card_description").removeAttribute("contenteditable");
                 
                 // Reset the contents of the current_card variable
                 changed_items = new Set([]);
@@ -133,7 +143,9 @@
             }
 
             function displayRawCardDescription() {
-                document.getElementById("card_description").innerText = raw_description;
+                var description_element = document.getElementById("card_description");
+                description_element.innerText = raw_description;
+                description_element.setAttribute("contenteditable", "true");
             }
 
             function displayNewCard() {
@@ -142,6 +154,7 @@
                 document.getElementById("card_description").innerHTML = "";
                 document.getElementById("card_tags").value = "";
                 document.getElementById("card_urgency").value = "";
+                document.getElementById("card_description").setAttribute("contenteditable", "true");
 
                 // Reset the contents of the current_card variable
                 changed_items = new Set([]);
