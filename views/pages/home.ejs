@@ -99,7 +99,7 @@
 
             function fetchPreviousCard() {
                 my_cards_manager.previous((card) => {
-                    if (card !== {}) {
+                    if (card.title !== undefined) {
                         renderCard(card);
                     } else {
                         displayPopUp();
