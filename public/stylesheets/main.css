@@ -13,9 +13,12 @@ footer {
 }
 
 .side_bar {
-    height: 50px;
-    width: 50px;
     overflow: scroll;
+}
+
+.side_bar_contents {
+    overflow: scroll;
+    max-height: 30px;
 }
 
 body {

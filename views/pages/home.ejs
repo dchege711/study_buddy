@@ -7,6 +7,8 @@
         <script src="/static/MaxPriorityQueue.js"></script>
         <script src="/static/CardsManager.js"></script>
         <script src="https://cdn.rawgit.com/showdownjs/showdown/1.0.1/dist/showdown.min.js"></script>
+        <link rel="stylesheet" href="/stylesheets/themes/atom-one-light.css">
+        <script src="/static/highlight.pack.js"></script>
         
     </head>
 
@@ -27,11 +29,11 @@
 
             <div class="w3-container">
 
-                <div class="w3-quarter w3-container w3-left" id="side_bar">
-                    
+                <div class="w3-container w3-border w3-left w3-quarter" id="side_bar">
+                    <div id="side_bar_contents"></div>  
                 </div>
                 
-                <div class="w3-threequarter w3-container w3-right">
+                <div class="w3-container w3-right w3-threequarter" id="card_template">
                     <% include ../partials/card_template.ejs %>
                 </div>
 
@@ -72,10 +74,10 @@
                     "' class='link' onclick='selectThisTag(`" + tag + 
                     "`);'> #" + tag + " (" + Object.keys(tags_and_ids[tag]).length + 
                     ")</ul>";
-            }); 
-            document.getElementById("side_bar").insertAdjacentHTML(
-                'beforeend', tags_html);
-
+            });
+            
+            document.getElementById("side_bar_contents").insertAdjacentHTML('beforeend', tags_html);
+            // document.getElementById("side_bar_contents").innerHTML = tags_html;
 
             function initializeCards() {
                 my_cards_manager.initialize(null, () => {
@@ -132,12 +134,18 @@
                 document.getElementById("card_tags").value = card.tags;
                 document.getElementById("card_urgency").value = card.urgency;
                 document.getElementById("card_description").removeAttribute("contenteditable");
-                
+                document.getElementById("side_bar_contents").style.height = document.getElementById("card_template").style.height;
+   
                 // Reset the contents of the current_card variable
                 changed_items = new Set([]);
                 current_card_id = card._id;
                 post_url = "/update-card";
                 raw_description = card.description;
+
+                // hljs.configure({ useBR: true });
+                $('pre code').each(function (i, block) {
+                    hljs.highlightBlock(block);
+                });
 
                 loadMathJAX();
             }
@@ -155,6 +163,7 @@
                 document.getElementById("card_tags").value = "";
                 document.getElementById("card_urgency").value = "";
                 document.getElementById("card_description").setAttribute("contenteditable", "true");
+                document.getElementById("side_bar_contents").style.height = document.getElementById("card_template").style.height;
 
                 // Reset the contents of the current_card variable
                 changed_items = new Set([]);
