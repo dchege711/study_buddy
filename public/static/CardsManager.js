@@ -104,8 +104,8 @@ function cards_manager(tags_and_ids, user_id) {
      * found
      */
     function find_card(card_id, callback) {
-        // var card = JSON.parse(localStorage.getItem(card_id));
-        var card = null;
+        var card = JSON.parse(localStorage.getItem(card_id));
+        // var card = null;
         if (card) {
             callback(card);
         } else {
