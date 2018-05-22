@@ -8,8 +8,6 @@
 
 :soon: Client-side username verification and validation for new users.
 
-:soon: Control the height of the sidebar such that it's scrollable.
-
 :white_check_mark: Have a cleaner way of updating a user's metadata. I associated metadata with a userID. Metadata is separate from the cards.
 
 :white_check_mark: Make the email address as the unique identifier.

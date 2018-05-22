@@ -12,13 +12,18 @@ footer {
     display: none;
 }
 
-.side_bar {
+#side_bar {
     overflow: scroll;
 }
 
-.side_bar_contents {
+#side_bar_contents {
     overflow: scroll;
-    max-height: 30px;
+    max-height: 600px;
+}
+
+#card_description {
+    min-height: 50px;
+    border-left: 5px solid grey;
 }
 
 body {
@@ -34,6 +39,8 @@ body {
     flex: 1;
     padding: 40px 0 0;
 }
+
+
 
 .topnav {
     position: fixed;
