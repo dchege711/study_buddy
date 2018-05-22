@@ -130,13 +130,23 @@
             }
 
             function filterCards() {
+                
+                // I apologize for this embarassing line. :-(
+                var tags_to_use;
+
                 // Communicate which cards are being displayed...
-                var status_message = "Now showing: ";
-                status_message += Array.from(selected_tags).join(", ");
-                document.getElementById("filter_list").innerHTML = status_message;
+                if (selected_tags.size == 0) {
+                    tags_to_use = null;
+                    document.getElementById("filter_list").innerHTML = "Now showing: all";
+                } else {
+                    tags_to_use = selected_tags;
+                    var status_message = "Now showing: ";
+                    status_message += Array.from(selected_tags).join(", ");
+                    document.getElementById("filter_list").innerHTML = status_message;
+                }
                 
                 // Update the cards being displayed
-                my_cards_manager.initialize(selected_tags, () => {
+                my_cards_manager.initialize(tags_to_use, () => {
                     my_cards_manager.next((card) => {
                         renderCard(card);
                     });

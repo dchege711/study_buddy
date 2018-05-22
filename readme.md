@@ -4,6 +4,8 @@
 
 :soon: The PQ doesn't preserve order when iterating through previous().
 
+:soon: Avail new cards/edits within the same session.
+
 :soon: Use email verification to validate accounts.
 
 :soon: Client-side username verification and validation for new users.
