@@ -10,6 +10,8 @@
 
 :soon: Client-side username verification and validation for new users.
 
+:soon: Fix bugs for new users.
+
 :white_check_mark: Have a cleaner way of updating a user's metadata. I associated metadata with a userID. Metadata is separate from the cards.
 
 :white_check_mark: Make the email address as the unique identifier.
@@ -25,3 +27,9 @@
 :white_check_mark: Prettify the scripts found inside the cards.
 
 :white_check_mark: Define a log out procedure and write the required code.
+
+## Screenshots
+
+![Login Page](https://github.com/dchege711/study_buddy/tree/master/data/login_page.png)
+
+![Sample Card](https://github.com/dchege711/study_buddy/tree/master/data/sample_card.png)
