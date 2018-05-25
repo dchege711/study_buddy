@@ -16,7 +16,6 @@ var mongoose = require('mongoose');
 var cardSchema = new mongoose.Schema({
     title: String,
     description: String,
-    description_markdown: String,
     tags: {
         type: String,
         lowercase: true,

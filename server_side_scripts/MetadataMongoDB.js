@@ -3,7 +3,7 @@ var Card = require('./models/CardSchema');
 var config = require('../config');
 var mongoose = require('mongoose');
 
-var debug = false;
+var debug = true;
 
 /**
  * 
@@ -39,7 +39,7 @@ exports.create = function (payload, callBack) {
                 // `markModified`, nothing happens. :-/
                 var tagMetadata = new Metadata({
                     "createdById": payload["userIDInApp"],
-                    "metadataIndex": 0,
+                    "metadataIndex": payload["metadataIndex"],
                     "stats": [],
                     "node_information": []
                 });
@@ -76,7 +76,44 @@ exports.read = function (payload, callBack) {
         metadataResults.push(metadataDoc);
     });
     cursor.on("close", () => {
-        callBack(metadataResults);
+        callBack({
+            "success": true, "internal_error": false,
+            "message": metadataResults
+        });
+    });
+}
+
+/**
+ * @description Scan the metadata database, looking for all the tags and their
+ * counts. Return this info as a list of {`text`: x, `size`: y} dicts.
+ * 
+ * @param {JSON} payload Empty for now. Might get used later on
+ * @param {Function} callBack Function that takes in an array of dicts. Each
+ * dict has the keys `text` and `size`.
+ */
+exports.readTags = function(payload, callBack) {
+    var cursor = Metadata.find({}).cursor();
+    var tags = {};
+    cursor.on("data", (metadataDoc) => {
+        var nodeInfo = metadataDoc.node_information[0];
+        for (const tag in nodeInfo) {
+            if (!tags.hasOwnProperty(tag)) {
+                tags[tag] = Object.keys(nodeInfo[tag]).length;
+            } else {
+                tags[tag] += Object.keys(nodeInfo[tag]).length;
+            }
+        }
+    });
+
+    cursor.on("close", () => {
+        tagsAsList = [];
+        for (const property in tags) {
+            tagsAsList.push({
+                text: property,
+                size: tags[property] 
+            });
+        }
+        callBack(tagsAsList);
     });
 }
 
@@ -92,6 +129,13 @@ exports.read = function (payload, callBack) {
 exports.update = function (savedCards, callBack) {
     if (savedCards[0].metadataIndex === undefined) {
         savedCards[0].metadataIndex = 0;
+    }
+
+    if (savedCards[0].createdById === undefined) {
+        callBack({
+            success: false, internal_error: false,
+            message: "Expected the ID of the creator of this card"
+        });
     }
     Metadata.findOne(
         {

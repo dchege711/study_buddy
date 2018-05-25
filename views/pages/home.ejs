@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <% include ../partials/header.ejs %>
+        <script src="/static/AppUtilities.js"></script>
+        <script src="/static/MaxPriorityQueue.js"></script>
+        <script src="/static/CardsManager.js"></script>
+        <script src="https://cdn.rawgit.com/showdownjs/showdown/1.0.1/dist/showdown.min.js"></script>
+        <link rel="stylesheet" href="/stylesheets/themes/atom-one-light.css">
+        <script src="/static/highlight.pack.js"></script>
+        
+    </head>
+
+    <body onload="initializeCards(); includeInAppButtons();">
+
+        <% include ../partials/navbar.ejs %>
+
+        <div id="main_div">
+
+            <div class="w3-container" id="status_bar">
+                <button class="w3-button w3-left" onclick="filterCards()">
+                    <b><i class="fa fa-refresh fa-fw"></i> Apply Filters </b>
+                </button>
+
+                <p id="filter_list" class="w3-right w3-container"></p>
+                
+            </div>
+
+            <div class="w3-container">
+
+                <div class="w3-container w3-left w3-quarter" id="side_bar">
+                    <div id="side_bar_contents"></div>  
+                </div>
+                
+                <div class="w3-container w3-right w3-threequarter" id="card_template">
+                    <% include ../partials/card_template.ejs %>
+                </div>
+
+            </div>
+            
+        </div>
+
+        <footer class="w3-container w3-container w3-black">
+
+            <% include ../partials/footer.ejs %>
+
+        </footer>
+
+        <script type="text/javascript">
+
+            /* Obtain the information on tags */
+            var tags_and_ids = JSON.parse(localStorage.getItem("metadata"))[0].node_information[0];
+            var my_cards_manager = cards_manager(tags_and_ids, localStorage.getItem("user_id"));
+            var converter = new showdown.Converter();
+            converter.setOption('literalMidWordUnderscores', true);
+            converter.setOption('literalMidWordAsterisks', true);
+            converter.setOption('tables', true);
+            // converter.setOption('backslashEscapesHTMLTags', true);
+            
+            /* Initialize variables that keep track of the state */
+            var changed_items = new Set([]);
+            var current_card_id = null;
+            var current_user_id = JSON.parse(localStorage.getItem("metadata"))[0]["createdById"];
+            var raw_description = null;
+            var selected_tags = new Set([]);
+
+            /* Assumes 1 of 2 values: '/update-card' or '/add-card' */
+            var post_url;
+
+            /* Load the sidebar */
+            var tags_html = "";
+            Object.keys(tags_and_ids).forEach((tag) => {
+                tags_html += "<ul id='" + tag + 
+                    "' class='link' onclick='selectThisTag(`" + tag + 
+                    "`);'> #" + tag + " (" + Object.keys(tags_and_ids[tag]).length + 
+                    ")</ul>";
+            });
+            
+            document.getElementById("side_bar_contents").insertAdjacentHTML('beforeend', tags_html);
+            // document.getElementById("side_bar_contents").innerHTML = tags_html;
+
+            function initializeCards() {
+                my_cards_manager.initialize(null, () => {
+                    my_cards_manager.next((card) => {
+                        renderCard(card);
+                    });
+                });
+            }
+
+            function fetchNextCard() {
+                my_cards_manager.next((card) => {
+                    if (card.title !== undefined) {
+                        renderCard(card);
+                    } else {
+                        displayPopUp();
+                    } 
+                });
+            }
+
+            function fetchPreviousCard() {
+                my_cards_manager.previous((card) => {
+                    if (card.title !== undefined) {
+                        renderCard(card);
+                    } else {
+                        displayPopUp();
+                    } 
+                });
+            }
+
+            function displayPopUp() {
+                var popup = document.getElementById("out_of_cards_popup");
+                popup.style.visibility = "visible";
+                window.setTimeout(() => {
+                    makeInvisible("out_of_cards_popup")
+                }, 1500);
+            }
+
+            function makeInvisible(element_id) {
+                document.getElementById(element_id).style.visibility = "hidden";
+            }
+
+            function selectThisTag(tag) {
+                if (selected_tags.has(tag)) {
+                    selected_tags.delete(tag);
+                } else {
+                    selected_tags.add(tag);
+                }                
+                document.getElementById(tag).classList.toggle("chosen");
+            }
+
+            function filterCards() {
+                
+                // I apologize for this embarassing line. :-(
+                var tags_to_use;
+
+                // Communicate which cards are being displayed...
+                if (selected_tags.size == 0) {
+                    tags_to_use = null;
+                    document.getElementById("filter_list").innerHTML = "Now showing: all";
+                } else {
+                    tags_to_use = selected_tags;
+                    var status_message = "Now showing: ";
+                    status_message += Array.from(selected_tags).join(", ");
+                    document.getElementById("filter_list").innerHTML = status_message;
+                }
+                
+                // Update the cards being displayed
+                my_cards_manager.initialize(tags_to_use, () => {
+                    my_cards_manager.next((card) => {
+                        renderCard(card);
+                    });
+
+                    selected_tags.forEach((tag) => {
+                        document.getElementById(tag).classList.toggle("chosen");
+                    })
+                    selected_tags.clear();
+                });
+            }
+
+            function renderCard(card) {
+                console.log("Rendering " + card.title);
+                document.getElementById("card_title").value = card.title;
+                document.getElementById("card_description").innerHTML = converter.makeHtml(card.description);
+                document.getElementById("card_tags").value = card.tags;
+                document.getElementById("card_urgency").value = card.urgency;
+                document.getElementById("card_description").removeAttribute("contenteditable");
+                document.getElementById("side_bar_contents").style.height = document.getElementById("card_template").style.height;
+   
+                // Reset the contents of the current_card variable
+                changed_items = new Set([]);
+                current_card_id = card._id;
+                post_url = "/update-card";
+                raw_description = card.description;
+
+                // hljs.configure({ useBR: true });
+                $('pre code').each(function (i, block) {
+                    hljs.highlightBlock(block);
+                });
+
+                loadMathJAX();
+            }
+
+            function displayRawCardDescription() {
+                var description_element = document.getElementById("card_description");
+                description_element.innerText = raw_description;
+                description_element.setAttribute("contenteditable", "true");
+            }
+
+            function displayNewCard() {
+                console.log("Creating a new card");
+                document.getElementById("card_title").value = "";
+                document.getElementById("card_description").innerHTML = "";
+                document.getElementById("card_tags").value = "";
+                document.getElementById("card_urgency").value = "";
+                document.getElementById("card_description").setAttribute("contenteditable", "true");
+                document.getElementById("side_bar_contents").style.height = document.getElementById("card_template").style.height;
+
+                // Reset the contents of the current_card variable
+                changed_items = new Set([]);
+                current_card_id = null;
+                raw_description = "";
+                post_url = "/add-card";
+            }
+
+            function handleInputChange(element_id) {
+                changed_items.add(element_id);
+            }
+
+            function saveCard() {
+                var payload = {};
+                changed_items.forEach((element_id) => {
+                    payload[element_id.split("card_")[1]] = document.getElementById(element_id).value;
+                });
+                if (current_card_id) {
+                    payload._id = current_card_id;
+                }
+
+                if (changed_items.has("card_description")) {
+                    payload.description = document.getElementById("card_description").innerText;
+                }
+                
+                payload.createdById = current_user_id;
+
+                sendHTTPRequest("POST", post_url, payload, (response) => {
+                    renderCard(response.message);
+                });
+
+            }
+
+            /**
+             * Once the user logs in, display the logout button 
+             */ 
+            function includeInAppButtons() {
+                var nav_bar = document.getElementById("topnavitems");
+                nav_bar.insertAdjacentHTML('beforeend', 
+                '<li><button class="w3-button w3-padding-small top-nav w3-right" onClick="logOut()"><b>Log Out</b></button></li>');
+            }
+
+            function logOut() {
+                localStorage.clear();
+                window.location = "/";
+            }
+            
+            /**
+             * @description Reload MathJAX to render new LaTEX
+             * http://docs.mathjax.org/en/latest/advanced/typeset.html
+             */ 
+            function loadMathJAX() {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, "card_description"]);
+            }
+
+        </script>
+
+    </body>
+
+</html>

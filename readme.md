@@ -1,26 +1,27 @@
-## Server Side Notes for Study Buddy
+# Study Buddy
 
-### Tasks 
+## Tasks
 
-:white_check_mark: Have a cleaner way of updating a user's metadata. I associated metadata with a userID. Metadata is separate from the cards.
+:soon: The PQ doesn't preserve order when iterating through previous().
+
+:soon: Avail new cards/edits within the same session.
+
+:soon: Use email verification to validate accounts.
 
 :soon: Client-side username verification and validation for new users.
 
-:white_check_mark: Make the email address as the unique identifier. 
+:white_check_mark: Have a cleaner way of updating a user's metadata. I associated metadata with a userID. Metadata is separate from the cards.
 
-:soon: Use email verification to validate accounts.
+:white_check_mark: Make the email address as the unique identifier.
 
 :white_check_mark: Implement an authenticated log-in process.
 
 :white_check_mark: Parse markdown from the card's content.
 
-#### Initial Notes
+:white_check_mark: Render LaTEX on the cards.
 
-<img src="https://github.com/dchege711/study_buddy/blob/master/images/version_1.png" width="700px" height="400px">
+:white_check_mark: Implement the sidebar and filter.
 
-* Changes made to initial design:
-    * The web client runs on ReactJS, but still on Heroku.
-    * I'm using mLab's MongoDB service instead of Google Cloud SQL because of cost.
-    * The backend logic is written in NodeJS, not in Python.
-    
+:white_check_mark: Prettify the scripts found inside the cards.
 
+:white_check_mark: Define a log out procedure and write the required code.

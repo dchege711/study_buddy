@@ -1,0 +1,130 @@
+footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: black;
+    color: white;
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}
+
+#side_bar {
+    overflow: scroll;
+}
+
+#side_bar_contents {
+    overflow: scroll;
+    max-height: 600px;
+}
+
+#card_description {
+    min-height: 50px;
+    border-left: 5px solid grey;
+}
+
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    padding: 40px 0 0;
+    margin-bottom: 5em;
+    font-family: 'Montserrat', sans-serif;          
+}
+
+#main_div {
+    flex: 1;
+    padding: 40px 0 0;
+}
+
+
+
+.topnav {
+    position: fixed;
+    padding: 10px;
+    width: 100%;
+    background-color: black;
+    color: white;
+    top: 0;
+}
+
+ul.topnav {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+ul.topnav li {
+    display: block;
+    color: white;
+    font-family: "Lobster";
+    font-size: 24px;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+.navbar a:hover {
+    background-color: "#eb90ed";
+    color: white;
+}
+
+.card_borders {
+    border-left: 5px solid #2196F3;
+    border-bottom: thin solid #2196F3;
+}
+
+ul.link {
+    background:none;
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+    border:none; 
+}
+
+ul.link.chosen {
+    background: black;
+    color: white;
+    text-decoration: none;
+}
+
+ul.link:hover {
+    text-decoration: underline;
+}
+
+ul.topnav li a:hover:not(.active) {background-color: #121;}
+
+ul.topnav li.right {float: right;}
+
+ul.topnav li.left {float: left;}
+
+/* Popup container - can be anything you want */
+.popup {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* The actual popup */
+.popup .popuptext {
+    visibility: hidden;
+    width: 160px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -80px;
+}

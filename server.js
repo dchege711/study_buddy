@@ -1,6 +1,7 @@
 var express = require('express');
 var path = require('path');
 var bodyParser = require('body-parser');
+
 var CardsDB = require('./server_side_scripts/CardsMongoDB');
 var MetadataDB = require('./server_side_scripts/MetadataMongoDB');
 var LogInUtilities = require('./server_side_scripts/LogInUtilities');
@@ -14,12 +15,13 @@ var port = process.env.PORT || 5000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(express.static(path.join(__dirname + '/client_side_react/build')));
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
 app.get('/', function(request, response) {
-    // response.sendFile(path.resolve(__dirname, 'public', 'index.html'));
-    response.sendFile(path.join(__dirname + "/client_side_react/build/index.html"));
+    response.render("pages/welcome_page");
 });
 
 app.post('/register-user', function(request, response) {
@@ -58,6 +60,10 @@ app.post('/read-card', function(request, response) {
     });
 });
 
+app.get('/home', function(request, response) {
+    response.render("pages/home.ejs");
+});
+
 app.post('/read-metadata', function (request, response) {
     console.log("POST request at /read-metadata");
     if (debugMode) {
@@ -67,6 +73,18 @@ app.post('/read-metadata', function (request, response) {
     MetadataDB.read(request.body, function (metadata) {
         if (debugMode) console.log(metadata);
         response.json(metadata);
+    });
+});
+
+app.post('/tags', function (request, response) {
+    console.log("POST request at /tags");
+    if (debugMode) {
+        console.log(request.body);
+    }
+
+    MetadataDB.readTags(request.body, function (tags) {
+        if (debugMode) console.log(tags);
+        response.json(tags);
     });
 });
 
@@ -107,5 +125,5 @@ app.post('/delete-card', function(request, response) {
 });
 
 app.listen(port, function() {
-    console.log(`API is running on port ${port}`);
+    console.log(`App is running on port ${port}`);
 });
