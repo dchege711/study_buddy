@@ -30,6 +30,6 @@
 
 ## Screenshots
 
-![Login Page](https://github.com/dchege711/study_buddy/tree/master/data/login_page.png)
+![Login Page](https://github.com/dchege711/study_buddy/blob/master/data/login_page.png)
 
-![Sample Card](https://github.com/dchege711/study_buddy/tree/master/data/sample_card.png)
+![Sample Card](https://github.com/dchege711/study_buddy/blob/master/data/sample_card.png)
