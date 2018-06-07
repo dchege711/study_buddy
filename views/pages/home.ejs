@@ -51,12 +51,15 @@
 
             /* Obtain the information on tags */
             var tags_and_ids = JSON.parse(localStorage.getItem("metadata"))[0].node_information[0];
+            
+            /* If it's a new user, return */
+            if (!tags_and_ids) tags_and_ids = {};
+            
             var my_cards_manager = cards_manager(tags_and_ids, localStorage.getItem("user_id"));
             var converter = new showdown.Converter();
             converter.setOption('literalMidWordUnderscores', true);
             converter.setOption('literalMidWordAsterisks', true);
             converter.setOption('tables', true);
-            // converter.setOption('backslashEscapesHTMLTags', true);
             
             /* Initialize variables that keep track of the state */
             var changed_items = new Set([]);
@@ -78,8 +81,7 @@
             });
             
             document.getElementById("side_bar_contents").insertAdjacentHTML('beforeend', tags_html);
-            // document.getElementById("side_bar_contents").innerHTML = tags_html;
-
+            
             function initializeCards() {
                 my_cards_manager.initialize(null, () => {
                     my_cards_manager.next((card) => {
@@ -159,6 +161,11 @@
             }
 
             function renderCard(card) {
+                if (!card.title) {
+                    console.log("Tried to render a non-existent card");
+                    displayNewCard();
+                    return;
+                }
                 console.log("Rendering " + card.title);
                 document.getElementById("card_title").value = card.title;
                 document.getElementById("card_description").innerHTML = converter.makeHtml(card.description);

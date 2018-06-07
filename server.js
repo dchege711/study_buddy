@@ -32,7 +32,14 @@ app.post('/register-user', function(request, response) {
     
     LogInUtilities.registerUserAndPassword(request.body, function(confirmation) {
         if (debugMode) console.log(confirmation);
-        response.json(confirmation);
+        if (confirmation.success) {
+            LogInUtilities.authenticateUser(request.body, function (login_confirmation) {
+                if (debugMode) console.log(login_confirmation);
+                response.json(login_confirmation);
+            });
+        } else {
+            response.json(confirmation);
+        }
     });
 });
 

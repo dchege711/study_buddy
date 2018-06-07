@@ -8,13 +8,25 @@
 
 :soon: Use email verification to validate accounts.
 
+:soon: Allow for password resets and account recovery.
+
 :soon: Client-side username verification and validation for new users.
 
-:soon: Fix bugs for new users.
+:white_check_mark: New users can't create cards. Fix the bug.
 
-:white_check_mark: Have a cleaner way of updating a user's metadata. I associated metadata with a userID. Metadata is separate from the cards.
+:soon: Handle edge case for removing the last card in a tag
 
-:white_check_mark: Make the email address as the unique identifier.
+:soon: Let users use normal LaTeX without double backslashes. Allow tab characters within the editable content.
+
+:soon: Allow filtering on the first set of filters.
+
+:soon: Include an about page with tutorial on how to use Study Buddy.
+
+:soon: Add an account page with configurable settings, e.g. code syntax theme, light vs dark UI, etc.
+
+:white_check_mark: Have a cleaner way of updating a user's metadata.
+
+:white_check_mark: Designate the email address as the unique identifier.
 
 :white_check_mark: Implement an authenticated log-in process.
 

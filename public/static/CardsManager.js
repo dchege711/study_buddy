@@ -16,6 +16,12 @@ function cards_manager(tags_and_ids, user_id) {
     /* Hold the IDs of the cards that have already been viewed. */
     var pq_cards_already_viewed;
 
+    /* Empty Card Template */
+    cards_manager_obj.empty_card = {
+        title: "", description: "", tags: "", createdById: null,
+        urgency: 0, metadataIndex: null, description_markdown: null
+    };
+
     /**
      * @description Initialize Card Manager by preparing a queue of cards.
      * @param {Array} tags_to_use The tags that should appear in the PQ.
