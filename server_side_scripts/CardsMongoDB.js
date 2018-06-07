@@ -15,11 +15,11 @@ var debug = false;
  */
 exports.create = function(payload, callBack) {
     var card = new Card({
-        title: payload["title"],
-        description: payload["description"],
-        tags: payload["tags"],
-        createdById: payload["createdById"],
-        urgency: payload["urgency"]
+        title: payload.title,
+        description: payload.description,
+        tags: payload.tags,
+        createdById: payload.createdById,
+        urgency: payload.urgency
     });
 
     /*
@@ -38,8 +38,9 @@ exports.create = function(payload, callBack) {
             })
         } else {
             // Update the metadata object with this card's details
+            savedCard.previousTags = card.tags;
             MetadataDB.update([savedCard], (response) => {
-                if (response["success"]) {
+                if (response.success) {
                     callBack({
                         "success": true, "internal_error": false,
                         "message": savedCard
@@ -47,42 +48,13 @@ exports.create = function(payload, callBack) {
                 } else {
                     callBack({
                         "success": false, "internal_error": false,
-                        "message": response["message"]
+                        "message": response.message
                     });
                 }
             });
         }
     });
 };
-
-/*
- * Delete this method if nothing breaks.
- * 
-exports.saveThisCard = function(card, callBack) {
-    // To do: Store the metadata ID under user's details.
-    if (card.title === "_tags_metadata_" || card.title === "_metadata_") {
-        return;
-    }
-
-    mongoose.connect(config.MONGO_URI);
-    var db = mongoose.connection;
-    db.on('error', console.error.bind(console, 'Connection Error:'));
-    db.once('open', function () {
-        console.log("Now saving card...");
-        console.log(card);
-        card.save(function (error, confirmation) {
-            console.log("I'm in the callback");
-            if (error) {
-                console.log(error);
-            } else {
-                console.log(confirmation);
-                callBack(confirmation);
-
-            }
-        });
-    });
-}
-*/
 
 /**
  * Read a card(s) from the database.
@@ -93,9 +65,9 @@ exports.saveThisCard = function(card, callBack) {
  * and `message` as keys.
  */
 exports.read = function(payload, callBack) {
-    var _id = payload["_id"];
+    var _id = payload._id;
     if (_id === undefined) {
-        var cursor = Card.find({ createdById: payload["userIDInApp"]}).cursor();
+        var cursor = Card.find({ createdById: payload.userIDInApp}).cursor();
         var allRelevantCards = [];
         cursor.on("data", (card) => {
             allRelevantCards.push(card);
@@ -132,18 +104,19 @@ exports.read = function(payload, callBack) {
  * `internal_error` and `message` as keys.
  */
 exports.update = function(cardJSON, callBack) {
-    var _id = cardJSON["_id"];
+    var _id = cardJSON._id;
 
     // findByIdAndUpdate will give me the old, not the updated, document.
     // I need to find the card, save it, and then call MetadataDB.update if need be
 
-    Card.findById(cardJSON["_id"], function(error, card) {
+    Card.findById(cardJSON._id, function(error, card) {
         if (error) {
             callBack({
                 "success": false, "internal_error": true,
                 "message": error
             });
         } else {
+            var previousTags = card.tags;
             // Overwrite the contents that changed
             Object.keys(cardJSON).forEach(card_key => {
                 card[card_key] = cardJSON[card_key];
@@ -156,8 +129,9 @@ exports.update = function(cardJSON, callBack) {
                     });
                 } else {
                     if (cardJSON.hasOwnProperty("tags") || cardJSON.hasOwnProperty("urgency")) {
+                        savedCard.previousTags = previousTags;
                         MetadataDB.update([savedCard], (response) => {
-                            if (response["success"]) {
+                            if (response.success) {
                                 callBack({
                                     "success": true, "internal_error": false,
                                     "message": savedCard
@@ -165,7 +139,7 @@ exports.update = function(cardJSON, callBack) {
                             } else {
                                 callBack({
                                     "success": false, "internal_error": false,
-                                    "message": response["message"]
+                                    "message": response.message
                                 });
                             }
                         });
@@ -179,35 +153,6 @@ exports.update = function(cardJSON, callBack) {
             });
         }
     });
-
-    /*
-    Card.findByIdAndUpdate(
-        _id, {$set: cardJSON}, {overwrite: true}, 
-        (error, updatedCard) => {
-            if (error) {
-                callBack({
-                    "success": false, "internal_error": true,
-                    "message": error
-                })
-            } else {
-                if (debug) console.log("Current urgency: " + updatedCard.urgency);
-                MetadataDB.update([updatedCard], (response) => {
-                    if (response["success"]) {
-                        callBack({
-                            "success": true, "internal_error": false,
-                            "message": updatedCard
-                        })
-                    } else {
-                        callBack({
-                            "success": false, "internal_error": false,
-                            "message": response["message"]
-                        })
-                    }
-                });
-            }
-        }
-    );
-    */
 };
 
 /**
@@ -219,7 +164,7 @@ exports.update = function(cardJSON, callBack) {
  */
 exports.delete = function(payload, callBack) {
     Card.findByIdAndRemove(
-        payload["_id"], (error, removedCard) => {
+        payload._id, (error, removedCard) => {
         if (error) {
             callBack({
                 "success": false, "internal_error": true,

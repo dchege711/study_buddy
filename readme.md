@@ -12,9 +12,7 @@
 
 :soon: Client-side username verification and validation for new users.
 
-:white_check_mark: New users can't create cards. Fix the bug.
-
-:soon: Handle edge case for removing the last card in a tag
+:soon: Implement logic for deleting a card.
 
 :soon: Let users use normal LaTeX without double backslashes. Allow tab characters within the editable content.
 
@@ -23,6 +21,10 @@
 :soon: Include an about page with tutorial on how to use Study Buddy.
 
 :soon: Add an account page with configurable settings, e.g. code syntax theme, light vs dark UI, etc.
+
+:white_check_mark: New users can't create cards. Fix the bug.
+
+:white_check_mark: Handle edge case for removing the last card in a tag
 
 :white_check_mark: Have a cleaner way of updating a user's metadata.
 

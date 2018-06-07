@@ -1,9 +1,7 @@
 var Metadata = require('./models/MetadataCardSchema');
-var Card = require('./models/CardSchema');
-var config = require('../config');
-var mongoose = require('mongoose');
+// var mongoose = require('mongoose');
 
-var debug = true;
+var debug = false;
 
 /**
  * 
@@ -12,7 +10,7 @@ var debug = true;
  * `internal_error` and `message` as keys.
  */
 exports.create = function (payload, callBack) {
-    if (payload["userIDInApp"] === undefined || payload["metadataIndex"] === undefined) {
+    if (payload.userIDInApp === undefined || payload.metadataIndex === undefined) {
         callBack({
             "success": false, "internal_error": false,
             "message": "Please provide a userIDInApp and a metadataIndex."
@@ -23,8 +21,8 @@ exports.create = function (payload, callBack) {
     // Do not overwrite. Only create new metadata.
     Metadata.count(
         { 
-            "createdById": payload["userIDInApp"],
-            "metadataIndex": payload["metadataIndex"]
+            "createdById": payload.userIDInApp,
+            "metadataIndex": payload.metadataIndex
         }, function(error, count) {
             if (count >= 1) {
                 callBack({
@@ -38,8 +36,8 @@ exports.create = function (payload, callBack) {
                 // `node_information`. Scrap that, even after using 
                 // `markModified`, nothing happens. :-/
                 var tagMetadata = new Metadata({
-                    "createdById": payload["userIDInApp"],
-                    "metadataIndex": payload["metadataIndex"],
+                    "createdById": payload.userIDInApp,
+                    "metadataIndex": payload.metadataIndex,
                     "stats": [],
                     "node_information": []
                 });
@@ -69,7 +67,7 @@ exports.create = function (payload, callBack) {
  * @param {Function} callBack Function that takes an array of JSON `Metadata` objects 
  */
 exports.read = function (payload, callBack) {
-    var userIDInApp = payload["userIDInApp"];
+    var userIDInApp = payload.userIDInApp;
     var cursor = Metadata.find({ createdById: userIDInApp}).cursor();
     var metadataResults = [];
     cursor.on("data", (metadataDoc) => {
@@ -159,24 +157,32 @@ exports.update = function (savedCards, callBack) {
                     var urgency = savedCard.urgency;
                     var cardID = savedCard._id;
 
-                    if(metadataDoc["stats"].length == 0) {
-                        metadataDoc["stats"].push({});
+                    if(metadataDoc.stats.length == 0) {
+                        metadataDoc.stats.push({});
                         if (debug) console.log("Created new stats item for " + savedCard.title);
                     }
 
-                    if (metadataDoc["node_information"].length == 0) {
-                        metadataDoc["node_information"].push({});
+                    if (metadataDoc.node_information.length == 0) {
+                        metadataDoc.node_information.push({});
                         if (debug) console.log("Created new nodes item for " + savedCard.title);
                     }
 
-                    metadataStats = metadataDoc["stats"][0];
-                    metadataNodeInfo = metadataDoc["node_information"][0];
+                    metadataStats = metadataDoc.stats[0];
+                    metadataNodeInfo = metadataDoc.node_information[0];
 
                     // Save this card in the stats field where it only appears once
                     if (metadataStats[cardID] === undefined) {
                         metadataStats[cardID] = {};
                     }
-                    metadataStats[cardID]["urgency"] = urgency;
+                    metadataStats[cardID].urgency = urgency;
+
+                    // Keep track of which tags have been changed
+                    var prevTagStillExists = {};
+                    savedCard.previousTags.split("#").forEach(prevTag => {
+                        if (prevTag !== "") {
+                            prevTagStillExists[prevTag] = false;
+                        }
+                    });
 
                     // Save the card's id in each tag that it has
                     savedCard.tags.split("#").forEach(tag => {
@@ -192,7 +198,25 @@ exports.update = function (savedCards, callBack) {
                                 metadataNodeInfo[strippedTag][cardID] = {}
                             }
 
-                            metadataNodeInfo[strippedTag][cardID]["urgency"] = urgency;
+                            // If this tag was in the previous version of the card, flag it
+                            if (strippedTag in prevTagStillExists) {
+                                prevTagStillExists[strippedTag] = true;
+                            }
+
+                            metadataNodeInfo[strippedTag][cardID].urgency = urgency;
+                        }
+                    });
+
+                    // Get rid of all tags that were deleted in the current card
+                    Object.keys(prevTagStillExists).forEach((prevTag) => {
+                        if (!prevTagStillExists[prevTag]) {
+                            delete metadataNodeInfo[prevTag][cardID];
+                            if (Object.keys(metadataNodeInfo[prevTag]).length === 0) {
+                                delete metadataNodeInfo[prevTag];
+                            }
+                            if (debug) console.log(
+                                `${savedCard.title} was deleted from ${prevTag}`
+                            );
                         }
                     });
 
@@ -227,7 +251,7 @@ exports.update = function (savedCards, callBack) {
  * `internal_error` and `message` as keys.
  */
 exports.delete = function (payload, callBack) {
-    var userIDInApp = payload["userIDInApp"];
+    var userIDInApp = payload.userIDInApp;
     Metadata.deleteMany(
         { createdById: userIDInApp }, 
         (error, deleteConfirmation) => {
