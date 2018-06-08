@@ -177,7 +177,6 @@ exports.delete = function(payload, callBack) {
 };
 
 /**
- * 
  * @param {JSON} payload Must contain `_id` that has the id of the card
  * to be placed into trash, and `userIDInApp`, the ID of the user who owns
  * the card.

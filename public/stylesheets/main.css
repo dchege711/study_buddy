@@ -41,8 +41,12 @@ body {
 }
 
 .underline_bold_text {
-    text-decoration: underline;
-    font-weight: bold;
+    text-decoration: underline !important;
+    font-weight: bold !important;
+}
+
+.clickable {
+    cursor: pointer;
 }
 
 .topnav {
@@ -109,7 +113,7 @@ ul.topnav li.left {float: left;}
 .popup {
     position: relative;
     display: inline-block;
-    cursor: pointer;
+    max-width: 300px;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -119,7 +123,8 @@ ul.topnav li.left {float: left;}
 /* The actual popup */
 .popup .popuptext {
     visibility: hidden;
-    width: 160px;
+    width: 300px;
+    height: 30px;
     background-color: #555;
     color: #fff;
     text-align: center;
@@ -131,3 +136,12 @@ ul.topnav li.left {float: left;}
     left: 50%;
     margin-left: -80px;
 }
+
+/*
+#out_of_cards_popup {
+   margin-top: 10px;
+   align-self: center;
+   width: 200px;
+   height: 200px; 
+}
+*/

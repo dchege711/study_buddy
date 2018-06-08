@@ -304,12 +304,16 @@ exports.send_to_trash = function (card_JSON, callBack) {
                 // Add the card to the trashed items associated with the user
                 // Associate the deletion time so that we can have a clean up 
                 // of all cards in the trash that are older than 30 days
-                if (!metadataDoc.trashed_cards) {
+                console.log(metadataDoc.trashed_cards);
+
+                if (!metadataDoc.trashed_cards || metadataDoc.trashed_cards.length == 0) {
                     metadataDoc.trashed_cards = [];
                     metadataDoc.trashed_cards.push({});
+                    console.log("Added an empty object to metadataDoc.trashed_cards[]");
                 }
-
-                metadataDoc.trashed_cards[trashed_card_id] = Date.now();
+                
+                console.log(metadataDoc.trashed_cards);
+                metadataDoc.trashed_cards[0][trashed_card_id] = Date.now();
 
                 // This is necessary. All that hair pulling can now stop :-/
                 metadataDoc.markModified("stats");
@@ -325,12 +329,31 @@ exports.send_to_trash = function (card_JSON, callBack) {
                     } else {
                         callBack({
                             success: true, internal_error: false,
-                            message: `${card_JSON.title} moved to the trash. 
-                                <span class='underline_bold_text' onclick='restoreFromTrash(${card_JSON._id}, 
-                                ${card_JSON.createdById})'>Undo Action</span>`
+                            message: `Card moved to the trash. 
+                                <span class="underline_bold_text clickable" 
+                                onclick="restoreFromTrash('${card_JSON._id}', 
+                                '${card_JSON.urgency}')">Undo Action</span>`
                         });
                     }
                 });
+            }
+        }
+    );
+};
+
+exports.restore_from_trash = function(restore_card_payload, callBack) {
+    Metadata.find(
+        { createdById: restore_card_payload.createdById},
+        (err, matchingMetadataDocs) => {
+            if (err) {
+                console.log(err);
+                callBack({
+                    success: false, internal_error: true,
+                    message: "500. Internal Server Error"
+                });
+            } else {
+                console.log(matchingMetadataDocs);
+                callBack({});
             }
         }
     );

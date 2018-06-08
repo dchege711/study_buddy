@@ -8,7 +8,7 @@ var LogInUtilities = require('./server_side_scripts/LogInUtilities');
 
 require("./server_side_scripts/MongooseClient");
 
-const debugMode = false;
+const debugMode = true;
 
 var app = express();
 var port = process.env.PORT || 5000;
@@ -138,6 +138,18 @@ app.post('/trash-card', function (request, response) {
     }
 
     CardsDB.send_to_trash(request.body, function (confirmation) {
+        if (debugMode) console.log(confirmation);
+        response.json(confirmation);
+    });
+});
+
+app.post('/restore-from-trash', function (request, response) {
+    console.log("POST request at /restore-from-trash");
+    if (debugMode) {
+        console.log(request.body);
+    }
+
+    MetadataDB.restore_from_trash(request.body, function (confirmation) {
         if (debugMode) console.log(confirmation);
         response.json(confirmation);
     });

@@ -115,6 +115,20 @@ function cards_manager(tags_and_ids, user_id) {
     };
 
     /**
+     * @description Insert a card into the queue. By convention, the card will 
+     * be inserted into the queue of already viewed cards. If you wish to view
+     * it, run `CardsManager.previous
+     * @param {String} card_to_insert_id The ID of the card to insert into the queue
+     * @param {Number} card_to_insert_urgency The urgency of the card to be inserted. 
+     * Used as a sorting key.
+     */
+    cards_manager_obj.insert_card = function(card_to_insert_id, card_to_insert_urgency) {
+        pq_cards_already_viewed.insert(
+            [card_to_insert_id, card_to_insert_urgency]
+        );
+    };
+
+    /**
      * @description Move the top item of the source PQ to the destination PQ.
      * Return the item that has been moved.
      * 

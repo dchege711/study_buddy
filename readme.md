@@ -4,7 +4,7 @@
 
 :soon: The PQ doesn't preserve order when iterating through previous().
 
-:soon: Avail new cards/edits within the same session.
+:soon: Avail new cards/edits within the same session. Insert them into the PQ. Deleting new cards doesn't work because of this.
 
 :soon: Use email verification to validate accounts.
 
@@ -12,11 +12,11 @@
 
 :soon: Client-side username verification and validation for new users.
 
-:soon: Implement logic for deleting a card. Update: Learned something about UI design - [never use a warning when you meant undo](http://alistapart.com/article/neveruseawarning). The argument is reasonable. I'll follow it.
+:white_check_mark: Implement logic for ~~deleting a card~~ moving a card to the trash. Learned that I should [never use a warning when I meant undo](http://alistapart.com/article/neveruseawarning).
 
-  * To do, make the toast bigger and implement the undo logic.
+:soon: Implement logic for recovering cards from the trash.
 
-:soon: Implement logic for recovering cards from the trash. And also logic for deleting a card from the trash forever.
+:soon: Implement a method that cleans all the cards in the trash that are more than 30 days old.
 
 :soon: Let users use normal LaTeX without double backslashes. Allow tab characters within the editable content.
 

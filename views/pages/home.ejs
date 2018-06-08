@@ -107,7 +107,10 @@
                     if (card.title !== undefined) {
                         renderCard(card);
                     } else {
-                        displayPopUp("Out of cards!", 1500);
+                        displayPopUp(
+                            `Card moved to trash. 
+                            <span class="underline_bold_text clickable" onclick="restoreFromTrash('43546rfnvfv', '23')">Undo Action</span>`, 7000
+                        );
                     } 
                 });
             }
@@ -267,6 +270,19 @@
                 }
             }
 
+            function restoreFromTrash(card_to_restore_id, card_to_restore_urgency) {
+                sendHTTPRequest(
+                    "POST", "/restore-from-trash", 
+                    {
+                        createdById: current_user_id,
+                        _id: card_to_restore_id,
+                    },
+                    (response) => {
+                        
+                    }
+                );
+            }
+            
             /**
              * Once the user logs in, display the logout button 
              */ 
