@@ -8,7 +8,7 @@ var LogInUtilities = require('./server_side_scripts/LogInUtilities');
 
 require("./server_side_scripts/MongooseClient");
 
-const debugMode = true;
+const debugMode = false;
 
 var app = express();
 var port = process.env.PORT || 5000;
@@ -137,7 +137,7 @@ app.post('/trash-card', function (request, response) {
         console.log(request.body);
     }
 
-    CardsDB.send_to_trash(request.body, function (confirmation) {
+    MetadataDB.send_to_trash(request.body, function (confirmation) {
         if (debugMode) console.log(confirmation);
         response.json(confirmation);
     });

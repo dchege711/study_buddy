@@ -107,10 +107,7 @@
                     if (card.title !== undefined) {
                         renderCard(card);
                     } else {
-                        displayPopUp(
-                            `Card moved to trash. 
-                            <span class="underline_bold_text clickable" onclick="restoreFromTrash('43546rfnvfv', '23')">Undo Action</span>`, 7000
-                        );
+                        displayPopUp("Out of cards!", 1500);
                     } 
                 });
             }
@@ -278,7 +275,11 @@
                         _id: card_to_restore_id,
                     },
                     (response) => {
-                        
+                        if (response.message === card_to_restore_id) {
+                            console.log(`Saved ${card_to_restore_id}`);
+                            my_cards_manager.insert_card(card_to_restore_id, card_to_restore_urgency);
+                            fetchPreviousCard();
+                        }
                     }
                 );
             }
