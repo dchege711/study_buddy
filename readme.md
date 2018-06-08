@@ -12,7 +12,11 @@
 
 :soon: Client-side username verification and validation for new users.
 
-:soon: Implement logic for deleting a card.
+:soon: Implement logic for deleting a card. Update: Learned something about UI design - [never use a warning when you meant undo](http://alistapart.com/article/neveruseawarning). The argument is reasonable. I'll follow it.
+
+  * To do, make the toast bigger and implement the undo logic.
+
+:soon: Implement logic for recovering cards from the trash. And also logic for deleting a card from the trash forever.
 
 :soon: Let users use normal LaTeX without double backslashes. Allow tab characters within the editable content.
 

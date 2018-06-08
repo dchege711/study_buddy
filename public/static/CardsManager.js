@@ -67,6 +67,14 @@ function cards_manager(tags_and_ids, user_id) {
 
     };
 
+    cards_manager_obj.num_next = function () {
+        return pq_cards_to_view.size();
+    };
+
+    cards_manager_obj.num_prev = function () {
+        return pq_cards_already_viewed.size();
+    };
+
     /**
      * @description Return the previous card on the queue.
      * @param {Function} callback The function to call that accepts a card
@@ -77,6 +85,7 @@ function cards_manager(tags_and_ids, user_id) {
 
         if (pq_cards_already_viewed.is_empty()) {
             callback({});
+            return;
         }
 
         var prev_card_id_urgency = transfer_item(
@@ -85,6 +94,24 @@ function cards_manager(tags_and_ids, user_id) {
         
         console.log("Prev: " + prev_card_id_urgency);
         find_card(prev_card_id_urgency[0], callback);
+    };
+
+    /**
+     * @description Remove the specified card from the cards that are displayed 
+     * to the user.
+     * 
+     * @param {String} card_to_remove_id The ID of the card to be removed from 
+     * the queue of cards.
+     */
+    cards_manager_obj.remove_card = function(card_to_remove_id) {
+        // The card to be removed will be at the top of either PQ
+        if (pq_cards_already_viewed.peek()[0] == card_to_remove_id) {
+            return pq_cards_already_viewed.del_max()[0];
+        } else if (pq_cards_to_view.peek()[0] == card_to_remove_id) {
+            return pq_cards_to_view.del_max()[0];
+        } else {
+            return null;
+        }
     };
 
     /**

@@ -49,6 +49,8 @@
 
         <script type="text/javascript">
 
+            var debug = true;
+
             /* Obtain the information on tags */
             var tags_and_ids = JSON.parse(localStorage.getItem("metadata"))[0].node_information[0];
             
@@ -95,7 +97,7 @@
                     if (card.title !== undefined) {
                         renderCard(card);
                     } else {
-                        displayPopUp();
+                        displayPopUp("Out of cards!", 1500);
                     } 
                 });
             }
@@ -105,17 +107,18 @@
                     if (card.title !== undefined) {
                         renderCard(card);
                     } else {
-                        displayPopUp();
+                        displayPopUp("Out of cards!", 1500);
                     } 
                 });
             }
 
-            function displayPopUp() {
+            function displayPopUp(text, timeout_ms) {
                 var popup = document.getElementById("out_of_cards_popup");
+                popup.innerHTML = text;
                 popup.style.visibility = "visible";
                 window.setTimeout(() => {
                     makeInvisible("out_of_cards_popup")
-                }, 1500);
+                }, timeout_ms);
             }
 
             function makeInvisible(element_id) {
@@ -233,6 +236,35 @@
                     renderCard(response.message);
                 });
 
+            }
+            
+            function moveCardToTrash() {
+                if (debug) console.log(`${my_cards_manager.num_prev()} vs ${my_cards_manager.num_next()}`);
+                // Remove the card from the ones that get displayed
+                var removed_card_id = my_cards_manager.remove_card(current_card_id);
+                if (removed_card_id === current_card_id) {
+                    if (debug) console.log(`${my_cards_manager.num_prev()} vs ${my_cards_manager.num_next()}`);
+                    // Move on to the next card in the PQ
+                    if (my_cards_manager.num_next() > 0) {
+                        fetchNextCard();
+                    } else if (my_cards_manager.num_prev() > 0) {
+                        fetchPreviousCard();
+                    } else {
+                        displayNewCard();
+                    }
+
+                    // Request the server to trash the card
+                    sendHTTPRequest("POST", "/trash-card", 
+                        {
+                            _id: removed_card_id, createdById: current_user_id
+                        }, 
+                        (trash_confirmation) => {
+                            displayPopUp(trash_confirmation.message, 10000);
+                    });
+
+                } else {
+                    console.log("Error: The wrong card was removed!");
+                }
             }
 
             /**

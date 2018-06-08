@@ -113,7 +113,7 @@ exports.readTags = function(payload, callBack) {
         }
         callBack(tagsAsList);
     });
-}
+};
 
 /**
  * Update the metadata with the new cards' details. This method
@@ -242,7 +242,7 @@ exports.update = function (savedCards, callBack) {
             }
         }
     );
-}
+};
 
 /**
  * Delete the metadata associated with the user.
@@ -267,4 +267,71 @@ exports.delete = function (payload, callBack) {
             });
         }
     });
-}
+};
+
+exports.send_to_trash = function (card_JSON, callBack) {
+    if (card_JSON.metadataIndex === undefined) {
+        card_JSON.metadataIndex = 0;
+    }
+    Metadata.findOne(
+        {
+            createdById: card_JSON.createdById,
+            metadataIndex: card_JSON.metadataIndex
+        }, (error, metadataDoc) => {
+            if (error) {
+                callBack({
+                    "success": false, "internal_error": true,
+                    "message": error
+                });
+            } else {
+
+                metadataStats = metadataDoc.stats[0];
+                metadataNodeInfo = metadataDoc.node_information[0];
+                var trashed_card_id = card_JSON._id;
+
+                // Remove the card from the lists that the user previews from
+                card_JSON.tags.split("#").forEach(tag_to_remove => {
+                    tag_to_remove = tag_to_remove.trim();
+                    if (tag_to_remove !== "") {
+                        delete metadataNodeInfo[tag_to_remove][trashed_card_id];
+                        if (Object.keys(metadataNodeInfo[tag_to_remove]).length === 0) {
+                            delete metadataNodeInfo[tag_to_remove];
+                        }
+                    }
+                });
+                delete metadataStats[trashed_card_id];
+
+                // Add the card to the trashed items associated with the user
+                // Associate the deletion time so that we can have a clean up 
+                // of all cards in the trash that are older than 30 days
+                if (!metadataDoc.trashed_cards) {
+                    metadataDoc.trashed_cards = [];
+                    metadataDoc.trashed_cards.push({});
+                }
+
+                metadataDoc.trashed_cards[trashed_card_id] = Date.now();
+
+                // This is necessary. All that hair pulling can now stop :-/
+                metadataDoc.markModified("stats");
+                metadataDoc.markModified("node_information");
+                metadataDoc.markModified("trashed_cards");
+
+                metadataDoc.save(function (error, savedMetadata, numAffected) {
+                    if (error) {
+                        callBack({
+                            "success": false, "internal_error": true,
+                            "message": error
+                        });
+                    } else {
+                        callBack({
+                            success: true, internal_error: false,
+                            message: `${card_JSON.title} moved to the trash. 
+                                <span class='underline_bold_text' onclick='restoreFromTrash(${card_JSON._id}, 
+                                ${card_JSON.createdById})'>Undo Action</span>`
+                        });
+                    }
+                });
+            }
+        }
+    );
+};

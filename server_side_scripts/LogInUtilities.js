@@ -1,7 +1,6 @@
 var stanfordCrypto = require('sjcl');
-var config = require("../config");
-var User = require("./models/UserSchema");
-var MetadataDB = require("./MetadataMongoDB");
+var User = require("./models/UserSchema.js");
+var MetadataDB = require("./MetadataMongoDB.js");
 var mongoose = require('mongoose');
 
 var debug = false;
@@ -11,12 +10,12 @@ getSaltAndHash = function(password, callBack) {
     var salt = stanfordCrypto.random.randomWords(8, 7);
     var hash = stanfordCrypto.misc.pbkdf2(password, salt);
     callBack(salt, hash);
-}
+};
 
 getHash = function(password, salt, callBack) {
     var hash = stanfordCrypto.misc.pbkdf2(password, salt);
     callBack(hash);
-}
+};
 
 /**
  * @description Generate a random User ID and make sure it is unique
@@ -35,7 +34,7 @@ getIdInApp = function(callBack) {
             return;
         }
     });
-}
+};
 
 /**
  * Register a new user using the provided password.
@@ -95,7 +94,7 @@ exports.registerUserAndPassword = function(payload, callBack) {
             });
         });    
     });
-}
+};
 
 /**
  * Authenticate a user that is trying to log in.
@@ -149,4 +148,4 @@ exports.authenticateUser = function(payload, callBack) {
             });
         }
     });
-}
+};

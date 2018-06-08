@@ -82,6 +82,14 @@ function max_PQ() {
     };
 
     /**
+     * @description Return the item at the top of the PQ, but don't 
+     * delete it.
+     */
+    pq_object.peek = function() {
+        return pq[1];
+    };
+
+    /**
      * @description Increase/descrease the underlying array for the PQ. 
      * We're currently doubling the size at half capacity, and halving 
      * at quarter capacity.

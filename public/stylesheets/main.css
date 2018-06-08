@@ -40,7 +40,10 @@ body {
     padding: 40px 0 0;
 }
 
-
+.underline_bold_text {
+    text-decoration: underline;
+    font-weight: bold;
+}
 
 .topnav {
     position: fixed;

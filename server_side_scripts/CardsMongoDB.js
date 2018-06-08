@@ -1,5 +1,5 @@
 var Card = require('./models/CardSchema');
-var config = require('../config');
+var User = require("./models/UserSchema.js");
 var mongoose = require('mongoose');
 var MetadataDB = require('./MetadataMongoDB');
 
@@ -169,9 +169,42 @@ exports.delete = function(payload, callBack) {
             callBack({
                 "success": false, "internal_error": true,
                 "message": error
-            })
+            });
         } else {
             MetadataDB.remove(removedCard, callBack);
         }
     });
+};
+
+/**
+ * 
+ * @param {JSON} payload Must contain `_id` that has the id of the card
+ * to be placed into trash, and `userIDInApp`, the ID of the user who owns
+ * the card.
+ * @param {Function} callBack Takes a JSON with `success`, `internal_error` 
+ * and `message` as keys.
+ */
+exports.send_to_trash = function(payload, callBack) {
+    Card.find(
+        {
+            _id: payload._id, createdById: payload.createdById
+        }, (error, card_results) => {
+            if (error) {
+                console.log(error);
+                callBack({
+                    success: false, internal_error: false,
+                    message: "500. Internal Server Error"
+                });
+            }
+            else if (card_results.length == 0) {
+                callBack({
+                    success: false, internal_error: false,
+                    message: "The card could not was not trashed."
+                });
+            } else {
+                // Since ids are unique, we're sure that we found an exact match
+                MetadataDB.send_to_trash(card_results[0], callBack);
+            }
+        }
+    );
 };

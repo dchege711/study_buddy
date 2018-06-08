@@ -11,6 +11,7 @@ var metadataSchema = new mongoose.Schema({
     createdById: Number,
     metadataIndex: Number,
     node_information: Array,
+    trashed_cards: Array,
     stats: Array,
 },
     {

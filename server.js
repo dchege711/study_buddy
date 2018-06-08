@@ -131,6 +131,18 @@ app.post('/delete-card', function(request, response) {
     });
 });
 
+app.post('/trash-card', function (request, response) {
+    console.log("POST request at /trash-card");
+    if (debugMode) {
+        console.log(request.body);
+    }
+
+    CardsDB.send_to_trash(request.body, function (confirmation) {
+        if (debugMode) console.log(confirmation);
+        response.json(confirmation);
+    });
+});
+
 app.listen(port, function() {
     console.log(`App is running on port ${port}`);
 });
