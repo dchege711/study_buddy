@@ -12,7 +12,7 @@
 
 :soon: Client-side username verification and validation for new users.
 
-:white_check_mark: Implement logic for ~~deleting a card~~ moving a card to the trash. Learned that I should [never use a warning when I meant undo](http://alistapart.com/article/neveruseawarning).
+:white_check_mark: Implement logic for ~~deleting a card~~ moving a card to the trash and undoing it within 10 seconds. Learned that I should [never use a warning when I meant undo](http://alistapart.com/article/neveruseawarning).
 
 :soon: Implement logic for recovering cards from the trash.
 

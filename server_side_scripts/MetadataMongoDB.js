@@ -58,7 +58,7 @@ exports.create = function (payload, callBack) {
             }
         }
     );
-}
+};
 
 /**
  * Read all the metadata associated with a user's cards.
@@ -79,7 +79,7 @@ exports.read = function (payload, callBack) {
             "message": metadataResults
         });
     });
-}
+};
 
 /**
  * @description Scan the metadata database, looking for all the tags and their
@@ -340,6 +340,7 @@ function updateMetadataWithCardDetails(savedCard, metadataDoc, callBack) {
     if (savedCard.previousTags) {
         savedCard.previousTags.split("#").forEach(prevTag => {
             if (prevTag !== "") {
+                prevTag = prevTag.trim();
                 prevTagStillExists[prevTag] = false;
             }
         });
@@ -381,6 +382,7 @@ function updateMetadataWithCardDetails(savedCard, metadataDoc, callBack) {
             );
         }
     });
+    
     callBack();
 }
 
