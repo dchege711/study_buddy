@@ -29,6 +29,10 @@
 
 :soon: Add an account page with configurable settings, e.g. code syntax theme, light vs dark UI, etc.
 
+:soon: Make card navigation more user-friendly
+
+I chose to display the tags appearing on the sidebar in decreasing order of importance. As opposed to tag frequency, I weighted each tag by summing up the urgencies of all the cards that the tag is included in. This better captures the relative importance of the tags.
+
 :white_check_mark: Implement logic for ~~deleting a card~~ moving a card to the trash and undoing it within 10 seconds. 
 
 I learned that I should [never use a warning when I meant undo](http://alistapart.com/article/neveruseawarning). Seems like a good design decision. Users who really want to delete a card might be unsatisifed, but I'll soon implement a clean up script that automatically deletes cards that are in the trash and are more than 30 days old. Amazing how much fiddling goes in the backend, just to allow a user to delete and then save themselves 3 seconds later by hitting `Undo`.

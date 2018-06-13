@@ -73,9 +73,25 @@
             /* Assumes 1 of 2 values: '/update-card' or '/add-card' */
             var post_url;
 
-            /* Load the sidebar */
+            /* Load the sidebar. Order the tags such that the ones that have the
+             * more important cards come up first.
+             */
+            var tags_in_decreasing_order = Object.keys(tags_and_ids);
+            tags_in_decreasing_order.sort(function(tag_a, tag_b) {
+                var tag_a_importance = 0;
+                var tag_b_importance = 0;
+
+                Object.keys(tags_and_ids[tag_b]).forEach((card_id) => {
+                    tag_b_importance += tags_and_ids[tag_b][card_id]["urgency"]
+                });
+
+                Object.keys(tags_and_ids[tag_a]).forEach((card_id) => {
+                    tag_a_importance += tags_and_ids[tag_a][card_id]["urgency"]
+                });
+                return tag_b_importance - tag_a_importance;
+            });
             var tags_html = "";
-            Object.keys(tags_and_ids).forEach((tag) => {
+            tags_in_decreasing_order.forEach((tag) => {
                 tags_html += "<ul id='" + tag + 
                     "' class='link' onclick='selectThisTag(`" + tag + 
                     "`);'> #" + tag + " (" + Object.keys(tags_and_ids[tag]).length + 
