@@ -21,7 +21,9 @@
 
 :soon: Implement a method that cleans all the cards in the trash that are more than 30 days old.
 
-:soon: Let users use normal LaTeX without double backslashes. Allow tab characters within the editable content.
+:soon: Make editing of cards more user-friendly
+
+Previously, users had to escape the LaTEX delimiter themselves and also escape underscores within inline LaTEX. This meant lines like `\(p_i = 2\)` had to be written as `\\(p\_i = 2\\)`. With some regular expressions, I was able to support the former approach. I traded computational efficiency (more code to automatically escape backslashes) for convenience (users entering normal LaTEX). I choose to make this correction on the client side since I can't afford that much storage capacity on the server side.
 
 :soon: Allow filtering on the first set of filters.
 
@@ -33,7 +35,7 @@
 
 I chose to display the tags appearing on the sidebar in decreasing order of importance. As opposed to tag frequency, I weighted each tag by summing up the urgencies of all the cards that the tag is included in. This better captures the relative importance of the tags.
 
-:white_check_mark: Implement logic for ~~deleting a card~~ moving a card to the trash and undoing it within 10 seconds. 
+:white_check_mark: Implement logic for ~~deleting a card~~ moving a card to the trash and undoing it within 10 seconds.
 
 I learned that I should [never use a warning when I meant undo](http://alistapart.com/article/neveruseawarning). Seems like a good design decision. Users who really want to delete a card might be unsatisifed, but I'll soon implement a clean up script that automatically deletes cards that are in the trash and are more than 30 days old. Amazing how much fiddling goes in the backend, just to allow a user to delete and then save themselves 3 seconds later by hitting `Undo`.
 

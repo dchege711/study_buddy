@@ -61,7 +61,6 @@
             var converter = new showdown.Converter();
             converter.setOption('literalMidWordUnderscores', true);
             converter.setOption('literalMidWordAsterisks', true);
-            converter.setOption('tables', true);
             
             /* Initialize variables that keep track of the state */
             var changed_items = new Set([]);
@@ -187,12 +186,24 @@
                 }
                 console.log("Rendering " + card.title);
                 document.getElementById("card_title").value = card.title;
-                document.getElementById("card_description").innerHTML = converter.makeHtml(card.description);
+                
+                // Workaround for allowing users to omit extra escaping backslashes
+                // in their LaTEX. I can't afford to do store this string on the server.
+                var description_html = converter.makeHtml(
+                    String.raw`${card.description.replace(/\\/g, "\\\\")}`
+                );
+
+                // This matches and replaces only <em> and </em> tags that occur
+                // within an inline LaTEX expression. Block LaTEX works fine (??)
+                description_html = description_html.replace(/(\\\(){1}([^(<em>)])*(<em>)([^(\\\))])*(\\\)){1}/g, "$1$2_$4$5");
+                description_html = description_html.replace(/(\\\(){1}([^(<\/em>)])*(<\/em>)([^(\\\))])*(\\\)){1}/g, "$1$2_$4$5");
+                document.getElementById("card_description").innerHTML = description_html;
+
                 document.getElementById("card_tags").value = card.tags;
                 document.getElementById("card_urgency").value = card.urgency;
                 document.getElementById("card_description").removeAttribute("contenteditable");
                 document.getElementById("side_bar_contents").style.height = document.getElementById("card_template").style.height;
-   
+
                 // Reset the contents of the current_card variable
                 changed_items = new Set([]);
                 current_card_id = card._id;
@@ -243,9 +254,9 @@
                 }
 
                 if (changed_items.has("card_description")) {
-                    payload.description = document.getElementById("card_description").innerText;
+                    payload.description = String.raw`${document.getElementById("card_description").innerText}`;
                 }
-                
+
                 payload.createdById = current_user_id;
 
                 sendHTTPRequest("POST", post_url, payload, (response) => {
