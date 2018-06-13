@@ -11,9 +11,11 @@
 
 :soon: Use email verification to validate accounts.
 
+:soon: Support extended sessions without requiring a re-login.
+
 :soon: Define a log out procedure and write the required code.
 
-:soon: Allow for password resets and account recovery.
+:soon: Support password resets and account recovery.
 
 :soon: Client-side username verification and validation for new users.
 
@@ -23,9 +25,11 @@
 
 :soon: Make editing of cards more user-friendly
 
+* Support tabs inside the description div.
+
 Previously, users had to escape the LaTEX delimiter themselves and also escape underscores within inline LaTEX. This meant lines like `\(p_i = 2\)` had to be written as `\\(p\_i = 2\\)`. With some regular expressions, I was able to support the former approach. I traded computational efficiency (more code to automatically escape backslashes) for convenience (users entering normal LaTEX). I choose to make this correction on the client side since I can't afford that much storage capacity on the server side.
 
-:soon: Allow filtering on the first set of filters.
+:soon: Support filtering on the first set of filters.
 
 :soon: Include an about page with tutorial on how to use Study Buddy.
 

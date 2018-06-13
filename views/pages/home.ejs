@@ -193,10 +193,17 @@
                     String.raw`${card.description.replace(/\\/g, "\\\\")}`
                 );
 
-                // This matches and replaces only <em> and </em> tags that occur
-                // within an inline LaTEX expression. Block LaTEX works fine (??)
-                description_html = description_html.replace(/(\\\(){1}([^(<em>)])*(<em>)([^(\\\))])*(\\\)){1}/g, "$1$2_$4$5");
-                description_html = description_html.replace(/(\\\(){1}([^(<\/em>)])*(<\/em>)([^(\\\))])*(\\\)){1}/g, "$1$2_$4$5");
+                // Find all <em> and </em> tags within strings supposed to be 
+                // interpreted as LaTEX. Convert these back to underscores because
+                // that's what they were meant to be.
+                var latex_regex = /(\\\(){1}([^(\\\))]*)(\\\)){1}/g;
+                var inline_latex_string;
+                while ((inline_latex_string = latex_regex.exec(description_html)) !== null) {
+                    description_html = description_html.replace(
+                        inline_latex_string[0],
+                        inline_latex_string[0].replace(/<em>|<\/em>/g, "_")
+                    );
+                }
                 document.getElementById("card_description").innerHTML = description_html;
 
                 document.getElementById("card_tags").value = card.tags;
