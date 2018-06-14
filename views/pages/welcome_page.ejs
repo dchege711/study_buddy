@@ -142,6 +142,8 @@
                     d3.wordcloud()
                         .size([width, height])
                         .selector("#word_cloud")
+                        .scale("log") // Options: sqrt, log, linear
+                        .spiral("archimedean") // Options: archimedean, rectangular
                         .words(words)
                         .start();
                 })   

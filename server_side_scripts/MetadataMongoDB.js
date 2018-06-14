@@ -95,11 +95,13 @@ exports.readTags = function(payload, callBack) {
     cursor.on("data", (metadataDoc) => {
         var nodeInfo = metadataDoc.node_information[0];
         for (const tag in nodeInfo) {
-            if (!tags.hasOwnProperty(tag)) {
-                tags[tag] = Object.keys(nodeInfo[tag]).length;
-            } else {
-                tags[tag] += Object.keys(nodeInfo[tag]).length;
-            }
+            Object.keys(nodeInfo[tag]).forEach((card_id) => {
+                if (!tags.hasOwnProperty(tag)) {
+                    tags[tag] = nodeInfo[tag][card_id].urgency;
+                } else {
+                    tags[tag] += nodeInfo[tag][card_id].urgency;
+                }
+            }); 
         }
     });
 
@@ -111,6 +113,14 @@ exports.readTags = function(payload, callBack) {
                 size: tags[property] 
             });
         }
+
+        // The D3 wrapper works better when the input is sorted.
+        // RN there's a pending PR: https://github.com/wvengen/d3-wordcloud/pull/13
+        tagsAsList.sort(function(tag_item_a, tag_item_b) {
+            return tag_item_b.size - tag_item_a.size;
+        });
+
+        tagsAsList = tagsAsList.slice(0, 25);
         callBack(tagsAsList);
     });
 };
