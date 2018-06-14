@@ -138,7 +138,7 @@
                 var word_cloud_element = document.getElementById("word_cloud");
                 var width = word_cloud_element.clientWidth;
                 var height = 500;
-                sendHTTPRequest("POST", "/tags", {}, (words) => {
+                sendHTTPRequest("POST", "/tags", {createdById: 1}, (words) => {
                     d3.wordcloud()
                         .size([width, height])
                         .selector("#word_cloud")

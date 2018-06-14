@@ -85,12 +85,12 @@ exports.read = function (payload, callBack) {
  * @description Scan the metadata database, looking for all the tags and their
  * counts. Return this info as a list of {`text`: x, `size`: y} dicts.
  * 
- * @param {JSON} payload Empty for now. Might get used later on
+ * @param {JSON} payload Filter for the metadata documents
  * @param {Function} callBack Function that takes in an array of dicts. Each
  * dict has the keys `text` and `size`.
  */
 exports.readTags = function(payload, callBack) {
-    var cursor = Metadata.find({}).cursor();
+    var cursor = Metadata.find(payload).cursor();
     var tags = {};
     cursor.on("data", (metadataDoc) => {
         var nodeInfo = metadataDoc.node_information[0];
