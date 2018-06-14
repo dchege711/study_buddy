@@ -9,6 +9,24 @@
         <script src="https://cdn.rawgit.com/showdownjs/showdown/1.0.1/dist/showdown.min.js"></script>
         <link rel="stylesheet" href="/stylesheets/themes/atom-one-light.css">
         <script src="/static/highlight.pack.js"></script>
+        <script>
+            window.onloadstart = function() {
+                console.log("DOM started loading...");
+            }
+
+            document.onload = function() {
+                console.log("Adding listener to " + document.getElementById("card_description"));
+                document.getElementById("card_description").addEventListener("keydown", function(event) {
+                    // if (event.defaultPrevented) return;
+                    console.log(event.key)
+                    if (event.key == "Tab") {
+                        console.log("Inserting tab character");
+                        document.execCommand("insertHTML", false, "&#009");
+                        event.preventDefault();
+                    } 
+                }, true);
+            }
+        </script>
         
     </head>
 
@@ -249,6 +267,13 @@
 
             function handleInputChange(element_id) {
                 changed_items.add(element_id);
+            }
+
+            function insertTabsIfNecessary() {
+                if (event.key == "Tab") {
+                    document.execCommand("insertHTML", false, "&nbsp;&nbsp;&nbsp;&nbsp;");
+                    event.preventDefault();
+                }
             }
 
             function saveCard() {
