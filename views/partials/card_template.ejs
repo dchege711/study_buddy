@@ -41,11 +41,22 @@
 
         <br />
 
-        <label class="input-area">
-            <strong>Urgency</strong>
-            <input id="card_urgency" type="number" name="urgency" 
-                class="w3-input" onChange="handleInputChange('card_urgency')" />
-        </label>
+        <div>
+            <div class="w3-threequarter w3-left">
+                <label class="input-area">
+                    <strong>Urgency</strong>
+                    <input id="card_urgency" type="range" name="urgency" 
+                        class="w3-input" min="0" max="10" step="0.1" 
+                        onChange="handleInputChange('card_urgency'); updateUrgencyCounter();"
+                    />
+                </label>
+            </div>
+            
+            <div class="w3-quarter w3-right">
+                <p id="card_urgency_number"><strong></strong></p>
+            </div>
+
+        </div>
     </div>
 
     <div class="w3-bar w3-padding-16">

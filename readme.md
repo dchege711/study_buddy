@@ -23,12 +23,6 @@
 
 :soon: Implement a method that cleans all the cards in the trash that are more than 30 days old.
 
-:soon: Make editing of cards more user-friendly
-
-* About supporting tabs in the card description, I chose to insert `&nbsp;&nbsp;&nbsp;&nbsp;` if the user pressed the tab key. The downside to this is that deleting a 'tab' requires 4 backspaces. I tried inserting a tab character instead but for it to render, I needed to add `white-space: pre-wrap;` as a style attribute. This however inserts to much whitespace when between separate lines of texts. Since flash cards are more frequently read than written, I prioritized having the flash cards as compact as possible in order to avoid the need to scroll down when reading them.
-
-Previously, users had to escape the LaTEX delimiter themselves and also escape underscores within inline LaTEX. This meant lines like `\(p_i = 2\)` had to be written as `\\(p\_i = 2\\)`. With some regular expressions, I was able to support the former approach. I traded computational efficiency *(more code to automatically escape backslashes and replace automatically inserted `<em>, </em>` tags)* for convenience *(users entering normal LaTEX)*. I choose to make this correction on the client side since I can't afford that much storage capacity on the server side.
-
 :soon: Support filtering on the first set of filters.
 
 :soon: Include an about page with tutorial on how to use Study Buddy.
@@ -38,6 +32,14 @@ Previously, users had to escape the LaTEX delimiter themselves and also escape u
 :soon: Make card navigation more user-friendly
 
 I chose to display the tags appearing on the sidebar in decreasing order of importance. As opposed to tag frequency, I weighted each tag by summing up the urgencies of all the cards that the tag is included in. This better captures the relative importance of the tags.
+
+:white_check_mark: Make editing of cards more user-friendly
+
+* About supporting tabs in the card description, I chose to insert `&nbsp;&nbsp;&nbsp;&nbsp;` if the user pressed the tab key. The downside to this is that deleting a 'tab' requires 4 backspaces. I tried inserting a tab character instead but for it to render, I needed to add `white-space: pre-wrap;` as a style attribute. This however inserts to much whitespace when between separate lines of texts. Since flash cards are more frequently read than written, I prioritized having the flash cards as compact as possible in order to avoid the need to scroll down when reading them.
+
+Previously, users had to escape the LaTEX delimiter themselves and also escape underscores within inline LaTEX. This meant lines like `\(p_i = 2\)` had to be written as `\\(p\_i = 2\\)`. With some regular expressions, I was able to support the former approach. I traded computational efficiency *(more code to automatically escape backslashes and replace automatically inserted `<em>, </em>` tags)* for convenience *(users entering normal LaTEX)*. I choose to make this correction on the client side since I can't afford that much storage capacity on the server side.
+
+I changed the urgency input from a number input type to a range input type. To set an urgency, using the range input type is faster since the user doesn't really care about the actual value, but its percentage, e.g. *card X is half as important as the most important cards in my deck*. Furthermore, using a range requires one click, while using a number type requires a click and a type.
 
 :white_check_mark: Implement logic for ~~deleting a card~~ moving a card to the trash and undoing it within 10 seconds.
 

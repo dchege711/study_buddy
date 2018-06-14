@@ -9,24 +9,6 @@
         <script src="https://cdn.rawgit.com/showdownjs/showdown/1.0.1/dist/showdown.min.js"></script>
         <link rel="stylesheet" href="/stylesheets/themes/atom-one-light.css">
         <script src="/static/highlight.pack.js"></script>
-        <script>
-            window.onloadstart = function() {
-                console.log("DOM started loading...");
-            }
-
-            document.onload = function() {
-                console.log("Adding listener to " + document.getElementById("card_description"));
-                document.getElementById("card_description").addEventListener("keydown", function(event) {
-                    // if (event.defaultPrevented) return;
-                    console.log(event.key)
-                    if (event.key == "Tab") {
-                        console.log("Inserting tab character");
-                        document.execCommand("insertHTML", false, "&#009");
-                        event.preventDefault();
-                    } 
-                }, true);
-            }
-        </script>
         
     </head>
 
@@ -198,11 +180,9 @@
 
             function renderCard(card) {
                 if (!card.title) {
-                    console.log("Tried to render a non-existent card");
                     displayNewCard();
                     return;
                 }
-                console.log("Rendering " + card.title);
                 document.getElementById("card_title").value = card.title;
                 
                 // Workaround for allowing users to omit extra escaping backslashes
@@ -223,9 +203,9 @@
                     );
                 }
                 document.getElementById("card_description").innerHTML = description_html;
-
                 document.getElementById("card_tags").value = card.tags;
                 document.getElementById("card_urgency").value = card.urgency;
+                document.getElementById("card_urgency_number").innerText = card.urgency;
                 document.getElementById("card_description").removeAttribute("contenteditable");
                 document.getElementById("side_bar_contents").style.height = document.getElementById("card_template").style.height;
 
@@ -250,11 +230,11 @@
             }
 
             function displayNewCard() {
-                console.log("Creating a new card");
                 document.getElementById("card_title").value = "";
                 document.getElementById("card_description").innerHTML = "";
                 document.getElementById("card_tags").value = "";
-                document.getElementById("card_urgency").value = "";
+                document.getElementById("card_urgency").value = 0;
+                document.getElementById("card_urgency_number").innerText = "0";
                 document.getElementById("card_description").setAttribute("contenteditable", "true");
                 document.getElementById("side_bar_contents").style.height = document.getElementById("card_template").style.height;
 
@@ -274,6 +254,10 @@
                     document.execCommand("insertHTML", false, "&nbsp;&nbsp;&nbsp;&nbsp;");
                     event.preventDefault();
                 }
+            }
+
+            function updateUrgencyCounter() {
+                document.getElementById("card_urgency_number").innerText = document.getElementById("card_urgency").value;
             }
 
             function saveCard() {
@@ -298,11 +282,9 @@
             }
             
             function moveCardToTrash() {
-                if (debug) console.log(`${my_cards_manager.num_prev()} vs ${my_cards_manager.num_next()}`);
                 // Remove the card from the ones that get displayed
                 var removed_card_id = my_cards_manager.remove_card(current_card_id);
                 if (removed_card_id === current_card_id) {
-                    if (debug) console.log(`${my_cards_manager.num_prev()} vs ${my_cards_manager.num_next()}`);
                     // Move on to the next card in the PQ
                     if (my_cards_manager.num_next() > 0) {
                         fetchNextCard();
@@ -335,7 +317,6 @@
                     },
                     (response) => {
                         if (response.message === card_to_restore_id) {
-                            console.log(`Saved ${card_to_restore_id}`);
                             my_cards_manager.insert_card(card_to_restore_id, card_to_restore_urgency);
                             fetchPreviousCard();
                         }
