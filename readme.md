@@ -5,8 +5,6 @@
 
 ## Tasks
 
-:soon: Avail new cards/edits within the same session. Insert them into the PQ. Deleting new cards doesn't work because of this.
-
 :soon: Use email verification to validate accounts.
 
 :soon: Support extended sessions without requiring a re-login.
@@ -27,11 +25,11 @@
 
 :soon: Add an account page with configurable settings, e.g. code syntax theme, light vs dark UI, etc.
 
-### :soon: Make card navigation more user-friendly
+### :white_check_mark: Make card navigation through the GUI more user-friendly
 
 I chose to display the tags appearing on the sidebar in decreasing order of importance. As opposed to tag frequency, I weighted each tag by summing up the urgencies of all the cards that the tag is included in. This better captures the relative importance of the tags.
 
-In addition to sorting cards in the underlying priority queue by urgency, I added an additional integer that denotes the insertion order. This enables the PQ to be stable. For instance, if the user views A --> B --> C, then pressing the previous button will visit the cards in reverse order, even when A, B and C have the same priority.
+In addition to sorting cards in the underlying priority queue by urgency, I added an additional integer that denotes the insertion order. This enables the PQ to be stable. For instance, if the user views the cards A then B then C, pressing the previous button will visit the cards in reverse order, even when A, B and C have the same priority. 
 
 ### :white_check_mark: Make editing of cards more user-friendly
 

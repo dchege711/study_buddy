@@ -276,7 +276,9 @@
                 payload.createdById = current_user_id;
 
                 sendHTTPRequest("POST", post_url, payload, (response) => {
+                    my_cards_manager.update_card(response.message);
                     renderCard(response.message);
+
                 });
 
             }

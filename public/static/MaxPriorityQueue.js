@@ -55,6 +55,14 @@ function max_PQ() {
     };
 
     /**
+     * @description Return `true` iff the specified key exists in the PQ
+     * @param {String} key The key of the item being queried
+     */
+    pq_object.contains_key = function(key) {
+        return keys_insertion_order.hasOwnProperty(key);
+    };
+
+    /**
      * @description Insert `key_and_weight` into the priority queue.
      * @param {Array} key_and_weight A tuple representing the key of the value
      * to be inserted, and its weight relative to what's in the PQ.
@@ -88,6 +96,7 @@ function max_PQ() {
             resize(Math.floor(pq.length / 2));
         // console.assert(is_max_heap(1), "Max Heap invariant has been broken");
         
+        delete keys_insertion_order[max[0]];
         return max;
     };
 
