@@ -15,7 +15,7 @@ var addAndPopulateMetadata = function(userIDInApp) {
         console.log(response["message"]);
         populateMetadata(1);
     });
-}
+};
 
 var testMetadataUpdate = function(callBack) {
     var randomUrgency = Math.floor(Math.random() * 200);
@@ -28,8 +28,8 @@ var testMetadataUpdate = function(callBack) {
             console.log(results[0]["stats"][0][cardID]["urgency"] + " should equal " + randomUrgency);
             callBack();
         });
-    })
-}
+    });
+};
 
 /**
  * @description Delete metadata for the specified user
@@ -42,7 +42,7 @@ var deleteMetadata = function (userIDInApp, callBack) {
             console.log(response["message"]);
             callBack(userIDInApp);
         });
-}
+};
 
 /**
  * Add the metadataIndex field to every card that the user owns.
@@ -60,7 +60,7 @@ var populateMetadata = function(userIDInApp) {
             });
         }
     );
-}
+};
 
 if (require.main === module) {
     deleteMetadata(1, addAndPopulateMetadata);

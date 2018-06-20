@@ -155,6 +155,21 @@ app.post('/restore-from-trash', function (request, response) {
     });
 });
 
+app.post('/reset-password', function (request, response) {
+    console.log("POST request at /reset-password");
+    if (debugMode) {
+        console.log(request.body);
+    }
+
+    // Fail silently
+    LogInUtilities.sendResetLink(request.body);
+    response.json({"success": true});
+});
+
+app.get('/reset-password-link/*', function(request, response) {
+    
+});
+
 app.listen(port, function() {
     console.log(`App is running on port ${port}`);
 });

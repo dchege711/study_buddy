@@ -85,7 +85,7 @@ ul.topnav li {
     border-bottom: thin solid #2196F3;
 }
 
-ul.link {
+ul.link, .link {
     background:none;
     color: black;
     text-decoration: none;

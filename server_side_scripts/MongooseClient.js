@@ -41,4 +41,4 @@ process.on("SIGINT", function () {
         console.log("Mongoose connection closed from MongooseClient.js");
         process.exit(0);
     });
-})
+});

@@ -149,3 +149,7 @@ exports.authenticateUser = function(payload, callBack) {
         }
     });
 };
+
+exports.sendResetLink = function(userIdentifier, callBack) {
+    
+};

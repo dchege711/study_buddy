@@ -19,10 +19,9 @@
                 <div id="word_cloud" class="svg-container"></div>
             </div>
             
-            <div class="w3-container w3-third w3-padding-large w3-right" 
-                >
+            <div class="w3-container w3-third w3-padding-large w3-right">
 
-                <form class="w3-padding-large w3-center" id="login_form" method="post">
+                <form class="w3-padding-large w3-center tab_content" id="login_form" method="post">
                 
                     <label for="username"> Username: </label>
                     <input class="w3-input" type="text" name="username" 
@@ -48,9 +47,13 @@
                         onclick="return displayForm('signup_form')">
                         ... or Sign Up for a New Account</button>
 
+                    <p class="link" onclick="return displayForm('password_reset_form')" style="text-decoration: underline">
+                        Forgot password?
+                    </p>
+
                 </form>
 
-                <form class="w3-padding-large w3-center hidden" id="signup_form" method="post">
+                <form class="w3-padding-large w3-center hidden tab_content" id="signup_form" method="post">
 
                     <label for="email">Email Address: </label>
                     <input class="w3-input" type="email" name="email" 
@@ -84,6 +87,26 @@
                         ... or go back to LogIn</button>
                 </form>
 
+                <form class="w3-padding-large w3-center hidden tab_content" id="password_reset_form" method="post">
+                    <label for="email">Enter the email address associated with the account: </label>
+                    <input class="w3-input" type="email" name="email" required/>
+                    
+                    <br />
+                    <br />
+
+                    <button class="w3-button w3-center w3-green" type="submit" 
+                        onclick="return passwordResetRequest('password_reset_form')">
+                        Send Password Reset Link
+                    </button>
+                    
+                    <br />
+                    <br />
+                    
+                    <button class="w3-button w3-center w3-blue" 
+                        onclick="return displayForm('login_form')">
+                        ... or go back to LogIn</button>
+                </form>
+
             </div>
 
         </div>
@@ -101,13 +124,11 @@
              * 
              */
             function displayForm(form_id) {
-                if (form_id === "signup_form") {
-                    document.getElementById("login_form").style.display = "none";
-                    document.getElementById("signup_form").style.display = "block";
-                } else if (form_id === "login_form") {
-                    document.getElementById("signup_form").style.display = "none";
-                    document.getElementById("login_form").style.display = "block";
+                var elements = document.getElementsByClassName("tab_content");
+                for (let i = 0; i < elements.length; i++) {
+                    elements[i].style.display = "none";
                 }
+                document.getElementById(form_id).style.display = "block";
                 return false;
             }
 
@@ -129,6 +150,25 @@
                 });
 
                 return false;
+            }
+            
+            /**
+             * @description Request a password reset.
+             */ 
+            function passwordResetRequest(formID) {
+                sendForm(formID, '/reset', (results) => {
+                    if (results.success) {
+                        document.getElementById(formID).innerHTML = `
+                        <p>Please check your email for a password reset link.</p>
+
+                        <br />
+                        <br />
+                        
+                        <button class="w3-button w3-center w3-blue" 
+                            onclick="return displayForm('login_form')">
+                            ... go back to LogIn</button>`;
+                    }
+                });
             }
 
             /*
