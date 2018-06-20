@@ -39,7 +39,7 @@ function cards_manager(tags_and_ids, user_id) {
             for (var card_id in tags_and_ids[tag]) {
                 if (already_seen_ids.has(card_id) === false) {
                     pq_cards_to_view.insert(
-                        [card_id, tags_and_ids[tag][card_id].urgency, tag]
+                        [card_id, tags_and_ids[tag][card_id].urgency]
                     );
                     already_seen_ids.add(card_id);
                 }
@@ -60,11 +60,10 @@ function cards_manager(tags_and_ids, user_id) {
             callback({});
             return;
         }
-
-        var next_card_id_urgency = transfer_item(pq_cards_to_view, pq_cards_already_viewed);
-        console.log("Next: " + next_card_id_urgency);
+        var next_card_id_urgency = transfer_item(
+            pq_cards_to_view, pq_cards_already_viewed
+        );
         find_card(next_card_id_urgency[0], callback);
-
     };
 
     cards_manager_obj.num_next = function () {
@@ -87,12 +86,10 @@ function cards_manager(tags_and_ids, user_id) {
             callback({});
             return;
         }
-
         var prev_card_id_urgency = transfer_item(
             pq_cards_already_viewed, pq_cards_to_view
         );
         
-        console.log("Prev: " + prev_card_id_urgency);
         find_card(prev_card_id_urgency[0], callback);
     };
 
@@ -154,12 +151,14 @@ function cards_manager(tags_and_ids, user_id) {
         var card = JSON.parse(localStorage.getItem(card_id));
         // var card = null;
         if (card) {
+            // console.log("Cache: " + card.title);
             callback(card);
         } else {
             sendHTTPRequest("POST", "/read-card", {
                 userIDInApp: user_id, _id: card_id
             }, (results) => {
                 localStorage.setItem(card_id, JSON.stringify(results.message));
+                // console.log("Fetched: " + results.message.title);
                 callback(results.message);
             });
         }

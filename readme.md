@@ -5,8 +5,6 @@
 
 ## Tasks
 
-:soon: The PQ doesn't preserve order when iterating through previous().
-
 :soon: Avail new cards/edits within the same session. Insert them into the PQ. Deleting new cards doesn't work because of this.
 
 :soon: Use email verification to validate accounts.
@@ -32,6 +30,8 @@
 ### :soon: Make card navigation more user-friendly
 
 I chose to display the tags appearing on the sidebar in decreasing order of importance. As opposed to tag frequency, I weighted each tag by summing up the urgencies of all the cards that the tag is included in. This better captures the relative importance of the tags.
+
+In addition to sorting cards in the underlying priority queue by urgency, I added an additional integer that denotes the insertion order. This enables the PQ to be stable. For instance, if the user views A --> B --> C, then pressing the previous button will visit the cards in reverse order, even when A, B and C have the same priority.
 
 ### :white_check_mark: Make editing of cards more user-friendly
 

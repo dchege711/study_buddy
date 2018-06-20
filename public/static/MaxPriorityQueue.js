@@ -12,6 +12,10 @@ function max_PQ() {
 
     var pq = [];
     var n = 0;
+    var keys_insertion_order = {};
+
+    /* An ever-increasing variable that allows stable sorting in the PQ */
+    var insert_order_id = 0; // We're not famous enough for an overflow problem
 
     /**
      * @description Initialize the max PQ data structure.
@@ -22,7 +26,9 @@ function max_PQ() {
         pq = Array(n + 1).fill([null, Number.NEGATIVE_INFINITY]);
 
         for (var i = 0; i < n; i++) {
+            keys_insertion_order[keys_and_weights[i][0]] = insert_order_id;
             pq[i+1] = keys_and_weights[i];
+            insert_order_id += 1;
         }
 
         for (var k = Math.floor(n/2); k >= 1; k--) {
@@ -57,6 +63,10 @@ function max_PQ() {
         if (n === pq.length - 1) resize(2 * pq.length);
         
         n = n + 1;
+        if (keys_insertion_order.hasOwnProperty(key_and_weight[0]) === false) {
+            keys_insertion_order[key_and_weight[0]] = insert_order_id;
+            insert_order_id += 1;
+        }
         pq[n] = key_and_weight;
         swim(n);
         // console.assert(is_max_heap(1), "Max Heap invariant has been broken");
@@ -143,8 +153,8 @@ function max_PQ() {
     function less(i, j) {
         // console.assert(is_int(i));
         // console.assert(is_int(j));
-        // console.log("size: " + n + ": " + i + " -> " + pq[i] + ", " + j + " -> " + pq[j]);
-        return pq[i][1] < pq[j][1];
+        if (pq[i][1] !== pq[j][1]) return pq[i][1] < pq[j][1];
+        else return keys_insertion_order[pq[i][0]] < keys_insertion_order[pq[j][0]];
     }
 
     /**

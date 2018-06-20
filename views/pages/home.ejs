@@ -249,7 +249,7 @@
                 changed_items.add(element_id);
             }
 
-            function insertTabsIfNecessary() {
+            function insertTabsIfNecessary(event) {
                 if (event.key == "Tab") {
                     document.execCommand("insertHTML", false, "&nbsp;&nbsp;&nbsp;&nbsp;");
                     event.preventDefault();
