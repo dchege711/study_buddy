@@ -68,7 +68,7 @@ getIdInAppAndValidationURI = function(callBack) {
  * @param {Function} callBack A function that takes a JSON object having the keys
  * `success`, `message`, `status`.
  */
-sendAccountValidationURL = function(userDetails, callBack) {
+emailAccountValidationURL = function(userDetails, callBack) {
     if (userDetails.email !== undefined && userDetails.account_validation_uri !== undefined) {
         Email.sendEmail(
             {
@@ -94,12 +94,97 @@ sendAccountValidationURL = function(userDetails, callBack) {
             }
         );
     } else {
-        console.error(`@sendAccountValidationURL: Missing email address and validation_uri in ${userDetails.username}`);
+        console.error(`@emailAccountValidationURL: Missing email address and validation_uri in ${userDetails.username}`);
         callBack({
             success: false, status: 500, 
-            message: "@sendAccountValidationURL: Missing parameters"
+            message: "@emailAccountValidationURL: Missing parameters"
         });
     }
+};
+
+/**
+ * 
+ * @param {Object} payload Expected keys: `email`
+ * @param {Function} callBack Takes a JSON object with `success`, `status` and
+ * `message` as its keys.
+ */
+exports.sendAccountValidationLink = function(payload, callBack) {
+    User.find({email: payload.email}, (error, users) => {
+        if (error) {
+            console.error(error);
+            callBack({success: false, status: 500, message: "Internal Server Error"});
+        } else if (users.length === 0) {
+            callBack({
+                success: false, status: 200,
+                message: `No account was found under ${payload.email}`
+            });
+        } else if (users.length > 1) {
+            console.error(`@sendAccountValidationLink: Multiple accounts under ${payload.email}`);
+            callBack({ success: false, status: 500, message: "Internal Server Error" });
+        } else {
+            var user = users[0];
+            if (user.account_validation_uri === undefined || user.account_is_valid === undefined) {
+                user.account_validation_uri = getRandomString(32, "abcdefghijklmnopqrstuvwxyz0123456789");
+                user.account_is_valid = false;
+                Users.find(
+                    { account_validation_uri: user.account_validation_uri},
+                    (error, existing_users_with_same_uri) => {
+                        if (error) {
+                            console.error(error);
+                            callBack({ success: false, status: 500, message: "Internal Server Error" });
+                        } else if (existing_users_with_same_uri.length !== 0) {
+                            sendAccountValidationLink(payload, callBack);
+                        } 
+                    }
+                );
+            }
+            emailAccountValidationURL(user, (email_confirmation) => {
+                if (email_confirmation.success) {
+                    user.save((error, savedUser) => {
+                        if (error) {
+                            console.error(error);
+                            callBack({ success: false, status: 500, message: "Internal Server Error" });
+                        } else {
+                            callBack({
+                                success: true, status: 200,
+                                message: `Please check ${savedUser.email} for a validation link.`
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    });
+};
+
+exports.validateAccount = function(validation_uri, callBack) {
+    User.find(
+        { account_validation_uri: validation_uri},
+        (error, users) => {
+            if (error) {
+                console.error(error);
+                callBack({success: false, status: 500, message: "Internal Server Error"});
+            } else if (users.length !== 1) {
+                console.error(`@validateAccount ${users.length} users have the same validation uri`);
+                callBack({ success: false, status: 500, message: "Internal Server Error" });
+            } else {
+                var user = users[0];
+                user.account_validation_uri = "verified";
+                user.account_is_valid = true;
+                user.save((error, savedUser) => {
+                    if (error) {
+                        console.error(error);
+                        callBack({ success: false, status: 500, message: "Internal Server Error" });
+                    } else {
+                        callBack({
+                            success: true, status: 200,
+                            message: savedUser.email
+                        });
+                    }
+                });
+            }
+        }
+    );
 };
 
 /**
@@ -191,7 +276,7 @@ exports.registerUserAndPassword = function(payload, callBack) {
                                     metadataIndex: 0
                                 }, (metadata_confirmation) => {
                                     if (metadata_confirmation.success) {
-                                        sendAccountValidationURL(savedUser, callBack);
+                                        emailAccountValidationURL(savedUser, callBack);
                                     } else {
                                         console.error(metadata_confirmation.message);
                                         callBack({

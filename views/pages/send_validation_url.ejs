@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Study Buddy Resend Validation URL</title>
+    <% include ../partials/header.ejs %>
+    <script src="/static/AppUtilities.js"></script>
+</head>
+
+<body>
+
+    <% include ../partials/navbar.ejs %>
+
+        <div id="main_div">
+
+            <div class="w3-padding-large w3-center" style="margin: 5% 25% 25% 25%" id="form_container">
+
+                <h5>Request a validation URL for your Study Buddy Account</h5>
+
+                <br />
+                <br />
+
+                <form method="post" id="send_validation_url_form">
+
+                    <label for="email"> Type your email address below: </label>
+                    <input class="w3-input" type="email" name="email" id="email" required/>
+                    
+                    <br />
+                    <br />
+                    
+                    <button class="w3-button w3-center w3-green" type="submit" 
+                    onclick="sendValidationURL()">Send Validation URL</button>
+
+                </form> 
+            </div>
+        </div>
+
+
+        <footer class="w3-container w3-container w3-black">
+            <% include ../partials/footer.ejs %>
+        </footer>
+
+        <script type="text/javascript">
+            function sendValidationURL() {
+                sendForm("send_validation_url_form", location.href, (response) => {
+                    alert(response.message);
+                    if (response.success) {
+                        window.location = "/";
+                    }
+                });
+            }
+        </script>
+
+</body>
+
+</html>

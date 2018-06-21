@@ -156,15 +156,37 @@ app.post('/restore-from-trash', function (request, response) {
     });
 });
 
+app.get('/send-validation-email', function(request, response) {
+    response.render("pages/send_validation_url.ejs");
+});
+
+app.post('/send-validation-email', function (request, response) {
+    if (debugMode) console.log(request.body);
+    LogInUtilities.sendAccountValidationLink(request.body, (confirmation) => {
+        if (debugMode) console.log(confirmation);
+        response.json(confirmation);
+    });
+});
+
+app.get('/verify-account/*', function (request, response) {
+    var verification_uri = request.path.split("/verify-account/")[1];
+    LogInUtilities.validateAccount(verification_uri, (results) => {
+        if (debugMode) console.log(results.message);
+        if (results.status === 200) {
+            response.redirect(302, "/?verified=" + encodeURIComponent(results.message));
+        } else {
+            response.render("pages/500_error_page.ejs");
+        }
+    });
+});
+
 app.get('/reset-password', function (request, response) {
     response.render("pages/reset_password_request");
 });
 
 app.post('/reset-password', function (request, response) {
     console.log("POST request at /reset-password");
-    if (debugMode) {
-        console.log(request.body);
-    }
+    if (debugMode) console.log(request.body);
     
     LogInUtilities.sendResetLink(request.body, (confirmation) => {
         if (confirmation.success) {
