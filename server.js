@@ -197,13 +197,13 @@ app.get('/reset-password-link/*', function(request, response) {
 app.post('/reset-password-link/*', function (request, response) {
     var reset_password_uri = request.path.split("/reset-password-link/")[1];
     console.log(`POST request at /reset-password-link/ for ${reset_password_uri}`);
-    var payload = request.body;
-    payload.reset_password_uri = reset_password_uri;
-    var todays_datetime = new Date();
-    payload.reset_request_time = todays_datetime.toString();
     LogInUtilities.validatePasswordResetLink(reset_password_uri, (results) => {
         if (debugMode) console.log(results.message);
         if (results.success) {
+            var payload = request.body;
+            payload.reset_password_uri = reset_password_uri;
+            var todays_datetime = new Date();
+            payload.reset_request_time = todays_datetime.toString();
             LogInUtilities.resetPassword(payload, (confirmation) => {
                 if (debugMode) console.log(confirmation);
                 if (confirmation.success) {

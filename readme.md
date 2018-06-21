@@ -13,8 +13,6 @@
 
 :soon: Define a log out procedure and write the required code.
 
-:soon: Support password resets and account recovery.
-
 :soon: Client-side username verification and validation for new users.
 
 :soon: Implement logic for recovering cards from the trash.
@@ -29,11 +27,13 @@
 
 :soon: Have fun with the 4xx-code page.
 
-### :soon: LogIn, SignUp and Password Reset
+### :soon: LogIn, SignUp and Account Recovery
 
 I found CrackStation's piece on [salted password hashing](https://crackstation.net/hashing-security.htm) informative. I store a hash and a salt on the database, and every time a user logs in, I validate the submitted password using the salt and the hash. The [Stanford Crypto Library](http://bitwiseshiftleft.github.io/sjcl/doc/) provided good tools for handling the encryption methods.
 
-When someone tries registering for a new account with a used email address, I let them know that the email address is already taken. If they try to reset a password I tell them to check their email. If no such email exists in the database, I will let them know since they can already determine whether the email address is valid by trying to register for a new account. If I wanted to prevent any email address knowledge from leaking, I'd ask new users to submit an email address, then send them a registration link in the mail. However, Study Buddy is not a sensitive application, so there's no need to hide email address since that would require additional steps for the user.
+When someone tries registering for a new account with a used email address, I let them know that the email address is already taken. If they try to reset a password I tell them to check their email. If no such email exists in the database, I will let them know since they can already determine whether the email address is valid by trying to register for a new account. If I wanted to prevent any email address knowledge from leaking, I'd have to ask new users to submit an email address, then send them a registration link in the mail. However, Study Buddy is not a sensitive application, so there's no need to hide email address since that would require additional steps for the user. Furthermore, it's typical for users to be able to register 
+
+Users can now reset their passwords in case they forget them. First, the user submits the email address associated with their Study Buddy account. If the account exists, I send an email containing a password reset link that is valid for 2 hours, or until it's used, whichever comes earlier.
 
 ### :white_check_mark: Make card navigation through the GUI more user-friendly
 

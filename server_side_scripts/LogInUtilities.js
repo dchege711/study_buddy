@@ -107,18 +107,29 @@ exports.registerUserAndPassword = function(payload, callBack) {
  */
 exports.authenticateUser = function(payload, callBack) {
 
-    var username = payload["username"];
-    var password = payload["password"];
+    var username = payload.username;
+    var identifier_query;
+    var submitted_identifier = payload.username_or_email;
+    if (submitted_identifier === undefined) {
+        identifier_query = {path_that_doesnt_exist: "invalid@username!@"};
+    } else {
+        if (submitted_identifier.includes("@")) {
+            identifier_query = { email: submitted_identifier };
+        } else {
+            identifier_query = { username: submitted_identifier };
+        }
+    }
+    var password = payload.password;
 
-    User.findOne({ username: username}, function(error, user) {
+    User.findOne(identifier_query, function(error, user) {
         if (error) {
-            console.log(error);
+            console.error(error);
         } else {
             // Case 1: The user doesn't exist
             if (!user) {
                 callBack({
                     "success": false, "internal_error": false,
-                    "message": "Incorrect username and/or password"
+                    "message": "Incorrect username/email and/or password"
                 });   
                 return;
             }
@@ -143,7 +154,7 @@ exports.authenticateUser = function(payload, callBack) {
                     // Case 3: The user provided wrong credentials
                     callBack({
                         "success": false, "internal_error": false,
-                        "message": "Incorrect username and/or password"
+                        "message": "Incorrect username/email and/or password"
                     });
                     return;
                 }
