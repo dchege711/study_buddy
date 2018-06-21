@@ -199,9 +199,12 @@ app.post('/reset-password-link/*', function (request, response) {
     LogInUtilities.validatePasswordResetLink(payload, (results) => {
         if (debugMode) console.log(results.message);
         if (results.success) {
-            response.render("welcome_page.ejs");
+            LogInUtilities.resetPassword(payload, (confirmation) => {
+                if (debugMode) console.log(confirmation);
+                callBack(confirmation);
+            });
         } else {
-            response.render("404_error_page.ejs");
+            callBack(results);
         }
     });
 });

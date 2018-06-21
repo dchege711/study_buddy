@@ -27,6 +27,8 @@
 
 :soon: Add an account page with configurable settings, e.g. code syntax theme, light vs dark UI, etc.
 
+:soon: Have fun with the 4xx-code page.
+
 ### :soon: LogIn, SignUp and Password Reset
 
 I found CrackStation's piece on [salted password hashing](https://crackstation.net/hashing-security.htm) informative. I store a hash and a salt on the database, and every time a user logs in, I validate the submitted password using the salt and the hash. The [Stanford Crypto Library](http://bitwiseshiftleft.github.io/sjcl/doc/) provided good tools for handling the encryption methods.

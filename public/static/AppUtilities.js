@@ -7,7 +7,6 @@
  * argument. 
  */
 function sendForm(form_id, url, callBack) {
-    var form = document.getElementById(form_id);
     var elements = document.getElementById(form_id).elements;
 
     // Send the form to the server for further processing.
