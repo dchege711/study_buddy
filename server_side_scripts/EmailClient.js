@@ -15,7 +15,7 @@ let transporter = nodemailer.createTransport({
 /**
  * 
  * @param {JSON} mailOptions Values are comma separated strings whose keys include: 
- * `from`, `to`, `cc`, `bcc`, `subject`, `text`, `html`, execpt for `attachment`
+ * `to`, `cc`, `bcc`, `subject`, `text`, `html`, except for `attachment`
  * which is an object with the keys `filename`, `content`, `path`, `href`,
  * `contentType`, `contentDisposition`, `cid`, `encoding`, `headers`, `raw`.
  * 

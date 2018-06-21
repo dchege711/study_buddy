@@ -20,22 +20,86 @@ getHash = function(password, salt, callBack) {
 };
 
 /**
- * @description Generate a random User ID and make sure it is unique
- * in the database.
+ * @description Generate a random string from the specified alphabet.
+ * @param {Number} string_length The length of the desired string.
+ * @param {String} alphabet The characters that can be included in the string.
  */
-getIdInApp = function(callBack) {
-    var randomID = Math.floor(Math.random() * 10000000000000);
-    User.findOne({userIDInApp: randomID}, function(error, user) {
+getRandomString = function(string_length, alphabet) {
+    var random_string = "";
+    for (let i = 0; i < string_length; i++) {
+        random_string += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+    }
+    return random_string;
+};
+
+/**
+ * @description Generate a User ID and a validation string, and 
+ * make sure they are unique in the database.
+ * @param {Function} callBack A function that takes two parameters, a user ID
+ * and a validation string.
+ */
+getIdInAppAndValidationURI = function(callBack) {
+    var randomID = parseInt(getRandomString(12, "123456789"), 10);
+    var validationURI = getRandomString(32, "abcdefghijklmnopqrstuvwxyz0123456789");
+    User.findOne(
+        { $or: 
+            [
+                { userIDInApp: randomID }, 
+                { account_validation_uri: validationURI }
+            ] 
+        },
+        function(error, user) {
         if (error) {
-            console.log(error);
+            console.error(error);
         }
         if (user === null) {
-            callBack(randomID);
+            callBack(randomID, validationURI);
         } else {
-            getIdInApp(callBack);
+            getIdInAppAndValidationURI(callBack);
             return;
         }
     });
+};
+
+/**
+ * @description Send a validation URL to the email address associated with the
+ * account.
+ * @param {object} userDetails Expected keys: `email_address`, `account_validation_uri`
+ * @param {Function} callBack A function that takes a JSON object having the keys
+ * `success`, `message`, `status`.
+ */
+sendAccountValidationURL = function(userDetails, callBack) {
+    if (userDetails.email !== undefined && userDetails.account_validation_uri !== undefined) {
+        Email.sendEmail(
+            {
+                to: userDetails.email,
+                subject: "Please Validate Your Study Buddy Account",
+                text: `Welcome to Study Buddy! Before you can log in, please click ` +
+                    `on this link to validate your account.\n\n` + 
+                    `${config.BASE_URL}/verify-account/${userDetails.account_validation_uri}` +
+                    `\n\nAgain, glad to have you onboard!`
+            }, (email_confirmation) => {
+                if (email_confirmation.success) {
+                    callBack({
+                        success: true, status: 200,
+                        message: `Please check ${user.email} for an account validation link.`
+                    });
+                } else {
+                    console.error(email_confirmation.message);
+                    callBack({
+                        success: false, status: 500,
+                        message: email_confirmation.message
+                    });
+                }
+            }
+        );
+    } else {
+        console.error(`@sendAccountValidationURL: Missing email address and validation_uri in ${userDetails.username}`);
+        callBack({
+            success: false, status: 500, 
+            message: "@sendAccountValidationURL: Missing parameters"
+        });
+    }
 };
 
 /**
@@ -46,26 +110,29 @@ getIdInApp = function(callBack) {
  * `internal_error` and `message` as keys. 
  */
 exports.registerUserAndPassword = function(payload, callBack) {
-    var username = payload["username"];
-    var password = payload["password"];
-    var email = payload["email"];
+    var username = payload.username;
+    var password = payload.password;
+    var email = payload.email;
 
     // Apologies for the nesting nightmare below
     // Be the change that you wish to see in the world ;-)
 
     getSaltAndHash(password, function(salt, hash) {
-        getIdInApp(function(userId) {
+        getIdInAppAndValidationURI(function(userId, validationURI) {
             var user = new User({
                 username: username,
                 salt: salt,
                 hash: hash,
                 userIDInApp: userId,
-                email: email
+                email: email,
+                account_validation_uri: validationURI,
+                account_is_valid: false
             });
 
             if (debug) console.log("Saving new user: " + email);
-            User.findOne({ email: user.email }, (error, existingUser) => {
+            User.find({ email: user.email }, (error, existingUsers) => {
                 if (error) {
+                    console.error(error);
                     callBack({
                         "success": false,
                         "internal_error": true,
@@ -74,21 +141,65 @@ exports.registerUserAndPassword = function(payload, callBack) {
                     return;
                 } else {
                     // Check what mongoose returns if a document doesn't exist. Ans: []
-                    if (existingUser) {
-                        // Send an email to them notifying them of suspicious activity            
+                    if (existingUsers.length !== 0) {
+
+                        if (existingUsers.length !== 1) {
+                            // I hope it never comes to this, ever.
+                            console.error(`@registerUserAndPassword: ${existingUsers.length} have the same email: ${user.email}`);
+                            callBack({success: false, status: 500, message: "500: Internal Server Error"});
+                        } else {
+                            // Send an email to them notifying them of suspicious activity
+                            var existingUser = existingUsers[0];
+                            Email.sendEmail(
+                                {
+                                    to: existingUser.email,
+                                    subject: `Did you try to register for a new Study Buddy Account?`,
+                                    text: `Psst! Someone tried registering for a new Study Buddy ` + 
+                                        `account using your email address. If this was you, you ` + 
+                                        `already have an account.\n\nForgot your password? Request a ` +
+                                        `reset at ${config.BASE_URL}/reset-password.\n\nCheers,\nStudy Buddy by c13u` 
+                                }, (email_confirmation) => {
+                                    if (email_confirmation.success) {
+                                        callBack({
+                                            success: true, status: 200, 
+                                            message: `Please check ${user.email} for a confirmation message`
+                                        });
+                                    } else {
+                                        console.error(email_confirmation.message);
+                                        callBack({
+                                            success: false, status: 500,
+                                            message: email_confirmation.message
+                                        });
+                                    }
+                                }
+                            );
+                        }            
                         return;
                     } else {
                         // Save the new user's account and send enough info to log them in
                         user.save(function (error, savedUser) {
                             if (error) {
+                                console.error(error);
                                 callBack({
-                                    "success": false, "internal_error": true, "message": error
+                                    success: false, 
+                                    internal_error: true, 
+                                    message: error
                                 });                   
                             } else {
                                 MetadataDB.create({
                                     userIDInApp: savedUser.userIDInApp,
                                     metadataIndex: 0
-                                }, callBack);
+                                }, (metadata_confirmation) => {
+                                    if (metadata_confirmation.success) {
+                                        sendAccountValidationURL(savedUser, callBack);
+                                    } else {
+                                        console.error(metadata_confirmation.message);
+                                        callBack({
+                                            success: false, status: 500,
+                                            message: metadata_confirmation.message
+                                        });
+                                    }
+                                });
                             }
                         });
                     }
@@ -128,15 +239,15 @@ exports.authenticateUser = function(payload, callBack) {
             // Case 1: The user doesn't exist
             if (!user) {
                 callBack({
-                    "success": false, "internal_error": false,
-                    "message": "Incorrect username/email and/or password"
+                    success: false, status: 200,
+                    message: "Incorrect username/email and/or password"
                 });   
                 return;
             }
 
             // Otherwise try authenticating the user
-            var saltOnFile = user["salt"];
-            var hashOnFile = user["hash"];
+            var saltOnFile = user.salt;
+            var hashOnFile = user.hash;
             getHash(password, saltOnFile, function(calculatedHash) {
                 var thereIsAMatch = true;
                 for (let i = 0; i < calculatedHash.length; i++) {
@@ -148,7 +259,21 @@ exports.authenticateUser = function(payload, callBack) {
 
                 // Case 2: The user has provided correct credentials
                 if (thereIsAMatch) {
-                    MetadataDB.read({ userIDInApp: user.userIDInApp}, callBack);        
+
+                    // Prevent unvalidated accounts from logging in..
+                    if (!user.account_is_valid) {
+                        callBack({
+                            success: false, status: 200,
+                            message: `Please validate the email address ` +
+                            `associated with this account. Go to ${config.BASE_URL}` + 
+                            `/send-validation-email to request a new URL, or use the ` +
+                            `URL that was sent to ${user.email}`
+                        });
+                    } else {
+                        MetadataDB.read(
+                            { userIDInApp: user.userIDInApp }, callBack
+                        ); 
+                    }       
                     return;
                 } else {
                     // Case 3: The user provided wrong credentials
@@ -169,11 +294,8 @@ exports.authenticateUser = function(payload, callBack) {
  * @param {*} callBack 
  */
 exports.sendResetLink = function(userIdentifier, callBack) {
-    var alphabet = "abcdefghijklmnopqrstuvwxyz0123456789";
-    var reset_password_uri = "";
-    for (let i = 0; i < 50; i++) {
-        reset_password_uri += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
-    }
+    
+    reset_password_uri = getRandomString(50, "abcdefghijklmnopqrstuvwxyz0123456789");
 
     User.findOne({ resetPasswordURL: reset_password_uri}, (error, user) => {
         if (error) console.log(error);
