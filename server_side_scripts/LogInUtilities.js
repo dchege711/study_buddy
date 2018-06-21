@@ -1,6 +1,8 @@
 var stanfordCrypto = require('sjcl');
 var User = require("./models/UserSchema.js");
 var MetadataDB = require("./MetadataMongoDB.js");
+var Email = require("./EmailClient.js");
+var config = require("../config.js");
 var mongoose = require('mongoose');
 
 var debug = false;
@@ -22,7 +24,7 @@ getHash = function(password, salt, callBack) {
  * in the database.
  */
 getIdInApp = function(callBack) {
-    var randomID = Math.floor(Math.random() * 100000000000);
+    var randomID = Math.floor(Math.random() * 10000000000000);
     User.findOne({userIDInApp: randomID}, function(error, user) {
         if (error) {
             console.log(error);
@@ -150,6 +152,136 @@ exports.authenticateUser = function(payload, callBack) {
     });
 };
 
+/**
+ * 
+ * @param {JSON} userIdentifier Expected key: `email_address`
+ * @param {*} callBack 
+ */
 exports.sendResetLink = function(userIdentifier, callBack) {
-    
+    var alphabet = "abcdefghijklmnopqrstuvwxyz0123456789";
+    var reset_password_uri = "";
+    for (let i = 0; i < 50; i++) {
+        reset_password_uri += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+    }
+
+    User.findOne({ resetPasswordURL: reset_password_uri}, (error, user) => {
+        if (error) console.log(error);
+        if (user === null) {
+            User.findOne({email: userIdentifier.email}, (error, user) => {
+                if (error) {
+                    console.log(error);
+                    return;
+                }
+                if (user === null) {
+                    callBack({
+                        success: false, 
+                        message: `Email not found. Did you want to sign up?`
+                    });
+                } else {
+                    user.reset_password_uri = reset_password_uri;
+                    user.reset_password_timestamp = Date.now();
+                    user.save(function (error, savedUser, numAffected) {
+                        if (error) {
+                            callBack({
+                                "success": false, "message": error
+                            });
+                        } else {
+                            // For some reason, multiline template strings get
+                            // unwanted line breaks in the sent email.
+                            Email.sendEmail({
+                                to: user.email,
+                                subject: "Study Buddy Password Reset",
+                                text: `To reset your Study Buddy password, ` + 
+                                    `click on this link:\n\n\t ${config.BASE_URL}` + 
+                                    `/reset-password-link/${reset_password_uri}` + 
+                                    `\n\nThe link is only valid for 2 hours. If you did not` +
+                                    `request a password reset, please ignore this email.`
+                            }, (email_results) => {
+                                callBack({
+                                    success: email_results.success,
+                                    message: email_results.message
+                                });
+                            });
+                        }
+                    });
+                }
+            });
+        } else {
+            sendResetLink(userIdentifier, callBack);
+        }
+    });
+
+};
+
+
+/**
+ * 
+ * @param {String} reset_password_uri The password reset uri sent in the email
+ * @param {Function} callBack Takes a JSON object that has `success` and `message`
+ * as its keys.
+ */
+exports.validatePasswordResetLink = function(reset_password_uri, callBack) {
+    User.find({ reset_password_uri: reset_password_uri}, (error, users) => {
+        if (error) {
+            console.log(error);
+            callBack({ success: false, message: error });
+        }
+        if (users.length !== 1) {
+            callBack({success: false, message: "Invalid link."});
+        } else {
+            if (Date.now() > users[0].reset_password_timestamp + 2 * 3600 * 1000) {
+                callBack({ success: false, message: "Invalid link." });
+            } else {
+                callBack({success: true, message: "Please submit a new password"});
+            }
+        }
+    });
+};
+
+/**
+ * 
+ * @param {payload} payload Expected keys: `reset_password_uri`, `password`,
+ * `reset_info`.
+ * 
+ * @param {Function} callBack Takes a JSON object that has the keys `success` 
+ * and `message`.
+ */
+exports.resetPassword = function(payload, callBack) {
+    User.find({reset_password_uri: payload.reset_password_uri}, (error, users) => {
+        if (error) {
+            console.log(error);
+            callBack({ success: false, message: error });
+        }
+        if (users.length !== 1) {
+            callBack({ success: false, message: "User not found." });
+        } else {
+            var user = user[0];
+            getSaltAndHash(payload.password, (salt, hash) => {
+                user.salt = salt;
+                user.hash = hash;
+                user.save(function (error, savedUser, numAffected) {
+                    if (error) {
+                        callBack({
+                            "success": false, "message": error
+                        });
+                    } else {
+                        // For some reason, multiline template strings get
+                        // unwanted line breaks in the sent email.
+                        Email.sendEmail({
+                            to: user.email,
+                            subject: "Study Buddy: Your Password Has Been Reset",
+                            text: `Your Study Buddy password was reset ${payload.reset_info}. ` +
+                                `If this wasn't you, please request another password reset at ${config.BASE_URL}`
+                            }, 
+                            (email_results) => {
+                                callBack({
+                                    success: email_results.success,
+                                    message: email_results.message
+                            });
+                        });
+                    }
+                });
+            });
+        }
+    });
 };

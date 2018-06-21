@@ -1,6 +1,7 @@
 var express = require('express');
 var path = require('path');
 var bodyParser = require('body-parser');
+const url = require("url");
 
 var CardsDB = require('./server_side_scripts/CardsMongoDB');
 var MetadataDB = require('./server_side_scripts/MetadataMongoDB');
@@ -160,14 +161,49 @@ app.post('/reset-password', function (request, response) {
     if (debugMode) {
         console.log(request.body);
     }
-
-    // Fail silently
-    LogInUtilities.sendResetLink(request.body);
-    response.json({"success": true});
+    
+    LogInUtilities.sendResetLink(request.body, (confirmation) => {
+        console.log(confirmation.message);
+        if (confirmation.success) {
+            response.json({
+                success: true, 
+                message: `Please check ${request.body.email} for a reset link`
+            });
+        } else {
+            response.json({
+                success: false,
+                message: `Unsuccessful attempt. Submitted email: ${request.body.email}. Was there a typo?`
+            });
+        }
+    });
 });
 
 app.get('/reset-password-link/*', function(request, response) {
-    
+    var password_reset_uri = request.path.split("/reset-password-link/")[0];
+    console.log(`GET request at /reset-password-link/ for ${reset_uri}`);
+    LogInUtilities.validatePasswordResetLink(password_reset_uri, (results) => {
+        if (debugMode) console.log(results.message);
+        if (results.success) {
+            response.render("reset_password.ejs");
+        } else {
+            response.render("404_error_page.ejs");
+        }
+    });
+});
+
+app.post('/reset-password-link/*', function (request, response) {
+    var password_reset_uri = request.path.split("/reset-password-link/")[0];
+    console.log(`POST request at /reset-password-link/ for ${reset_uri}`);
+    var payload = request.body;
+    payload.password_reset_uri = password_reset_uri;
+    LogInUtilities.validatePasswordResetLink(payload, (results) => {
+        if (debugMode) console.log(results.message);
+        if (results.success) {
+            response.render("welcome_page.ejs");
+        } else {
+            response.render("404_error_page.ejs");
+        }
+    });
 });
 
 app.listen(port, function() {

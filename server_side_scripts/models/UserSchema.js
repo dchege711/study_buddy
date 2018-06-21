@@ -22,7 +22,9 @@ var userSchema = new mongoose.Schema(
             type: String,
             required: true,
             unique: true
-        }
+        },
+        reset_password_uri: String,
+        reset_password_timestamp: Number
     },
     {
         timestamps: true,

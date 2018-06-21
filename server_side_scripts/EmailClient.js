@@ -2,6 +2,7 @@ const nodemailer = require("nodemailer");
 var config = require("../config.js");
 
 let transporter = nodemailer.createTransport({
+    pool: true,
     host: "smtp.gmail.com",
     port: 587,
     secure: false,
@@ -21,6 +22,7 @@ let transporter = nodemailer.createTransport({
  * @param {Function} callBack Takes a JSON with `success` and `message` as the keys
  */
 exports.sendEmail = function(mailOptions, callBack) {
+    mailOptions.from = `Study Buddy by c13u <${config.EMAIL_ADDRESS}>`;
     transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
             callBack({
