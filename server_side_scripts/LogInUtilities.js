@@ -192,9 +192,9 @@ exports.sendResetLink = function(userIdentifier, callBack) {
                                 to: user.email,
                                 subject: "Study Buddy Password Reset",
                                 text: `To reset your Study Buddy password, ` + 
-                                    `click on this link:\n\n\t ${config.BASE_URL}` + 
+                                    `click on this link:\n\n${config.BASE_URL}` + 
                                     `/reset-password-link/${reset_password_uri}` + 
-                                    `\n\nThe link is only valid for 2 hours. If you did not` +
+                                    `\n\nThe link is only valid for 2 hours. If you did not ` +
                                     `request a password reset, please ignore this email.`
                             }, (email_results) => {
                                 callBack({
@@ -223,16 +223,17 @@ exports.sendResetLink = function(userIdentifier, callBack) {
 exports.validatePasswordResetLink = function(reset_password_uri, callBack) {
     User.find({ reset_password_uri: reset_password_uri}, (error, users) => {
         if (error) {
-            console.log(error);
+            console.error(error);
             callBack({ success: false, message: error });
         }
         if (users.length !== 1) {
+            console.error(`@validatePasswordResetLink: ${users.length} had ${reset_password_uri} as their reset link`);
             callBack({success: false, message: "Invalid link."});
         } else {
             if (Date.now() > users[0].reset_password_timestamp + 2 * 3600 * 1000) {
-                callBack({ success: false, message: "Invalid link." });
+                callBack({ success: false, message: "Expired link. Please submit another reset request." });
             } else {
-                callBack({success: true, message: "Please submit a new password"});
+                callBack({ success: true, message: "Please submit a new password" });
             }
         }
     });
@@ -247,18 +248,20 @@ exports.validatePasswordResetLink = function(reset_password_uri, callBack) {
  * and `message`.
  */
 exports.resetPassword = function(payload, callBack) {
-    User.find({reset_password_uri: payload.reset_password_uri}, (error, users) => {
+    User.find({ reset_password_uri: payload.reset_password_uri}, (error, users) => {
         if (error) {
-            console.log(error);
+            console.error(error);
             callBack({ success: false, message: error });
         }
         if (users.length !== 1) {
+            console.error(`${users.length} users had ${payload.reset_password_uri} as their reset link`);
             callBack({ success: false, message: "User not found." });
         } else {
-            var user = user[0];
+            var user = users[0];
             getSaltAndHash(payload.password, (salt, hash) => {
                 user.salt = salt;
                 user.hash = hash;
+                user.reset_password_timestamp += -3 * 3600 * 1000; // Invalidate link
                 user.save(function (error, savedUser, numAffected) {
                     if (error) {
                         callBack({
@@ -270,8 +273,9 @@ exports.resetPassword = function(payload, callBack) {
                         Email.sendEmail({
                             to: user.email,
                             subject: "Study Buddy: Your Password Has Been Reset",
-                            text: `Your Study Buddy password was reset ${payload.reset_info}. ` +
-                                `If this wasn't you, please request another password reset at ${config.BASE_URL}`
+                            text: `Your Study Buddy password was reset on ${payload.reset_request_time}. ` +
+                                `If this wasn't you, please request another password reset at ` + 
+                                `${config.BASE_URL}/reset-password`
                             }, 
                             (email_results) => {
                                 callBack({

@@ -156,6 +156,10 @@ app.post('/restore-from-trash', function (request, response) {
     });
 });
 
+app.get('/reset-password', function (request, response) {
+    response.render("pages/reset_password_request");
+});
+
 app.post('/reset-password', function (request, response) {
     console.log("POST request at /reset-password");
     if (debugMode) {
@@ -163,7 +167,6 @@ app.post('/reset-password', function (request, response) {
     }
     
     LogInUtilities.sendResetLink(request.body, (confirmation) => {
-        console.log(confirmation.message);
         if (confirmation.success) {
             response.json({
                 success: true, 
@@ -179,36 +182,54 @@ app.post('/reset-password', function (request, response) {
 });
 
 app.get('/reset-password-link/*', function(request, response) {
-    var password_reset_uri = request.path.split("/reset-password-link/")[0];
-    console.log(`GET request at /reset-password-link/ for ${reset_uri}`);
-    LogInUtilities.validatePasswordResetLink(password_reset_uri, (results) => {
+    var reset_password_uri = request.path.split("/reset-password-link/")[1];
+    console.log(`GET request at /reset-password-link/ for ${reset_password_uri}`);
+    LogInUtilities.validatePasswordResetLink(reset_password_uri, (results) => {
         if (debugMode) console.log(results.message);
         if (results.success) {
-            response.render("reset_password.ejs");
+            response.render("pages/reset_password.ejs");
         } else {
-            response.render("404_error_page.ejs");
+            response.render("pages/404_error_page.ejs");
         }
     });
 });
 
 app.post('/reset-password-link/*', function (request, response) {
-    var password_reset_uri = request.path.split("/reset-password-link/")[0];
-    console.log(`POST request at /reset-password-link/ for ${reset_uri}`);
+    var reset_password_uri = request.path.split("/reset-password-link/")[1];
+    console.log(`POST request at /reset-password-link/ for ${reset_password_uri}`);
     var payload = request.body;
-    payload.password_reset_uri = password_reset_uri;
-    LogInUtilities.validatePasswordResetLink(payload, (results) => {
+    payload.reset_password_uri = reset_password_uri;
+    var todays_datetime = new Date();
+    payload.reset_request_time = todays_datetime.toString();
+    LogInUtilities.validatePasswordResetLink(reset_password_uri, (results) => {
         if (debugMode) console.log(results.message);
         if (results.success) {
             LogInUtilities.resetPassword(payload, (confirmation) => {
                 if (debugMode) console.log(confirmation);
-                callBack(confirmation);
+                if (confirmation.success) {
+                    response.json({
+                        success: true, 
+                        message: "Password reset was successful!"
+                    });
+                } else {
+                    console.error(`Error on password reset: ${response.message}`);
+                    response.json({
+                        success: true,
+                        message: "Internal Server Error. Please try again later."
+                    });
+                }
             });
         } else {
-            callBack(results);
+            response.json(results);
         }
     });
 });
 
 app.listen(port, function() {
     console.log(`App is running on port ${port}`);
+});
+
+app.use(function (err, req, res, next) {
+    console.error(err.stack);
+    response.render("pages/404_error_page.ejs");
 });
