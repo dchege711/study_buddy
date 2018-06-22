@@ -442,7 +442,10 @@ exports.validatePasswordResetLink = function(reset_password_uri, callBack) {
             callBack({ success: false, status: 500, message: "Internal Server Error" });
         } else {
             if (Date.now() > users[0].reset_password_timestamp + 2 * 3600 * 1000) {
-                callBack({ success: false, status: 200, message: "Expired link. Please submit another reset request." });
+                callBack({ 
+                    success: false, status: 303, redirect_url: "/reset-password", 
+                    message: "Expired link. Please submit another reset request." 
+                });
             } else {
                 callBack({ success: true, status: 200, message: "Please submit a new password" });
             }
@@ -493,7 +496,7 @@ exports.resetPassword = function(payload, callBack) {
                             (email_results) => {
                                 if (email_results.success) {
                                     callBack({
-                                        success: true, status: 200,
+                                        success: true, status: 303, redirect_url: "/",
                                         message: `Password successfully reset. Log in with your new password.`
                                     });
                                 } else {
