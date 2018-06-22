@@ -9,8 +9,6 @@ var LogInUtilities = require('./server_side_scripts/LogInUtilities');
 
 require("./server_side_scripts/MongooseClient");
 
-const debugMode = false;
-
 var app = express();
 var port = process.env.PORT || 5000;
 
@@ -26,37 +24,19 @@ app.get('/', function(request, response) {
 });
 
 app.post('/register-user', function(request, response) {
-    console.log("POST request at /register-user");
-    if (debugMode) {
-        console.log(request.body);
-    }
-    
     LogInUtilities.registerUserAndPassword(request.body, function(confirmation) {
-        if (debugMode) console.log(confirmation);
         response.json(confirmation);
     });
 });
 
 app.post('/login', function(request, response) {
-    console.log("POST request at /login");
-    if (debugMode) {
-        console.log(request.body);
-    }
-
     LogInUtilities.authenticateUser(request.body, function(confirmation) {
-        if (debugMode) console.log(confirmation);
         response.json(confirmation);
     });
 });
 
 app.post('/read-card', function(request, response) {
-    console.log("POST request at /read-card");
-    if (debugMode) {
-        console.log(request.body);
-    }
-    
     CardsDB.read(request.body, function(card) {
-        if (debugMode) console.log(card);
         response.json(card);
     });
 });
@@ -66,85 +46,43 @@ app.get('/home', function(request, response) {
 });
 
 app.post('/read-metadata', function (request, response) {
-    console.log("POST request at /read-metadata");
-    if (debugMode) {
-        console.log(request.body);
-    }
-
     MetadataDB.read(request.body, function (metadata) {
-        if (debugMode) console.log(metadata);
         response.json(metadata);
     });
 });
 
 app.post('/tags', function (request, response) {
-    console.log("POST request at /tags");
-    if (debugMode) {
-        console.log(request.body);
-    }
-
     MetadataDB.readTags(request.body, function (tags) {
-        if (debugMode) console.log(tags);
         response.json(tags);
     });
 });
 
 app.post('/add-card', function(request, response) {
-    console.log("POST request at /add-card.");
-    if (debugMode) {
-        console.log(request.body);
-    }
-    
     CardsDB.create(request.body, function(confirmation) {
-        if (debugMode) console.log(confirmation);
         response.json(confirmation);
     });
 });
 
 app.post('/update-card', function(request, response) {
-    console.log("POST request at /update-card.");
-    if (debugMode) {
-        console.log(request.body);
-    }
-    
     CardsDB.update(request.body, function(confirmation) {
-        if (debugMode) console.log(confirmation);
         response.json(confirmation);
     });
 });
 
 app.post('/delete-card', function(request, response) {
-    console.log("POST request at /delete-card");
-    if (debugMode) {
-        console.log(request.body);
-    }
-    
     CardsDB.delete(request.body, function(confirmation) {
-        if (debugMode) console.log(confirmation);
         response.json(confirmation);
     });
 });
 
 app.post('/trash-card', function (request, response) {
-    console.log("POST request at /trash-card");
-    if (debugMode) {
-        console.log(request.body);
-    }
-
     MetadataDB.send_to_trash(request.body, function (confirmation) {
-        if (debugMode) console.log(confirmation);
         response.json(confirmation);
     });
 });
 
 app.post('/restore-from-trash', function (request, response) {
-    console.log("POST request at /restore-from-trash");
-    if (debugMode) {
-        console.log(request.body);
-    }
-
     MetadataDB.restore_from_trash(request.body, function (confirmation) {
-        if (debugMode) console.log(confirmation);
         response.json(confirmation);
     });
 });
@@ -154,19 +92,14 @@ app.get('/send-validation-email', function(request, response) {
 });
 
 app.post('/send-validation-email', function (request, response) {
-    if (debugMode) console.log(request.body);
-    console.log(`POST request at /send-validation-email`);
     LogInUtilities.sendAccountValidationLink(request.body, (confirmation) => {
-        if (debugMode) console.log(confirmation);
         response.json(confirmation);
     });
 });
 
 app.get('/verify-account/*', function (request, response) {
     var verification_uri = request.path.split("/verify-account/")[1];
-    console.log(`GET request at /verify-account/${verification_uri}`);
     LogInUtilities.validateAccount(verification_uri, (results) => {
-        if (debugMode) console.log(results.message);
         if (results.status === 200) {
             response.redirect(302, "/?verified=" + encodeURIComponent(results.message));
         } else {
@@ -179,10 +112,7 @@ app.get('/reset-password', function (request, response) {
     response.render("pages/reset_password_request.ejs");
 });
 
-app.post('/reset-password', function (request, response) {
-    console.log("POST request at /reset-password");
-    if (debugMode) console.log(request.body);
-    
+app.post('/reset-password', function (request, response) {    
     LogInUtilities.sendResetLink(request.body, (confirmation) => {
         if (confirmation.success) {
             response.json({
@@ -200,9 +130,7 @@ app.post('/reset-password', function (request, response) {
 
 app.get('/reset-password-link/*', function(request, response) {
     var reset_password_uri = request.path.split("/reset-password-link/")[1];
-    console.log(`GET request at /reset-password-link/ for ${reset_password_uri}`);
     LogInUtilities.validatePasswordResetLink(reset_password_uri, (results) => {
-        if (debugMode) console.log(results.message);
         if (results.success) {
             response.render("pages/reset_password.ejs");
         } else {
@@ -213,16 +141,13 @@ app.get('/reset-password-link/*', function(request, response) {
 
 app.post('/reset-password-link/*', function (request, response) {
     var reset_password_uri = request.path.split("/reset-password-link/")[1];
-    console.log(`POST request at /reset-password-link/ for ${reset_password_uri}`);
     LogInUtilities.validatePasswordResetLink(reset_password_uri, (results) => {
-        if (debugMode) console.log(results.message);
         if (results.success) {
             var payload = request.body;
             payload.reset_password_uri = reset_password_uri;
             var todays_datetime = new Date();
             payload.reset_request_time = todays_datetime.toString();
             LogInUtilities.resetPassword(payload, (confirmation) => {
-                if (debugMode) console.log(confirmation);
                 if (confirmation.success) {
                     response.json({
                         success: true, 
