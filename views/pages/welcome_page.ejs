@@ -77,7 +77,7 @@
                     <br />
                     
                     <button class="w3-button w3-center w3-green" type="submit" 
-                        onclick="return logInUser('signup_form', '/register-user')">Sign Up</button>
+                        onclick="return signUpUser('signup_form', '/register-user')">Sign Up</button>
                     
                     <br />
                     <br />
@@ -144,11 +144,23 @@
                             "metadata", JSON.stringify(results.message)
                         );
                         window.location = "/home";
-                    } else if (!results.internal_error) {
+                    } else {
                         alert(results.message);
                     }
                 });
 
+                return false;
+            }
+
+            /*
+            * @description Log in the user.
+            * @param {string} formID The ID of the form that has credentials
+            * @param {string} url The URL at which the form will be processed
+            */
+            function signUpUser(formID, url) {
+                sendForm(formID, url, (results) => {
+                    alert(results.message);
+                });
                 return false;
             }
             
@@ -159,7 +171,7 @@
                 sendForm(formID, '/reset-password', (results) => {
                     if (results.success) {
                         document.getElementById(formID).innerHTML = `
-                        <p>Please check your email for a password reset link.</p>
+                        <p>${results.message}</p>
 
                         <br />
                         <br />

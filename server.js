@@ -33,14 +33,7 @@ app.post('/register-user', function(request, response) {
     
     LogInUtilities.registerUserAndPassword(request.body, function(confirmation) {
         if (debugMode) console.log(confirmation);
-        if (confirmation.success) {
-            LogInUtilities.authenticateUser(request.body, function (login_confirmation) {
-                if (debugMode) console.log(login_confirmation);
-                response.json(login_confirmation);
-            });
-        } else {
-            response.json(confirmation);
-        }
+        response.json(confirmation);
     });
 });
 
@@ -199,7 +192,7 @@ app.post('/reset-password', function (request, response) {
         } else {
             response.json({
                 success: false,
-                message: `Unsuccessful attempt. Submitted email: ${request.body.email}. Was there a typo?`
+                message: `Unsuccessful: Was there a typo in ${request.body.email}?`
             });
         }
     });

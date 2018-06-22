@@ -86,9 +86,7 @@ sendAccountValidationURLToEmail = function(userDetails, callBack) {
                     });
                 } else {
                     console.error(email_confirmation.message);
-                    callBack({
-                        success: false, status: 500, message: "See error logs for details."
-                    });
+                    callBack({success: false, status: 500, message: email_confirmation.message});
                 }
             }
         );
@@ -214,11 +212,7 @@ exports.registerUserAndPassword = function(payload, callBack) {
             User.find({ email: user.email }, (error, existingUsers) => {
                 if (error) {
                     console.error(error);
-                    callBack({
-                        "success": false,
-                        "internal_error": true,
-                        "message": error
-                    });        
+                    callBack({success: false, status: 500, message: error});        
                     return;
                 } else {
                     // Check what mongoose returns if a document doesn't exist. Ans: []
@@ -261,11 +255,7 @@ exports.registerUserAndPassword = function(payload, callBack) {
                         user.save(function (error, savedUser) {
                             if (error) {
                                 console.error(error);
-                                callBack({
-                                    success: false, 
-                                    internal_error: true, 
-                                    message: error
-                                });                   
+                                callBack({ success: false, status: 500, message: error });                   
                             } else {
                                 MetadataDB.create({
                                     userIDInApp: savedUser.userIDInApp,
@@ -299,7 +289,6 @@ exports.registerUserAndPassword = function(payload, callBack) {
  */
 exports.authenticateUser = function(payload, callBack) {
 
-    var username = payload.username;
     var identifier_query;
     var submitted_identifier = payload.username_or_email;
     if (submitted_identifier === undefined) {
@@ -345,10 +334,9 @@ exports.authenticateUser = function(payload, callBack) {
                     if (!user.account_is_valid) {
                         callBack({
                             success: false, status: 200,
-                            message: `Please validate the email address ` +
-                            `associated with this account. Go to ${config.BASE_URL}` + 
-                            `/send-validation-email to request a new URL, or use the ` +
-                            `URL that was sent to ${user.email}`
+                            message: `Please validate this account using the URL that was sent ` +
+                                `to the email address associated with ${user.username}, ` + 
+                                `or go to ${config.BASE_URL}/send-validation-email to request a new URL`
                         });
                     } else {
                         MetadataDB.read(
@@ -359,8 +347,8 @@ exports.authenticateUser = function(payload, callBack) {
                 } else {
                     // Case 3: The user provided wrong credentials
                     callBack({
-                        "success": false, "internal_error": false,
-                        "message": "Incorrect username/email and/or password"
+                        success: false, status: 200,
+                        message: "Incorrect username/email and/or password"
                     });
                     return;
                 }
@@ -383,21 +371,22 @@ exports.sendResetLink = function(userIdentifier, callBack) {
         if (user === null) {
             User.findOne({email: userIdentifier.email}, (error, user) => {
                 if (error) {
-                    console.log(error);
+                    console.error(error);
                     return;
                 }
                 if (user === null) {
                     callBack({
-                        success: false, 
-                        message: `Email not found. Did you want to sign up?`
+                        success: false, status: 200,
+                        message: `If ${userIdentifier.email} has an account, we've sent a reset link`
                     });
                 } else {
                     user.reset_password_uri = reset_password_uri;
                     user.reset_password_timestamp = Date.now();
                     user.save(function (error, savedUser, numAffected) {
                         if (error) {
+                            console.error(error);
                             callBack({
-                                "success": false, "message": error
+                                success: false, status: 500, message: error
                             });
                         } else {
                             // For some reason, multiline template strings get
@@ -411,16 +400,22 @@ exports.sendResetLink = function(userIdentifier, callBack) {
                                     `\n\nThe link is only valid for 2 hours. If you did not ` +
                                     `request a password reset, please ignore this email.`
                             }, (email_results) => {
-                                callBack({
-                                    success: email_results.success,
-                                    message: email_results.message
-                                });
+                                if (email_results.success) {
+                                    callBack({
+                                        success: true, status: 200,
+                                        message: `If ${userIdentifier.email} has an account, we've sent a reset link`
+                                    });
+                                } else {
+                                    console.error(email_results.message);
+                                    callBack({ success: false, message: error, status: 500 });
+                                }
                             });
                         }
                     });
                 }
             });
         } else {
+            // Repeat the process because the password_uri is already taken
             sendResetLink(userIdentifier, callBack);
         }
     });
@@ -438,16 +433,18 @@ exports.validatePasswordResetLink = function(reset_password_uri, callBack) {
     User.find({ reset_password_uri: reset_password_uri}, (error, users) => {
         if (error) {
             console.error(error);
-            callBack({ success: false, message: error });
+            callBack({ success: false, message: error, status: 500 });
         }
-        if (users.length !== 1) {
-            console.error(`@validatePasswordResetLink: ${users.length} had ${reset_password_uri} as their reset link`);
-            callBack({success: false, message: "Invalid link."});
+        if (users.length === 0) {
+            callBack({success: false, status: 404, message: ""});
+        } else if (users.length > 1) {
+            console.error(`@validatePasswordResetLink: ${users.length} share the same password reset uri`);
+            callBack({ success: false, status: 500, message: "" });
         } else {
             if (Date.now() > users[0].reset_password_timestamp + 2 * 3600 * 1000) {
-                callBack({ success: false, message: "Expired link. Please submit another reset request." });
+                callBack({ success: false, status: 200, message: "Expired link. Please submit another reset request." });
             } else {
-                callBack({ success: true, message: "Please submit a new password" });
+                callBack({ success: true, status: 200, message: "Please submit a new password" });
             }
         }
     });
@@ -465,11 +462,15 @@ exports.resetPassword = function(payload, callBack) {
     User.find({ reset_password_uri: payload.reset_password_uri}, (error, users) => {
         if (error) {
             console.error(error);
-            callBack({ success: false, message: error });
+            callBack({ success: false, message: error, status: 500 });
         }
         if (users.length !== 1) {
-            console.error(`${users.length} users had ${payload.reset_password_uri} as their reset link`);
-            callBack({ success: false, message: "User not found." });
+            if (users.length === 0) {
+                callBack({ success: false, status: 404, message: "" });
+            } else {
+                console.error(`${users.length} users had ${payload.reset_password_uri} as their reset link`);
+                callBack({ success: false, status: 500, message: "" });
+            }
         } else {
             var user = users[0];
             getSaltAndHash(payload.password, (salt, hash) => {
@@ -478,12 +479,10 @@ exports.resetPassword = function(payload, callBack) {
                 user.reset_password_timestamp += -3 * 3600 * 1000; // Invalidate link
                 user.save(function (error, savedUser, numAffected) {
                     if (error) {
-                        callBack({
-                            "success": false, "message": error
-                        });
+                        console.error(error);
+                        callBack({success: false, message: error, status: 500});
                     } else {
-                        // For some reason, multiline template strings get
-                        // unwanted line breaks in the sent email.
+                        // For some reason, multiline template strings get line breaks in the sent email.
                         Email.sendEmail({
                             to: user.email,
                             subject: "Study Buddy: Your Password Has Been Reset",
@@ -492,11 +491,17 @@ exports.resetPassword = function(payload, callBack) {
                                 `${config.BASE_URL}/reset-password`
                             }, 
                             (email_results) => {
-                                callBack({
-                                    success: email_results.success,
-                                    message: email_results.message
-                            });
-                        });
+                                if (email_results.success) {
+                                    callBack({
+                                        success: true, status: 200,
+                                        message: `Password successfully reset. Log in with your new password.`
+                                    });
+                                } else {
+                                    console.error(email_results.message);
+                                    callBack({ success: false, message: error, status: 500 });
+                                }
+                            }
+                        );
                     }
                 });
             });
