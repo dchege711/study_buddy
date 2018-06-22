@@ -5,17 +5,13 @@
 
 ## Tasks
 
-:soon: Use email verification to validate accounts.
-
 :soon: Support extended sessions without requiring a re-login.
 
 :soon: Define a log out procedure and write the required code.
 
-:soon: Client-side username verification and validation for new users.
-
 :soon: Implement logic for recovering cards from the trash.
 
-:soon: Implement a method that cleans all the cards in the trash that are more than 30 days old.
+:soon: Implement a method that cleans all the cards in the trash and unvalidated accounts that are more than 30 days old.
 
 :soon: Support filtering on the first set of filters.
 
@@ -23,9 +19,7 @@
 
 :soon: Add an account page with configurable settings, e.g. code syntax theme, light vs dark UI, etc.
 
-:soon: Have fun with the 4xx-code page.
-
-### :soon: LogIn, SignUp and Account Recovery
+### :white_check_mark: LogIn, SignUp and Account Recovery [:arrow_up:](#contents)
 
 I found CrackStation's piece on [salted password hashing](https://crackstation.net/hashing-security.htm) informative. I store a hash and a salt on the database, and every time a user logs in, I validate the submitted password using the salt and the hash. The [Stanford Crypto Library](http://bitwiseshiftleft.github.io/sjcl/doc/) provided good tools for handling the encryption methods.
 
@@ -77,7 +71,7 @@ Since I'm targeting users that store somewhat detailed flashcards, I felt that M
 
 The sidebar shows which tags are available as clickable buttons. Once the user clicks on a tag(s), they can then click the filter button to only show cards that have that filter. I am using two priority queues to control the card flow, one for the cards that are yet to be seen, and the other for the cards that have already been seen. I used notes from COS 226 on PQs to re-write the Java implementation of a PQ into JavaScript, then absracted away the underlying PQ into a cards manager that could be queried for `next_card(), previous_card()`, etc. Although PQ packages exist on NPM, implementing a barebones version is good enough for me.
 
-### :white_check_mark: Prettify the scripts found inside the cards
+### :white_check_mark: Prettify the scripts found inside the cards [:arrow_up:](#contents)
 
 I found the [highlight.js](https://highlightjs.org/) library useful for this. It even allows me to specify what languages I want supported. I downloaded a package from them instead of using a CDN. Although I refrain from adding more dependencies, writing my own syntax highlighter would have been unwise.
 
