@@ -6,13 +6,13 @@
 
 * [Make card navigation through the GUI more user-friendly](#make-card-navigation-through-the-gui-more-user-friendly)
 
-* [Make editing of cards more user-friendly](make-editing-of-cards-more-user-friendly)
+* [Make editing of cards more user-friendly](#make-editing-of-cards-more-user-friendly)
 
-* [Support ~~deleting a card~~ moving a card to the trash and undoing the move](support-deleting-a-card-moving-a-card-to-the-trash-and-undoing-the-move)
+* [Support moving a card to the trash and undoing the move](#support-deleting-a-card-moving-a-card-to-the-trash-and-undoing-the-move)
 
-* [Organize how data will be represented in the database](organize-how-data-will-be-represented-in-the-database)
+* [Organize how data will be represented in the database](#organize-how-data-will-be-represented-in-the-database)
 
-* [Render card content appropriately](render-card-content-appropriately)
+* [Render card content appropriately](#render-card-content-appropriately)
 
 * [Add a sidebar that supports filters based on tags](#add-a-sidebar-that-supports-filters-based-on-tags)
 
