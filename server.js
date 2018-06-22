@@ -162,6 +162,7 @@ app.get('/send-validation-email', function(request, response) {
 
 app.post('/send-validation-email', function (request, response) {
     if (debugMode) console.log(request.body);
+    console.log(`POST request at /send-validation-email`);
     LogInUtilities.sendAccountValidationLink(request.body, (confirmation) => {
         if (debugMode) console.log(confirmation);
         response.json(confirmation);
@@ -170,6 +171,7 @@ app.post('/send-validation-email', function (request, response) {
 
 app.get('/verify-account/*', function (request, response) {
     var verification_uri = request.path.split("/verify-account/")[1];
+    console.log(`GET request at /verify-account/${verification_uri}`);
     LogInUtilities.validateAccount(verification_uri, (results) => {
         if (debugMode) console.log(results.message);
         if (results.status === 200) {
@@ -181,7 +183,7 @@ app.get('/verify-account/*', function (request, response) {
 });
 
 app.get('/reset-password', function (request, response) {
-    response.render("pages/reset_password_request");
+    response.render("pages/reset_password_request.ejs");
 });
 
 app.post('/reset-password', function (request, response) {
@@ -251,7 +253,7 @@ app.listen(port, function() {
     console.log(`App is running on port ${port}`);
 });
 
-app.use(function (err, req, res, next) {
-    console.error(err.stack);
+app.use(function (error, request, response, next) {
+    console.error(error.stack);
     response.render("pages/404_error_page.ejs");
 });

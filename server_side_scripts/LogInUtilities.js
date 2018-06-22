@@ -68,7 +68,7 @@ getIdInAppAndValidationURI = function(callBack) {
  * @param {Function} callBack A function that takes a JSON object having the keys
  * `success`, `message`, `status`.
  */
-emailAccountValidationURL = function(userDetails, callBack) {
+sendAccountValidationURLToEmail = function(userDetails, callBack) {
     if (userDetails.email !== undefined && userDetails.account_validation_uri !== undefined) {
         Email.sendEmail(
             {
@@ -82,22 +82,21 @@ emailAccountValidationURL = function(userDetails, callBack) {
                 if (email_confirmation.success) {
                     callBack({
                         success: true, status: 200,
-                        message: `Please check ${user.email} for an account validation link.`
+                        message: `Please check ${userDetails.email} for an account validation link.`
                     });
                 } else {
                     console.error(email_confirmation.message);
                     callBack({
-                        success: false, status: 500,
-                        message: email_confirmation.message
+                        success: false, status: 500, message: "See error logs for details."
                     });
                 }
             }
         );
     } else {
-        console.error(`@emailAccountValidationURL: Missing email address and validation_uri in ${userDetails.username}`);
+        console.error(`@sendAccountValidationURLToEmail: Missing email address and validation_uri in ${userDetails.username}`);
         callBack({
             success: false, status: 500, 
-            message: "@emailAccountValidationURL: Missing parameters"
+            message: "@sendAccountValidationURLToEmail: Missing parameters"
         });
     }
 };
@@ -126,33 +125,30 @@ exports.sendAccountValidationLink = function(payload, callBack) {
             if (user.account_validation_uri === undefined || user.account_is_valid === undefined) {
                 user.account_validation_uri = getRandomString(32, "abcdefghijklmnopqrstuvwxyz0123456789");
                 user.account_is_valid = false;
-                Users.find(
+                User.find(
                     { account_validation_uri: user.account_validation_uri},
                     (error, existing_users_with_same_uri) => {
                         if (error) {
                             console.error(error);
                             callBack({ success: false, status: 500, message: "Internal Server Error" });
                         } else if (existing_users_with_same_uri.length !== 0) {
+                            console.error(`${existing_users_with_same_uri.length} duplicate URIs found!`);
                             sendAccountValidationLink(payload, callBack);
-                        } 
-                    }
-                );
-            }
-            emailAccountValidationURL(user, (email_confirmation) => {
-                if (email_confirmation.success) {
-                    user.save((error, savedUser) => {
-                        if (error) {
-                            console.error(error);
-                            callBack({ success: false, status: 500, message: "Internal Server Error" });
                         } else {
-                            callBack({
-                                success: true, status: 200,
-                                message: `Please check ${savedUser.email} for a validation link.`
+                            user.save((error, savedUser) => {
+                                if (error) {
+                                    console.error(error);
+                                    callBack({ success: false, status: 500, message: "Internal Server Error" });
+                                } else {
+                                    sendAccountValidationURLToEmail(savedUser, callBack);
+                                }
                             });
                         }
-                    });
-                }
-            });
+                    }
+                );
+            } else {
+                sendAccountValidationURLToEmail(user, callBack);
+            }  
         }
     });
 };
@@ -276,7 +272,7 @@ exports.registerUserAndPassword = function(payload, callBack) {
                                     metadataIndex: 0
                                 }, (metadata_confirmation) => {
                                     if (metadata_confirmation.success) {
-                                        emailAccountValidationURL(savedUser, callBack);
+                                        sendAccountValidationURLToEmail(savedUser, callBack);
                                     } else {
                                         console.error(metadata_confirmation.message);
                                         callBack({
