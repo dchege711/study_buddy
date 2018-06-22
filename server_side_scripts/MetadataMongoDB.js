@@ -74,10 +74,7 @@ exports.read = function (payload, callBack) {
         metadataResults.push(metadataDoc);
     });
     cursor.on("close", () => {
-        callBack({
-            "success": true, "internal_error": false,
-            "message": metadataResults
-        });
+        callBack({ success: true, status: 200, message: metadataResults});
     });
 };
 

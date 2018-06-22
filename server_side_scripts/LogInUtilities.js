@@ -82,20 +82,17 @@ sendAccountValidationURLToEmail = function(userDetails, callBack) {
                 if (email_confirmation.success) {
                     callBack({
                         success: true, status: 200,
-                        message: `Please check ${userDetails.email} for an account validation link.`
+                        message: `If ${userDetails.email} has an account, we've sent a validation URL`
                     });
                 } else {
                     console.error(email_confirmation.message);
-                    callBack({success: false, status: 500, message: email_confirmation.message});
+                    callBack({ success: false, status: 500, message: "Internal Server Error"});
                 }
             }
         );
     } else {
         console.error(`@sendAccountValidationURLToEmail: Missing email address and validation_uri in ${userDetails.username}`);
-        callBack({
-            success: false, status: 500, 
-            message: "@sendAccountValidationURLToEmail: Missing parameters"
-        });
+        callBack({success: false, status: 500, message: "Internal Server Error" });
     }
 };
 
@@ -113,7 +110,7 @@ exports.sendAccountValidationLink = function(payload, callBack) {
         } else if (users.length === 0) {
             callBack({
                 success: false, status: 200,
-                message: `No account was found under ${payload.email}`
+                message: `If ${payload.email} has an account, we've sent a validation URL`
             });
         } else if (users.length > 1) {
             console.error(`@sendAccountValidationLink: Multiple accounts under ${payload.email}`);
@@ -170,9 +167,9 @@ exports.validateAccount = function(validation_uri, callBack) {
                         console.error(error);
                         callBack({ success: false, status: 500, message: "Internal Server Error" });
                     } else {
-                        callBack({
-                            success: true, status: 200,
-                            message: savedUser.email
+                        callBack({ 
+                            success: true, status: 303, redirect_url: "/",
+                            message: `Successfully validated ${savedUser.email}. Redirecting you to login`
                         });
                     }
                 });
@@ -196,88 +193,94 @@ exports.registerUserAndPassword = function(payload, callBack) {
     // Apologies for the nesting nightmare below
     // Be the change that you wish to see in the world ;-)
 
-    getSaltAndHash(password, function(salt, hash) {
-        getIdInAppAndValidationURI(function(userId, validationURI) {
-            var user = new User({
-                username: username,
-                salt: salt,
-                hash: hash,
-                userIDInApp: userId,
-                email: email,
-                account_validation_uri: validationURI,
-                account_is_valid: false
-            });
+    User.find({username: username}, (error, usersWithSameUsername) => {
+        if (error) {
+            console.error(error);
+            callBack({ success: false, status: 500, message: "Internal Server Error" });
+        } else if (usersWithSameUsername.length !== 0) {
+            callBack({ success: false, status: 200, message: "Username already taken."});
+        } else {
+            getSaltAndHash(password, function (salt, hash) {
+                getIdInAppAndValidationURI(function (userId, validationURI) {
+                    var user = new User({
+                        username: username,
+                        salt: salt,
+                        hash: hash,
+                        userIDInApp: userId,
+                        email: email,
+                        account_validation_uri: validationURI,
+                        account_is_valid: false
+                    });
 
-            if (debug) console.log("Saving new user: " + email);
-            User.find({ email: user.email }, (error, existingUsers) => {
-                if (error) {
-                    console.error(error);
-                    callBack({success: false, status: 500, message: error});        
-                    return;
-                } else {
-                    // Check what mongoose returns if a document doesn't exist. Ans: []
-                    if (existingUsers.length !== 0) {
-
-                        if (existingUsers.length !== 1) {
-                            // I hope it never comes to this, ever.
-                            console.error(`@registerUserAndPassword: ${existingUsers.length} have the same email: ${user.email}`);
-                            callBack({success: false, status: 500, message: "500: Internal Server Error"});
+                    if (debug) console.log(`Saving new user: ${email}`);
+                    User.find({ email: user.email }, (error, existingUsers) => {
+                        if (error) {
+                            console.error(error);
+                            callBack({ success: false, status: 500, message: error });
+                            return;
                         } else {
-                            // Send an email to them notifying them of suspicious activity
-                            var existingUser = existingUsers[0];
-                            Email.sendEmail(
-                                {
-                                    to: existingUser.email,
-                                    subject: `Did you try to register for a new Study Buddy Account?`,
-                                    text: `Psst! Someone tried registering for a new Study Buddy ` + 
-                                        `account using your email address. If this was you, you ` + 
-                                        `already have an account.\n\nForgot your password? Request a ` +
-                                        `reset at ${config.BASE_URL}/reset-password.\n\nCheers,\nStudy Buddy by c13u` 
-                                }, (email_confirmation) => {
-                                    if (email_confirmation.success) {
-                                        callBack({
-                                            success: true, status: 200, 
-                                            message: `Please check ${user.email} for a confirmation message`
-                                        });
-                                    } else {
-                                        console.error(email_confirmation.message);
-                                        callBack({
-                                            success: false, status: 500,
-                                            message: email_confirmation.message
-                                        });
+                            if (existingUsers.length > 1) {
+                                // I hope it never comes to this, ever.
+                                console.error(`@registerUserAndPassword: ${existingUsers.length} have the same email: ${user.email}`);
+                                callBack({ success: false, status: 500, message: "Internal Server Error" });
+                            } else if (existingUsers.length === 1) {
+                                // Send an email to them notifying them of suspicious activity
+                                var existingUser = existingUsers[0];
+                                Email.sendEmail(
+                                    {
+                                        to: existingUser.email,
+                                        subject: `Did you try to register for a new Study Buddy Account?`,
+                                        text: `Psst! Someone tried registering for a new Study Buddy ` +
+                                            `account using your email address. If this was you, you ` +
+                                            `already have an account.\n\nForgot your password? Request a ` +
+                                            `reset at ${config.BASE_URL}/reset-password.\n\nCheers,\nStudy Buddy by c13u`
+                                    }, (email_confirmation) => {
+                                        if (email_confirmation.success) {
+                                            callBack({
+                                                success: true, status: 200,
+                                                message: `Please check ${existingUser.email} for an account validation link.`
+                                            });
+                                        } else {
+                                            console.error(email_confirmation.message);
+                                            callBack({ success: false, status: 500, message: "Internal Server Error" });
+                                        }
                                     }
-                                }
-                            );
-                        }            
-                        return;
-                    } else {
-                        // Save the new user's account and send enough info to log them in
-                        user.save(function (error, savedUser) {
-                            if (error) {
-                                console.error(error);
-                                callBack({ success: false, status: 500, message: error });                   
+                                );
                             } else {
-                                MetadataDB.create({
-                                    userIDInApp: savedUser.userIDInApp,
-                                    metadataIndex: 0
-                                }, (metadata_confirmation) => {
-                                    if (metadata_confirmation.success) {
-                                        sendAccountValidationURLToEmail(savedUser, callBack);
+                                // Save the new user's account and send enough info to log them in
+                                user.save(function (error, savedUser) {
+                                    if (error) {
+                                        console.error(error);
+                                        callBack({ success: false, status: 500, message: "Internal Server Error" });
                                     } else {
-                                        console.error(metadata_confirmation.message);
-                                        callBack({
-                                            success: false, status: 500,
-                                            message: metadata_confirmation.message
+                                        MetadataDB.create({
+                                            userIDInApp: savedUser.userIDInApp,
+                                            metadataIndex: 0
+                                        }, (metadata_confirmation) => {
+                                            if (metadata_confirmation.success) {
+                                                sendAccountValidationURLToEmail(savedUser, (email_confirmation) => {
+                                                    // Overwrite the message on success
+                                                    if (email_confirmation.success) {
+                                                        email_confirmation.message = `We've sent a validation URL to ${savedUser.email}. Please validate before logging in`;
+                                                    }
+                                                    callBack(email_confirmation);
+                                                });
+                                            } else {
+                                                console.error(metadata_confirmation.message);
+                                                callBack({ success: false, status: 500, message: "Internal Server Error" });
+                                            }
                                         });
                                     }
                                 });
                             }
-                        });
-                    }
-                }
+                        }
+                    });
+                });
             });
-        });    
+        }
     });
+
+    
 };
 
 /**
@@ -309,7 +312,7 @@ exports.authenticateUser = function(payload, callBack) {
             // Case 1: The user doesn't exist
             if (!user) {
                 callBack({
-                    success: false, status: 200,
+                    success: false, status: 200, 
                     message: "Incorrect username/email and/or password"
                 });   
                 return;
@@ -332,12 +335,7 @@ exports.authenticateUser = function(payload, callBack) {
 
                     // Prevent unvalidated accounts from logging in..
                     if (!user.account_is_valid) {
-                        callBack({
-                            success: false, status: 200,
-                            message: `Please validate this account using the URL that was sent ` +
-                                `to the email address associated with ${user.username}, ` + 
-                                `or go to ${config.BASE_URL}/send-validation-email to request a new URL`
-                        });
+                        sendAccountValidationURLToEmail(user, callBack);
                     } else {
                         MetadataDB.read(
                             { userIDInApp: user.userIDInApp }, callBack
@@ -366,28 +364,30 @@ exports.sendResetLink = function(userIdentifier, callBack) {
     
     reset_password_uri = getRandomString(50, "abcdefghijklmnopqrstuvwxyz0123456789");
 
-    User.findOne({ resetPasswordURL: reset_password_uri}, (error, user) => {
+    User.find({ resetPasswordURL: reset_password_uri}, (error, existing_users_with_same_uri) => {
         if (error) console.log(error);
-        if (user === null) {
-            User.findOne({email: userIdentifier.email}, (error, user) => {
+        if (existing_users_with_same_uri.length === 0) {
+            User.find({email: userIdentifier.email}, (error, users_with_same_email) => {
                 if (error) {
                     console.error(error);
-                    return;
+                    callBack({ success: false, status: 500, message: "Internal Server Error" });
                 }
-                if (user === null) {
+                else if (users_with_same_email.length === 0) {
                     callBack({
-                        success: false, status: 200,
-                        message: `If ${userIdentifier.email} has an account, we've sent a reset link`
+                        success: true, status: 200,
+                        message: `If ${userIdentifier.email} has an account, we've sent a password reset link`
                     });
+                } else if (users_with_same_email.length > 1) {
+                    console.error(`${users_with_same_email.length} users have ${userIdentifier.email} as their email address`);
+                    callBack({ success: false, status: 500, message: "Internal Server Error" });
                 } else {
+                    var user = users_with_same_email[0];
                     user.reset_password_uri = reset_password_uri;
                     user.reset_password_timestamp = Date.now();
                     user.save(function (error, savedUser, numAffected) {
                         if (error) {
                             console.error(error);
-                            callBack({
-                                success: false, status: 500, message: error
-                            });
+                            callBack({ success: false, status: 500, message: "Internal Server Error" });
                         } else {
                             // For some reason, multiline template strings get
                             // unwanted line breaks in the sent email.
@@ -407,7 +407,7 @@ exports.sendResetLink = function(userIdentifier, callBack) {
                                     });
                                 } else {
                                     console.error(email_results.message);
-                                    callBack({ success: false, message: error, status: 500 });
+                                    callBack({ success: false, message: "Internal Server Error", status: 500 });
                                 }
                             });
                         }
@@ -436,10 +436,10 @@ exports.validatePasswordResetLink = function(reset_password_uri, callBack) {
             callBack({ success: false, message: error, status: 500 });
         }
         if (users.length === 0) {
-            callBack({success: false, status: 404, message: ""});
+            callBack({success: false, status: 404, message: "Page Not Found"});
         } else if (users.length > 1) {
             console.error(`@validatePasswordResetLink: ${users.length} share the same password reset uri`);
-            callBack({ success: false, status: 500, message: "" });
+            callBack({ success: false, status: 500, message: "Internal Server Error" });
         } else {
             if (Date.now() > users[0].reset_password_timestamp + 2 * 3600 * 1000) {
                 callBack({ success: false, status: 200, message: "Expired link. Please submit another reset request." });
@@ -466,10 +466,10 @@ exports.resetPassword = function(payload, callBack) {
         }
         if (users.length !== 1) {
             if (users.length === 0) {
-                callBack({ success: false, status: 404, message: "" });
+                callBack({ success: false, status: 404, message: "Page Not Found" });
             } else {
                 console.error(`${users.length} users had ${payload.reset_password_uri} as their reset link`);
-                callBack({ success: false, status: 500, message: "" });
+                callBack({ success: false, status: 500, message: "Internal Server Error" });
             }
         } else {
             var user = users[0];
@@ -498,7 +498,7 @@ exports.resetPassword = function(payload, callBack) {
                                     });
                                 } else {
                                     console.error(email_results.message);
-                                    callBack({ success: false, message: error, status: 500 });
+                                    callBack({ success: false, message: "Internal Server Error", status: 500 });
                                 }
                             }
                         );
