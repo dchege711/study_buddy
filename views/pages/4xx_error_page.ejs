@@ -2,7 +2,7 @@
 <html>
 
     <head>
-        <title>Study Buddy Internal Server Error</title>
+        <title>Study Buddy 4xx Page</title>
         <% include ../partials/header.ejs %>
     </head>
 
@@ -12,13 +12,13 @@
 
             <div id="main_div">
 
-                <div style="margin: 5% 25% 5% 25%">
-                    
-                    <h4>Internal Server Error</h4>
+                <div style="margin: 5% 20% 10% 20%">
+
+                    <h3><%= response_JSON.status %></h3>
 
                     <br />
                     
-                    <p>It's not you, it's me.</p>
+                    <p><%= response_JSON.message %></p>
 
                 </div>
 

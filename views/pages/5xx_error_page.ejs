@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>Study Buddy 5xx Page</title>
+        <% include ../partials/header.ejs %>
+    </head>
+
+    <body>
+
+        <% include ../partials/navbar.ejs %>
+
+            <div id="main_div">
+            
+                <div style="margin: 5% 20% 10% 20%">
+            
+                    <h3>
+                        <%= response_JSON.status %>
+                    </h3>
+                    <br />
+                    <p>
+                        <%= response_JSON.message %>
+                    </p>
+
+                </div>
+            
+            </div>
+
+
+            <footer class="w3-container w3-container w3-black">
+                <% include ../partials/footer.ejs %>
+            </footer>
+
+    </body>
+
+</html>
