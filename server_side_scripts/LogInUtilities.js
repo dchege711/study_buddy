@@ -1,11 +1,16 @@
 var stanfordCrypto = require('sjcl');
 var User = require("./models/UserSchema.js");
 var MetadataDB = require("./MetadataMongoDB.js");
+var Token = require("./models/Token.js");
 var Email = require("./EmailClient.js");
 var config = require("../config.js");
 var mongoose = require('mongoose');
 
 var debug = false;
+
+var DIGITS = "0123456789";
+var LOWER_CASE = "abcdefghijklmnopqrstuvwxyz";
+var UPPER_CASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 getSaltAndHash = function(password, callBack) {
     // 8 words = 32 bytes = 256 bits, a paranoia of 7
@@ -27,6 +32,7 @@ getHash = function(password, salt, callBack) {
 getRandomString = function(string_length, alphabet) {
     var random_string = "";
     for (let i = 0; i < string_length; i++) {
+        // In JavaScript, concatenation is actually faster...
         random_string += alphabet.charAt(Math.floor(Math.random() * alphabet.length));
     }
     return random_string;
@@ -40,7 +46,7 @@ getRandomString = function(string_length, alphabet) {
  */
 getIdInAppAndValidationURI = function(callBack) {
     var randomID = parseInt(getRandomString(12, "123456789"), 10);
-    var validationURI = getRandomString(32, "abcdefghijklmnopqrstuvwxyz0123456789");
+    var validationURI = getRandomString(32, LOWER_CASE + DIGITS);
     User.findOne(
         { $or: 
             [
@@ -57,6 +63,36 @@ getIdInAppAndValidationURI = function(callBack) {
         } else {
             getIdInAppAndValidationURI(callBack);
             return;
+        }
+    });
+};
+
+/**
+ * @description Generate a unique session token.
+ * @param {String} owner_id The database ID of whoever owns this token.
+ * @param {Function} callBack Takes a JSON object with `success`, `status` and
+ * `message` as its keys.
+ */
+provideSessionToken = function(owner_id, callBack) {
+    var session_token = getRandomString(35, LOWER_CASE + DIGITS + UPPER_CASE);
+    Token.findOne({value: session_token}, (error, tokenObject) => {
+        if (error) {
+            console.error(error);
+            callBack({status: 500, success: false, message: "Internal Server Error"});
+        } else if (tokenObject) {
+            provideSessionToken(callBack);
+        } else {
+            var new_token = Token({
+                value: session_token, owner: owner_id
+            });
+            new_token.save((error, saved_token) => {
+                if (error) {
+                    console.error(error);
+                    callBack({ status: 500, success: false, message: "Internal Server Error" });
+                } else {
+                    callBack({ status: 200, success: true, message: saved_token.value });
+                }
+            });
         }
     });
 };
@@ -118,7 +154,7 @@ exports.sendAccountValidationLink = function(payload, callBack) {
         } else {
             var user = users[0];
             if (user.account_validation_uri === undefined || user.account_is_valid === undefined) {
-                user.account_validation_uri = getRandomString(32, "abcdefghijklmnopqrstuvwxyz0123456789");
+                user.account_validation_uri = getRandomString(32, LOWER_CASE + DIGITS);
                 user.account_is_valid = false;
                 User.find(
                     { account_validation_uri: user.account_validation_uri},
@@ -335,11 +371,12 @@ exports.authenticateUser = function(payload, callBack) {
 
                     // Prevent unvalidated accounts from logging in..
                     if (!user.account_is_valid) {
-                        sendAccountValidationURLToEmail(user, callBack);
+                        sendAccountValidationURLToEmail(user, (email_confirmation) => {
+                            if (email_confirmation.success) email_confirmation.success = false; 
+                            callBack(email_confirmation);
+                        });
                     } else {
-                        MetadataDB.read(
-                            { userIDInApp: user.userIDInApp }, callBack
-                        ); 
+                        provideSessionToken(user._id, callBack);
                     }       
                     return;
                 } else {

@@ -1,7 +1,8 @@
 var express = require('express');
 var path = require('path');
 var bodyParser = require('body-parser');
-const url = require("url");
+var passport = require("passport");
+var LocalStrategy = require("passport-local").Strategy;
 
 var CardsDB = require('./server_side_scripts/CardsMongoDB.js');
 var MetadataDB = require('./server_side_scripts/MetadataMongoDB.js');
@@ -9,6 +10,23 @@ var LogInUtilities = require('./server_side_scripts/LogInUtilities.js');
 
 // Needed to get a Mongoose instance running for this process
 require("./server_side_scripts/MongooseClient.js");
+
+// Set up the authentication procedure
+passport.use(new LocalStrategy(
+    {
+        passReqToCallback: true,
+        session: true
+    },
+    function(request, username, password, done) {
+        LogInUtilities.authenticateUser(request.body, function (confirmation) {
+            if (confirmation.status === 200) {
+                if (confirmation.success) {
+                     
+                }
+            }
+        });
+    }
+));
 
 var app = express();
 var port = process.env.PORT || 5000;
