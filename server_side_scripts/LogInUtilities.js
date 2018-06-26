@@ -29,7 +29,7 @@ getHash = function(password, salt, callBack) {
  * @param {Number} string_length The length of the desired string.
  * @param {String} alphabet The characters that can be included in the string.
  */
-getRandomString = function(string_length, alphabet) {
+exports.getRandomString = function(string_length, alphabet) {
     var random_string = "";
     for (let i = 0; i < string_length; i++) {
         // In JavaScript, concatenation is actually faster...
@@ -74,7 +74,7 @@ getIdInAppAndValidationURI = function(callBack) {
  * `message` as its keys.
  */
 provideSessionToken = function(owner_id, callBack) {
-    var session_token = getRandomString(35, LOWER_CASE + DIGITS + UPPER_CASE);
+    var session_token = exports.getRandomString(48, LOWER_CASE + DIGITS + UPPER_CASE);
     Token.findOne({value: session_token}, (error, tokenObject) => {
         if (error) {
             console.error(error);
@@ -392,6 +392,20 @@ exports.authenticateUser = function(payload, callBack) {
     });
 };
 
+exports.deleteSessionToken = function(session_id, callBack) {
+    Token.findOneAndRemove({ value: session_id }, (error, removed_token) => {
+        if (error) {
+            console.log(error);
+            callBack({ status: 500, success: false, message: "Internal Server Error" });
+        } else if (removed_token) {
+            callBack({ status: 200, success: true, message: removed_token.value });
+        } else {
+            console.error("@deleteSessionToken: Could not find session token.");
+            callBack({ status: 500, success: false, message: "Internal Server Error" });
+        }
+    });
+};
+
 /**
  * 
  * @param {JSON} userIdentifier Expected key: `email_address`
@@ -458,7 +472,6 @@ exports.sendResetLink = function(userIdentifier, callBack) {
     });
 
 };
-
 
 /**
  * 

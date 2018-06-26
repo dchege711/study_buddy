@@ -1,4 +1,5 @@
 var express = require('express');
+var session = require("express-session");
 var path = require('path');
 var bodyParser = require('body-parser');
 var passport = require("passport");
@@ -11,39 +12,53 @@ var LogInUtilities = require('./server_side_scripts/LogInUtilities.js');
 // Needed to get a Mongoose instance running for this process
 require("./server_side_scripts/MongooseClient.js");
 
-// Set up the authentication procedure
+var app = express();
+var port = process.env.PORT || 5000;
+
+// Configure a strategy for logging in a user...
 passport.use(new LocalStrategy(
     {
         passReqToCallback: true,
+        passwordField: "password",
+        usernameField: "username_or_email",
         session: true
     },
-    function(request, username, password, done) {
+    function (request, username, password, done) {
+        console.log(request.body);
         LogInUtilities.authenticateUser(request.body, function (confirmation) {
-            if (confirmation.status === 200) {
-                if (confirmation.success) {
-                     
-                }
+            if (confirmation.status === 200 && confirmation.success) {
+                passport.serializeUser(function (confirmation, done) {
+                    done(null, confirmation.message, null);
+                });
+                return done(null, confirmation, null);
+            } else {
+                return done(null, false, confirmation);
             }
         });
     }
 ));
 
-var app = express();
-var port = process.env.PORT || 5000;
-
+app.use(session({
+    secret: LogInUtilities.getRandomString(10, "abcdefghijklmnopqrstuvwxyz"),
+    resave: false,
+    saveUninitialized: false
+}));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
 
 /* 
  * Login and authentication endpoints 
  * 
  */
 
-app.get('/', function(request, response) {
+app.get(/\/|\/login/, function(request, response) {
     response.render("pages/welcome_page");
 });
 
@@ -53,9 +68,23 @@ app.post('/register-user', function(request, response) {
     });
 });
 
-app.post('/login', function(request, response) {
-    LogInUtilities.authenticateUser(request.body, function(confirmation) {
-        convertObjectToResponse(confirmation, response);
+app.post('/login', function(request, response, next) {
+    passport.authenticate("local", (error, user_identifier, login_error) => {
+        if (error) console.error(error);
+        else if (user_identifier) {
+            response.json(user_identifier);
+        } else {
+            convertObjectToResponse(login_error);
+        }
+    })(request, response, next);
+});
+
+app.post("/logout", function(request, response) {
+    passport.deserializeUser(function(session_id, done) {
+        LogInUtilities.deleteSessionToken(session_id, (delete_info) => {
+            done(null, session_id);
+            convertObjectToResponse(delete_info, response);
+        });
     });
 });
 
@@ -173,9 +202,7 @@ app.post('/restore-from-trash', function (request, response) {
 
 /**
  * @description A function to interpret JSON documents into server responses.
- * 
  * @param {JSON} result_JSON Expected keys: `status`, `success`, `message`
- * 
  * @param {Response} response An Express JS response object 
  */
 convertObjectToResponse = function(result_JSON, response) {

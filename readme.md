@@ -26,11 +26,19 @@
 
 :soon: Implement a method that cleans all the cards in the trash and unvalidated accounts that are more than 30 days old.
 
-:soon: Support filtering on the first set of filters.
+:soon: Support filtering on the first set of filters. Filter by time too.
+
+:soon: Inside the card, map `#` to `#####`. We don't need big ass headers.
+
+:soon: Stick the footer to the bottom of the page. It takes up space unnecessarily.
 
 :soon: Include an about page with tutorial on how to use Study Buddy.
 
 :soon: Add an account page with configurable settings, e.g. code syntax theme, light vs dark UI, etc.
+
+:soon: Support text search for cards.
+
+:soon: Navigate cards using the left and right button too.
 
 ### :white_check_mark: LogIn, SignUp and Account Recovery
 

@@ -141,7 +141,7 @@
                 sendForm(formID, url, (results) => {
                     if (results.success) {
                         localStorage.setItem(
-                            "metadata", JSON.stringify(results.message)
+                            "session_id", JSON.stringify(results.message)
                         );
                         window.location = "/home";
                     } else {
