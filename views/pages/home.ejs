@@ -192,6 +192,8 @@
                     String.raw`${card.description.replace(/\\/g, "\\\\")}`
                 );
 
+                console.log(description_html);
+
                 // Find all <em> and </em> tags within strings supposed to be 
                 // interpreted as LaTEX. Convert these back to underscores because
                 // that's what they were meant to be.
@@ -203,6 +205,9 @@
                         inline_latex_string[0].replace(/<em>|<\/em>/g, "_")
                     );
                 }
+
+                console.log(description_html);
+                
                 document.getElementById("card_description").innerHTML = description_html;
                 document.getElementById("card_tags").value = card.tags;
                 document.getElementById("card_urgency").value = card.urgency;

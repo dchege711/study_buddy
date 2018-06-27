@@ -38,6 +38,8 @@
 
 :soon: Support text search for cards.
 
+:soon: Figure out regex for capturing `<em>` or `</em>` tags within inline LaTEX, e.g. `\(i<em>{r}, i</em>{l}.low \le i_{r}.low\)`
+
 :soon: Navigate cards using the left and right button too.
 
 ### :soon: Persistent Session Management
@@ -46,7 +48,7 @@
 
 * How to differentiate logins on different devices?
 
-I am using [passport](http://www.passportjs.org/docs/configure/) and [express-session](https://github.com/expressjs/session) to allow persistent logins. Although it's possible to do everything in `express-session`, I chose to use `passport` because it has ready-made templates for other modes of authentication like Facebook login. I think I'll support Facebook/Twitter/Google logins in the future.
+I am using [express-session](https://github.com/expressjs/session) and some custom middleware to support persistent logins. In case I'll need to support Facebook/Twitter/Google logins in the future, I'll use [passport](http://www.passportjs.org/docs/configure/). For now, Passport is an overkill.
 
 When a user successfully logs in, I issue a session token that can be used in lieu of a username/email-password combination.
 
