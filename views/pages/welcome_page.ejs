@@ -141,9 +141,18 @@
                 sendForm(formID, url, (results) => {
                     if (results.success) {
                         localStorage.setItem(
-                            "session_id", JSON.stringify(results.message)
+                            "session_info", JSON.stringify(results.message)
                         );
-                        window.location = "/home";
+                        sendHTTPRequest(
+                            "POST", "/read-metadata",
+                            { userIDInApp: results.message.userIDInApp},
+                            (metadata_response) => {
+                                localStorage.setItem(
+                                    "metadata", JSON.stringify(metadata_response.message)
+                                );
+                                window.location = "/home";
+                            }
+                        );
                     } else {
                         alert(results.message);
                     }

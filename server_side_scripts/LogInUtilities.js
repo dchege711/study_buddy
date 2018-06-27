@@ -73,8 +73,8 @@ getIdInAppAndValidationURI = function(callBack) {
  * @param {Function} callBack Takes a JSON object with `success`, `status` and
  * `message` as its keys.
  */
-provideSessionToken = function(owner_id, callBack) {
-    var session_token = exports.getRandomString(48, LOWER_CASE + DIGITS + UPPER_CASE);
+provideSessionToken = function(user, callBack) {
+    var session_token = exports.getRandomString(64, LOWER_CASE + DIGITS + UPPER_CASE);
     Token.findOne({value: session_token}, (error, tokenObject) => {
         if (error) {
             console.error(error);
@@ -83,14 +83,14 @@ provideSessionToken = function(owner_id, callBack) {
             provideSessionToken(callBack);
         } else {
             var new_token = Token({
-                value: session_token, owner: owner_id
+                token_id: session_token, userIDInApp: user.userIDInApp
             });
             new_token.save((error, saved_token) => {
                 if (error) {
                     console.error(error);
                     callBack({ status: 500, success: false, message: "Internal Server Error" });
                 } else {
-                    callBack({ status: 200, success: true, message: saved_token.value });
+                    callBack({ status: 200, success: true, message: saved_token });
                 }
             });
         }
@@ -323,7 +323,7 @@ exports.registerUserAndPassword = function(payload, callBack) {
  * Authenticate a user that is trying to log in.
  * 
  * @param {JSON} payload Expected keys: `username`, `password`
- * @param {function} callBack Accepts JSON param w/ `success`, `internal_error`
+ * @param {function} callBack Accepts JSON param w/ `success`, `status`
  *  and `message` as keys
  */
 exports.authenticateUser = function(payload, callBack) {
@@ -376,7 +376,7 @@ exports.authenticateUser = function(payload, callBack) {
                             callBack(email_confirmation);
                         });
                     } else {
-                        provideSessionToken(user._id, callBack);
+                        provideSessionToken(user, callBack);
                     }       
                     return;
                 } else {
@@ -392,8 +392,8 @@ exports.authenticateUser = function(payload, callBack) {
     });
 };
 
-exports.deleteSessionToken = function(session_id, callBack) {
-    Token.findOneAndRemove({ value: session_id }, (error, removed_token) => {
+exports.deleteSessionToken = function (session_token, callBack) {
+    Token.findOneAndRemove({ token_id: session_token }, (error, removed_token) => {
         if (error) {
             console.log(error);
             callBack({ status: 500, success: false, message: "Internal Server Error" });

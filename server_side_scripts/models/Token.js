@@ -7,16 +7,16 @@ var mongoose = require('mongoose');
 
 var tokenSchema = new mongoose.Schema(
     {
-        value: {
+        token_id: {
             type: String,
             required: true,
             unique: [true, "This token already exists"],
         },
-        owner: String
+        userIDInApp: String
     },
     {
         autoIndex: false,
-        collection: "study_buddy_meta"
+        collection: "study_buddy_tokens"
     }
 );
 

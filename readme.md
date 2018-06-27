@@ -40,6 +40,16 @@
 
 :soon: Navigate cards using the left and right button too.
 
+### :soon: Persistent Session Management
+
+<sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
+
+* How to differentiate logins on different devices?
+
+I am using [passport](http://www.passportjs.org/docs/configure/) and [express-session](https://github.com/expressjs/session) to allow persistent logins. Although it's possible to do everything in `express-session`, I chose to use `passport` because it has ready-made templates for other modes of authentication like Facebook login. I think I'll support Facebook/Twitter/Google logins in the future.
+
+When a user successfully logs in, I issue a session token that can be used in lieu of a username/email-password combination.
+
 ### :white_check_mark: LogIn, SignUp and Account Recovery
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
