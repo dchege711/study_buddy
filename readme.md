@@ -2,21 +2,23 @@
 
 ## [Tasks](#tasks)
 
-* [Login, SignUp and Account Recovery](#:white_check_mark:-login-signup-and-account-recovery)
+[:white_check_mark: Persistent Session Management](#:white_check_mark:-persistent-session-management)
 
-* [Make card navigation through the GUI more user-friendly](#:white_check_mark:-make-card-navigation-through-the-gui-more-user-friendly)
+[:white_check_mark: Login, SignUp and Account Recovery](#:white_check_mark:-login-signup-and-account-recovery)
 
-* [Make editing of cards more user-friendly](#:white_check_mark:-make-editing-of-cards-more-user-friendly)
+[:white_check_mark: Make card navigation through the GUI more user-friendly](#:white_check_mark:-make-card-navigation-more-user-friendly)
 
-* [Support moving a card to the trash and undoing the move](#:white_check_mark:-support-deleting-a-card-moving-a-card-to-the-trash-and-undoing-the-move)
+[:white_check_mark: Make editing of cards more user-friendly](#:white_check_mark:-make-editing-of-cards-more-user-friendly)
 
-* [Organize how data will be represented in the database](#:white_check_mark:-organize-how-data-will-be-represented-in-the-database)
+[:white_check_mark: Support moving a card to the trash and undoing the move](#:white_check_mark:-support-deleting-a-card-moving-a-card-to-the-trash-and-undoing-the-move)
 
-* [Render card content appropriately](#:white_check_mark:-render-card-content-appropriately)
+[:white_check_mark: Organize how data will be represented in the database](#:white_check_mark:-organize-how-data-will-be-represented-in-the-database)
 
-* [Add a sidebar that supports filters based on tags](#:white_check_mark:-add-a-sidebar-that-supports-filters-based-on-tags)
+[:white_check_mark: Render card content appropriately](#:white_check_mark:-render-card-content-appropriately)
 
-## Tasks
+[:white_check_mark: Add a sidebar that supports filters based on tags](#:white_check_mark:-add-a-sidebar-that-supports-filters-based-on-tags)
+
+### To-do Items...
 
 :soon: Implement logic for recovering cards from the trash.
 
@@ -36,7 +38,7 @@
 
 :soon: Figure out regex for capturing `<em>` or `</em>` tags within inline LaTEX, e.g. `\(i<em>{r}, i</em>{l}.low \le i_{r}.low\)`
 
-### :soon: Persistent Session Management
+### :white_check_mark: Persistent Session Management
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
 
@@ -44,7 +46,7 @@ I am using [express-session](https://github.com/expressjs/session) and some cust
 
 When a user successfully logs in, I set a token that will be sent on all subsequent requests. Once I receive any request that needs a logged in user, I automatically log in a user if the token provided is valid. If the cookie is invalid, I redirect them to the login page.
 
-When a user logs out, I delete the token that I issued upon their initial login and redirect them to the welcome/login page.
+When a user logs out, I delete the token that I issued upon their initial login and redirect them to the welcome/login page. In case a user resets their password, I also invalidate all previously issued tokens.
 
 ### :white_check_mark: LogIn, SignUp and Account Recovery
 
