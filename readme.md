@@ -2,7 +2,7 @@
 
 ## [Tasks](#tasks)
 
-[:white_check_mark: Persistent Session Management](#:white_check_mark:-persistent-session-management)
+[:white_check_mark: Persistent Session Management](#persistent-session-management)
 
 [:white_check_mark: Login, SignUp and Account Recovery](#:white_check_mark:-login-signup-and-account-recovery)
 
