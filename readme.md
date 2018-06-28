@@ -40,8 +40,6 @@
 
 :soon: Figure out regex for capturing `<em>` or `</em>` tags within inline LaTEX, e.g. `\(i<em>{r}, i</em>{l}.low \le i_{r}.low\)`
 
-:soon: Navigate cards using the left and right button too.
-
 ### :soon: Persistent Session Management
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
@@ -66,13 +64,15 @@ Logging in should be as painless as possible. Since the usernames only contain `
 
 Users can reset their passwords in case they forget them. First, the user submits the email address associated with their Study Buddy account. If the account exists, I send an email containing a password reset link that is valid for 2 hours, or until it's used, whichever comes earlier.
 
-### :white_check_mark: Make card navigation through the GUI more user-friendly
+### :white_check_mark: Make card navigation more user-friendly
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
 
 I chose to display the tags appearing on the sidebar in decreasing order of importance. As opposed to tag frequency, I weighted each tag by summing up the urgencies of all the cards that the tag is included in. This better captures the relative importance of the tags.
 
 In addition to sorting cards in the underlying priority queue by urgency, I added an additional integer that denotes the insertion order. This enables the PQ to be stable. For instance, if the user views the cards A then B then C, pressing the previous button will visit the cards in reverse order, even when A, B and C have the same priority.
+
+I overrode the default action of the left and right arrow keys when the user is viewing a set of cards. The left arrow key shows the previous card, while the right arrow key shows the next card. However, when the user is editing the cards, the left and right arrow keys default back to their usual behavior.
 
 ### :white_check_mark: Make editing of cards more user-friendly
 
