@@ -2,6 +2,7 @@ var express = require('express');
 var session = require("express-session");
 var path = require('path');
 var bodyParser = require('body-parser');
+var cookieParser = require("cookie-parser");
 
 var CardsDB = require('./server_side_scripts/CardsMongoDB.js');
 var MetadataDB = require('./server_side_scripts/MetadataMongoDB.js');
@@ -19,7 +20,41 @@ var port = process.env.PORT || 5000;
  */
 function requireLogIn(req, res, next) {
     if (!req.session.user) res.redirect("/login");
-    else next();
+    else if (req.session.user) next();
+    else if (req.cookies.session_token) {
+        logInBySessionToken(req.cookies.session_token, res, next);
+    }
+}
+
+/**
+ * @description Middleware for authenticating browsers that provide a session
+ * token.
+ */
+function logInBySessionToken(req, res, next) {
+    LogInUtilities.authenticateByToken(
+        req.cookies.session_token, (auth_response) => {
+            if (auth_response.success) {
+                req.session.user = auth_response.message;
+                next();
+            } else {
+                res.setHeader(
+                    "Set-Cookie",
+                    [`session_token=null;Expires=Thu, 01 Jan 1970 00:00:00 GMT`]
+                );
+                res.redirect("/login");
+            }
+        }
+    );
+}
+
+function handleLogIn(req, res) {
+    if (req.session.user) {
+        res.redirect("/home");
+    } else if (req.cookies.session_token) {
+        logInBySessionToken(req, res, function () { res.redirect("/home"); });
+    } else {
+        res.render("pages/welcome_page");
+    }
 }
 
 app.use(session({
@@ -32,6 +67,7 @@ app.use(session({
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cookieParser());
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -41,13 +77,8 @@ app.set('view engine', 'ejs');
  * 
  */
 
-app.get("/", function(req, res) {
-    res.render("pages/welcome_page");
-});
-
-app.get("/login", function (req, res) {
-    res.render("pages/welcome_page");
-});
+app.get("/", handleLogIn);
+app.get("/login", handleLogIn);
 
 app.post('/register-user', function(req, res) {
     LogInUtilities.registerUserAndPassword(req.body, function(confirmation) {
@@ -59,15 +90,25 @@ app.post('/login', function(req, res, next) {
     LogInUtilities.authenticateUser(req.body, function (confirmation) {
         if (confirmation.status === 200 && confirmation.success) {
             req.session.user = confirmation.message;
+            var expiry_date = new Date(Date.now() + 1000 * 3600 * 24 * 30);
+            expiry_date = expiry_date.toString();
+            res.setHeader(
+                "Set-Cookie", 
+                [`session_token=${confirmation.message.token_id};Expires=${expiry_date}`]
+            );
         }
         convertObjectToResponse(confirmation, res);
     });
 });
 
 app.post("/logout", function(req, res) {
-    var session_token = req.user.session_token;
+    var session_token = req.session.user.token_id;
     LogInUtilities.deleteSessionToken(session_token, (delete_info) => {
-        convertObjectToResponse(delete_info, res);
+        res.setHeader(
+            "Set-Cookie",
+            [`session_token=null;Expires=Thu, 01 Jan 1970 00:00:00 GMT`]
+        );
+        res.redirect("/login");
     });
 });
 

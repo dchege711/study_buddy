@@ -69,7 +69,7 @@ getIdInAppAndValidationURI = function(callBack) {
 
 /**
  * @description Generate a unique session token.
- * @param {String} owner_id The database ID of whoever owns this token.
+ * @param {String} user The user to be associated with this token
  * @param {Function} callBack Takes a JSON object with `success`, `status` and
  * `message` as its keys.
  */
@@ -392,16 +392,42 @@ exports.authenticateUser = function(payload, callBack) {
     });
 };
 
+/**
+ * @description Provide an authentication endpoint where a session token has 
+ * been provided. Useful for maintaining persistent logins.
+ * @param {String} token_id The token ID that can be used for logging in.
+ * @param {Function} callBack Takes a JSON object with keys `success`, `status`
+ * and `message` as keys.
+ */
+exports.authenticateByToken = function(token_id, callBack) {
+    Token.find({ token_id: token_id }, (err, tokens) => {
+        if (err) {
+            console.error(err);
+            callBack({ status: 500, success: false, message: "Internal Server Error" });
+        } else if (tokens.length > 1) {
+            console.error("@authenticateByToken: Multiple users have the same login token!");
+        } else if (tokens.length == 0) {
+            callBack({ status: 200, success: false, message: "Invalid login token" });
+        } else {
+            callBack({ status: 200, success: true, message: tokens[0] });
+        }
+    });
+};
+
+/**
+ * @description Delete a token from the database. Fail silently if no token
+ * has the specified ID.
+ * @param {String} session_token The ID of the token to be removed
+ * @param {Function} callBack Takes a JSON object with keys `success`, `status`
+ * and `message` as keys.
+ */
 exports.deleteSessionToken = function (session_token, callBack) {
     Token.findOneAndRemove({ token_id: session_token }, (error, removed_token) => {
         if (error) {
             console.log(error);
             callBack({ status: 500, success: false, message: "Internal Server Error" });
-        } else if (removed_token) {
-            callBack({ status: 200, success: true, message: removed_token.value });
         } else {
-            console.error("@deleteSessionToken: Could not find session token.");
-            callBack({ status: 500, success: false, message: "Internal Server Error" });
+            callBack({ status: 200, success: true, message: "Removed token" });
         }
     });
 };
