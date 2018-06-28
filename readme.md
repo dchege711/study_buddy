@@ -4,19 +4,19 @@
 
 :white_check_mark: [Persistent Session Management](#persistent-session-management)
 
-:white_check_mark: [Login, SignUp and Account Recovery](#:white_check_mark:-login-signup-and-account-recovery)
+:white_check_mark: [Login, SignUp and Account Recovery](#login-signup-and-account-recovery)
 
-:white_check_mark: [Make card navigation through the GUI more user-friendly](#:white_check_mark:-make-card-navigation-more-user-friendly)
+:white_check_mark: [Make card navigation through the GUI more user-friendly](#make-card-navigation-more-user-friendly)
 
-:white_check_mark: [Make editing of cards more user-friendly](#:white_check_mark:-make-editing-of-cards-more-user-friendly)
+:white_check_mark: [Make editing of cards more user-friendly](#make-editing-of-cards-more-user-friendly)
 
-:white_check_mark: [Support moving a card to the trash and undoing the move](#:white_check_mark:-support-deleting-a-card-moving-a-card-to-the-trash-and-undoing-the-move)
+:white_check_mark: [Support moving a card to the trash and undoing the move](#support-deleting-a-card-moving-a-card-to-the-trash-and-undoing-the-move)
 
-:white_check_mark: [Organize how data will be represented in the database](#:white_check_mark:-organize-how-data-will-be-represented-in-the-database)
+:white_check_mark: [Organize how data will be represented in the database](#organize-how-data-will-be-represented-in-the-database)
 
-:white_check_mark: [Render card content appropriately](#:white_check_mark:-render-card-content-appropriately)
+:white_check_mark: [Render card content appropriately](#render-card-content-appropriately)
 
-:white_check_mark: [Add a sidebar that supports filters based on tags](#:white_check_mark:-add-a-sidebar-that-supports-filters-based-on-tags)
+:white_check_mark: [Add a sidebar that supports filters based on tags](#add-a-sidebar-that-supports-filters-based-on-tags)
 
 ### To-do Items...
 
