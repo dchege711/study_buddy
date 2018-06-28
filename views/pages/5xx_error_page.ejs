@@ -10,26 +10,24 @@
 
         <% include ../partials/navbar.ejs %>
 
-            <div id="main_div">
-            
-                <div style="margin: 5% 20% 10% 20%">
-            
-                    <h3>
-                        <%= response_JSON.status %>
-                    </h3>
-                    <br />
-                    <p>
-                        <%= response_JSON.message %>
-                    </p>
+        <div id="main_div">
+        
+            <div style="margin: 5% 20% 10% 20%">
+        
+                <h3>
+                    <%= response_JSON.status %>
+                </h3>
+                <br />
+                <p>
+                    <%= response_JSON.message %>
+                </p>
 
-                </div>
-            
             </div>
+        
+        </div>
 
 
-            <footer class="w3-container w3-container w3-black">
-                <% include ../partials/footer.ejs %>
-            </footer>
+        <% include ../partials/footer.ejs %>
 
     </body>
 
