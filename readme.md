@@ -2,21 +2,21 @@
 
 ## [Tasks](#tasks)
 
-[:white_check_mark: Persistent Session Management](#persistent-session-management)
+:white_check_mark: [Persistent Session Management](#persistent-session-management)
 
-[:white_check_mark: Login, SignUp and Account Recovery](#:white_check_mark:-login-signup-and-account-recovery)
+:white_check_mark: [Login, SignUp and Account Recovery](#:white_check_mark:-login-signup-and-account-recovery)
 
-[:white_check_mark: Make card navigation through the GUI more user-friendly](#:white_check_mark:-make-card-navigation-more-user-friendly)
+:white_check_mark: [Make card navigation through the GUI more user-friendly](#:white_check_mark:-make-card-navigation-more-user-friendly)
 
-[:white_check_mark: Make editing of cards more user-friendly](#:white_check_mark:-make-editing-of-cards-more-user-friendly)
+:white_check_mark: [Make editing of cards more user-friendly](#:white_check_mark:-make-editing-of-cards-more-user-friendly)
 
-[:white_check_mark: Support moving a card to the trash and undoing the move](#:white_check_mark:-support-deleting-a-card-moving-a-card-to-the-trash-and-undoing-the-move)
+:white_check_mark: [Support moving a card to the trash and undoing the move](#:white_check_mark:-support-deleting-a-card-moving-a-card-to-the-trash-and-undoing-the-move)
 
-[:white_check_mark: Organize how data will be represented in the database](#:white_check_mark:-organize-how-data-will-be-represented-in-the-database)
+:white_check_mark: [Organize how data will be represented in the database](#:white_check_mark:-organize-how-data-will-be-represented-in-the-database)
 
-[:white_check_mark: Render card content appropriately](#:white_check_mark:-render-card-content-appropriately)
+:white_check_mark: [Render card content appropriately](#:white_check_mark:-render-card-content-appropriately)
 
-[:white_check_mark: Add a sidebar that supports filters based on tags](#:white_check_mark:-add-a-sidebar-that-supports-filters-based-on-tags)
+:white_check_mark: [Add a sidebar that supports filters based on tags](#:white_check_mark:-add-a-sidebar-that-supports-filters-based-on-tags)
 
 ### To-do Items...
 
@@ -38,7 +38,7 @@
 
 :soon: Figure out regex for capturing `<em>` or `</em>` tags within inline LaTEX, e.g. `\(i<em>{r}, i</em>{l}.low \le i_{r}.low\)`
 
-### :white_check_mark: Persistent Session Management
+### Persistent Session Management
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
 
@@ -48,7 +48,7 @@ When a user successfully logs in, I set a token that will be sent on all subsequ
 
 When a user logs out, I delete the token that I issued upon their initial login and redirect them to the welcome/login page. In case a user resets their password, I also invalidate all previously issued tokens.
 
-### :white_check_mark: LogIn, SignUp and Account Recovery
+### LogIn, SignUp and Account Recovery
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
 
@@ -62,7 +62,7 @@ Logging in should be as painless as possible. Since the usernames only contain `
 
 Users can reset their passwords in case they forget them. First, the user submits the email address associated with their Study Buddy account. If the account exists, I send an email containing a password reset link that is valid for 2 hours, or until it's used, whichever comes earlier.
 
-### :white_check_mark: Make card navigation more user-friendly
+### Make card navigation more user-friendly
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
 
@@ -72,7 +72,7 @@ In addition to sorting cards in the underlying priority queue by urgency, I adde
 
 I overrode the default action of the left and right arrow keys when the user is viewing a set of cards. The left arrow key shows the previous card, while the right arrow key shows the next card. However, when the user is editing the cards, the left and right arrow keys default back to their usual behavior.
 
-### :white_check_mark: Make editing of cards more user-friendly
+### Make editing of cards more user-friendly
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
 
@@ -82,13 +82,13 @@ Previously, users had to escape the LaTEX delimiter themselves and also escape u
 
 I changed the urgency input from a number input type to a range input type. To set an urgency, using the range input type is faster since the user doesn't really care about the actual value, but its percentage, e.g. *card X is half as important as the most important cards in my deck*. Furthermore, using a range requires one click, while using a number type requires a click and a type.
 
-### :white_check_mark: Support ~~deleting a card~~ moving a card to the trash and undoing the move
+### Support ~~deleting a card~~ moving a card to the trash and undoing the move
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
 
 I learned that I should [never use a warning when I meant undo](http://alistapart.com/article/neveruseawarning). Seems like a good design decision. Users who really want to delete a card might be unsatisifed, but I'll soon implement a clean up script that automatically deletes cards that are in the trash and are more than 30 days old. Amazing how much fiddling goes in the backend, just to allow a user to delete and then save themselves 3 seconds later by hitting `Undo`.
 
-### :white_check_mark: Organize how data will be represented in the database
+### Organize how data will be represented in the database
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
 
@@ -96,7 +96,7 @@ I choose MongoDB mainly because it's schemaless - I didn't yet have a crystal-cl
 
 As of now, the user's profile is in one document. The user's profile contains links to metadata documents. Each metadata document has a list of the cards owned by the user who owns the metadata document, and some high level stats like how many cards have a given tag. Each card is a separate document, but it also has information on who owns it. `User, Card, MetadataDoc` have all been writen as Mongoose schemas.
 
-### :white_check_mark: Render card content appropriately
+### Render card content appropriately
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
 
@@ -106,7 +106,7 @@ I found the [highlight.js](https://highlightjs.org/) library useful for syntax h
 
 Since I'm targeting users that store somewhat detailed flashcards, I felt that Markdown (in addition to LaTEX and syntax highlighting) will prove more useful. Manually converting markdown to HTML is a project by itself. Since it's not the main purpose of Study Buddy, I was happy to import [Showdown](https://github.com/showdownjs/showdown). The library looks mature and the documentation is sound.
 
-### :white_check_mark: Add a sidebar that supports filters based on tags
+### Add a sidebar that supports filters based on tags
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
 
