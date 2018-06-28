@@ -18,10 +18,6 @@
 
 ## Tasks
 
-:soon: Support extended sessions without requiring a re-login.
-
-:soon: Define a log out procedure and write the required code.
-
 :soon: Implement logic for recovering cards from the trash.
 
 :soon: Implement a method that cleans all the cards in the trash and unvalidated accounts that are more than 30 days old.
@@ -44,11 +40,11 @@
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
 
-* How to differentiate logins on different devices?
-
 I am using [express-session](https://github.com/expressjs/session) and some custom middleware to support persistent logins. In case I'll need to support Facebook/Twitter/Google logins in the future, I'll use [passport](http://www.passportjs.org/docs/configure/). For now, Passport is an overkill.
 
-When a user successfully logs in, I issue a session token that can be used in lieu of a username/email-password combination.
+When a user successfully logs in, I set a token that will be sent on all subsequent requests. Once I receive any request that needs a logged in user, I automatically log in a user if the token provided is valid. If the cookie is invalid, I redirect them to the login page.
+
+When a user logs out, I delete the token that I issued upon their initial login and redirect them to the welcome/login page.
 
 ### :white_check_mark: LogIn, SignUp and Account Recovery
 

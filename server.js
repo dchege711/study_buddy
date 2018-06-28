@@ -103,12 +103,13 @@ app.post('/login', function(req, res, next) {
 
 app.post("/logout", function(req, res) {
     var session_token = req.session.user.token_id;
+    delete req.session.user;
     LogInUtilities.deleteSessionToken(session_token, (delete_info) => {
         res.setHeader(
             "Set-Cookie",
             [`session_token=null;Expires=Thu, 01 Jan 1970 00:00:00 GMT`]
         );
-        res.redirect("/login");
+        convertObjectToResponse(delete_info, res);
     });
 });
 
@@ -227,7 +228,7 @@ app.post('/restore-from-trash', requireLogIn, function (req, res) {
 /**
  * @description A function to interpret JSON documents into server responses.
  * @param {JSON} result_JSON Expected keys: `status`, `success`, `message`
- * @param {res} res An Express JS res object 
+ * @param {Response} res An Express JS res object 
  */
 convertObjectToResponse = function(result_JSON, res) {
     if (result_JSON.status < 400) {

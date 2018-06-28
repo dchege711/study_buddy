@@ -361,8 +361,10 @@
             }
 
             function logOut() {
-                localStorage.clear();
-                window.location = "/";
+                sendHTTPRequest("POST", "/logout", {}, (response) => {
+                    localStorage.clear();
+                    window.location = "/";
+                });
             }
             
             /**
