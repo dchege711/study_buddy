@@ -562,25 +562,33 @@ exports.resetPassword = function(payload, callBack) {
                         callBack({success: false, message: error, status: 500});
                     } else {
                         // For some reason, multiline template strings get line breaks in the sent email.
-                        Email.sendEmail({
-                            to: user.email,
-                            subject: "Study Buddy: Your Password Has Been Reset",
-                            text: `Your Study Buddy password was reset on ${payload.reset_request_time}. ` +
-                                `If this wasn't you, please request another password reset at ` + 
-                                `${config.BASE_URL}/reset-password`
-                            }, 
-                            (email_results) => {
-                                if (email_results.success) {
-                                    callBack({
-                                        success: true, status: 303, redirect_url: "/",
-                                        message: `Password successfully reset. Log in with your new password.`
-                                    });
-                                } else {
-                                    console.error(email_results.message);
-                                    callBack({ success: false, message: "Internal Server Error", status: 500 });
-                                }
+                        Token.deleteMany({userIDInApp: user.userIDInApp}, (err) => {
+                            if (err) {
+                                console.error(error);
+                                callBack({ success: false, message: error, status: 500 });
+                            } else {
+                                Email.sendEmail({
+                                    to: user.email,
+                                    subject: "Study Buddy: Your Password Has Been Reset",
+                                    text: `Your Study Buddy password was reset on ${payload.reset_request_time}. ` +
+                                        `If this wasn't you, please request another password reset at ` +
+                                        `${config.BASE_URL}/reset-password`
+                                },
+                                    (email_results) => {
+                                        if (email_results.success) {
+                                            callBack({
+                                                success: true, status: 303, redirect_url: "/",
+                                                message: `Password successfully reset. Log in with your new password.`
+                                            });
+                                        } else {
+                                            console.error(email_results.message);
+                                            callBack({ success: false, message: "Internal Server Error", status: 500 });
+                                        }
+                                    }
+                                );
                             }
-                        );
+                        });
+                        
                     }
                 });
             });
