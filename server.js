@@ -201,6 +201,14 @@ app.post('/add-card', requireLogIn, function(req, res) {
     });
 });
 
+app.post('/search-cards', requireLogIn, function(req, res) {
+    var payload = req.body;
+    payload.userIDInApp = req.session.user.userIDInApp;
+    CardsDB.search(payload, (search_results) => {
+        convertObjectToResponse(search_results, res);
+    });
+});
+
 app.post('/update-card', requireLogIn, function(req, res) {
     CardsDB.update(req.body, function(confirmation) {
         res.json(confirmation);

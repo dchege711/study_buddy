@@ -38,6 +38,12 @@
 
 :soon: Figure out regex for capturing `<em>` or `</em>` tags within inline LaTEX, e.g. `\(i<em>{r}, i</em>{l}.low \le i_{r}.low\)`
 
+### Support text search for cards
+
+Plan: Have a search bar for taking in queries. Provide at most 5 results. Update the search results whenever the user hits SPACE or ENTER (reduces # queries to the database).
+
+Challenges: Provide relevant search results. Don't transfer more data than necessary. Be fast.
+
 ### Persistent Session Management
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>

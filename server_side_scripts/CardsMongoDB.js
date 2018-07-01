@@ -2,6 +2,10 @@ var Card = require('./models/CardSchema.js');
 // var User = require("./models/UserSchema.js");
 var MetadataDB = require('./MetadataMongoDB');
 
+var generic_500_msg = { 
+    success: false, status: 500, message: "Internal Server Error" 
+};
+
 var debug = false;
 
 /**
@@ -173,4 +177,39 @@ exports.delete = function(payload, callBack) {
             MetadataDB.remove(removedCard, callBack);
         }
     });
+};
+
+/**
+ * Remove this card from the database.
+ * 
+ * @param {JSON} payload Expected keys: `key_words`
+ * @param {Function} callBack Takes a JSON with `success`,
+ * `internal_error` and `message` as keys.
+ */
+exports.search = function(payload, callBack) {
+    /**
+     * $expr is faster than $where because it does not execute JavaScript 
+     * and should be preferred where possible. Note that the JS expression
+     * is processed for EACH document in the collection. Yikes!
+     */
+    var query_regex = `/\b${payload.key_words.join("|")}\b/`;
+    Card
+        .find({
+            $and: [
+                { createdById: payload.userIDInApp },
+                { $or : [
+                    { title: { $regex: query_regex } },
+                    { description: { $regex: query_regex } }
+                    ]
+                }
+            ]
+        })
+        // Sort them by relevance? Yes? No?
+        .limit(payload.limit)
+        .exec((err, cards) => {
+            if (err) { console.log(err); callBack(generic_500_msg); }
+            else {
+                callBack({success: true, status: 200, message: cards });
+            }
+        });
 };

@@ -31,7 +31,8 @@ footer {
     background-color: black;
     border: none;
     border-bottom: 0.1px solid #fff;
-    font-size: smaller;
+    margin-right: 10%;
+    font-size: 17px;
 }
 
 body {

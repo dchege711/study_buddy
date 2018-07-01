@@ -354,14 +354,21 @@
              * search bar.
              */
             function searchCards(event) {
+                window.removeEventListener("keydown", arrowKeysForNavigation);
                 var key_press = event.key;
                 if (key_press === " " || key_press === "Enter") {
                     sendHTTPRequest(
                         "POST", "/search-cards",
-                        {query: document.getElementById("card_search_input").value},
+                        { 
+                            key_words: document.getElementById("card_search_input").value.match(/\w+/g), 
+                            limit: 7 
+                        },
                         (response) => {
                             if (response.success) {
-                                console.log(response.message);
+                                console.log("********");
+                                for (let i = 0; i < response.message.length; i++) {
+                                    console.log(response.message[i].title);
+                                }
                             }
                         }
                     );
@@ -375,15 +382,17 @@
                 var nav_bar = document.getElementById("topnavitems");
                 nav_bar.insertAdjacentHTML('beforeend', 
                     `<li>
-                        <input 
-                            type="text" id="card_search_input" 
-                            placeholder="Search card descriptions and titles..."
-                            class="w3-half" onchange="searchCards(event)"
-                        />
                         <button 
                             class="w3-button w3-padding-small top-nav w3-right" 
                             onClick="logOut()"><b>Log Out</b>
                         </button>
+
+                        <input 
+                            type="text" id="card_search_input" 
+                            placeholder="Search card descriptions and titles..."
+                            class="w3-half w3-right" onkeydown="searchCards(event)"
+                        />
+
                     </li>`
                 );
             }
