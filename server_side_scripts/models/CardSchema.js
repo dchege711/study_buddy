@@ -30,11 +30,11 @@ var cardSchema = new mongoose.Schema({
     }}, 
     {
         timestamps: true,
-        autoIndex: false,
         collection: "c13u_study_buddy"
     }
 );
 
+cardSchema.index( {title: "text", description: "text"} );
 cardSchema.virtual("url").get(function () {
     return "/study-buddy/card/" + this._id;
 });

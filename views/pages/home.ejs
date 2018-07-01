@@ -366,14 +366,14 @@
                 window.removeEventListener("keydown", arrowKeysForNavigation);
                 var key_press = event.key;
                 if (key_press === " " || key_press === "Enter") {
-                    var key_words = document.getElementById("card_search_input").value.match(/\w+/g);
+                    var query_string = document.getElementById("card_search_input").value.trim();
                     if (key_press === " ") limit = 7;
                     else limit = Infinity;
-                    if (key_words) {
+                    if (query_string !== "") {
                         sendHTTPRequest(
                             "POST", "/search-cards",
                             {
-                                key_words: key_words,
+                                query_string: query_string,
                                 limit: limit
                             },
                             (response) => {

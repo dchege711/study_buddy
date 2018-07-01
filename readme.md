@@ -2,6 +2,8 @@
 
 ## [Tasks](#tasks)
 
+:white_check_mark: [Support Text Search for Cards](#support-text-search-for-cards)
+
 :white_check_mark: [Persistent Session Management](#persistent-session-management)
 
 :white_check_mark: [Login, SignUp and Account Recovery](#login-signup-and-account-recovery)
@@ -18,7 +20,7 @@
 
 :white_check_mark: [Add a sidebar that supports filters based on tags](#add-a-sidebar-that-supports-filters-based-on-tags)
 
-### To-do Items...
+### To-do Items
 
 :soon: Implement logic for recovering cards from the trash.
 
@@ -38,15 +40,21 @@
 
 :soon: Figure out regex for capturing `<em>` or `</em>` tags within inline LaTEX, e.g. `\(i<em>{r}, i</em>{l}.low \le i_{r}.low\)`
 
-### Support text search for cards
+:soon: Change the underlying DS for the cards manager from two max-oriented priority queues to a balanced binary search tree. That way, you can visit a any card on the tree much faster on average.
+
+### Support Text Search for Cards
+
+<sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
 
 Plan: Have a search bar for taking in queries. Provide at most 7 results. Update the search results whenever the user hits SPACE or ENTER (reduces # queries to the database).
 
 Challenges: Provide relevant search results (rank them before returning them). Don't transfer more data than necessary (return only snippets, maybe title plus first line).
 
-Search should be relevant and fast, erring on the side of relevance. Connecting to the database is slow. Luckily, `mongoose` allows me to maintain a persistent connection to the database. Studying the docs helps one make efficient queries and capture some low-hanging fruit. For instance, using `where` in MongoDB is expensive because the expression will be evaluated for every document in the collection. Using regex inside the query itself is more efficient.
+Search should be relevant and fast, erring on the side of relevance. Connecting to the database is slow. Luckily, `mongoose` allows me to maintain a persistent connection to the database. Studying the docs helps one make efficient queries and capture some low-hanging fruit. For instance, using `where` in MongoDB is expensive because the expression will be evaluated for every document in the collection. ~~Using regex inside the query itself is more efficient.~~ MongoDB supports [text search](https://docs.mongodb.com/v3.2/text-search/) and a 'sort by relevance' function. Yay!
 
-Next: Display search results as the user types.
+I want to strike a balance between making frequent hits to the database and providing search feedback as the user types. Whenever a user hits SPACE after at least one word, I query the database for 7 results and display their titles in the dropdown menu on the search bar. If the user clicks on any of the 7 results, I display the entire card and terminate the search. If the user hits ENTER, then I query the database for all cards that match the query. These cards are then fed into the cards manager, and the user can browse them at their own pace.
+
+To minimize the amount of data being transferred between the client and the database as the user types a query, the server returns partial cards to a search query. These partial cards contain the `_id, urgency, title` fields and nothing else. I display the titles in the dropdown menu that gets updated as the user continues searching. Once the user has decided on which card(s) to view, I use the already built functions to load the card, i.e. first check if the card is in the cache, otherwise, fetch the full card from the database.
 
 ### Persistent Session Management
 
