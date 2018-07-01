@@ -40,9 +40,13 @@
 
 ### Support text search for cards
 
-Plan: Have a search bar for taking in queries. Provide at most 5 results. Update the search results whenever the user hits SPACE or ENTER (reduces # queries to the database).
+Plan: Have a search bar for taking in queries. Provide at most 7 results. Update the search results whenever the user hits SPACE or ENTER (reduces # queries to the database).
 
-Challenges: Provide relevant search results. Don't transfer more data than necessary. Be fast.
+Challenges: Provide relevant search results (rank them before returning them). Don't transfer more data than necessary (return only snippets, maybe title plus first line).
+
+Search should be relevant and fast, erring on the side of relevance. Connecting to the database is slow. Luckily, `mongoose` allows me to maintain a persistent connection to the database. Studying the docs helps one make efficient queries and capture some low-hanging fruit. For instance, using `where` in MongoDB is expensive because the expression will be evaluated for every document in the collection. Using regex inside the query itself is more efficient.
+
+Next: Display search results as the user types.
 
 ### Persistent Session Management
 
