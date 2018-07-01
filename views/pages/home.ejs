@@ -42,6 +42,14 @@
                     <b><i class="fa fa-refresh fa-fw" aria-hidden="true"></i> Apply Filters </b>
                 </button>
 
+                <div id="card_search_container" class="w3-half">
+                    <div class="dropdown">
+                        <input type="text" id="card_search_input" placeholder="Search card descriptions and titles..." onkeydown="searchCards(event)"
+                            class="dropbtn" />
+                        <div class="dropdown-content" id="card_search_results"></div>
+                    </div>
+                </div>
+
                 <p id="filter_list" class="w3-right w3-container"></p>
                 
             </div>
@@ -351,28 +359,47 @@
             
             /*
              * @description Provide search results for queries typed in the 
-             * search bar.
+             * search bar. If the space bar is pressed, only ask for 7 results,
+             * otherwise ask for all matching documents.
              */
             function searchCards(event) {
                 window.removeEventListener("keydown", arrowKeysForNavigation);
                 var key_press = event.key;
                 if (key_press === " " || key_press === "Enter") {
-                    sendHTTPRequest(
-                        "POST", "/search-cards",
-                        { 
-                            key_words: document.getElementById("card_search_input").value.match(/\w+/g), 
-                            limit: 7 
-                        },
-                        (response) => {
-                            if (response.success) {
-                                console.log("********");
-                                for (let i = 0; i < response.message.length; i++) {
-                                    console.log(response.message[i].title);
+                    var key_words = document.getElementById("card_search_input").value.match(/\w+/g);
+                    if (key_press === " ") limit = 7;
+                    else limit = Infinity;
+                    if (key_words) {
+                        sendHTTPRequest(
+                            "POST", "/search-cards",
+                            {
+                                key_words: key_words,
+                                limit: limit
+                            },
+                            (response) => {
+                                if (response.success) {
+                                    console.log(`\n${response.message.length} search results`);
+                                    if (limit !== Infinity) {
+                                        var search_results_html = "";
+                                        for (let i = 0; i < response.message.length; i++) {
+                                            console.log(response.message[i].title);
+                                            search_results_html += `
+                                        <ul onclick="displayThisCard('${response.message[i]._id}', ${response.message[i].urgency}')">
+                                        ${response.message[i].title}</ul>`;
+                                        }
+                                        document.getElementById("card_search_results").innerHTML = search_results_html;
+                                    } else {
+
+                                    }    
                                 }
                             }
-                        }
-                    );
+                        );
+                    }
                 }
+            }
+
+            function displayThisCard(card_id, card_urgency) {
+                my_cards_manager.insert_card(card_id, card_urgency);
             }
             
             /**
@@ -386,13 +413,6 @@
                             class="w3-button w3-padding-small top-nav w3-right" 
                             onClick="logOut()"><b>Log Out</b>
                         </button>
-
-                        <input 
-                            type="text" id="card_search_input" 
-                            placeholder="Search card descriptions and titles..."
-                            class="w3-half w3-right" onkeydown="searchCards(event)"
-                        />
-
                     </li>`
                 );
             }

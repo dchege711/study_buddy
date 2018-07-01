@@ -34,7 +34,7 @@
 
 :soon: Add an account page with configurable settings, e.g. code syntax theme, light vs dark UI, etc.
 
-:soon: Support text search for cards.
+:soon: Figure out why cards with similar content but different IDs exist in the database. There is a data replication bug lying somewhere.
 
 :soon: Figure out regex for capturing `<em>` or `</em>` tags within inline LaTEX, e.g. `\(i<em>{r}, i</em>{l}.low \le i_{r}.low\)`
 

@@ -33,7 +33,7 @@ function sendHTTPRequest(method, url, payload, callBack) {
         if (this.readyState == 4 && this.status == 200) {
             callBack(JSON.parse(this.responseText));
         }
-    }
+    };
     xhttp.open(method, url, true);
     xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     xhttp.send(JSON.stringify(payload));

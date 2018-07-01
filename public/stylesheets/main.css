@@ -21,18 +21,31 @@ footer {
     max-height: 600px;
 }
 
+#status_bar {
+    padding: 1%;
+}
+
 #card_description {
     min-height: 50px;
     border-left: 5px solid grey;
 }
 
 #card_search_input {
-    color: white;
-    background-color: black;
     border: none;
-    border-bottom: 0.1px solid #fff;
+    border-bottom: 0.2px solid black;
+    width: 100%;
     margin-right: 10%;
-    font-size: 17px;
+}
+
+#card_search_results {
+    text-overflow: ellipsis;
+    font-size: smaller;
+    position: absolute;
+    background: white;
+}
+
+#card_search_results ul {
+    border-bottom: 2px solid lightgray;
 }
 
 body {

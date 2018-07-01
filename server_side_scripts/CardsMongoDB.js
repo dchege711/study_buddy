@@ -192,14 +192,14 @@ exports.search = function(payload, callBack) {
      * and should be preferred where possible. Note that the JS expression
      * is processed for EACH document in the collection. Yikes!
      */
-    var query_regex = `/\b${payload.key_words.join("|")}\b/`;
+    var query_regex = new RegExp(`\\b(${payload.key_words.join("|")})\\b`);
     Card
         .find({
             $and: [
                 { createdById: payload.userIDInApp },
                 { $or : [
-                    { title: { $regex: query_regex } },
-                    { description: { $regex: query_regex } }
+                    { title: { $regex: query_regex, $options: "ix" } },
+                    { description: { $regex: query_regex, $options: "ix" } }
                     ]
                 }
             ]

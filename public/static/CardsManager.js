@@ -66,10 +66,16 @@ function cards_manager(tags_and_ids, user_id) {
         find_card(next_card_id_urgency[0], callback);
     };
 
+    /**
+     * @description Return the number of cards that are yet to be viewed.
+     */
     cards_manager_obj.num_next = function () {
         return pq_cards_to_view.size();
     };
 
+    /**
+     * @description Return the number of cards that have already been viewed.
+     */
     cards_manager_obj.num_prev = function () {
         return pq_cards_already_viewed.size();
     };
@@ -114,7 +120,7 @@ function cards_manager(tags_and_ids, user_id) {
     /**
      * @description Insert a card into the queue. By convention, the card will 
      * be inserted into the queue of already viewed cards. If you wish to view
-     * it, run `CardsManager.previous
+     * it, run `CardsManager.previous`
      * @param {String} card_to_insert_id The ID of the card to insert into the queue
      * @param {Number} card_to_insert_urgency The urgency of the card to be inserted. 
      * Used as a sorting key.
