@@ -183,8 +183,9 @@ exports.delete = function(payload, callBack) {
  * Remove this card from the database.
  * 
  * @param {JSON} payload Expected keys: `key_words`
- * @param {Function} callBack Takes a JSON with `success`,
- * `internal_error` and `message` as keys.
+ * @param {Function} callBack Takes a JSON with `success`, `status` and `message` 
+ * as keys. If successful `message` will contain abbreviated cards that only 
+ * the `id`, `urgency` and `title` fields.
  */
 exports.search = function(payload, callBack) {
     /**
@@ -209,7 +210,15 @@ exports.search = function(payload, callBack) {
         .exec((err, cards) => {
             if (err) { console.log(err); callBack(generic_500_msg); }
             else {
-                callBack({success: true, status: 200, message: cards });
+                search_results = new Array(cards.length);
+                cards.forEach((card, index) => {
+                    search_results[index] = {
+                        _id: card._id,
+                        urgency: card.urgency,
+                        title: card.title
+                    };
+                });
+                callBack({ success: true, status: 200, message: search_results });
             }
         });
 };

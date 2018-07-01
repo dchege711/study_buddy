@@ -50,6 +50,24 @@ function cards_manager(tags_and_ids, user_id) {
     };
 
     /**
+     * @description Initialize a card manager using an array of abbreviated 
+     * cards.
+     * @param {Array} minicards Array of JSON objects having the keys `_id`, 
+     * and `urgency`
+     * @param {Function} callBack Function to call once everything is complete.
+     */
+    cards_manager_obj.initialize_from_minicards = function(minicards, callBack) {
+        pq_cards_already_viewed = max_PQ();
+        pq_cards_to_view = max_PQ();
+
+        minicards.forEach((minicard) => {
+            pq_cards_to_view.insert([minicard._id, minicard.urgency])
+        });
+
+        callBack();
+    };
+
+    /**
      * @description Return the next card on the queue.
      * @param {Function} callback The function to call that accepts a card
      * as a parameter.

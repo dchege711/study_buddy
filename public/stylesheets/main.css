@@ -46,6 +46,13 @@ footer {
 
 #card_search_results ul {
     border-bottom: 2px solid lightgray;
+    padding: 0;
+}
+
+#card_search_results ul:hover {
+    color: white;
+    background: black;
+    cursor: pointer;
 }
 
 body {

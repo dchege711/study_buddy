@@ -379,17 +379,17 @@
                             (response) => {
                                 if (response.success) {
                                     console.log(`\n${response.message.length} search results`);
-                                    if (limit !== Infinity) {
+                                    var search_results = response.message;
+                                    if (key_press === " ") {
                                         var search_results_html = "";
-                                        for (let i = 0; i < response.message.length; i++) {
-                                            console.log(response.message[i].title);
+                                        for (let i = 0; i < search_results.length; i++) {
                                             search_results_html += `
-                                        <ul onclick="displayThisCard('${response.message[i]._id}', ${response.message[i].urgency}')">
-                                        ${response.message[i].title}</ul>`;
+                                                <ul onclick='reInitializeCards([${JSON.stringify(search_results[i])}]);'>
+                                                ${search_results[i].title}</ul>`;
                                         }
                                         document.getElementById("card_search_results").innerHTML = search_results_html;
                                     } else {
-
+                                        reInitializeCards(search_results);
                                     }    
                                 }
                             }
@@ -397,9 +397,22 @@
                     }
                 }
             }
-
-            function displayThisCard(card_id, card_urgency) {
-                my_cards_manager.insert_card(card_id, card_urgency);
+            
+            /*
+             * @description Reset the queue of cards to be viewed. 
+             * @param {Array} abbreviated_cards Array of JSON objects having the
+             * keys `_id`, and `urgency`
+             */  
+            function reInitializeCards(abbreviated_cards) {
+                document.getElementById("card_search_results").innerHTML = "";
+                my_cards_manager.initialize_from_minicards(
+                    abbreviated_cards, 
+                    () => {
+                        my_cards_manager.next((card) => {
+                            renderCard(card);
+                        });
+                    }
+                );
             }
             
             /**
