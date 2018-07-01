@@ -31,7 +31,7 @@
         
     </head>
 
-    <body onload="initializeCards(); includeInAppButtons();">
+    <body onload="includeInAppButtons(); initializeCards();">
 
         <% include ../partials/navbar.ejs %>
 
@@ -39,7 +39,7 @@
 
             <div class="w3-container" id="status_bar">
                 <button class="w3-button w3-left" onclick="filterCards()">
-                    <b><i class="fa fa-refresh fa-fw"></i> Apply Filters </b>
+                    <b><i class="fa fa-refresh fa-fw" aria-hidden="true"></i> Apply Filters </b>
                 </button>
 
                 <p id="filter_list" class="w3-right w3-container"></p>
@@ -268,6 +268,7 @@
             }
 
             function handleInputChange(element_id) {
+                window.removeEventListener("keydown", arrowKeysForNavigation);
                 changed_items.add(element_id);
             }
 
@@ -348,13 +349,43 @@
                 );
             }
             
+            /*
+             * @description Provide search results for queries typed in the 
+             * search bar.
+             */
+            function searchCards(event) {
+                var key_press = event.key;
+                if (key_press === " " || key_press === "Enter") {
+                    sendHTTPRequest(
+                        "POST", "/search-cards",
+                        {query: document.getElementById("card_search_input").value},
+                        (response) => {
+                            if (response.success) {
+                                console.log(response.message);
+                            }
+                        }
+                    );
+                }
+            }
+            
             /**
              * Once the user logs in, display the logout button 
              */ 
             function includeInAppButtons() {
                 var nav_bar = document.getElementById("topnavitems");
                 nav_bar.insertAdjacentHTML('beforeend', 
-                '<li><button class="w3-button w3-padding-small top-nav w3-right" onClick="logOut()"><b>Log Out</b></button></li>');
+                    `<li>
+                        <input 
+                            type="text" id="card_search_input" 
+                            placeholder="Search card descriptions and titles..."
+                            class="w3-half" onchange="searchCards(event)"
+                        />
+                        <button 
+                            class="w3-button w3-padding-small top-nav w3-right" 
+                            onClick="logOut()"><b>Log Out</b>
+                        </button>
+                    </li>`
+                );
             }
 
             function logOut() {

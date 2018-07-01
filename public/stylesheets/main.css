@@ -26,6 +26,14 @@ footer {
     border-left: 5px solid grey;
 }
 
+#card_search_input {
+    color: white;
+    background-color: black;
+    border: none;
+    border-bottom: 0.1px solid #fff;
+    font-size: smaller;
+}
+
 body {
     display: flex;
     min-height: 100vh;
@@ -63,6 +71,10 @@ ul.topnav {
     margin: 0;
     padding: 0;
     overflow: hidden;
+}
+
+.link_button {
+    text-decoration: none;
 }
 
 ul.topnav li {
