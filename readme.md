@@ -28,8 +28,6 @@
 
 :soon: Support filtering on the first set of filters. Filter by time too.
 
-:soon: Inside the card, map `#` to `#####`. We don't need big ass headers.
-
 :soon: Stick the footer to the bottom of the page. It takes up space unnecessarily.
 
 :soon: Include an about page with tutorial on how to use Study Buddy.
@@ -37,8 +35,6 @@
 :soon: Add an account page with configurable settings, e.g. code syntax theme, light vs dark UI, etc.
 
 :soon: Figure out why cards with similar content but different IDs exist in the database. There is a data replication bug lying somewhere.
-
-:soon: Figure out regex for capturing `<em>` or `</em>` tags within inline LaTEX, e.g. `\(i<em>{r}, i</em>{l}.low \le i_{r}.low\)`
 
 :soon: Change the underlying DS for the cards manager from two max-oriented priority queues to a balanced binary search tree. That way, you can visit a any card on the tree much faster on average.
 
@@ -96,9 +92,9 @@ I overrode the default action of the left and right arrow keys when the user is 
 
 About supporting tabs in the card description, I chose to insert `&nbsp;&nbsp;&nbsp;&nbsp;` if the user pressed the tab key. The downside to this is that deleting a 'tab' requires 4 backspaces. I tried inserting a tab character instead but for it to render, I needed to add `white-space: pre-wrap;` as a style attribute. This however inserts to much whitespace when between separate lines of texts. Since flash cards are more frequently read than written, I prioritized having the flash cards as compact as possible in order to avoid the need to scroll down when reading them.
 
-Previously, users had to escape the LaTEX delimiter themselves and also escape underscores within inline LaTEX. This meant lines like `\(p_i = 2\)` had to be written as `\\(p\_i = 2\\)`. With some regular expressions, I was able to support the former approach. I traded computational efficiency *(more code to automatically escape backslashes and replace automatically inserted `<em>, </em>` tags)* for convenience *(users entering normal LaTEX)*. I choose to make this correction on the client side since I can't afford that much storage capacity on the server side.
+Previously, users had to escape the LaTEX delimiter themselves and also escape underscores within inline LaTEX. This meant lines like `\(p_i = 2\)` had to be written as `\\(p\_i = 2\\)`. ~~With some regular expressions, I was able to support the former approach. I traded computational efficiency *(more code to automatically escape backslashes and replace automatically inserted `<em>, </em>` tags)* for convenience *(users entering normal LaTEX)*. I choose to make this correction on the client side since I can't afford that much storage capacity on the server side.~~ I configured `showdown.converter` to escape underscores and asterisks when converting markdown to HTML. Although I had activated these options before, `showdown.converter` wasn't applying them. The bug was fixed on Github. I thus downloaded the version of `showdown.min.js` available during commit `039dd66256e771716c20a807a2941974ac7c5873`. Since that version works fine, I choose to use my downloaded copy instead of using the version hosted on the CDN since that might change over time. Later versions of the file insert extra whitespace in my code blocks, so I prefer maintaining the version from the above commit.
 
-I changed the urgency input from a number input type to a range input type. To set an urgency, using the range input type is faster since the user doesn't really care about the actual value, but its percentage, e.g. *card X is half as important as the most important cards in my deck*. Furthermore, using a range requires one click, while using a number type requires a click and a type.
+I changed the urgency input from a number input type to a range input type. To set an urgency, using the range input type is faster since the user doesn't really care about the actual value, but its percentage, e.g. *card X is half as important as the most important cards in my deck*. Furthermore, using a range requires one click, while using a number type requires a click and a type. 
 
 ### Support ~~deleting a card~~ moving a card to the trash and undoing the move
 

@@ -7,7 +7,7 @@
         <script src="/static/AppUtilities.js"></script>
         <script src="/static/MaxPriorityQueue.js"></script>
         <script src="/static/CardsManager.js"></script>
-        <script src="https://cdn.rawgit.com/showdownjs/showdown/1.0.1/dist/showdown.min.js"></script>
+        <script src="/static/showdown.min.js"></script>
         <link rel="stylesheet" href="/stylesheets/themes/atom-one-light.css">
         <script src="/static/highlight.pack.js"></script>
         <script>
@@ -83,8 +83,13 @@
             
             var my_cards_manager = cards_manager(tags_and_ids, localStorage.getItem("user_id"));
             var converter = new showdown.Converter();
-            converter.setOption('literalMidWordUnderscores', true);
-            converter.setOption('literalMidWordAsterisks', true);
+            converter.setOption("headerLevelStart", 4);
+            converter.setOption("literalMidWordUnderscores", true);
+            converter.setOption("literalMidWordAsterisks", true);
+            converter.setOption("tables", true);
+            converter.setOption("simpleLineBreaks", true);
+
+            console.log(converter.getOptions());
             
             /* Initialize variables that keep track of the state */
             var changed_items = new Set([]);
@@ -216,19 +221,6 @@
                 var description_html = converter.makeHtml(
                     String.raw`${card.description.replace(/\\/g, "\\\\")}`
                 );
-
-                /* Find all <em> and </em> tags within strings supposed to be 
-                 * interpreted as LaTEX. Convert these back to underscores because
-                 * that's what they were meant to be.
-                 */
-                var latex_regex = /(\\\(){1}([^(\\\))]*)(\\\)){1}/g;
-                var inline_latex_string;
-                while ((inline_latex_string = latex_regex.exec(description_html)) !== null) {
-                    description_html = description_html.replace(
-                        inline_latex_string[0],
-                        inline_latex_string[0].replace(/<em>|<\/em>/g, "_")
-                    );
-                }
 
                 document.getElementById("card_description").innerHTML = description_html;
                 document.getElementById("card_tags").value = card.tags;
