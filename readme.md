@@ -28,15 +28,15 @@
 
 :soon: Support filtering on the first set of filters. Filter by time too.
 
-:soon: Stick the footer to the bottom of the page. It takes up space unnecessarily.
-
-:soon: Include an about page with tutorial on how to use Study Buddy.
+:soon: Include an about page with tutorial on how to Study Buddy's features.
 
 :soon: Add an account page with configurable settings, e.g. code syntax theme, light vs dark UI, etc.
 
 :soon: Figure out why cards with similar content but different IDs exist in the database. There is a data replication bug lying somewhere.
 
 :soon: Change the underlying DS for the cards manager from two max-oriented priority queues to a balanced binary search tree. That way, you can visit a any card on the tree much faster on average.
+
+:soon: Suggest tags based on card content. Offer autocomplete for tags. The better the tags, the more organized the content.
 
 ### Support Text Search for Cards
 
