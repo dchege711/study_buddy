@@ -40,6 +40,14 @@
 
 :soon: Implement one of the researched flashcard memory practices.
 
+### Enhance the Tagging System
+
+I currently have 100 cards and 63 unique tags. Ideally, I want to have as many cards as I want and the fewest tags possible while making sure that the tags are descriptive. I can't afford to have near tags such as `searching` and `search` at the same time. Who knows if 3 weeks from now I'll start tagging cards using `information_retrieval` instead of `search`. I approach this problem in two ways.
+
+I'll first grab the low-hanging fruits that need no fancy math. If the user starts typing `sear...`, I should provide `search`, and `searching` as autocomplete options. I trust the user will choose an existing option when applicable. I can smell a trie coming up! I'll also provide some naive suggestions based on how previous tags have been used. For instance, if I type `trees`, it's possible that the card can also be tagged as `data_structures` and `search` since those tags have appeared before. This looks like a graph problem.
+
+The second approach involves building a tag recommendation module. But before I get my hands dirty, I need some confirmation that it's worth it. I can collect some stats on the tags suggested by the first method, and the percentage that ends up included as tags. Song et. al's [Automatic Tag Recommendation Algorithms for Social Recommender Systems](misc_resources/automatic_tag_recommendation_algos_for_social_recommender_systems.pdf) discusses different recommendation systems ranging from 25% precision up to 40% accuracy. If my first approach falls below 15% I'll consider implementing one of the systems in Song's paper. For now, let's keep things simple until we can't.
+
 ### Support Text Search for Cards
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
