@@ -38,6 +38,8 @@
 
 :soon: Suggest tags based on card content. Offer autocomplete for tags. The better the tags, the more organized the content.
 
+:soon: Implement one of the researched flashcard memory practices.
+
 ### Support Text Search for Cards
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
