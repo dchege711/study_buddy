@@ -31,6 +31,16 @@ footer {
     border-left: 5px solid grey;
 }
 
+blockquote {
+    font-style: italic;
+    border-left: 5px solid lightblue;
+    border-bottom: 1px solid lightblue;
+    padding: 0px 1%;
+    border-top: 1px solid lightblue;
+    border-right: 1px solid lightblue;
+    border-radius: 5px;
+}
+
 #card_search_input {
     border: none;
     border-bottom: 0.2px solid black;
