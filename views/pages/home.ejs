@@ -31,7 +31,7 @@
         
     </head>
 
-    <body onload="includeInAppButtons(); initializeCards();">
+    <body onload="includeInAppButtons(); initializeSideBar(); initializeCards();">
 
         <% include ../partials/navbar.ejs %>
 
@@ -73,59 +73,52 @@
 
         <script type="text/javascript">
 
-            var debug = true;
-
-            /* Obtain the information on tags */
+            /* Initialize variables that keep track of the state */
+            var changed_items = new Set([]);
+            var current_card_id = null;
+            var current_user_id = localStorage.getItem("user_id");
+            var raw_description = null;
+            var selected_tags = new Set([]);
             var tags_and_ids = JSON.parse(localStorage.getItem("metadata"))[0].node_information[0];
-            
-            /* If it's a new user, return */
             if (!tags_and_ids) tags_and_ids = {};
             
-            var my_cards_manager = cards_manager(tags_and_ids, localStorage.getItem("user_id"));
+            var my_cards_manager = cards_manager(tags_and_ids, current_user_id);
             var converter = new showdown.Converter();
             converter.setOption("headerLevelStart", 4);
             converter.setOption("literalMidWordUnderscores", true);
             converter.setOption("literalMidWordAsterisks", true);
             converter.setOption("tables", true);
             converter.setOption("simpleLineBreaks", true);
-            
-            /* Initialize variables that keep track of the state */
-            var changed_items = new Set([]);
-            var current_card_id = null;
-            var current_user_id = JSON.parse(localStorage.getItem("metadata"))[0]["createdById"];
-            var raw_description = null;
-            var selected_tags = new Set([]);
 
-            /* Assumes 1 of 2 values: '/update-card' or '/add-card' */
             var post_url;
 
-            /* Load the sidebar. Order the tags such that the ones that have the
-             * more important cards come up first.
-             */
-            var tags_in_decreasing_order = Object.keys(tags_and_ids);
-            tags_in_decreasing_order.sort(function(tag_a, tag_b) {
-                var tag_a_importance = 0;
-                var tag_b_importance = 0;
+            function initializeSideBar() {
+                var tags_in_decreasing_order = Object.keys(tags_and_ids);
+                tags_in_decreasing_order.sort(function (tag_a, tag_b) {
+                    var tag_a_importance = 0;
+                    var tag_b_importance = 0;
 
-                Object.keys(tags_and_ids[tag_b]).forEach((card_id) => {
-                    tag_b_importance += tags_and_ids[tag_b][card_id]["urgency"]
+                    Object.keys(tags_and_ids[tag_b]).forEach((card_id) => {
+                        tag_b_importance += tags_and_ids[tag_b][card_id]["urgency"]
+                    });
+
+                    Object.keys(tags_and_ids[tag_a]).forEach((card_id) => {
+                        tag_a_importance += tags_and_ids[tag_a][card_id]["urgency"]
+                    });
+                    return tag_b_importance - tag_a_importance;
                 });
 
-                Object.keys(tags_and_ids[tag_a]).forEach((card_id) => {
-                    tag_a_importance += tags_and_ids[tag_a][card_id]["urgency"]
+                var tags_html = "";
+                tags_in_decreasing_order.forEach((tag) => {
+                    tags_html += "<ul id='" + tag +
+                        "' class='link' onclick='selectThisTag(`" + tag +
+                        "`);'> #" + tag + " (" + Object.keys(tags_and_ids[tag]).length +
+                        ")</ul>";
                 });
-                return tag_b_importance - tag_a_importance;
-            });
-            var tags_html = "";
-            tags_in_decreasing_order.forEach((tag) => {
-                tags_html += "<ul id='" + tag + 
-                    "' class='link' onclick='selectThisTag(`" + tag + 
-                    "`);'> #" + tag + " (" + Object.keys(tags_and_ids[tag]).length + 
-                    ")</ul>";
-            });
-            
-            document.getElementById("side_bar_contents").insertAdjacentHTML('beforeend', tags_html);
-            
+                
+                document.getElementById("side_bar_contents").innerHTML = tags_html;
+            }
+
             function initializeCards() {
                 my_cards_manager.initialize(null, () => {
                     my_cards_manager.next((card) => {
@@ -240,6 +233,14 @@
 
                 loadMathJAX();
             }
+            
+            /**
+             * @description Reload MathJAX to render new LaTEX
+             * http://docs.mathjax.org/en/latest/advanced/typeset.html
+             */
+            function loadMathJAX() {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, "card_description"]);
+            }
 
             function displayRawCardDescription() {
                 var description_element = document.getElementById("card_description");
@@ -297,9 +298,23 @@
                 payload.createdById = current_user_id;
 
                 sendHTTPRequest("POST", post_url, payload, (response) => {
-                    my_cards_manager.update_card(response.message);
-                    renderCard(response.message);
+                    var saved_card = response.message;
+                    my_cards_manager.update_card(saved_card);
+                    renderCard(saved_card);
 
+                    // If the tags or urgency has been changed, update the sidebar to reflect current info
+                    if (changed_items.has("card_tags") || changed_items.has("card_urgency")) {
+                        saved_card.tags.split("#").forEach(tag => {
+                            if (tag !== "") {
+                                tag = tag.trim();
+                                if (!tags_and_ids.has(tag)) {
+                                    tags_and_ids[tag] = {};
+                                }
+                                tags_and_ids[tag][saved_card._id] = {urgency: saved_card.urgency};
+                            }
+                        });
+                        initializeSideBar();
+                    }
                 });
 
             }
@@ -425,15 +440,6 @@
                     localStorage.clear();
                     window.location = "/";
                 });
-            }
-            
-            /**
-             * @description Reload MathJAX to render new LaTEX
-             * http://docs.mathjax.org/en/latest/advanced/typeset.html
-             */ 
-            function loadMathJAX() {
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub, "card_description"]);
-                MathJax.HUb.Queue(["Typeset", MathJax.Hub, "card_title"]);
             }
 
         </script>

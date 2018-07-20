@@ -150,6 +150,7 @@ function cards_manager(tags_and_ids, user_id) {
     };
 
     cards_manager_obj.update_card = function(card) {
+        localStorage.removeItem(card._id);
         localStorage.setItem(card._id, JSON.stringify(card));
         var id_if_card_already_existed = this.remove_card(card._id);
         if (id_if_card_already_existed === null && !pq_cards_already_viewed.contains_key(card._id)) {
