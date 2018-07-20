@@ -223,7 +223,7 @@ function max_PQ() {
     };
 
     return pq_object;
-};
+}
 
 /**
  * Sanity check...
@@ -254,6 +254,3 @@ if (typeof require !== "undefined" && require.main === module) {
         console.log(item);
     }
 }
-
-/* Make the contents available to others */
-// module.exports = max_PQ;
