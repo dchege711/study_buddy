@@ -42,11 +42,25 @@
 
 ### Enhance the Tagging System
 
-I currently have 100 cards and 63 unique tags. Ideally, I want to have as many cards as I want and the fewest tags possible while making sure that the tags are descriptive. I can't afford to have near tags such as `searching` and `search` at the same time. Who knows if 3 weeks from now I'll start tagging cards using `information_retrieval` instead of `search`. I approach this problem in two ways.
+<sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
 
-I'll first grab the low-hanging fruits that need no fancy math. If the user starts typing `sear...`, I should provide `search`, and `searching` as autocomplete options. I trust the user will choose an existing option when applicable. I can smell a trie coming up! I'll also provide some naive suggestions based on how previous tags have been used. For instance, if I type `trees`, it's possible that the card can also be tagged as `data_structures` and `search` since those tags have appeared before. This looks like a graph problem.
+I currently have 100 cards and 63 unique tags. Ideally, I want to have as many cards as I want and the fewest tags possible while making sure that the tags are descriptive. I can't afford to have near tags such as `searching` and `search` at the same time. Who knows if 3 weeks from now I'll start tagging cards using `information_retrieval` instead of `search`. There are three levels at which I can approach this. Level 1 is the least sophisticated while Level 3 is the most sophisticated. I'll start by implementing Level 1. If Level 1 isn't satisfactory (based on how I use Study Buddy), I'll implement Level 2, and maybe even Level 3.
 
-The second approach involves building a tag recommendation module. But before I get my hands dirty, I need some confirmation that it's worth it. I can collect some stats on the tags suggested by the first method, and the percentage that ends up included as tags. Song et. al's [Automatic Tag Recommendation Algorithms for Social Recommender Systems](misc_resources/automatic_tag_recommendation_algos_for_social_recommender_systems.pdf) discusses different recommendation systems ranging from 25% precision up to 40% accuracy. If my first approach falls below 15% I'll consider implementing one of the systems in Song's paper. For now, let's keep things simple until we can't.
+#### Level 1 (Implemented)
+
+If the user starts typing `pr`, I should provide `probability`, and `primes` as autocomplete options. I trust the user will choose an existing option when applicable. This approach will reduce spelling variations, e.g. `searching` vs `search`. The autocomplete options come from the tags that a user has already used. The major shortcoming is that the user needs to type a similar tag which starts with the same spelling, e.g. `chance` will never cause `probability` to come up in the autocomplete result set. A trie is sufficient for this purpose.
+
+#### Level 2
+
+I can also provide some naive suggestions based on how similar/related tags are. There are two ways of determining this.
+
+I can infer similarity based on how tags have been used in the past, e.g. if the user types `trees`, and there's already a card that has `trees, data_structures, search` as tags, I should recommend `data_structures` and `search` as well. This looks like a graph problem.
+
+It's also possible to build a graph of words based on an external dataset. Such a graph would have nodes like `markov_chain` and `probability` connected by an edge with a greater weight than say `markov_chain`-->`poisson`. This approach can suggest tags that have not been used before. However, this 'knowledge graph' isn't readily available. I might have to make it myself.
+
+#### Level 3
+
+The Level 1 & 2 approaches are agnostic of the content contained inside the card and suffer from cold starts. Level 3 involves building a content-based recommendation system. Song et. al's [Automatic Tag Recommendation Algorithms for Social Recommender Systems](misc_resources/automatic_tag_recommendation_algos_for_social_recommender_systems.pdf) discusses different recommendation systems ranging from 25% precision up to 40% accuracy. If Level 1 and 2 fall below 15% I'll consider implementing one of the systems in Song's paper. For now, let's keep things simple until we can't.
 
 ### Support Text Search for Cards
 
