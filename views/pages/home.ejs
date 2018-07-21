@@ -76,11 +76,12 @@
 
             /* Initialize variables that keep track of the state */
             var changed_items = new Set([]);
+            var metadata = JSON.parse(localStorage.getItem("metadata"))[0];
             var current_card_id = null;
-            var current_user_id = localStorage.getItem("user_id");
+            var current_user_id = metadata.createdById;
             var raw_description = null;
             var selected_tags = new Set([]);
-            var tags_and_ids = JSON.parse(localStorage.getItem("metadata"))[0].node_information[0];
+            var tags_and_ids = metadata.node_information[0];
             if (!tags_and_ids) tags_and_ids = {};
             var tags_trie = ternary_search_trie(Object.keys(tags_and_ids));
 
@@ -222,10 +223,10 @@
 
                 var tags_html = "";
                 current_card_tags.clear();
-                var tags_array = card.tags.trim().split("#");
+                var tags_array = card.tags.trim().split(" ");
                 for (let i = 0; i < tags_array.length; i++) {
                     if (tags_array[i].length > 0) {
-                        tags_html += `<button class="card_tag_button_text">${tags_array[i]}</button><button <button class="card_tag_button_remove" onclick="removeTag('${tags_array[i]}')"> <i class="fa fa-times fa-fw" aria-hidden="true"></i> </button>`;
+                        tags_html += `<button id="card_tag_text_${tags_array[i]}" class="card_tag_button_text">${tags_array[i]}</button><button id="card_tag_remove_${tags_array[i]}" class="card_tag_button_remove" onclick="removeTagFromCard('${tags_array[i]}')"> <i class="fa fa-times fa-fw" aria-hidden="true"></i> </button>`;
                         current_card_tags.add(tags_array[i]);
                     }
                 }
@@ -271,6 +272,7 @@
                 document.getElementById("card_description").innerHTML = "";
                 document.getElementById("already_set_card_tags").value = "";
                 current_card_tags_have_changed = false;
+
                 document.getElementById("card_urgency").value = 0;
                 document.getElementById("card_urgency_number").innerText = "0";
                 document.getElementById("card_description").setAttribute("contenteditable", "true");
@@ -278,7 +280,8 @@
                 window.removeEventListener("keydown", arrowKeysForNavigation);
 
                 // Reset the contents of the current_card variable
-                changed_items = new Set([]);
+                changed_items.clear();
+                current_card_tags.clear();
                 current_card_id = null;
                 raw_description = "";
                 post_url = "/add-card";
@@ -295,7 +298,7 @@
                 var key_press = event.key;
                 // If whitespace was added, create the new tag if need be.
                 if (key_press === " " || key_press === "Enter" || key_press === "Tab") {
-                    updateTagsButtons(tag_being_entered);
+                    updateTagsButtons(tag_being_entered.trim());
                 } else {
                     // Provide autocomplete results
                     autocomplete_html = ""
@@ -316,11 +319,18 @@
                     document.getElementById("tags_autocomplete_results").innerHTML = "";
                     document.getElementById("already_set_card_tags").insertAdjacentHTML(
                         "beforeend",
-                        `<button class="card_tag_button_text">${new_tag}</button><button <button class="card_tag_button_remove" onclick="removeTag('${new_tag}')"> <i class="fa fa-times fa-fw" aria-hidden="true"></i> </button>`
+                        `<button id="card_tag_text_${new_tag}" class="card_tag_button_text_">${new_tag}</button><button id="card_tag_remove_${new_tag}" class="card_tag_button_remove" onclick="removeTagFromCard('${new_tag}')"> <i class="fa fa-times fa-fw" aria-hidden="true"></i> </button>`
                     );
                     document.getElementById("card_tag_input").value = "";
                     current_card_tags_have_changed = true;
                 }
+            }
+
+            function removeTagFromCard(tag) {
+                document.getElementById(`card_tag_text_${tag}`).remove();
+                document.getElementById(`card_tag_remove_${tag}`).remove();
+                current_card_tags.delete(tag);
+                current_card_tags_have_changed = true;
             }
 
             function insertTabsIfNecessary(event) {
@@ -348,6 +358,9 @@
                 }
 
                 payload.createdById = current_user_id;
+                if (current_card_tags_have_changed) {
+                    payload.tags = Array.from(current_card_tags).join(" ");
+                }
 
                 sendHTTPRequest("POST", post_url, payload, (response) => {
                     var saved_card = response.message;

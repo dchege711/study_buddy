@@ -120,6 +120,7 @@ exports.update = function(cardJSON, callBack) {
             });
         } else {
             var previousTags = card.tags;
+            if (previousTags.includes("#")) previousTags = previousTags.replace("#", "");
             // Overwrite the contents that changed
             Object.keys(cardJSON).forEach(card_key => {
                 card[card_key] = cardJSON[card_key];
