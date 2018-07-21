@@ -31,6 +31,35 @@ footer {
     border-left: 5px solid grey;
 }
 
+.card_tag_button_text, .card_tag_button_remove {
+    padding: 1%;
+    background-color: #73eaff;
+}
+
+.card_tag_button_text {
+    margin: 3px 0px 3px 4px;
+    border-bottom-left-radius: 5px;
+    border-top-left-radius: 5px;
+}
+
+.card_tag_button_remove {
+    cursor: pointer;
+    margin: 3px 4px 3px 0px;
+    border-bottom-right-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.card_tag_button_remove:hover {
+    background-color: red;
+}
+
+.autocomplete_suggestion_button {
+    margin: 4px;
+    border: thin solid lightseagreen;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
 blockquote {
     font-style: italic;
     border-left: 5px solid lightblue;

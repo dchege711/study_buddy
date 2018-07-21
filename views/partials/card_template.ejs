@@ -34,16 +34,21 @@
         <br />
 
         <div>
-            <strong>Tags</strong>
-            <textarea id="card_tags" name="tags" class="w3-input"
-                onchange="handleInputChange('card_tags')"></textarea>
+            <strong>Tags</strong><br>
+            <div id="already_set_card_tags"></div>
+            <div class="dropdown">
+                <input type="text" id="card_tag_input" placeholder="Add a new tag (whitespace separates different tags)..." 
+                onkeyup="handleTagsInputChange(event);"
+                class="w3-input dropbtn" />
+                <div class="dropdown-content" id="tags_autocomplete_results"></div>
+            </div>
         </div>
 
         <br />
 
         <div>
             <div class="w3-threequarter w3-left">
-                <label class="input-area">
+                <label class="input-area-padded w3-padding-small">
                     <strong>Urgency</strong>
                     <input id="card_urgency" type="range" name="urgency" 
                         class="w3-input" min="0" max="10" step="0.1" 

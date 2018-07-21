@@ -13,7 +13,7 @@
  * autocomplete purposes. No values are stored at the nodes of the TST.
  * @param {String[]} words Words to initialize the trie with.
  */
-function TernarySearchTrie(words) {
+function ternary_search_trie(words) {
     var TST = {};
     var root = null;
 
@@ -84,7 +84,7 @@ function TernarySearchTrie(words) {
         collect(x.left, prefix, matching_keys);
         if (x.val) matching_keys.push(prefix + x.c);
         collect(x.mid, prefix + x.c, matching_keys);
-        prefix = prefix.slice(0, prefix.length-1);
+        prefix = prefix.slice(0, prefix.length);
         collect(x.right, prefix, matching_keys);
     }
 
@@ -136,15 +136,15 @@ if (typeof require !== "undefined" && require.main === module) {
         "rhetoric", "binary_search", "c13u_diaries"
     ];
 
-    var testTST = TernarySearchTrie(words_one);
+    var testTST = ternary_search_trie(words_one);
 
     console.log("Printing keys with prefix 'pr'...");
     console.log(testTST.keys_with_prefix("pr"));
 
     for (let i = 0; i < words_two.length; i++) testTST.put(words_two[i]);
 
-    console.log("Printing keys with prefix 'red'...");
-    console.log(testTST.keys_with_prefix("red"));
+    console.log("Printing keys with prefix 's'...");
+    console.log(testTST.keys_with_prefix("s"));
 
     console.log("Printing all keys with prefix 'sdcdvfv'...");
     console.log(testTST.keys_with_prefix("sdcdvfv"));

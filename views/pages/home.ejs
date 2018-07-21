@@ -7,6 +7,7 @@
         <script src="/static/AppUtilities.js"></script>
         <script src="/static/MaxPriorityQueue.js"></script>
         <script src="/static/CardsManager.js"></script>
+        <script src="/static/TernarySearchTrie.js"></script>
         <script src="/static/showdown.min.js"></script>
         <link rel="stylesheet" href="/stylesheets/themes/atom-one-light.css">
         <script src="/static/highlight.pack.js"></script>
@@ -81,6 +82,10 @@
             var selected_tags = new Set([]);
             var tags_and_ids = JSON.parse(localStorage.getItem("metadata"))[0].node_information[0];
             if (!tags_and_ids) tags_and_ids = {};
+            var tags_trie = ternary_search_trie(Object.keys(tags_and_ids));
+
+            var current_card_tags = new Set([]);
+            var current_card_tags_have_changed = false;
             
             var my_cards_manager = cards_manager(tags_and_ids, current_user_id);
             var converter = new showdown.Converter();
@@ -214,7 +219,19 @@
                 );
 
                 document.getElementById("card_description").innerHTML = description_html;
-                document.getElementById("card_tags").value = card.tags;
+
+                var tags_html = "";
+                current_card_tags.clear();
+                var tags_array = card.tags.trim().split("#");
+                for (let i = 0; i < tags_array.length; i++) {
+                    if (tags_array[i].length > 0) {
+                        tags_html += `<button class="card_tag_button_text">${tags_array[i]}</button><button <button class="card_tag_button_remove" onclick="removeTag('${tags_array[i]}')"> <i class="fa fa-times fa-fw" aria-hidden="true"></i> </button>`;
+                        current_card_tags.add(tags_array[i]);
+                    }
+                }
+                document.getElementById("already_set_card_tags").innerHTML = tags_html;
+                current_card_tags_have_changed = false;
+
                 document.getElementById("card_urgency").value = card.urgency;
                 document.getElementById("card_urgency_number").innerText = card.urgency;
                 document.getElementById("card_description").removeAttribute("contenteditable");
@@ -252,7 +269,8 @@
             function displayNewCard() {
                 document.getElementById("card_title").value = "";
                 document.getElementById("card_description").innerHTML = "";
-                document.getElementById("card_tags").value = "";
+                document.getElementById("already_set_card_tags").value = "";
+                current_card_tags_have_changed = false;
                 document.getElementById("card_urgency").value = 0;
                 document.getElementById("card_urgency_number").innerText = "0";
                 document.getElementById("card_description").setAttribute("contenteditable", "true");
@@ -269,6 +287,40 @@
             function handleInputChange(element_id) {
                 window.removeEventListener("keydown", arrowKeysForNavigation);
                 changed_items.add(element_id);
+            }
+
+            function handleTagsInputChange(event) {
+                window.removeEventListener("keydown", arrowKeysForNavigation);
+                var tag_being_entered = document.getElementById("card_tag_input").value;
+                var key_press = event.key;
+                // If whitespace was added, create the new tag if need be.
+                if (key_press === " " || key_press === "Enter" || key_press === "Tab") {
+                    updateTagsButtons(tag_being_entered);
+                } else {
+                    // Provide autocomplete results
+                    autocomplete_html = ""
+                    var matches = tags_trie.keys_with_prefix(tag_being_entered);
+                    var num_results_to_show = 5;
+                    if (matches.length < 5) num_results_to_show = matches.length;
+                    for (let i = 0; i < matches.length; i++) {
+                        autocomplete_html += `<button class="autocomplete_suggestion_button" onclick="updateTagsButtons('${matches[i]}');">${matches[i]}</button>`;
+                    }
+                    document.getElementById("tags_autocomplete_results").innerHTML = autocomplete_html;
+                }
+                
+            }
+
+            function updateTagsButtons(new_tag) {
+                if (!current_card_tags.has(new_tag)) {
+                    current_card_tags.add(new_tag);
+                    document.getElementById("tags_autocomplete_results").innerHTML = "";
+                    document.getElementById("already_set_card_tags").insertAdjacentHTML(
+                        "beforeend",
+                        `<button class="card_tag_button_text">${new_tag}</button><button <button class="card_tag_button_remove" onclick="removeTag('${new_tag}')"> <i class="fa fa-times fa-fw" aria-hidden="true"></i> </button>`
+                    );
+                    document.getElementById("card_tag_input").value = "";
+                    current_card_tags_have_changed = true;
+                }
             }
 
             function insertTabsIfNecessary(event) {
