@@ -319,7 +319,7 @@
                     document.getElementById("tags_autocomplete_results").innerHTML = "";
                     document.getElementById("already_set_card_tags").insertAdjacentHTML(
                         "beforeend",
-                        `<button id="card_tag_text_${new_tag}" class="card_tag_button_text_">${new_tag}</button><button id="card_tag_remove_${new_tag}" class="card_tag_button_remove" onclick="removeTagFromCard('${new_tag}')"> <i class="fa fa-times fa-fw" aria-hidden="true"></i> </button>`
+                        `<button id="card_tag_text_${new_tag}" class="card_tag_button_text">${new_tag}</button><button id="card_tag_remove_${new_tag}" class="card_tag_button_remove" onclick="removeTagFromCard('${new_tag}')"> <i class="fa fa-times fa-fw" aria-hidden="true"></i> </button>`
                     );
                     document.getElementById("card_tag_input").value = "";
                     current_card_tags_have_changed = true;
@@ -361,18 +361,20 @@
                 if (current_card_tags_have_changed) {
                     payload.tags = Array.from(current_card_tags).join(" ");
                 }
-
+                
+                // If the tags or urgency has been changed, update the sidebar to reflect current info
+                var rerender_sidebar = current_card_tags_have_changed || changed_items.has("card_urgency");
+                
                 sendHTTPRequest("POST", post_url, payload, (response) => {
                     var saved_card = response.message;
                     my_cards_manager.update_card(saved_card);
                     renderCard(saved_card);
 
-                    // If the tags or urgency has been changed, update the sidebar to reflect current info
-                    if (changed_items.has("card_tags") || changed_items.has("card_urgency")) {
-                        saved_card.tags.split("#").forEach(tag => {
+                    if (rerender_sidebar) {
+                        saved_card.tags.split(" ").forEach(tag => {
                             if (tag !== "") {
                                 tag = tag.trim();
-                                if (!tags_and_ids.has(tag)) {
+                                if (!tags_and_ids.hasOwnProperty(tag)) {
                                     tags_and_ids[tag] = {};
                                 }
                                 tags_and_ids[tag][saved_card._id] = {urgency: saved_card.urgency};

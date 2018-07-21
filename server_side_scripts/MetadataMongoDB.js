@@ -345,7 +345,6 @@ function updateMetadataWithCardDetails(savedCard, metadataDoc, callBack) {
     // Keep track of which tags have been changed
     var prevTagStillExists = {};
     if (savedCard.previousTags) {
-        console.log(savedCard.previousTags.split(" "));
         savedCard.previousTags.split(" ").forEach(prevTag => {
             if (prevTag !== "") {
                 prevTag = prevTag.trim();
@@ -355,7 +354,6 @@ function updateMetadataWithCardDetails(savedCard, metadataDoc, callBack) {
     }
 
     // Save the card's id in each tag that it has
-    console.log(savedCard.tags.split(" "));
     savedCard.tags.split(" ").forEach(tag => {
         var strippedTag = tag.trim();
         if (strippedTag !== "") {
