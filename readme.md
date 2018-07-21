@@ -2,6 +2,8 @@
 
 ## [Tasks](#tasks)
 
+:white_check_mark: [Enhance the Tagging System](#enhance-the-tagging-system)
+
 :white_check_mark: [Support Text Search for Cards](#support-text-search-for-cards)
 
 :white_check_mark: [Persistent Session Management](#persistent-session-management)
@@ -36,9 +38,9 @@
 
 :soon: Change the underlying DS for the cards manager from two max-oriented priority queues to a balanced binary search tree. That way, you can visit a any card on the tree much faster on average.
 
-:soon: Suggest tags based on card content. Offer autocomplete for tags. The better the tags, the more organized the content.
-
 :soon: Implement one of the researched flashcard memory practices.
+
+:soon: Read into layout/reflow. Avoid inefficient operations where possible. Starting resources [here](https://gist.github.com/paulirish/5d52fb081b3570c81e3a), [here](https://developers.google.com/speed/docs/insights/browser-reflow) and [here](https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers).
 
 ### Enhance the Tagging System
 
