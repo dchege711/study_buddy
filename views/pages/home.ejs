@@ -74,42 +74,51 @@
 
         <script type="text/javascript">
 
-            /* Initialize variables that keep track of the state */
-            var changed_items = new Set([]);
-            var metadata = JSON.parse(localStorage.getItem("metadata"))[0];
-            var current_card_id = null;
-            var current_user_id = metadata.createdById;
-            var raw_description = null;
-            var selected_tags = new Set([]);
-            var tags_and_ids = metadata.node_information[0];
-            if (!tags_and_ids) tags_and_ids = {};
-            var tags_trie = ternary_search_trie(Object.keys(tags_and_ids));
-
-            var current_card_tags = new Set([]);
-            var current_card_tags_have_changed = false;
+            /* The converter is used to turn the markdown in the cards into html. */
+            var converter = new showdown.Converter({
+                headerLevelStart: 4, literalMidWordUnderscores: true,
+                literalMidWordAsterisks: true, simpleLineBreaks: true
+            });
             
-            var my_cards_manager = cards_manager(tags_and_ids, current_user_id);
-            var converter = new showdown.Converter();
-            converter.setOption("headerLevelStart", 4);
-            converter.setOption("literalMidWordUnderscores", true);
-            converter.setOption("literalMidWordAsterisks", true);
-            converter.setOption("tables", true);
-            converter.setOption("simpleLineBreaks", true);
+            /* If a user is logged in, there'll be some metadata about them in 
+             * Local Storage. 
+             */
+            const metadata = JSON.parse(localStorage.getItem("metadata"))[0];
+            
+            /* Useful for storing the state of the Study Buddy app. Wrapped 
+             * inside an object so that I can know when global variables are
+             * being used and when they're not.
+             */
+            var state = {
+                changed_items: new Set([]),
+                current_card_id: null,
+                current_user_id: metadata.createdById,
+                raw_description: null,
+                selected_tags: new Set([]),
+                tags_and_ids: metadata.node_information[0],
+                current_card_tags: new Set([]),
+                current_card_tags_have_changed: false,
+                post_url: null,
+            }
 
-            var post_url;
+            if (!state.tags_and_ids) state.tags_and_ids = {};
+            
+            var tags_trie = ternary_search_trie(Object.keys(state.tags_and_ids))
+            
+            var my_cards_manager = cards_manager(state.tags_and_ids, state.current_user_id);
 
             function initializeSideBar() {
-                var tags_in_decreasing_order = Object.keys(tags_and_ids);
+                var tags_in_decreasing_order = Object.keys(state.tags_and_ids);
                 tags_in_decreasing_order.sort(function (tag_a, tag_b) {
                     var tag_a_importance = 0;
                     var tag_b_importance = 0;
 
-                    Object.keys(tags_and_ids[tag_b]).forEach((card_id) => {
-                        tag_b_importance += tags_and_ids[tag_b][card_id]["urgency"]
+                    Object.keys(state.tags_and_ids[tag_b]).forEach((card_id) => {
+                        tag_b_importance += state.tags_and_ids[tag_b][card_id]["urgency"]
                     });
 
-                    Object.keys(tags_and_ids[tag_a]).forEach((card_id) => {
-                        tag_a_importance += tags_and_ids[tag_a][card_id]["urgency"]
+                    Object.keys(state.tags_and_ids[tag_a]).forEach((card_id) => {
+                        tag_a_importance += state.tags_and_ids[tag_a][card_id]["urgency"]
                     });
                     return tag_b_importance - tag_a_importance;
                 });
@@ -118,7 +127,7 @@
                 tags_in_decreasing_order.forEach((tag) => {
                     tags_html += "<ul id='" + tag +
                         "' class='link' onclick='selectThisTag(`" + tag +
-                        "`);'> #" + tag + " (" + Object.keys(tags_and_ids[tag]).length +
+                        "`);'> #" + tag + " (" + Object.keys(state.tags_and_ids[tag]).length +
                         ")</ul>";
                 });
                 
@@ -167,10 +176,10 @@
             }
 
             function selectThisTag(tag) {
-                if (selected_tags.has(tag)) {
-                    selected_tags.delete(tag);
+                if (state.selected_tags.has(tag)) {
+                    state.selected_tags.delete(tag);
                 } else {
-                    selected_tags.add(tag);
+                    state.selected_tags.add(tag);
                 }                
                 document.getElementById(tag).classList.toggle("chosen");
             }
@@ -181,13 +190,13 @@
                 var tags_to_use;
 
                 // Communicate which cards are being displayed...
-                if (selected_tags.size == 0) {
+                if (state.selected_tags.size == 0) {
                     tags_to_use = null;
                     document.getElementById("filter_list").innerHTML = "Now showing: all";
                 } else {
-                    tags_to_use = selected_tags;
+                    tags_to_use = state.selected_tags;
                     var status_message = "Now showing: ";
-                    status_message += Array.from(selected_tags).join(", ");
+                    status_message += Array.from(state.selected_tags).join(", ");
                     document.getElementById("filter_list").innerHTML = status_message;
                 }
                 
@@ -197,10 +206,10 @@
                         renderCard(card);
                     });
 
-                    selected_tags.forEach((tag) => {
+                    state.selected_tags.forEach((tag) => {
                         document.getElementById(tag).classList.toggle("chosen");
                     })
-                    selected_tags.clear();
+                    state.selected_tags.clear();
                 });
             }
 
@@ -231,7 +240,7 @@
                     }
                 }
                 document.getElementById("already_set_card_tags").innerHTML = tags_html;
-                current_card_tags_have_changed = false;
+                state.current_card_tags_have_changed = false;
 
                 document.getElementById("card_urgency").value = card.urgency;
                 document.getElementById("card_urgency_number").innerText = card.urgency;
@@ -239,10 +248,10 @@
                 document.getElementById("side_bar_contents").style.height = document.getElementById("card_template").style.height;
 
                 // Reset the contents of the current_card variable
-                changed_items = new Set([]);
-                current_card_id = card._id;
-                post_url = "/update-card";
-                raw_description = card.description;
+                state.changed_items = new Set([]);
+                state.current_card_id = card._id;
+                state.post_url = "/update-card";
+                state.raw_description = card.description;
 
                 // hljs.configure({ useBR: true });
                 $('pre code').each(function (i, block) {
@@ -262,7 +271,7 @@
 
             function displayRawCardDescription() {
                 var description_element = document.getElementById("card_description");
-                description_element.innerText = raw_description;
+                description_element.innerText = state.raw_description;
                 description_element.setAttribute("contenteditable", "true");
                 window.removeEventListener("keydown", arrowKeysForNavigation);
             }
@@ -271,7 +280,7 @@
                 document.getElementById("card_title").value = "";
                 document.getElementById("card_description").innerHTML = "";
                 document.getElementById("already_set_card_tags").value = "";
-                current_card_tags_have_changed = false;
+                state.current_card_tags_have_changed = false;
 
                 document.getElementById("card_urgency").value = 0;
                 document.getElementById("card_urgency_number").innerText = "0";
@@ -280,16 +289,16 @@
                 window.removeEventListener("keydown", arrowKeysForNavigation);
 
                 // Reset the contents of the current_card variable
-                changed_items.clear();
+                state.changed_items.clear();
                 current_card_tags.clear();
-                current_card_id = null;
-                raw_description = "";
-                post_url = "/add-card";
+                state.current_card_id = null;
+                state.raw_description = "";
+                state.post_url = "/add-card";
             }
 
             function handleInputChange(element_id) {
                 window.removeEventListener("keydown", arrowKeysForNavigation);
-                changed_items.add(element_id);
+                state.changed_items.add(element_id);
             }
 
             function handleTagsInputChange(event) {
@@ -322,7 +331,7 @@
                         `<button id="card_tag_text_${new_tag}" class="card_tag_button_text">${new_tag}</button><button id="card_tag_remove_${new_tag}" class="card_tag_button_remove" onclick="removeTagFromCard('${new_tag}')"> <i class="fa fa-times fa-fw" aria-hidden="true"></i> </button>`
                     );
                     document.getElementById("card_tag_input").value = "";
-                    current_card_tags_have_changed = true;
+                    state.current_card_tags_have_changed = true;
                 }
             }
 
@@ -330,7 +339,7 @@
                 document.getElementById(`card_tag_text_${tag}`).remove();
                 document.getElementById(`card_tag_remove_${tag}`).remove();
                 current_card_tags.delete(tag);
-                current_card_tags_have_changed = true;
+                state.current_card_tags_have_changed = true;
             }
 
             function insertTabsIfNecessary(event) {
@@ -346,26 +355,26 @@
 
             function saveCard() {
                 var payload = {};
-                changed_items.forEach((element_id) => {
+                state.changed_items.forEach((element_id) => {
                     payload[element_id.split("card_")[1]] = document.getElementById(element_id).value;
                 });
-                if (current_card_id) {
-                    payload._id = current_card_id;
+                if (state.current_card_id) {
+                    payload._id = state.current_card_id;
                 }
 
-                if (changed_items.has("card_description")) {
+                if (state.changed_items.has("card_description")) {
                     payload.description = String.raw`${document.getElementById("card_description").innerText}`;
                 }
 
-                payload.createdById = current_user_id;
-                if (current_card_tags_have_changed) {
+                payload.createdById = state.current_user_id;
+                if (state.current_card_tags_have_changed) {
                     payload.tags = Array.from(current_card_tags).join(" ");
                 }
                 
                 // If the tags or urgency has been changed, update the sidebar to reflect current info
-                var rerender_sidebar = current_card_tags_have_changed || changed_items.has("card_urgency");
+                var rerender_sidebar = state.current_card_tags_have_changed || changed_items.has("card_urgency");
                 
-                sendHTTPRequest("POST", post_url, payload, (response) => {
+                sendHTTPRequest("POST", state.post_url, payload, (response) => {
                     var saved_card = response.message;
                     my_cards_manager.update_card(saved_card);
                     renderCard(saved_card);
@@ -374,10 +383,10 @@
                         saved_card.tags.split(" ").forEach(tag => {
                             if (tag !== "") {
                                 tag = tag.trim();
-                                if (!tags_and_ids.hasOwnProperty(tag)) {
-                                    tags_and_ids[tag] = {};
+                                if (!state.tags_and_ids.hasOwnProperty(tag)) {
+                                    state.tags_and_ids[tag] = {};
                                 }
-                                tags_and_ids[tag][saved_card._id] = {urgency: saved_card.urgency};
+                                state.tags_and_ids[tag][saved_card._id] = {urgency: saved_card.urgency};
                             }
                         });
                         initializeSideBar();
@@ -388,8 +397,8 @@
             
             function moveCardToTrash() {
                 // Remove the card from the ones that get displayed
-                var removed_card_id = my_cards_manager.remove_card(current_card_id);
-                if (removed_card_id === current_card_id) {
+                var removed_card_id = my_cards_manager.remove_card(state.current_card_id);
+                if (removed_card_id === state.current_card_id) {
                     // Move on to the next card in the PQ
                     if (my_cards_manager.num_next() > 0) {
                         fetchNextCard();
@@ -402,7 +411,7 @@
                     // Request the server to trash the card
                     sendHTTPRequest("POST", "/trash-card", 
                         {
-                            _id: removed_card_id, createdById: current_user_id
+                            _id: removed_card_id, createdById: state.current_user_id
                         }, 
                         (trash_confirmation) => {
                             displayPopUp(trash_confirmation.message, 10000);
@@ -417,7 +426,7 @@
                 sendHTTPRequest(
                     "POST", "/restore-from-trash", 
                     {
-                        createdById: current_user_id,
+                        createdById: state.current_user_id,
                         _id: card_to_restore_id,
                     },
                     (response) => {
