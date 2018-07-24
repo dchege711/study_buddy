@@ -214,6 +214,11 @@
             }
 
             function renderCard(card) {
+
+                state.current_card_tags.clear();
+                state.current_card_tags_have_changed = false;
+                state.changed_items = new Set([]);
+
                 if (!card.title) {
                     displayNewCard();
                     return;
@@ -231,24 +236,20 @@
                 document.getElementById("card_description").innerHTML = description_html;
 
                 var tags_html = "";
-                current_card_tags.clear();
                 var tags_array = card.tags.trim().split(" ");
                 for (let i = 0; i < tags_array.length; i++) {
                     if (tags_array[i].length > 0) {
                         tags_html += `<button id="card_tag_text_${tags_array[i]}" class="card_tag_button_text">${tags_array[i]}</button><button id="card_tag_remove_${tags_array[i]}" class="card_tag_button_remove" onclick="removeTagFromCard('${tags_array[i]}')"> <i class="fa fa-times fa-fw" aria-hidden="true"></i> </button>`;
-                        current_card_tags.add(tags_array[i]);
+                        state.current_card_tags.add(tags_array[i]);
                     }
                 }
                 document.getElementById("already_set_card_tags").innerHTML = tags_html;
-                state.current_card_tags_have_changed = false;
-
                 document.getElementById("card_urgency").value = card.urgency;
                 document.getElementById("card_urgency_number").innerText = card.urgency;
                 document.getElementById("card_description").removeAttribute("contenteditable");
                 document.getElementById("side_bar_contents").style.height = document.getElementById("card_template").style.height;
 
                 // Reset the contents of the current_card variable
-                state.changed_items = new Set([]);
                 state.current_card_id = card._id;
                 state.post_url = "/update-card";
                 state.raw_description = card.description;
@@ -279,7 +280,7 @@
             function displayNewCard() {
                 document.getElementById("card_title").value = "";
                 document.getElementById("card_description").innerHTML = "";
-                document.getElementById("already_set_card_tags").value = "";
+                document.getElementById("already_set_card_tags").innerHTML = "";
                 state.current_card_tags_have_changed = false;
 
                 document.getElementById("card_urgency").value = 0;
@@ -290,7 +291,7 @@
 
                 // Reset the contents of the current_card variable
                 state.changed_items.clear();
-                current_card_tags.clear();
+                state.current_card_tags.clear();
                 state.current_card_id = null;
                 state.raw_description = "";
                 state.post_url = "/add-card";
@@ -323,8 +324,8 @@
             }
 
             function updateTagsButtons(new_tag) {
-                if (!current_card_tags.has(new_tag)) {
-                    current_card_tags.add(new_tag);
+                if (!state.current_card_tags.has(new_tag)) {
+                    state.current_card_tags.add(new_tag);
                     document.getElementById("tags_autocomplete_results").innerHTML = "";
                     document.getElementById("already_set_card_tags").insertAdjacentHTML(
                         "beforeend",
@@ -338,7 +339,7 @@
             function removeTagFromCard(tag) {
                 document.getElementById(`card_tag_text_${tag}`).remove();
                 document.getElementById(`card_tag_remove_${tag}`).remove();
-                current_card_tags.delete(tag);
+                state.current_card_tags.delete(tag);
                 state.current_card_tags_have_changed = true;
             }
 
