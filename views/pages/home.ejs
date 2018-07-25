@@ -369,11 +369,11 @@
 
                 payload.createdById = state.current_user_id;
                 if (state.current_card_tags_have_changed) {
-                    payload.tags = Array.from(current_card_tags).join(" ");
+                    payload.tags = Array.from(state.current_card_tags).join(" ");
                 }
                 
                 // If the tags or urgency has been changed, update the sidebar to reflect current info
-                var rerender_sidebar = state.current_card_tags_have_changed || changed_items.has("card_urgency");
+                var rerender_sidebar = state.current_card_tags_have_changed || state.changed_items.has("card_urgency");
                 
                 sendHTTPRequest("POST", state.post_url, payload, (response) => {
                     var saved_card = response.message;
