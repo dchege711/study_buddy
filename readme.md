@@ -42,6 +42,20 @@
 
 :soon: Read into layout/reflow. Avoid inefficient operations where possible. Starting resources [here](https://gist.github.com/paulirish/5d52fb081b3570c81e3a), [here](https://developers.google.com/speed/docs/insights/browser-reflow) and [here](https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers).
 
+### Implement a card review system
+
+<sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
+
+[Spaced Repitition](https://en.wikipedia.org/wiki/Spaced_repetition) is commonly practised when a user has to retain a large amount of information indefinitely. It exploits the [Spacing Effect](https://en.wikipedia.org/wiki/Spacing_effect), the phenomenon whereby learning is greater when studying is spread out over time, as opposed to studying the same amount of content in a single session.
+
+Flash card software usually adjusts the spacing time based on whether the user provided the right answer. Unlike vocabulary-based flash cards, most of my cards don't have an answer that can be checked trivially. I'll thus depend on the user updating the urgency attribute in lieu of providing an answer to the flash card. Since the cards are shown in decreasing order of urgency, cards that are ranked lower will appear much later in subsequent review sessions.
+
+Two immediate concerns come to mind:
+
+1. Support a `Review Mode` setting that automatically saves the card whenever the urgency attribute is changed, and advances to the next card in the queue. This saves the user from saving the changes and requesting for the next card.
+
+1. Over time, the urgencies on the cards might drift towards zero. I don't really know what to do about this. There's a chance that the user will be adding new cards over time (and these new cards are likely to have mid/high urgencies) or that the user will find a card that they wish to see more often (and thus raise the urgency). Depending on which of the two scenarios pan out, I'll decide whether additional code is needed to mitigate this.
+
 ### Enhance the Tagging System
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
