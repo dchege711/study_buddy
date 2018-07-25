@@ -2,6 +2,8 @@
 
 ## [Tasks](#tasks)
 
+:white_check_mark: [Implement a Card Review System](#implement-a-card-review-system)
+
 :white_check_mark: [Enhance the Tagging System](#enhance-the-tagging-system)
 
 :white_check_mark: [Support Text Search for Cards](#support-text-search-for-cards)
@@ -42,7 +44,7 @@
 
 :soon: Read into layout/reflow. Avoid inefficient operations where possible. Starting resources [here](https://gist.github.com/paulirish/5d52fb081b3570c81e3a), [here](https://developers.google.com/speed/docs/insights/browser-reflow) and [here](https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers).
 
-### Implement a card review system
+### Implement a Card Review System
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
 
@@ -52,9 +54,9 @@ Flash card software usually adjusts the spacing time based on whether the user p
 
 Two immediate concerns come to mind:
 
-1. Support a `Review Mode` setting that automatically saves the card whenever the urgency attribute is changed, and advances to the next card in the queue. This saves the user from saving the changes and requesting for the next card.
+1. Support a `Review Mode` setting that automatically saves the card whenever the urgency attribute is changed, and advances to the next card in the queue. This saves the user from saving the changes and requesting for the next card. (Implemented)
 
-1. Over time, the urgencies on the cards might drift towards zero. I don't really know what to do about this. There's a chance that the user will be adding new cards over time (and these new cards are likely to have mid/high urgencies) or that the user will find a card that they wish to see more often (and thus raise the urgency). Depending on which of the two scenarios pan out, I'll decide whether additional code is needed to mitigate this.
+1. Over time, the urgencies on the cards might drift towards zero. I don't really know what to do about this. There's a chance that the user will be adding new cards over time (and these new cards are likely to have mid/high urgencies) or that the user will find a card that they wish to see more often (and thus raise the urgency). Depending on which of the two scenarios pan out, I'll decide whether additional code is needed to mitigate this. (Pending)
 
 ### Enhance the Tagging System
 

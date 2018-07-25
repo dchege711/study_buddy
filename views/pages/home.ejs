@@ -29,6 +29,101 @@
             window.addEventListener("keydown", arrowKeysForNavigation);
 
         </script>
+
+        <style>
+
+            .switch {
+                position: relative;
+                display: inline-block;
+                width: 60px;
+                height: 34px;
+            }
+
+            .switch input {display:none;}
+
+            .slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: #ccc;
+                -webkit-transition: .4s;
+                transition: .4s;
+            }
+
+            .slider:before {
+                position: absolute;
+                content: "";
+                height: 26px;
+                width: 26px;
+                left: 4px;
+                bottom: 4px;
+                background-color: white;
+                -webkit-transition: .4s;
+                transition: .4s;
+            }
+
+            input:checked + .slider {
+                background-color: #2196F3;
+            }
+
+            input:focus + .slider {
+                box-shadow: 0 0 1px #2196F3;
+            }
+
+            input:checked + .slider:before {
+                -webkit-transform: translateX(26px);
+                -ms-transform: translateX(26px);
+                transform: translateX(26px);
+            }
+
+            /* Rounded sliders */
+            .slider.round {
+                border-radius: 34px;
+            }
+
+            .slider.round:before {
+                border-radius: 50%;
+            }
+
+            .slider.round::after {
+                position:relative;
+                right:70px;
+                content: "Review Mode"
+            }
+
+            /* Tooltip container */
+            .tooltip {
+                position: relative;
+                display: inline-block;
+            }
+
+            /* Tooltip text */
+            .tooltip .tooltiptext {
+                visibility: hidden;
+                width: 150px;
+                background-color: black;
+                color: #fff;
+                text-align: center;
+                padding: 5px 0;
+                border-radius: 6px;
+                font-size: smaller;
+            
+                /* Position the tooltip text - see examples below! */
+                position: absolute;
+                z-index: 1;
+                top: -5px;
+                right: 105%;
+            }
+
+            /* Show the tooltip text when you mouse over the tooltip container */
+            .tooltip:hover .tooltiptext {
+                visibility: visible;
+            }
+        
+        </style>
         
     </head>
 
@@ -51,8 +146,18 @@
                     </div>
                 </div>
 
-                <p id="filter_list" class="w3-right w3-container"></p>
+                <label class="w3-right switch tooltip">
+                    <input type="checkbox" id="review_mode_toggle" onchange="toggleReviewMode();">
+                    <span class="slider round"></span>
+                    <span class="tooltiptext">
+                        Modifying the urgency of a card will automatically save the changes and display the next card on the queue.
+                    </span>
+                </label>
                 
+            </div>
+
+            <div>
+                <p id="filter_list" class="w3-right w3-container"></p>
             </div>
 
             <div class="w3-container">
@@ -99,6 +204,7 @@
                 current_card_tags: new Set([]),
                 current_card_tags_have_changed: false,
                 post_url: null,
+                review_mode_on: false
             }
 
             if (!state.tags_and_ids) state.tags_and_ids = {};
@@ -169,6 +275,10 @@
                 window.setTimeout(() => {
                     makeInvisible("out_of_cards_popup")
                 }, timeout_ms);
+            }
+
+            function toggleReviewMode() {
+                state.review_mode_on = document.getElementById("review_mode_toggle").checked;
             }
 
             function makeInvisible(element_id) {
@@ -350,11 +460,17 @@
                 }
             }
 
-            function updateUrgencyCounter() {
-                document.getElementById("card_urgency_number").innerText = document.getElementById("card_urgency").value;
+            function handleCardUrgencyChange() {
+                handleInputChange("card_urgency");
+                if (state.review_mode_on) {
+                    saveCard(false);
+                    fetchNextCard();
+                } else {
+                    document.getElementById("card_urgency_number").innerText = document.getElementById("card_urgency").value;
+                }
             }
 
-            function saveCard() {
+            function saveCard(render_saved_card=true) {
                 var payload = {};
                 state.changed_items.forEach((element_id) => {
                     payload[element_id.split("card_")[1]] = document.getElementById(element_id).value;
@@ -378,7 +494,7 @@
                 sendHTTPRequest("POST", state.post_url, payload, (response) => {
                     var saved_card = response.message;
                     my_cards_manager.update_card(saved_card);
-                    renderCard(saved_card);
+                    if (render_saved_card) renderCard(saved_card);
 
                     if (rerender_sidebar) {
                         saved_card.tags.split(" ").forEach(tag => {
