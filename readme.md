@@ -54,7 +54,7 @@ Flash card software usually adjusts the spacing time based on whether the user p
 
 Two immediate concerns come to mind:
 
-1. Support a `Review Mode` setting that automatically saves the card whenever the urgency attribute is changed, and advances to the next card in the queue. This saves the user from saving the changes and requesting for the next card. (Implemented)
+1. Support a `Review Mode` setting that automatically saves the card whenever the urgency attribute is changed, and advances to the next card in the queue. This saves the user from having to click the `Save` and the `Next Card` buttons. (Implemented)
 
 1. Over time, the urgencies on the cards might drift towards zero. I don't really know what to do about this. There's a chance that the user will be adding new cards over time (and these new cards are likely to have mid/high urgencies) or that the user will find a card that they wish to see more often (and thus raise the urgency). Depending on which of the two scenarios pan out, I'll decide whether additional code is needed to mitigate this. (Pending)
 
