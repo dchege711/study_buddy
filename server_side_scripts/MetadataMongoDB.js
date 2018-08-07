@@ -1,7 +1,7 @@
 var Metadata = require('./models/MetadataCardSchema');
 var Card = require('./models/CardSchema.js');
 
-var debug = false;
+var debug = true;
 
 /**
  * 
@@ -256,7 +256,7 @@ exports.send_to_trash = function (payload, callBack) {
                             var trashed_card_id = card_JSON._id;
 
                             // Remove the card from the lists that the user previews from
-                            card_JSON.tags.split("#").forEach(tag_to_remove => {
+                            card_JSON.tags.split(" ").forEach(tag_to_remove => {
                                 tag_to_remove = tag_to_remove.trim();
                                 if (tag_to_remove !== "") {
                                     delete metadataNodeInfo[tag_to_remove][trashed_card_id];

@@ -12,20 +12,20 @@ var addAndPopulateMetadata = function(userIDInApp) {
             "userIDInApp": userIDInApp,
             "metadataIndex": 0
         }, (response) => {
-        console.log(response["message"]);
+        console.log(response.message);
         populateMetadata(1);
     });
 };
 
 var testMetadataUpdate = function(callBack) {
     var randomUrgency = Math.floor(Math.random() * 200);
-    var cardID = "5a7d20921aef274630536c1a"
+    var cardID = "5a7d20921aef274630536c1a";
     CardsDB.update({
         _id: cardID, urgency: randomUrgency
     }, function(response) {
         MetadataDB.read({ "userIDInApp": 1 }, (results) => {
             console.log("Testing updates to metadata...");
-            console.log(results[0]["stats"][0][cardID]["urgency"] + " should equal " + randomUrgency);
+            console.log(results[0].stats[0][cardID].urgency + " should equal " + randomUrgency);
             callBack();
         });
     });
@@ -39,7 +39,7 @@ var deleteMetadata = function (userIDInApp, callBack) {
         {
             "userIDInApp": userIDInApp
         }, (response) => {
-            console.log(response["message"]);
+            console.log(response.message);
             callBack(userIDInApp);
         });
 };
@@ -54,9 +54,9 @@ var populateMetadata = function(userIDInApp) {
         {
             "userIDInApp": userIDInApp
         }, (response) => {
-            cards = response["message"];
+            cards = response.message;
             MetadataDB.update(cards, (response) => {
-                console.log(response["message"]);
+                console.log(response.message);
             });
         }
     );
@@ -64,8 +64,4 @@ var populateMetadata = function(userIDInApp) {
 
 if (require.main === module) {
     deleteMetadata(1, addAndPopulateMetadata);
-    // addAndPopulateMetadata(1);
-    // testMetadataUpdate(function() {
-    //     process.exit(0);
-    // });
 }

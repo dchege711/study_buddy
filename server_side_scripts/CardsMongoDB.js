@@ -1,5 +1,6 @@
+// require('./MongooseClient');
+
 var Card = require('./models/CardSchema.js');
-// var User = require("./models/UserSchema.js");
 var MetadataDB = require('./MetadataMongoDB');
 
 var generic_500_msg = { 
@@ -38,7 +39,7 @@ exports.create = function(payload, callBack) {
             callBack({
                 "success": false, "internal_error": true,
                 "message": error
-            })
+            });
         } else {
             // Update the metadata object with this card's details
             savedCard.previousTags = card.tags;
@@ -120,7 +121,6 @@ exports.update = function(cardJSON, callBack) {
             });
         } else {
             var previousTags = card.tags;
-            if (previousTags.includes("#")) previousTags = previousTags.replace("#", "");
             // Overwrite the contents that changed
             Object.keys(cardJSON).forEach(card_key => {
                 card[card_key] = cardJSON[card_key];
@@ -220,3 +220,33 @@ exports.search = function(payload, callBack) {
             }
         });
 };
+
+/**
+ * @description For uniformity, tags should be delimited by white-space. If a 
+ * tag has multiple words, then an underscore or hyphen can be used to delimit
+ * the words themselves.
+ * 
+ * Remember to add `require('./MongooseClient');` at the top of this file when
+ * running this script as main.
+ * 
+ */
+let standardizeTagDelimiters = function() {
+    let cursor = Card.find({}).cursor();
+    cursor.on("data", (card) => {
+        let currentCard = card; // In case of any race conditions...
+        currentCard.tags = currentCard.tags.replace(/#/g, "");
+
+        currentCard.save((err, savedCard) => {
+            if (err) console.log(err);
+            else console.log(`${savedCard.title} -> ${savedCard.tags}`);
+        });
+            
+    });
+    cursor.on("close", () => {
+        if (debug) console.log("Finished the operation");
+    });
+};
+
+if (require.main === module) {
+    standardizeTagDelimiters();
+}

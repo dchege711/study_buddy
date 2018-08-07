@@ -72,6 +72,8 @@ Two immediate concerns come to mind:
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
 
+I need a tags convention. I chose white-space delimited tags. For instance, multiple card tags would be entered as follows: `string_processing algorithms dynamic_programming`.
+
 I currently have 100 cards and 63 unique tags. Ideally, I want to have as many cards as I want and the fewest tags possible while making sure that the tags are descriptive. I can't afford to have near tags such as `searching` and `search` at the same time. Who knows if 3 weeks from now I'll start tagging cards using `information_retrieval` instead of `search`. There are three levels at which I can approach this. Level 1 is the least sophisticated while Level 3 is the most sophisticated. I'll start by implementing Level 1. If Level 1 isn't satisfactory (based on how I use Study Buddy), I'll implement Level 2, and maybe even Level 3.
 
 #### Level 1 (Implemented)
