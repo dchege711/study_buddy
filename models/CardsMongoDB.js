@@ -1,6 +1,6 @@
 // require('./MongooseClient');
 
-var Card = require('./models/CardSchema.js');
+var Card = require('./mongoose_models/CardSchema.js');
 var MetadataDB = require('./MetadataMongoDB');
 
 var generic_500_msg = { 

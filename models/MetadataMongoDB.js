@@ -1,5 +1,5 @@
-var Metadata = require('./models/MetadataCardSchema');
-var Card = require('./models/CardSchema.js');
+var Metadata = require('./mongoose_models/MetadataCardSchema');
+var Card = require('./mongoose_models/CardSchema.js');
 
 var debug = true;
 
