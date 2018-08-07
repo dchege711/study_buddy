@@ -4,10 +4,10 @@ var path = require("path");
 var bodyParser = require("body-parser");
 var cookieParser = require("cookie-parser");
 var AccountRoutes = require("./routes/AuthenticationRoutes.js");
-var AppRoutes = require("./routes/AppRoutes.js");
+var AppRoutes = require("./routes/InAppRoutes.js");
 
 // Needed to get a Mongoose instance running for this process
-require("./server_side_scripts/MongooseClient.js");
+require("./models/MongooseClient.js");
 
 var app = express();
 var port = process.env.PORT || 5000;

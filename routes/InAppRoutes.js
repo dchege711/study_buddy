@@ -23,3 +23,5 @@ router.post("/delete-card", requireLogIn, inAppController.delete_card);
 router.post("/trash-card", requireLogIn, inAppController.trash_card);
 
 router.post("/restore-from-trash", requireLogIn, inAppController.restore_from_trash);
+
+module.exports = router;
