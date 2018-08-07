@@ -365,9 +365,10 @@
                 state.raw_description = card.description;
 
                 // hljs.configure({ useBR: true });
-                $('pre code').each(function (i, block) {
-                    hljs.highlightBlock(block);
-                });
+                let code_elements = document.querySelectorAll('pre code');
+                for (let i = 0; i < code_elements.length; i++) {
+                    hljs.highlightBlock(code_elements[i]);
+                }
 
                 loadMathJAX();
             }
