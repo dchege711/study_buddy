@@ -1,5 +1,7 @@
 # Contents
 
+The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
+
 ## [Tasks](#tasks)
 
 :white_check_mark: [Implement a Card Review System](#implement-a-card-review-system)
@@ -26,6 +28,10 @@
 
 ### To-do Items
 
+:soon: Submit the web app to various forums. :sweat_smile:
+
+:soon: Learn how to handle subscriptions using Stripe.
+
 :soon: Implement logic for recovering cards from the trash.
 
 :soon: Implement a method that cleans all the cards in the trash and unvalidated accounts that are more than 30 days old.
@@ -40,9 +46,13 @@
 
 :soon: Change the underlying DS for the cards manager from two max-oriented priority queues to a balanced binary search tree. That way, you can visit a any card on the tree much faster on average.
 
-:soon: Implement one of the researched flashcard memory practices.
-
 :soon: Read into layout/reflow. Avoid inefficient operations where possible. Starting resources [here](https://gist.github.com/paulirish/5d52fb081b3570c81e3a), [here](https://developers.google.com/speed/docs/insights/browser-reflow) and [here](https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers).
+
+:soon: Avail newly added tags in the autocomplete suggestions.
+
+:soon: Make the title contenteditable so that LaTEX can render on it. Also update the MathJax configuration to track the title and description on startup.
+
+:soon: Add spoiler tag support.
 
 ### Implement a Card Review System
 
