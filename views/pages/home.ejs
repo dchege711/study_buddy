@@ -535,8 +535,6 @@
                             displayPopUp(trash_confirmation.message, 10000);
                     });
 
-                } else {
-                    console.log("Error: The wrong card was removed!");
                 }
             }
 
@@ -577,7 +575,6 @@
                             },
                             (response) => {
                                 if (response.success) {
-                                    console.log(`\n${response.message.length} search results`);
                                     var search_results = response.message;
                                     if (key_press === " ") {
                                         var search_results_html = "";

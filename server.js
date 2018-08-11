@@ -4,7 +4,7 @@ var path = require("path");
 var bodyParser = require("body-parser");
 var cookieParser = require("cookie-parser");
 var AccountRoutes = require("./routes/AuthenticationRoutes.js");
-var AppRoutes = require("./routes/InAppRoutes.js");
+var InAppRoutes = require("./routes/InAppRoutes.js");
 
 // Needed to get a Mongoose instance running for this process
 require("./models/MongooseClient.js");
@@ -25,7 +25,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser());
 
 app.use("/", AccountRoutes);
-app.use("/", AppRoutes);
+app.use("/", InAppRoutes);
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");

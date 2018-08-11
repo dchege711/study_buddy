@@ -1,5 +1,6 @@
 var CardsDB = require("../models/CardsMongoDB.js");
 var MetadataDB = require("../models/MetadataMongoDB.js");
+var convertObjectToResponse = require("./ControllerUtilities.js").convertObjectToResponse;
 
 exports.read_card = function (req, res) {
     CardsDB.read(req.body, function (card) {
@@ -31,7 +32,7 @@ exports.add_card = function (req, res) {
 
 exports.search_cards = function (req, res) {
     var payload = req.body;
-    payload.userIDInrouter = req.session.user.userIDInrouter;
+    payload.userIDInApp = req.session.user.userIDInApp;
     CardsDB.search(payload, (search_results) => {
         convertObjectToResponse(search_results, res);
     });

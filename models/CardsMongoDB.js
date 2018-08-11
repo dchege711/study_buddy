@@ -194,7 +194,6 @@ exports.search = function(payload, callBack) {
      * and should be preferred where possible. Note that the JS expression
      * is processed for EACH document in the collection. Yikes!
      */
-
     Card
         .find({
             $and: [

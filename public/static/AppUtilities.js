@@ -31,7 +31,12 @@ function sendHTTPRequest(method, url, payload, callBack) {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
-            callBack(JSON.parse(this.responseText));
+            try {
+                callBack(JSON.parse(this.responseText));
+            } catch (err) {
+                console.error(this.responseText);
+                console.error(err);
+            }
         }
     };
     xhttp.open(method, url, true);
