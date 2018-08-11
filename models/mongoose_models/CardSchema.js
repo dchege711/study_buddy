@@ -13,21 +13,16 @@ var mongoose = require('mongoose');
  * 
  */
 
-var cardSchema = new mongoose.Schema({
-    title: String,
-    description: String,
-    tags: {
-        type: String,
-        lowercase: true,
-        trim: true
-    },
-    urgency: Number,
-    metadataIndex: Number,
-    createdById: Number,
-    lastReviewed: {
-        type: Date,
-        default: Date.now
-    }}, 
+var cardSchema = new mongoose.Schema(
+    {
+        title: { type: String, default: "" },
+        description: { type: String, default: "" },
+        tags: { type: String, lowercase: true, trim: true, default: "" },
+        urgency: { type: Number, default: 0 },
+        metadataIndex: Number,
+        createdById: Number,
+        lastReviewed: { type: Date, default: Date.now }
+    }, 
     {
         timestamps: true,
         collection: "c13u_study_buddy"

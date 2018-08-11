@@ -105,6 +105,7 @@ function max_PQ() {
      * delete it.
      */
     pq_object.peek = function() {
+        if (n === 0) return null;
         return pq[1];
     };
 

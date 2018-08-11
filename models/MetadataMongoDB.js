@@ -353,27 +353,29 @@ function updateMetadataWithCardDetails(savedCard, metadataDoc, callBack) {
     }
 
     // Save the card's id in each tag that it has
-    savedCard.tags.split(" ").forEach(tag => {
-        var strippedTag = tag.trim();
-        if (strippedTag !== "") {
-            // If we've not seen this tag before, create its node
-            if (metadataNodeInfo[strippedTag] === undefined) {
-                metadataNodeInfo[strippedTag] = {};
-            }
+    if (savedCard.tags) {
+        savedCard.tags.split(" ").forEach(tag => {
+            var strippedTag = tag.trim();
+            if (strippedTag !== "") {
+                // If we've not seen this tag before, create its node
+                if (metadataNodeInfo[strippedTag] === undefined) {
+                    metadataNodeInfo[strippedTag] = {};
+                }
 
-            // If we've not seen this card under this tag, add it
-            if (metadataNodeInfo[strippedTag][cardID] === undefined) {
-                metadataNodeInfo[strippedTag][cardID] = {}
-            }
+                // If we've not seen this card under this tag, add it
+                if (metadataNodeInfo[strippedTag][cardID] === undefined) {
+                    metadataNodeInfo[strippedTag][cardID] = {}
+                }
 
-            // If this tag was in the previous version of the card, flag it
-            if (strippedTag in prevTagStillExists) {
-                prevTagStillExists[strippedTag] = true;
-            }
+                // If this tag was in the previous version of the card, flag it
+                if (strippedTag in prevTagStillExists) {
+                    prevTagStillExists[strippedTag] = true;
+                }
 
-            metadataNodeInfo[strippedTag][cardID].urgency = urgency;
-        }
-    });
+                metadataNodeInfo[strippedTag][cardID].urgency = urgency;
+            }
+        });
+    }
     metadataDoc.markModified("node_information");
 
     // Get rid of all tags that were deleted in the current card

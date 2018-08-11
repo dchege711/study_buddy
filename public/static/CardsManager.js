@@ -11,10 +11,10 @@ function cards_manager(tags_and_ids, user_id) {
     var cards_manager_obj = {};
 
     /* Hold the IDs of the cards that are yet to be viewed */
-    var pq_cards_to_view;
+    var pq_cards_to_view = max_PQ();
 
     /* Hold the IDs of the cards that have already been viewed. */
-    var pq_cards_already_viewed;
+    var pq_cards_already_viewed = max_PQ();
 
     /* Empty Card Template */
     cards_manager_obj.empty_card = {
@@ -125,14 +125,19 @@ function cards_manager(tags_and_ids, user_id) {
      * the queue of cards.
      */
     cards_manager_obj.remove_card = function(card_to_remove_id) {
+
         // The card to be removed will be at the top of either PQ
-        if (pq_cards_already_viewed.peek()[0] == card_to_remove_id) {
+        let card_to_remove = pq_cards_already_viewed.peek();
+        if (card_to_remove && card_to_remove[0] == card_to_remove_id) {
             return pq_cards_already_viewed.del_max()[0];
-        } else if (pq_cards_to_view.peek()[0] == card_to_remove_id) {
-            return pq_cards_to_view.del_max()[0];
         } else {
-            return null;
+            card_to_remove = pq_cards_to_view.peek();
+            if (card_to_remove && card_to_remove[0] == card_to_remove_id) {
+                return pq_cards_to_view.del_max()[0];
+            }
         }
+        
+        return null;
     };
 
     /**
