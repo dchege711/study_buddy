@@ -18,7 +18,10 @@ app.use(session({
     httpOnly: false,
     resave: false,
     name: "c13u-study-buddy",
-    store: new MongoStore({ mongooseConnection: dbConnection.mongooseConnection }),
+    store: new MongoStore({
+        mongooseConnection: dbConnection.mongooseConnection,
+        touchAfter: 24 * 3600
+    }),
     saveUninitialized: true
 }));
 app.use(bodyParser.urlencoded({ extended: true }));
