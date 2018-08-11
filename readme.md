@@ -38,8 +38,6 @@ The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
 
 :soon: Support filtering on the first set of filters. Filter by time too.
 
-:soon: Include an about page with tutorial on how to Study Buddy's features.
-
 :soon: Add an account page with configurable settings, e.g. code syntax theme, light vs dark UI, etc.
 
 :soon: Figure out why cards with similar content but different IDs exist in the database. There is a data replication bug lying somewhere.
