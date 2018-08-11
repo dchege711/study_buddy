@@ -42,3 +42,5 @@ process.on("SIGINT", function () {
         process.exit(0);
     });
 });
+
+exports.mongooseConnection = db;

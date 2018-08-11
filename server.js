@@ -1,5 +1,6 @@
 var express = require("express");
 var session = require("express-session");
+var MongoStore = require('connect-mongo')(session);
 var path = require("path");
 var bodyParser = require("body-parser");
 var cookieParser = require("cookie-parser");
@@ -7,7 +8,7 @@ var AccountRoutes = require("./routes/AuthenticationRoutes.js");
 var InAppRoutes = require("./routes/InAppRoutes.js");
 
 // Needed to get a Mongoose instance running for this process
-require("./models/MongooseClient.js");
+const dbConnection = require("./models/MongooseClient.js");
 
 var app = express();
 var port = process.env.PORT || 5000;
@@ -17,6 +18,7 @@ app.use(session({
     httpOnly: false,
     resave: false,
     name: "c13u-study-buddy",
+    store: new MongoStore({ mongooseConnection: dbConnection.mongooseConnection }),
     saveUninitialized: true
 }));
 app.use(bodyParser.urlencoded({ extended: true }));
