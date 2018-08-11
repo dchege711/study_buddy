@@ -329,6 +329,11 @@
                 state.current_card_tags_have_changed = false;
                 state.changed_items = new Set([]);
 
+                if (!card.description) card.description = "";
+                if (!card.tags) card.tags = "";
+                if (!card.title) card.title = "";
+                if (!card.urgency) card.urgency = 0;
+
                 if (!card.title) {
                     displayNewCard();
                     return;
