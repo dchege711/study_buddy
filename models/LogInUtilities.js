@@ -49,8 +49,8 @@ exports.getRandomString = function(string_length, alphabet) {
  * and a validation string.
  */
 getIdInAppAndValidationURI = function(callBack) {
-    var randomID = parseInt(getRandomString(12, "123456789"), 10);
-    var validationURI = getRandomString(32, LOWER_CASE + DIGITS);
+    var randomID = parseInt(exports.getRandomString(12, "123456789"), 10);
+    var validationURI = exports.getRandomString(32, LOWER_CASE + DIGITS);
     User.findOne(
         { $or: 
             [
@@ -158,7 +158,7 @@ exports.sendAccountValidationLink = function(payload, callBack) {
         } else {
             var user = users[0];
             if (user.account_validation_uri === undefined || user.account_is_valid === undefined) {
-                user.account_validation_uri = getRandomString(32, LOWER_CASE + DIGITS);
+                user.account_validation_uri = exports.getRandomString(32, LOWER_CASE + DIGITS);
                 user.account_is_valid = false;
                 User.find(
                     { account_validation_uri: user.account_validation_uri},
@@ -443,7 +443,7 @@ exports.deleteSessionToken = function (session_token, callBack) {
  */
 exports.sendResetLink = function(userIdentifier, callBack) {
     
-    reset_password_uri = getRandomString(50, "abcdefghijklmnopqrstuvwxyz0123456789");
+    reset_password_uri = exports.getRandomString(50, "abcdefghijklmnopqrstuvwxyz0123456789");
 
     User.find({ resetPasswordURL: reset_password_uri}, (error, existing_users_with_same_uri) => {
         if (error) console.log(error);

@@ -34,7 +34,6 @@ function sendHTTPRequest(method, url, payload, callBack) {
             try {
                 callBack(JSON.parse(this.responseText));
             } catch (err) {
-                console.error(this.responseText);
                 console.error(err);
             }
         }

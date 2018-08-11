@@ -1,7 +1,7 @@
 var Metadata = require('./mongoose_models/MetadataCardSchema');
 var Card = require('./mongoose_models/CardSchema.js');
 
-var debug = true;
+var debug = false;
 
 /**
  * 
@@ -274,7 +274,6 @@ exports.send_to_trash = function (payload, callBack) {
                             if (!metadataDoc.trashed_cards || metadataDoc.trashed_cards.length == 0) {
                                 metadataDoc.trashed_cards = [];
                                 metadataDoc.trashed_cards.push({});
-                                console.log("Added an empty object to metadataDoc.trashed_cards[]");
                             }
                             metadataDoc.trashed_cards[0][trashed_card_id] = Date.now();
 
