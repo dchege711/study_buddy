@@ -1,10 +1,11 @@
 var stanfordCrypto = require('sjcl');
 var User = require("./mongoose_models/UserSchema.js");
 var MetadataDB = require("./MetadataMongoDB.js");
+var Card = require('./mongoose_models/CardSchema.js');
+var Metadata = require("./mongoose_models/MetadataCardSchema");
 var Token = require("./mongoose_models/Token.js");
 var Email = require("./EmailClient.js");
 var config = require("../config.js");
-var mongoose = require('mongoose');
 
 var debug = false;
 
@@ -600,6 +601,44 @@ exports.resetPassword = function(payload, callBack) {
                         
                     }
                 });
+            });
+        }
+    });
+};
+
+
+/**
+ * @description Permanently delete a user's account and all related cards.
+ * 
+ * @param {Number} userIDInApp The ID of the account that will be deleted.
+ * 
+ * @param {Function} callBack The first parameter will be set in case of errors,
+ * the second param will be a JSON object that has redirect instructions.
+ * 
+ */
+exports.deleteAccount = function(userIDInApp, callBack) {
+    // Forgive Lord-of_Promises, I have not yet left the Land of Callbacks :-(
+    User.deleteMany({ userIDInApp: userIDInApp }, (err) => {
+        if (err) { console.error(err); callBack(generic_500_msg); }
+        else {
+            Card.deleteMany({ createdById: userIDInApp }, (err) => {
+                if (err) { console.error(err); callBack(generic_500_msg); }
+                else {
+                    Token.deleteMany({ userIDInApp: userIDInApp }, (err) => {
+                        if (err) { console.error(err); callBack(generic_500_msg); }
+                        else {
+                            Metadata.deleteMany({ createdById: userIDInApp }, (err) => {
+                                if (err) { console.error(err); callBack(generic_500_msg); }
+                                else {
+                                    callBack(null, {
+                                        success: true, status: 200,
+                                        message: "Account successfully deleted. Sayonara!"
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
             });
         }
     });

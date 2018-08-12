@@ -1,6 +1,7 @@
 var CardsDB = require("../models/CardsMongoDB.js");
 var MetadataDB = require("../models/MetadataMongoDB.js");
 var controller_utils = require("./ControllerUtilities.js");
+var login_utils = require("../models/LogInUtilities.js");
 
 var convertObjectToResponse = controller_utils.convertObjectToResponse;
 var deleteTempFile = controller_utils.deleteTempFile;
@@ -73,12 +74,26 @@ exports.download_user_data = function(req, res) {
     MetadataDB.write_cards_to_json_file(req.session.user.userIDInApp, (err, filepath, filename) => {
         if (err) { convertObjectToResponse(err, res); }
         else {
-            // res.setHeader(`Content-disposition`, `attachment; filename=${filename}`);
-            // res.setHeader('Content-type', 'application/json');
             res.download(filepath, filename, (err) => {
                 if (err) { console.error(err); }
                 else { deleteTempFile(filepath); }
             });
         }
     });
+};
+
+exports.delete_account = function(req, res) {
+    login_utils.deleteAccount(
+        req.session.user.userIDInApp, (err, confirmation) => {
+            if (err) convertObjectToResponse(err, res);
+            else {
+                delete req.session.user;
+                res.setHeader(
+                    "Set-Cookie",
+                    [`session_token=null;Expires=Thu, 01 Jan 1970 00:00:00 GMT`]
+                );
+                convertObjectToResponse(confirmation, res);
+            }
+        }
+    );
 };

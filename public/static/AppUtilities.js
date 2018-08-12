@@ -38,10 +38,9 @@ function sendHTTPRequest(method, url, payload, callBack) {
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             try {
-                callBack(JSON.parse(this.responseText));
-            } catch (err) {
-                console.error(err);
-            }
+                let json_response_data = JSON.parse(this.responseText);
+                callBack(json_response_data);
+            } catch (err) { }
         }
     };
     xhttp.open(method, url, true);

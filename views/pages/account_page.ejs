@@ -122,7 +122,10 @@
 
         function confirmDeletion() {
             if (window.confirm("Deleting your account is irreversible. Continue?")) {
-                window.alert("Psyche!");
+                sendHTTPRequest("POST", "/account/delete-account", {}, (response) => {
+                    localStorage.clear();
+                    window.location = "/";
+                });
             }
         }
 

@@ -28,4 +28,6 @@ router.post("/restore-from-trash", requireLogIn, inAppController.restore_from_tr
 
 router.get("/account/download-user-data", requireLogIn, inAppController.download_user_data);
 
+router.post("/account/delete-account", requireLogIn, inAppController.delete_account);
+
 module.exports = router;
