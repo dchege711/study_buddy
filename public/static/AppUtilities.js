@@ -49,5 +49,11 @@ function sendHTTPRequest(method, url, payload, callBack) {
     xhttp.send(JSON.stringify(payload));
 }
 
-// module is not defined in the browser
-// module.exports = {sendHTTPRequest};
+/**
+ * @description Parse the parameters that are passed in the URL and perform
+ * the expected actions.
+ */
+function processParams() {
+    var params = (new URL(document.location)).searchParams;
+    if (params.has("msg")) alert(params.get("msg"));
+}
