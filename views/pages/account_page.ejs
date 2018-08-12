@@ -38,6 +38,14 @@
 
                     <h3 class="account_header">Account Info</h3>
 
+                    <p>
+                        Username: <%= account_info.username %>
+                        <br><br>
+                        Email Address: <%= account_info.email %>
+                        <br><br>
+                        Study Buddy Birthday: <%= account_info.user_reg_date %>
+                    </p>
+
                 </div>
 
                 <div class="account_section">
@@ -57,7 +65,7 @@
                     <h3 class="account_header">Request your data</h3>
 
                     <p>
-                        The data will be delivered to the email address specified in your account.
+                        The data will be delivered to <%= account_info.email %>
                         <br>
                         <br>
                         <button class="w3-btn w3-round-xxlarge w3-left w3-green" onClick="sendData();">

@@ -20,3 +20,16 @@
     </ul>
 
 </div>
+
+<script type="text/javascript">
+    /**
+     * @description Log out the currently logged in user.
+     */
+    function logOut() {
+        sendHTTPRequest("POST", "/logout", {}, (response) => {
+            localStorage.clear();
+            window.location = "/";
+        });
+    }
+
+</script>

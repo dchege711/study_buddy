@@ -13,7 +13,7 @@ exports.home = function (req, res) {
 };
 
 exports.account_get = function (req, res) {
-    res.render("pages/account_page.ejs");
+    res.render("pages/account_page.ejs", {account_info: req.session.user});
 };
 
 exports.read_metadata = function (req, res) {

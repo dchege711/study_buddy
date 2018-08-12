@@ -29,7 +29,7 @@ var userSchema = new mongoose.Schema(
         account_is_valid: Boolean
     },
     {
-        timestamps: false,
+        timestamps: true,
         autoIndex: false,
         collection: "study_buddy_users"
     }

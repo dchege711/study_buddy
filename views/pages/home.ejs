@@ -621,13 +621,6 @@
                 );
             }
 
-            function logOut() {
-                sendHTTPRequest("POST", "/logout", {}, (response) => {
-                    localStorage.clear();
-                    window.location = "/";
-                });
-            }
-
         </script>
 
     </body>

@@ -84,17 +84,22 @@ provideSessionToken = function(user, callBack) {
             console.error(error);
             callBack(generic_500_msg);
         } else if (tokenObject) {
-            provideSessionToken(callBack);
+            provideSessionToken(user, callBack);
         } else {
             var new_token = Token({
-                token_id: session_token, userIDInApp: user.userIDInApp
+                token_id: session_token, userIDInApp: user.userIDInApp,
+                username: user.username, email: user.email,
+                user_reg_date: new Date(user.createdAt).toDateString()
             });
             new_token.save((error, saved_token) => {
                 if (error) {
                     console.error(error);
                     callBack(generic_500_msg);
                 } else {
-                    callBack({ status: 200, success: true, message: saved_token });
+                    callBack({ 
+                        status: 200, success: true, 
+                        message: saved_token 
+                    });
                 }
             });
         }

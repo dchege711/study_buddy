@@ -12,7 +12,10 @@ var tokenSchema = new mongoose.Schema(
             required: true,
             unique: [true, "This token already exists"],
         },
-        userIDInApp: String
+        userIDInApp: String,
+        username: String, 
+        email: String,
+        user_reg_date: String
     },
     {
         autoIndex: false,
