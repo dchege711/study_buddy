@@ -392,13 +392,13 @@ exports.restore_from_trash = function (restore_card_args, callBack) {
  * 
  */
 exports.write_cards_to_json_file = function (userIDInApp, callBack) {
-    let card_data = { active_cards: [], trashed_cards: [] };
+    let card_data = [];
 
     Card.find({ createdById: userIDInApp}, (err, cards) => {
         if (err) { console.error(err); callBack(generic_500_msg); }
         else {
             for (let i = 0; i < cards.length; i++) {
-                card_data.active_cards.push({
+                card_data.push({
                     title: cards[i].title,
                     description: cards[i].description,
                     tags: cards[i].tags,

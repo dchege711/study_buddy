@@ -19,5 +19,7 @@ exports.convertObjectToResponse = function (result_JSON, res) {
 };
 
 exports.deleteTempFile = function(filepath) {
-    fs.rmdir(filepath, (err) => { console.error(err); });
+    fs.unlink(filepath, (err) => { 
+        if (err) console.error(err); 
+    });
 };
