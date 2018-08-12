@@ -12,6 +12,10 @@ exports.home = function (req, res) {
     res.render("pages/home.ejs");
 };
 
+exports.account_get = function (req, res) {
+    res.render("pages/account_page.ejs");
+};
+
 exports.read_metadata = function (req, res) {
     MetadataDB.read(req.body, function (metadata) {
         res.json(metadata);

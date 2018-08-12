@@ -136,6 +136,16 @@ ul.topnav {
 
 .link_button {
     text-decoration: none;
+    color: white;
+    background-color: black;
+}
+
+button.link_button {
+    border: none;
+}
+
+.link_button:hover {
+    cursor: pointer;
 }
 
 ul.topnav li {

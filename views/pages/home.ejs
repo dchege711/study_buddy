@@ -617,18 +617,11 @@
             }
             
             /**
-             * Once the user logs in, display the logout button 
+             * Once the user logs in, display the logout & accounts button 
              */ 
             function includeInAppButtons() {
-                var nav_bar = document.getElementById("topnavitems");
-                nav_bar.insertAdjacentHTML('beforeend', 
-                    `<li>
-                        <button 
-                            class="w3-button w3-padding-small top-nav w3-right" 
-                            onClick="logOut()"><b>Log Out</b>
-                        </button>
-                    </li>`
-                );
+                document.getElementById("logout_button").style.display = "inline";
+                document.getElementById("account_button").style.display = "inline";
             }
 
             function logOut() {
