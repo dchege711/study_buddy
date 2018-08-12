@@ -26,7 +26,7 @@
 
     </head>
 
-    <body onload="includeInAppButtons(); fillInStats();">
+    <body onload="includeInAppButtons();">
 
         <% include ../partials/navbar.ejs %>
 
@@ -64,15 +64,15 @@
 
                 <div class="account_section">
 
-                    <h3 class="account_header">Request your data</h3>
+                    <h3 class="account_header">Download your cards</h3>
 
                     <p>
-                        The data will be delivered to <%= account_info.email %>
+                        Download all of the cards you own.
                         <br>
                         <br>
-                        <button class="w3-btn w3-round-xxlarge w3-left w3-green" onClick="sendData();">
+                        <button class="w3-btn w3-round-xxlarge w3-left w3-green" onClick="downloadUserData();">
                             <b>
-                                <i class="fa fa-paper-plane fa-fw" aria-hidden="true"></i> Send Me My Data
+                                <i class="fa fa-download fa-fw" aria-hidden="true"></i> Download My Cards
                             </b>
                         </button>
 
@@ -85,7 +85,8 @@
                     <h3 class="account_header">Delete account</h3>
 
                     <p>
-                        Careful now. Once you delete your account, there is no going back. Please be sure.
+                        Careful now. Once you delete your account, there is no going back. 
+                        Please be sure. You might want to download your data first.
                         <br>
                         <br>
                         <button class="w3-btn w3-round-xxlarge w3-left w3-red" onClick="confirmDeletion();">
@@ -115,9 +116,16 @@
             document.getElementById("account_button").style.display = "inline";
         }
 
-        function fillInStats() {
-            
+        function downloadUserData() {
+            window.open("/account/download-user-data");
         }
+
+        function confirmDeletion() {
+            if (window.confirm("Deleting your account is irreversible. Are you sure?")) {
+                window.alert("Psyche!");
+            }
+        }
+
     </script>
 
 </html>

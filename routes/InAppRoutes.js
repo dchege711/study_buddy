@@ -26,4 +26,6 @@ router.post("/trash-card", requireLogIn, inAppController.trash_card);
 
 router.post("/restore-from-trash", requireLogIn, inAppController.restore_from_trash);
 
+router.get("/account/download-user-data", requireLogIn, inAppController.download_user_data);
+
 module.exports = router;

@@ -1,3 +1,5 @@
+var fs = require("fs");
+
 /**
  * @description A function to interpret JSON documents into server responses.
  * @param {JSON} result_JSON Expected keys: `status`, `success`, `message`
@@ -14,4 +16,8 @@ exports.convertObjectToResponse = function (result_JSON, res) {
     } else {
         res.render("pages/5xx_error_page.ejs", { response_JSON: result_JSON });
     }
+};
+
+exports.deleteTempFile = function(filepath) {
+    fs.rmdir(filepath, (err) => { console.error(err); });
 };

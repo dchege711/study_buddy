@@ -1,6 +1,9 @@
 var CardsDB = require("../models/CardsMongoDB.js");
 var MetadataDB = require("../models/MetadataMongoDB.js");
-var convertObjectToResponse = require("./ControllerUtilities.js").convertObjectToResponse;
+var controller_utils = require("./ControllerUtilities.js");
+
+var convertObjectToResponse = controller_utils.convertObjectToResponse;
+var deleteTempFile = controller_utils.deleteTempFile;
 
 exports.read_card = function (req, res) {
     CardsDB.read(req.body, function (card) {
@@ -63,5 +66,19 @@ exports.trash_card = function (req, res) {
 exports.restore_from_trash = function (req, res) {
     MetadataDB.restore_from_trash(req.body, function (confirmation) {
         res.json(confirmation);
+    });
+};
+
+exports.download_user_data = function(req, res) {
+    MetadataDB.write_cards_to_json_file(req.session.user.userIDInApp, (err, filepath, filename) => {
+        if (err) { convertObjectToResponse(err, res); }
+        else {
+            // res.setHeader(`Content-disposition`, `attachment; filename=${filename}`);
+            // res.setHeader('Content-type', 'application/json');
+            res.download(filepath, filename, (err) => {
+                if (err) { console.error(err); }
+                else { deleteTempFile(filepath); }
+            });
+        }
     });
 };
