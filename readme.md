@@ -36,11 +36,7 @@ The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
 
 :soon: Implement a method that cleans all the cards in the trash and unvalidated accounts that are more than 30 days old.
 
-:soon: Support filtering on the first set of filters. Filter by time too.
-
 :soon: Add an account page with configurable settings, e.g. code syntax theme, light vs dark UI, etc.
-
-:soon: Figure out why cards with similar content but different IDs exist in the database. There is a data replication bug lying somewhere.
 
 :soon: Change the underlying DS for the cards manager from two max-oriented priority queues to a balanced binary search tree. That way, you can visit a any card on the tree much faster on average.
 

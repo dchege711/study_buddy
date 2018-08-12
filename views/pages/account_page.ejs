@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>Study Buddy Account Page</title>
+        <% include ../partials/header.ejs %>
+    </head>
+
+    <body>
+
+        <% include ../partials/navbar.ejs %>
+
+        <div id="main_div">
+
+            <div class="account_section">
+
+                <button class="w3-btn w3-round-xxlarge w3-left w3-red" onClick="confirmDeletion();">
+                    <b>
+                        <i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> Delete Your Account
+                    </b>
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <% include ../partials/footer.ejs %>
+
+    </body>
+
+</html>

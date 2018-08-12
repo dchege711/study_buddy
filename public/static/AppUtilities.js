@@ -7,16 +7,22 @@
  * argument. 
  */
 function sendForm(form_id, url, callBack) {
-    var elements = document.getElementById(form_id).elements;
 
-    // Send the form to the server for further processing.
-    var payload = {};
-    for (var i = 0; i < elements.length; i++) {
-        payload[elements[i].name] = elements[i].value;
+    var form = document.forms[form_id];
+
+    if (form.checkValidity()) {
+        // Send the form to the server for further processing.
+        var elements = form.elements;
+        var payload = {};
+        for (var i = 0; i < elements.length; i++) {
+            payload[elements[i].name] = elements[i].value;
+        }
+        delete payload[""];
+
+        sendHTTPRequest("POST", url, payload, callBack);
+    } else {
+        form.reportValidity();
     }
-    delete payload[""];
-
-    sendHTTPRequest("POST", url, payload, callBack);
 }
 
 /**
