@@ -4,21 +4,89 @@
     <head>
         <title>Study Buddy Account Page</title>
         <% include ../partials/header.ejs %>
+        <script src="/static/AppUtilities.js"></script>
+
+        <style>
+
+            #account_details {
+                margin: 1% 15% 1% 15%;
+                padding: 1% 5% 1% 5%;
+            }
+
+            .account_header {
+                border-bottom: 1px #e1e4e8 solid;
+            }
+
+            .account_section {
+                margin: 2% 0%;
+                padding: 3% 0%;
+            }
+
+        </style>
+
     </head>
 
-    <body>
+    <body onload="includeInAppButtons(); fillInStats();">
 
         <% include ../partials/navbar.ejs %>
 
         <div id="main_div">
 
-            <div class="account_section">
+            <div id="account_details">
 
-                <button class="w3-btn w3-round-xxlarge w3-left w3-red" onClick="confirmDeletion();">
-                    <b>
-                        <i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> Delete Your Account
-                    </b>
-                </button>
+                <div class="account_section">
+
+                    <h3 class="account_header">Account Info</h3>
+
+                </div>
+
+                <div class="account_section">
+
+                    <h3 class="account_header">Send an email to Study Buddy's Developer</h3>
+
+                    <p>
+                        Chege would love to hear your suggestions, feedback and criticism.
+                        <br><br>
+                        <i class="fa fa-envelope fa-fw" aria-hidden="true"></i> c13u.studybuddy (@gmail.com)
+                    </p>
+
+                </div>
+
+                <div class="account_section">
+
+                    <h3 class="account_header">Request your data</h3>
+
+                    <p>
+                        The data will be delivered to the email address specified in your account.
+                        <br>
+                        <br>
+                        <button class="w3-btn w3-round-xxlarge w3-left w3-green" onClick="sendData();">
+                            <b>
+                                <i class="fa fa-paper-plane fa-fw" aria-hidden="true"></i> Send Me My Data
+                            </b>
+                        </button>
+
+                    </p>
+                
+                </div>
+
+                <div class="account_section">
+
+                    <h3 class="account_header">Delete account</h3>
+
+                    <p>
+                        Careful now. Once you delete your account, there is no going back. Please be sure.
+                        <br>
+                        <br>
+                        <button class="w3-btn w3-round-xxlarge w3-left w3-red" onClick="confirmDeletion();">
+                            <b>
+                                <i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> Delete Account
+                            </b>
+                        </button>
+                    
+                    </p>
+                    
+                </div>
 
             </div>
 
@@ -28,5 +96,20 @@
         <% include ../partials/footer.ejs %>
 
     </body>
+
+    <script type="text/javascript">
+        var metadata = JSON.parse(localStorage.getItem("metadata"));
+
+        function includeInAppButtons() {
+            document.getElementById("logout_button").style.display = "inline";
+            document.getElementById("account_button").style.display = "inline";
+        }
+
+        function fillInStats() {
+            for (let i = 0; i < metadata.length; i++) {
+                let metadataDoc = metada
+            }
+        }
+    </script>
 
 </html>

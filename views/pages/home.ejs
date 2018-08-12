@@ -11,7 +11,7 @@
         <script src="/static/showdown.min.js"></script>
         <link rel="stylesheet" href="/stylesheets/themes/atom-one-light.css">
         <script src="/static/highlight.pack.js"></script>
-        <script>
+        <script type="text/javascript">
 
             /**
              * @description Make LEFT/RIGHT arrow keys show PREVIOUS/NEXT card.
@@ -212,6 +212,11 @@
             var tags_trie = ternary_search_trie(Object.keys(state.tags_and_ids))
             
             var my_cards_manager = cards_manager(state.tags_and_ids, state.current_user_id);
+            
+            function includeInAppButtons() {
+                document.getElementById("logout_button").style.display = "inline";
+                document.getElementById("account_button").style.display = "inline";
+            }
 
             function initializeSideBar() {
                 var tags_in_decreasing_order = Object.keys(state.tags_and_ids);
@@ -614,14 +619,6 @@
                         });
                     }
                 );
-            }
-            
-            /**
-             * Once the user logs in, display the logout & accounts button 
-             */ 
-            function includeInAppButtons() {
-                document.getElementById("logout_button").style.display = "inline";
-                document.getElementById("account_button").style.display = "inline";
             }
 
             function logOut() {
