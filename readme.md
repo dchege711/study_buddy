@@ -46,11 +46,20 @@ The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
 
 :soon: Add spoiler tag support.
 
-:soon: State and Metadata are not defined for new users...
-
 ### Add an Accounts Page
 
-Funny that this was added so late in the game. I'll be supporting downloading one's data, deleting one's account and changing one's password.
+<sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
+
+I think the barebones for the Study Buddy Account page are:
+
+* Being able to download one's data.
+* Being able to delete one's account.
+* Recovering cards from the trash.
+
+Anything else (e.g. avatars, themes) will be considered after observing usage patterns and deciding what feature is worth adding. Of the top of my head, stuff that would be worth looking into are:
+
+* Importing cards from a JSON file.
+* Creating a PDF cheatsheet from a selection of tags.
 
 ### Implement a Card Review System
 

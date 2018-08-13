@@ -5,6 +5,8 @@
         <title>Study Buddy Account Page</title>
         <% include ../partials/header.ejs %>
         <script src="/static/AppUtilities.js"></script>
+        <script src="/static/MaxPriorityQueue.js"></script>
+        <script src="/static/CardsManager.js"></script>
 
         <style>
 
@@ -20,6 +22,10 @@
             .account_section {
                 margin: 2% 0%;
                 padding: 3% 0%;
+            }
+
+            #card_container {
+                display: none;
             }
 
         </style>
@@ -46,6 +52,34 @@
                         Study Buddy Birthday: <%= account_info.user_reg_date %>
                     </p>
 
+                </div>
+
+                <div class="account_section">
+
+                    <h3 class="account_header">Restore/Delete Cards from Trash</h3>
+
+                    <p>
+                        The trash only holds a card for 30 days, after which the 
+                        card will be permanently deleted. Use this option to either 
+                        delete cards permanently, or restore them to your active cards.
+
+                        <br><br>
+
+                        <button id="trash_button" class="w3-btn w3-round-xxlarge w3-left w3-blue" onClick="showCardsFromTrash();">
+                            <b id="trash_button_text">
+                                <i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> View Trashed Cards
+                            </b>
+                        </button>    
+
+                        <br>
+                    </p>
+
+                    <div>
+                    
+                        <% include ../partials/trashed_card_template.ejs %>
+                    
+                    </div>
+                    
                 </div>
 
                 <div class="account_section">
@@ -109,11 +143,33 @@
     </body>
 
     <script type="text/javascript">
-        var metadata = JSON.parse(localStorage.getItem("metadata"));
+        var state = {
+            metadata: JSON.parse(localStorage.getItem("metadata"))[0],
+            card_container: document.getElementById("card_container"),
+            trash_button: document.getElementById("trash_button"),
+            trashed_card_index: 0,
+            current_card_title: document.getElementById("card_title"),
+            current_card_description: document.getElementById("card_description"),
+            current_card_tags: document.getElementById("card_tags"),
+            current_card_urgency_number: document.getElementById("card_urgency_number"),
+            current_card_delete_button: document.getElementById("card_delete_button"),
+            current_card_restore_button: document.getElementById("card_restore_button")
+        }
+        if (state.metadata.trashed_cards.length === 0) {
+            state.trashed_cards = {}; 
+        } else {
+            state.trashed_cards = state.metadata.trashed_cards[0];
+        }
+
+        var my_cards_manager = cards_manager(
+            state.trashed_cards, 
+            state.metadata.createdById
+        );
 
         function includeInAppButtons() {
             document.getElementById("logout_button").style.display = "inline";
             document.getElementById("account_button").style.display = "inline";
+            document.getElementById("trash_button_text").innerHTML = `<i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> View ${Object.keys(state.trashed_cards).length} Trashed Cards`;
         }
 
         function downloadUserData() {
@@ -127,6 +183,61 @@
                     window.location = "/";
                 });
             }
+        }
+
+        function showCardsFromTrash() {
+            if (Object.keys(state.trashed_cards).length > 0) {
+                state.card_container.style.display = "block";
+                state.trash_button.style.display = "none";
+                my_cards_manager.initialize_from_trash(state.trashed_cards, () => {
+                    my_cards_manager.next((card) => {
+                        renderTrashedCard(card);
+                    });
+                });
+            }
+        }
+
+        function closeTrashWindow() {
+            state.trash_button.style.display = "inline";
+            state.card_container.style.display = "none";
+        }
+
+        function fetchNextCard() {
+            my_cards_manager.next((card) => {
+                if (card.title !== undefined) {
+                    renderTrashedCard(card);
+                } else {
+                    displayPopUp("Out of cards!", 1000);
+                }
+            });
+        }
+
+        function fetchPreviousCard() {
+            my_cards_manager.previous((card) => {
+                if (card.title !== undefined) {
+                    renderTrashedCard(card);
+                } else {
+                    displayPopUp("Out of cards!", 1000);
+                }
+            });
+        }
+
+        function displayPopUp(text, timeout_ms) {
+            var popup = document.getElementById("out_of_cards_popup");
+            popup.innerHTML = text;
+            popup.style.visibility = "visible";
+            window.setTimeout(() => {
+                makeInvisible("out_of_cards_popup")
+            }, timeout_ms);
+        }
+
+        function renderTrashedCard(card) {
+            state.current_card_delete_button.onclick = `deleteCardFromTrash(${card._id});`;
+            state.current_card_restore_button.onclick = `restoreCardFromTrash(${card._id});`;
+            state.current_card_title.innerText = card.title;
+            state.current_card_description.innerText = card.description;
+            state.current_card_tags.innerText = card.tags;
+            state.current_card_urgency_number.innerText = card.urgency;
         }
 
     </script>

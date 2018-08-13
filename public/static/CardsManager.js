@@ -61,8 +61,28 @@ function cards_manager(tags_and_ids, user_id) {
         pq_cards_to_view = max_PQ();
 
         minicards.forEach((minicard) => {
-            pq_cards_to_view.insert([minicard._id, minicard.urgency])
+            pq_cards_to_view.insert([minicard._id, minicard.urgency]);
         });
+
+        callBack();
+    };
+
+    /**
+     * @description Initialize a card manager using a Study Buddy trash object.
+     * 
+     * @param {JSON} trashed_card_ids A JSON object whose keys are card IDs and 
+     * the value is the timestamp on which they were trashed.
+     * 
+     * @param {Function} callBack Function to call once everything is complete.
+     */
+    cards_manager_obj.initialize_from_trash = function (trashed_card_ids, callBack) {
+        pq_cards_already_viewed = max_PQ();
+        pq_cards_to_view = max_PQ();
+
+        let card_ids = Object.keys(trashed_card_ids); // Synchronous
+        for (let i = 0; i < card_ids.length; i++) {
+            pq_cards_to_view.insert([card_ids[i], trashed_card_ids[card_ids[i]]]);
+        }
 
         callBack();
     };
