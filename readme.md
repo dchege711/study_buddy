@@ -4,6 +4,8 @@ The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
 
 ## [Tasks](#tasks)
 
+:white_check_mark: [Add an Accounts Page](#add-an-accounts-page)
+
 :white_check_mark: [Implement a Card Review System](#implement-a-card-review-system)
 
 :white_check_mark: [Enhance the Tagging System](#enhance-the-tagging-system)
@@ -52,9 +54,9 @@ The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
 
 I think the barebones for the Study Buddy Account page are:
 
-* Being able to download one's data.
-* Being able to delete one's account.
-* Recovering cards from the trash.
+* Being able to download one's data. (Implemented)
+* Being able to delete one's account. (Implemented)
+* Recovering cards from the trash. (Implemented)
 
 Anything else (e.g. avatars, themes) will be considered after observing usage patterns and deciding what feature is worth adding. Of the top of my head, stuff that would be worth looking into are:
 

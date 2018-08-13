@@ -330,49 +330,40 @@ exports.restore_from_trash = function (restore_card_args, callBack) {
                     message: "500. Internal Server Error"
                 });
             } else if (matchingCards.length == 1) {
-                var card_to_restore_JSON = matchingCards[0];
-                Metadata.find(
-                    { createdById: card_to_restore_JSON.createdById },
-                    (err, matchingMetadataDocs) => {
+                removeCardFromMetadataTrash(
+                    matchingCards[0], 
+                    (err, metadataDoc) => {
                         if (err) {
-                            console.log(err);
-                            callBack({
-                                success: false, internal_error: true,
-                                message: "500. Internal Server Error"
-                            });
+                            console.error(err);
+                            callBack(generic_500_msg);
                         } else {
-                            matchingMetadataDocs.forEach((metadataDoc) => {
-                                if (card_to_restore_JSON._id in metadataDoc.trashed_cards[0]) {
-                                    delete metadataDoc.trashed_cards[0][card_to_restore_JSON._id];
-                                    metadataDoc.markModified("trashed_cards");
-
-                                    updateMetadataWithCardDetails(
-                                        card_to_restore_JSON, metadataDoc, () => {
-                                            metadataDoc.save(function (error, savedMetadata, numAffected) {
-                                                if (error) {
-                                                    callBack({
-                                                        "success": false, "internal_error": true,
-                                                        "message": error
-                                                    });
-                                                } else {
-                                                    callBack({
-                                                        success: true, internal_error: false,
-                                                        message: card_to_restore_JSON._id
-                                                    });
-                                                }
-                                                return;
+                            updateMetadataWithCardDetails(
+                                restore_card_args, metadataDoc, () => {
+                                    metadataDoc.save(function (error, savedMetadata, numAffected) {
+                                        if (error) {
+                                            callBack({
+                                                "success": false, "internal_error": true,
+                                                "message": error
+                                            });
+                                        } else {
+                                            callBack({
+                                                success: true, internal_error: false,
+                                                message: "Card restored from the trash."
                                             });
                                         }
-                                    );
+                                        return;
+                                    });
                                 }
-                            });
+                            );
                         }
                     }
                 );
+                
             } else {
                 // ... otherwise don't do anything to the database
-                console.log(`Search Failure: Restore query: 
-                ${Object.values(restore_card_args)} returned ${matchingCards}`);
+                console.error(`@MetadataMongoDB.restore_from_trash: Search Failure`);
+                console.error(restore_card_args);
+                console.error(matchingCards) 
                 callBack({
                     success: false, internal_error: true,
                     message: "404: Card Not Found"
@@ -381,6 +372,73 @@ exports.restore_from_trash = function (restore_card_args, callBack) {
         }
     );
 };
+
+/**
+ * @description Permanently delete a card from the user's trash.
+ * 
+ * @param {JSON} restore_card_args Expected keys: `_id`, `createdById`
+ * @param {Function} callBack First parameter is set to any error that occurs.
+ * Second parameter is a JSON object with `success`, `internal_error` and 
+ * `message` as keys.
+ */
+exports.delete_from_trash = function(delete_card_args, callBack) {
+    Card.findOneAndRemove(
+        {
+            _id: delete_card_args._id,
+            createdById: delete_card_args.createdById
+        }, 
+        (err, deletedCard) => {
+            if (err) {
+                console.error(err); callBack(generic_500_msg);
+            } else {
+                removeCardFromMetadataTrash(
+                    deletedCard, 
+                    (err, metadataDoc) => {
+                        if (err) {
+                            console.error(err); callBack(generic_500_msg);
+                        } else {
+                            metadataDoc.save(function (err) {
+                                if (err) {
+                                    console.error(err);
+                                    callBack(generic_500_msg);
+                                } else {
+                                    callBack({
+                                        success: true, internal_error: false,
+                                        message: "Card permanently deleted."
+                                    });
+                                }
+                                return;
+                            });
+                        }
+                    }
+                );
+            }
+        }
+    );
+};
+
+function removeCardFromMetadataTrash(card_identifer, callBack) {
+    Metadata.find(
+        { createdById: card_identifer.createdById },
+        (err, matchingMetadataDocs) => {
+            if (err) {
+                console.log(err);
+                callBack(generic_500_msg);
+            } else {
+                for (let i = 0; i < matchingMetadataDocs.length; i++) {
+                    let metadataDoc = matchingMetadataDocs[i];
+                    if (card_identifer._id in metadataDoc.trashed_cards[0]) {
+                        delete metadataDoc.trashed_cards[0][card_identifer._id];
+                        metadataDoc.markModified("trashed_cards");
+                        callBack(null, metadataDoc);
+                        return;
+                    }
+                }
+                callBack({success: false, internal_error: false, message: "404. File Not Found"})
+            }
+        }
+    );
+}
 
 /**
  * @description Fetch all the user's cards and compile them into a JSON file.

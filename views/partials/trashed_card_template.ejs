@@ -55,13 +55,13 @@
 
     <div class="w3-container w3-center w3-bar w3-padding-16">
 
-        <button class="w3-btn w3-round-xxlarge w3-left w3-red" id="card_delete_button" onClick="deleteCardFromTrash();">
+        <button class="w3-btn w3-round-xxlarge w3-left w3-red" id="card_delete_button" onClick="modifyTrash('/delete-card');">
             <b>
                 <i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> Delete Permanently
             </b>
         </button>
 
-        <button class="w3-btn w3-round-xxlarge w3-right w3-green" id="card_restore_button" onClick="restoreFromTrash();">
+        <button class="w3-btn w3-round-xxlarge w3-right w3-green" id="card_restore_button" onClick="modifyTrash('/restore-from-trash');">
             <b>
                 <i class="fa fa-floppy-o fa-fw" aria-hidden="true"></i> Restore Card</b>
         </button>

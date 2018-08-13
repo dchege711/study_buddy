@@ -53,7 +53,7 @@ exports.update_card = function (req, res) {
 };
 
 exports.delete_card = function (req, res) {
-    CardsDB.delete(req.body, function (confirmation) {
+    MetadataDB.delete_from_trash(req.body, function(confirmation) {
         res.json(confirmation);
     });
 };

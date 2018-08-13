@@ -148,6 +148,7 @@
             card_container: document.getElementById("card_container"),
             trash_button: document.getElementById("trash_button"),
             trashed_card_index: 0,
+            current_card_id: null,
             current_card_title: document.getElementById("card_title"),
             current_card_description: document.getElementById("card_description"),
             current_card_tags: document.getElementById("card_tags"),
@@ -155,11 +156,8 @@
             current_card_delete_button: document.getElementById("card_delete_button"),
             current_card_restore_button: document.getElementById("card_restore_button")
         }
-        if (state.metadata.trashed_cards.length === 0) {
-            state.trashed_cards = {}; 
-        } else {
-            state.trashed_cards = state.metadata.trashed_cards[0];
-        }
+        state.trashed_cards = state.metadata.trashed_cards[0];
+        if (!state.trashed_cards) state.trashed_cards = {};
 
         var my_cards_manager = cards_manager(
             state.trashed_cards, 
@@ -232,12 +230,29 @@
         }
 
         function renderTrashedCard(card) {
-            state.current_card_delete_button.onclick = `deleteCardFromTrash(${card._id});`;
-            state.current_card_restore_button.onclick = `restoreCardFromTrash(${card._id});`;
+            state.current_card_id = card._id;
             state.current_card_title.innerText = card.title;
             state.current_card_description.innerText = card.description;
             state.current_card_tags.innerText = card.tags;
             state.current_card_urgency_number.innerText = card.urgency;
+        }
+
+        function modifyTrash(endpoint) {
+            sendHTTPRequest(
+                "POST", endpoint, 
+                { 
+                    _id: state.current_card_id,
+                    createdById: state.metadata.createdById
+                }, 
+                (confirmation) => {
+                displayPopUp(confirmation.message, 2000);
+                my_cards_manager.remove_card(state.current_card_id);
+                fetchNextCard();
+            });
+        }
+
+        function makeInvisible(element_id) {
+            document.getElementById(element_id).style.visibility = "hidden";
         }
 
     </script>
