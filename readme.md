@@ -46,8 +46,6 @@ The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
 
 :soon: Make the title contenteditable so that LaTEX can render on it. Also update the MathJax configuration to track the title and description on startup.
 
-:soon: Add spoiler tag support.
-
 ### Add an Accounts Page
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
@@ -157,7 +155,15 @@ About supporting tabs in the card description, I chose to insert `&nbsp;&nbsp;&n
 
 Previously, users had to escape the LaTEX delimiter themselves and also escape underscores within inline LaTEX. This meant lines like `\(p_i = 2\)` had to be written as `\\(p\_i = 2\\)`. ~~With some regular expressions, I was able to support the former approach. I traded computational efficiency *(more code to automatically escape backslashes and replace automatically inserted `<em>, </em>` tags)* for convenience *(users entering normal LaTEX)*. I choose to make this correction on the client side since I can't afford that much storage capacity on the server side.~~ I configured `showdown.converter` to escape underscores and asterisks when converting markdown to HTML. Although I had activated these options before, `showdown.converter` wasn't applying them. The bug was fixed on Github. I thus downloaded the version of `showdown.min.js` available during commit `039dd66256e771716c20a807a2941974ac7c5873`. Since that version works fine, I choose to use my downloaded copy instead of using the version hosted on the CDN since that might change over time. Later versions of the file insert extra whitespace in my code blocks, so I prefer maintaining the version from the above commit.
 
-I changed the urgency input from a number input type to a range input type. To set an urgency, using the range input type is faster since the user doesn't really care about the actual value, but its percentage, e.g. *card X is half as important as the most important cards in my deck*. Furthermore, using a range requires one click, while using a number type requires a click and a type. 
+I changed the urgency input from a number input type to a range input type. To set an urgency, using the range input type is faster since the user doesn't really care about the actual value, but its percentage, e.g. *card X is half as important as the most important cards in my deck*. Furthermore, using a range requires one click, while using a number type requires a click and a type.
+
+I've also added some support for spoilers. Since the spoilers can span multiple lines and need to be displayed at the same time, I have opted for this format:
+
+```markdown
+<div class="spoiler">
+* This text will be faded out by default. But the box will still be upto size.
+</div>
+```
 
 ### Support ~~deleting a card~~ moving a card to the trash and undoing the move
 
