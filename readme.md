@@ -159,14 +159,6 @@ Previously, users had to escape the LaTEX delimiter themselves and also escape u
 
 I changed the urgency input from a number input type to a range input type. To set an urgency, using the range input type is faster since the user doesn't really care about the actual value, but its percentage, e.g. *card X is half as important as the most important cards in my deck*. Furthermore, using a range requires one click, while using a number type requires a click and a type.
 
-I've also added some support for spoilers. Since the spoilers can span multiple lines and need to be displayed at the same time, I have opted for this format:
-
-```markdown
-<div class="spoiler">
-* This text will be faded out by default. But the box will still be upto size.
-</div>
-```
-
 ### Support ~~deleting a card~~ moving a card to the trash and undoing the move
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
