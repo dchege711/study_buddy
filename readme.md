@@ -48,6 +48,8 @@ The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
 
 :soon: Add spoiler tag support.
 
+:soon: Hide the search results once someone clicks away.
+
 ### Add an Accounts Page
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
