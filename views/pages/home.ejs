@@ -123,6 +123,17 @@
             .tooltip:hover .tooltiptext {
                 visibility: visible;
             }
+
+            .spoiler {
+                padding: 1% 2%;
+                background-color: black;
+                fill-opacity: black !important;
+                opacity: 0.03;
+            }
+
+            .spoiler:hover, .spoiler:visited, .spoiler:focus {
+                opacity: 1;
+            }
         
         </style>
         
@@ -183,7 +194,9 @@
             /* The converter is used to turn the markdown in the cards into html. */
             var converter = new showdown.Converter({
                 headerLevelStart: 4, literalMidWordUnderscores: true,
-                literalMidWordAsterisks: true, simpleLineBreaks: true
+                literalMidWordAsterisks: true, simpleLineBreaks: true,
+                emoji: true, backslashEscapesHTMLTags: true, tables: true,
+                parseImgDimensions: true, simplifiedAutoLink: true
             });
             
             /* If a user is logged in, there'll be some metadata about them in 
