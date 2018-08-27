@@ -183,6 +183,25 @@ I found the [highlight.js](https://highlightjs.org/) library useful for syntax h
 
 Since I'm targeting users that store somewhat detailed flashcards, I felt that Markdown (in addition to LaTEX and syntax highlighting) will prove more useful. Manually converting markdown to HTML is a project by itself. Since it's not the main purpose of Study Buddy, I was happy to import [Showdown](https://github.com/showdownjs/showdown). The library looks mature and the documentation is sound.
 
+I've also added support for one spoiler per card. The format is:
+
+```markdown
+What's the general approach for solving problems on probability?
+
+[spoiler]
+
+* Find the sample space \(S\). Draw a tree if \(S\) is not too large.
+
+* From the leaves, define the events of interest. Don't be fooled by their frequency!
+
+* Determine the probabilities along the edges using the assumptions made in the problem. The probability of an outcome is the product of all edge probabilities along the path from the root to the outcome. This is mechanical.
+
+* Compute event probabilities by adding up probabilities for all favorable outcomes.
+
+```
+
+Any content found under the first `[spoiler]` is assumed to be part of the spoiler.
+
 ### Add a sidebar that supports filters based on tags
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>

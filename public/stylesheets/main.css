@@ -15,11 +15,12 @@ footer {
 
 #side_bar {
     overflow: scroll;
+    min-height: 100vh;
 }
 
 #side_bar_contents {
     overflow: scroll;
-    height: 80vh;
+    height: 90vh;
 }
 
 #status_bar {

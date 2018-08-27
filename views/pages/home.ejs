@@ -123,6 +123,24 @@
             .tooltip:hover .tooltiptext {
                 visibility: visible;
             }
+
+            #spoiler_box {
+                background: rgb(172, 172, 172);
+                cursor: pointer;
+                position: absolute;
+                z-index: 1;
+            }
+
+            #spoiler_box:hover {
+                opacity: 0;
+            }
+
+            #spoiler_box p {
+                font-size: larger;
+                text-align: center;
+                color: white;
+                padding: 10% 0 0 0;
+            }
         
         </style>
         
@@ -355,8 +373,16 @@
                 var description_html = converter.makeHtml(
                     String.raw`${card.description.replace(/\\/g, "\\\\")}`
                 );
-
-                document.getElementById("card_description").innerHTML = description_html;
+                
+                if (description_html.match(/\[spoiler\]/i)) {
+                    description_html = description_html.replace(
+                        /\[spoiler\]/i, "<span id='spoiler'>[spoiler]</span>"
+                    );
+                    description_html += `<span id="spoiler_end"></span>`;
+                }
+                
+                let card_description_element = document.getElementById("card_description");
+                card_description_element.innerHTML = description_html;
 
                 var tags_html = "";
                 var tags_array = card.tags.trim().split(" ");
@@ -378,12 +404,46 @@
                 state.raw_description = card.description;
 
                 // hljs.configure({ useBR: true });
+                
                 let code_elements = document.querySelectorAll('pre code');
                 for (let i = 0; i < code_elements.length; i++) {
                     hljs.highlightBlock(code_elements[i]);
                 }
 
                 loadMathJAX();
+                syncSpoilerBox();
+            }
+            
+            /**
+             * @description Set the dimensions of the spoiler cover so that it
+             * hides the intended content.
+             */ 
+            function syncSpoilerBox() {
+                // These two elements exist whenever there is a spoiler. 
+                // We use them to determine the height of the obscuring cover.
+                let spoiler = document.getElementById("spoiler");
+                let spoiler_end = document.getElementById("spoiler_end");
+
+                if (spoiler && spoiler_end) {
+                    let spoiler_bbox = spoiler.getBoundingClientRect();
+                    let spoiler_end_bbox = spoiler_end.getBoundingClientRect();
+                    // Only the difference matters. No biggie that the coordinates are not absolute.
+                    // Reduce the width because the card_description HTMLElement is padded
+                    let spoiler_box_html = `
+                        <div id="spoiler_box" 
+                        style="height:${spoiler_end_bbox.bottom - spoiler_bbox.top}px; 
+                        width:${document.getElementById("card_description").getBoundingClientRect().width - 30}px" 
+                        onclick="makeInvisible('spoiler_box')">
+                        <p>Hover/Click to Reveal</p></div>
+                    `;
+                    console.log(spoiler_box_html);
+                    let existing_spoiler_cover = document.getElementById("spoiler_box");
+                    if (existing_spoiler_cover) {
+                        existing_spoiler_cover.innerHTML = spoiler_box_html;
+                    } else {
+                        spoiler.insertAdjacentHTML("beforebegin", spoiler_box_html);
+                    }
+                }
             }
             
             /**
