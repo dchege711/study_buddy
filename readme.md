@@ -159,14 +159,6 @@ Previously, users had to escape the LaTEX delimiter themselves and also escape u
 
 I changed the urgency input from a number input type to a range input type. To set an urgency, using the range input type is faster since the user doesn't really care about the actual value, but its percentage, e.g. *card X is half as important as the most important cards in my deck*. Furthermore, using a range requires one click, while using a number type requires a click and a type.
 
-I've also added some support for spoilers. Since the spoilers can span multiple lines and need to be displayed at the same time, I have opted for this format:
-
-```markdown
-<div class="spoiler">
-* This text will be faded out by default. But the box will still be upto size.
-</div>
-```
-
 ### Support ~~deleting a card~~ moving a card to the trash and undoing the move
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
@@ -190,6 +182,25 @@ I found the [highlight.js](https://highlightjs.org/) library useful for syntax h
 [MathJAX](https://www.mathjax.org/) renders my LaTEX. At first I had problems getting LaTEX to render properly, but I realized that by default, MathJAX expects LaTEX to be already on the DOM. I dug through its documentation and I found out that MathJAX allows manual reloads. I therefore added a function that requests MathJAX to re-render the contents of the card template every time I load a different card.
 
 Since I'm targeting users that store somewhat detailed flashcards, I felt that Markdown (in addition to LaTEX and syntax highlighting) will prove more useful. Manually converting markdown to HTML is a project by itself. Since it's not the main purpose of Study Buddy, I was happy to import [Showdown](https://github.com/showdownjs/showdown). The library looks mature and the documentation is sound.
+
+I've also added support for one spoiler per card. The format is:
+
+```markdown
+What's the general approach for solving problems on probability?
+
+[spoiler]
+
+* Find the sample space \(S\). Draw a tree if \(S\) is not too large.
+
+* From the leaves, define the events of interest. Don't be fooled by their frequency!
+
+* Determine the probabilities along the edges using the assumptions made in the problem. The probability of an outcome is the product of all edge probabilities along the path from the root to the outcome. This is mechanical.
+
+* Compute event probabilities by adding up probabilities for all favorable outcomes.
+
+```
+
+Any content found under the first `[spoiler]` is assumed to be part of the spoiler.
 
 ### Add a sidebar that supports filters based on tags
 
