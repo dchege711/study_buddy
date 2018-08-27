@@ -124,15 +124,21 @@
                 visibility: visible;
             }
 
-            .spoiler {
-                padding: 1% 2%;
-                background-color: black;
-                fill-opacity: black !important;
-                opacity: 0.03;
+            #spoiler_box {
+                background: grey;
+                cursor: pointer;
+                position: absolute;
+                z-index: 1;
             }
 
-            .spoiler:hover, .spoiler:visited, .spoiler:focus {
-                opacity: 1;
+            #spoiler_box:hover {
+                opacity: 0;
+            }
+
+            #spoiler_box p {
+                text-align: center;
+                font-size: larger;
+                color: white;
             }
         
         </style>
@@ -367,7 +373,12 @@
                     String.raw`${card.description.replace(/\\/g, "\\\\")}`
                 );
 
-                document.getElementById("card_description").innerHTML = description_html;
+                description_html = description_html.replace(
+                    /\[spoiler\]/i, "<span id='spoiler' style='display:none'>[spoiler]</span>"
+                );
+
+                var card_description_element = document.getElementById("card_description");
+                card_description_element.innerHTML = description_html;
 
                 var tags_html = "";
                 var tags_array = card.tags.trim().split(" ");
@@ -382,6 +393,16 @@
                 document.getElementById("card_urgency_number").innerText = card.urgency;
                 document.getElementById("card_description").removeAttribute("contenteditable");
                 document.getElementById("side_bar_contents").style.height = document.getElementById("card_template").style.height;
+
+                let spoiler = document.getElementById("spoiler");
+                if (spoiler) {
+                    let larger_box = card_description_element.getBoundingClientRect();
+                    let smaller_box = spoiler.getBoundingClientRect();
+                    spoiler.insertAdjacentHTML(
+                        "beforebegin",
+                        `<div id="spoiler_box" style="height:${larger_box.bottom - smaller_box.top}px; width:${larger_box.width}px" onclick="makeInvisible('spoiler_box')"><p>Hover/Click to Reveal</p></div>`
+                    );
+                }
 
                 // Reset the contents of the current_card variable
                 state.current_card_id = card._id;
@@ -402,7 +423,8 @@
              * http://docs.mathjax.org/en/latest/advanced/typeset.html
              */
             function loadMathJAX() {
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub, "card_description"]);
+                // MathJax.Hub.Queue(["Typeset", MathJax.Hub, "card_description"]);
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub]); // The element IDs were set in <head></head>
             }
 
             function displayRawCardDescription() {
