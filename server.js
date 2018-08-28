@@ -6,12 +6,17 @@ var bodyParser = require("body-parser");
 var cookieParser = require("cookie-parser");
 var AccountRoutes = require("./routes/AuthenticationRoutes.js");
 var InAppRoutes = require("./routes/InAppRoutes.js");
+var enforce = require('express-sslify');
 
 // Needed to get a Mongoose instance running for this process
 const dbConnection = require("./models/MongooseClient.js");
 
 var app = express();
 var port = process.env.PORT || 5000;
+
+// In Heroku's honesty we trust. Beware otherwise as headers can be spoofed
+// https://github.com/florianheinemann/express-sslify
+app.use(enforce.HTTPS({ trustProtoHeader: true}));
 
 app.use(session({
     secret: "bad secret",
