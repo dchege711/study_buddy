@@ -4,7 +4,7 @@
   "description": "A web application that helps me review content",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha",
     "start": "node server.js"
   },
   "repository": {
@@ -34,5 +34,8 @@
     "nodemailer": "4.6.7",
     "path": "0.12.7",
     "sjcl": "1.0.7"
+  },
+  "devDependencies": {
+    "mocha": "^5.2.0"
   }
 }
