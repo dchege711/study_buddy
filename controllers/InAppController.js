@@ -42,7 +42,7 @@ exports.search_cards = function (req, res) {
     var payload = req.body;
     payload.userIDInApp = req.session.user.userIDInApp;
     CardsDB.search(payload, (search_results) => {
-        convertObjectToResponse(search_results, res);
+        convertObjectToResponse(null, search_results, res);
     });
 };
 
@@ -72,7 +72,7 @@ exports.restore_from_trash = function (req, res) {
 
 exports.download_user_data = function(req, res) {
     MetadataDB.write_cards_to_json_file(req.session.user.userIDInApp, (err, filepath, filename) => {
-        if (err) { convertObjectToResponse(err, res); }
+        if (err) { convertObjectToResponse(err, null, res); }
         else {
             res.download(filepath, filename, (err) => {
                 if (err) { console.error(err); }
@@ -85,14 +85,14 @@ exports.download_user_data = function(req, res) {
 exports.delete_account = function(req, res) {
     login_utils.deleteAccount(
         req.session.user.userIDInApp, (err, confirmation) => {
-            if (err) convertObjectToResponse(err, res);
+            if (err) convertObjectToResponse(err, null, res);
             else {
                 delete req.session.user;
                 res.setHeader(
                     "Set-Cookie",
                     [`session_token=null;Expires=Thu, 01 Jan 1970 00:00:00 GMT`]
                 );
-                convertObjectToResponse(confirmation, res);
+                convertObjectToResponse(null, confirmation, res);
             }
         }
     );

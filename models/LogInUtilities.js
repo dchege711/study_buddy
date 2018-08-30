@@ -227,7 +227,7 @@ exports.validateAccount = function(validation_uri, callBack) {
 /**
  * Register a new user using the provided password.
  * 
- * @param {JSON} payload Expected keys: `username`, `password`
+ * @param {JSON} payload Expected keys: `username`, `password`, `email_address`
  * @param {function} callBack Function that takes a JSON param w/ `success`, 
  * `internal_error` and `message` as keys. 
  */
@@ -241,10 +241,9 @@ exports.registerUserAndPassword = function(payload, callBack) {
 
     User.find({username: username}, (error, usersWithSameUsername) => {
         if (error) {
-            console.error(error);
-            callBack(generic_500_msg);
+            callBack(error);
         } else if (usersWithSameUsername.length !== 0) {
-            callBack({ success: false, status: 200, message: "Username already taken."});
+            callBack(null, { success: false, status: 200, message: "Username already taken."});
         } else {
             getSaltAndHash(password, function (salt, hash) {
                 getIdInAppAndValidationURI(function (userId, validationURI) {
@@ -261,14 +260,11 @@ exports.registerUserAndPassword = function(payload, callBack) {
                     if (debug) console.log(`Saving new user: ${email}`);
                     User.find({ email: user.email }, (error, existingUsers) => {
                         if (error) {
-                            console.error(error);
-                            callBack(generic_500_msg);
-                            return;
+                            callBack(error);
                         } else {
                             if (existingUsers.length > 1) {
                                 // I hope it never comes to this, ever.
-                                console.error(`@registerUserAndPassword: ${existingUsers.length} have the same email: ${user.email}`);
-                                callBack(generic_500_msg);
+                                callBack(new Error(`${existingUsers.length} have the same email: ${user.email}`));
                             } else if (existingUsers.length === 1) {
                                 // Send an email to them notifying them of suspicious activity
                                 var existingUser = existingUsers[0];
@@ -282,13 +278,12 @@ exports.registerUserAndPassword = function(payload, callBack) {
                                             `reset at ${config.BASE_URL}/reset-password.\n\nCheers,\nStudy Buddy by c13u`
                                     }, (email_confirmation) => {
                                         if (email_confirmation.success) {
-                                            callBack({
+                                            callBack(null, {
                                                 success: true, status: 200,
                                                 message: `Please check ${existingUser.email} for an account validation link.`
                                             });
                                         } else {
-                                            console.error(email_confirmation.message);
-                                            callBack(generic_500_msg);
+                                            callBack(email_confirmation);
                                         }
                                     }
                                 );
@@ -296,8 +291,7 @@ exports.registerUserAndPassword = function(payload, callBack) {
                                 // Save the new user's account and send enough info to log them in
                                 user.save(function (error, savedUser) {
                                     if (error) {
-                                        console.error(error);
-                                        callBack(generic_500_msg);
+                                        callBack(error);
                                     } else {
                                         MetadataDB.create({
                                             userIDInApp: savedUser.userIDInApp,
@@ -309,11 +303,10 @@ exports.registerUserAndPassword = function(payload, callBack) {
                                                     if (email_confirmation.success) {
                                                         email_confirmation.message = `We've sent a validation URL to ${savedUser.email}. Please validate before logging in`;
                                                     }
-                                                    callBack(email_confirmation);
+                                                    callBack(null, email_confirmation);
                                                 });
                                             } else {
-                                                console.error(metadata_confirmation.message);
-                                                callBack(generic_500_msg);
+                                                callBack(metadata_confirmation);
                                             }
                                         });
                                     }

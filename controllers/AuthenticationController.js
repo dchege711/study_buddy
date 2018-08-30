@@ -45,8 +45,8 @@ exports.handleLogIn = function (req, res) {
 };
 
 exports.register_user = function (req, res) {
-    LogInUtilities.registerUserAndPassword(req.body, function (confirmation) {
-        convertObjectToResponse(confirmation, res);
+    LogInUtilities.registerUserAndPassword(req.body, (err, confirmation) => {
+        convertObjectToResponse(err, confirmation, res);
     });
 };
 
@@ -61,7 +61,7 @@ exports.login = function (req, res, next) {
                 [`session_token=${confirmation.message.token_id};Expires=${expiry_date}`]
             );
         }
-        convertObjectToResponse(confirmation, res);
+        convertObjectToResponse(null, confirmation, res);
     });
 };
 
@@ -73,7 +73,7 @@ exports.logout = function (req, res) {
             "Set-Cookie",
             [`session_token=null;Expires=Thu, 01 Jan 1970 00:00:00 GMT`]
         );
-        convertObjectToResponse(delete_info, res);
+        convertObjectToResponse(null, delete_info, res);
     });
 };
 
@@ -83,14 +83,14 @@ exports.send_validation_email_get = function (req, res) {
 
 exports.send_validation_email_post = function (req, res) {
     LogInUtilities.sendAccountValidationLink(req.body, (confirmation) => {
-        convertObjectToResponse(confirmation, res);
+        convertObjectToResponse(null, confirmation, res);
     });
 };
 
 exports.verify_account = function (req, res) {
     var verification_uri = req.path.split("/verify-account/")[1];
     LogInUtilities.validateAccount(verification_uri, (results) => {
-        convertObjectToResponse(results, res);
+        convertObjectToResponse(null, results, res);
     });
 };
 
@@ -100,7 +100,7 @@ exports.reset_password_get = function (req, res) {
 
 exports.reset_password_post = function (req, res) {
     LogInUtilities.sendResetLink(req.body, (confirmation) => {
-        convertObjectToResponse(confirmation, res);
+        convertObjectToResponse(null, confirmation, res);
     });
 };
 
@@ -110,24 +110,24 @@ exports.reset_password_link_get = function (req, res) {
         if (results.success) {
             res.render("pages/reset_password.ejs");
         } else {
-            convertObjectToResponse(results, res);
+            convertObjectToResponse(null, results, res);
         }
     });
 };
 
 exports.reset_password_link_post =  function (req, res) {
     var reset_password_uri = req.path.split("/reset-password-link/")[1];
-    LogInUtilities.validatePasswordResetLink(reset_password_uri, (results) => {
-        if (results.success) {
+    LogInUtilities.validatePasswordResetLink(reset_password_uri, (valid_link) => {
+        if (valid_link.success) {
             var payload = req.body;
             payload.reset_password_uri = reset_password_uri;
             var todays_datetime = new Date();
             payload.reset_request_time = todays_datetime.toString();
-            LogInUtilities.resetPassword(payload, (confirmation) => {
-                convertObjectToResponse(confirmation, res);
+            LogInUtilities.resetPassword(payload, (reset_confirmation) => {
+                convertObjectToResponse(null, reset_confirmation, res);
             });
         } else {
-            convertObjectToResponse(confirmation, results);
+            convertObjectToResponse(valid_link, null, res);
         }
     });
 };
