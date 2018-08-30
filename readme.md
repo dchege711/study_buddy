@@ -1,4 +1,6 @@
-# Contents
+# Study Buddy by c13u
+
+[![Build Status](https://travis-ci.com/dchege711/study_buddy.svg?branch=master)](https://travis-ci.com/dchege711/study_buddy)
 
 The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
 
