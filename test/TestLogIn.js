@@ -5,6 +5,10 @@ var LogInUtilities = require("../models/LogInUtilities.js");
 
 describe("LogIn Utilities", function() {
 
+    after(function(done) {
+        dbConnection.closeMongooseConnection(done);        
+    });
+
     describe("#registerUserAndPassword()", function() {
 
         it("should reject incomplete signup info", function(done) {
@@ -19,8 +23,4 @@ describe("LogIn Utilities", function() {
 
     });
 });
-
-setTimeout(() => {
-    still_running();
-}, 5000);
 

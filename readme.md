@@ -50,6 +50,10 @@ The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
 
 :soon: Hide the search results once someone clicks away.
 
+### Add a Test Suite for Continuous Testing
+
+Objective: write tests using MochaJS. Prevent commits that fail the tests from being merged into master.
+
 ### Add an Accounts Page
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>

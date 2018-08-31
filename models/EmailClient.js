@@ -36,10 +36,16 @@ exports.sendEmail = function(mailOptions, callBack) {
     });
 };
 
+/**
+ * @description Clean up the resources before exiting this module.
+ */
+exports.closeTransporter = function() {
+    transporter.close();
+};
+
 // Close the SMTP pool before closing the application.
 process.on("SIGINT", function () {
-    transporter.close();
-    console.log("Closed the SMTP pool.");
+    exports.closeTransporter();
 });
 
 if (require.main === module) {

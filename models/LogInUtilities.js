@@ -17,6 +17,12 @@ var generic_500_msg = {
     success: false, status: 500, message: "Internal Server Error"
 };
 
+exports.close = function(callBack) {
+    User.db.close((err) => {
+        callBack(err);
+    });
+};
+
 getSaltAndHash = function(password, callBack) {
     // 8 words = 32 bytes = 256 bits, a paranoia of 7
     var salt = stanfordCrypto.random.randomWords(8, 7);

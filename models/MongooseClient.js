@@ -19,10 +19,6 @@ var db = mongoose.connection;
 // Bind the connection to the error event (to get notifications)
 db.on("error", console.error.bind(console, "Connection Error:"));
 
-// db.once("open", function() {
-//     console.log("Successfully connected to MongoDB.");
-// });
-
 /*
  * Tip from MDN:
  * 
@@ -35,10 +31,15 @@ db.on("error", console.error.bind(console, "Connection Error:"));
  * as connect() and returns a Connection object).
  */
 
-// Close the MongoDB connection before closing the application.
+ /**
+  * @description Close the MongoDB connection before closing the application.
+  */
+exports.closeMongooseConnection = function(callback) {
+    mongoose.disconnect(callback);
+};
+
 process.on("SIGINT", function () {
-    db.close(function () {
-        console.log("Mongoose connection closed from MongooseClient.js");
+    exports.closeMongooseConnection(function () {
         process.exit(0);
     });
 });

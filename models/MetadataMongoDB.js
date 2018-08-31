@@ -363,7 +363,7 @@ exports.restore_from_trash = function (restore_card_args, callBack) {
                 // ... otherwise don't do anything to the database
                 console.error(`@MetadataMongoDB.restore_from_trash: Search Failure`);
                 console.error(restore_card_args);
-                console.error(matchingCards) 
+                console.error(matchingCards) ;
                 callBack({
                     success: false, internal_error: true,
                     message: "404: Card Not Found"
@@ -434,7 +434,7 @@ function removeCardFromMetadataTrash(card_identifer, callBack) {
                         return;
                     }
                 }
-                callBack({success: false, internal_error: false, message: "404. File Not Found"})
+                callBack({success: false, internal_error: false, message: "404. File Not Found"});
             }
         }
     );
@@ -465,7 +465,7 @@ exports.write_cards_to_json_file = function (userIDInApp, callBack) {
                 });
             }
 
-            let json_filename = `study_buddy_cards_${userIDInApp}.json`
+            let json_filename = `study_buddy_cards_${userIDInApp}.json`;
             let json_filepath = `${process.cwd()}/${json_filename}`;
             fs.open(json_filepath, "w", (err, file_descriptor) => {
                 if (err) {
@@ -552,7 +552,7 @@ function updateMetadataWithCardDetails(savedCard, metadataDoc, callBack) {
 
                 // If we've not seen this card under this tag, add it
                 if (metadataNodeInfo[strippedTag][cardID] === undefined) {
-                    metadataNodeInfo[strippedTag][cardID] = {}
+                    metadataNodeInfo[strippedTag][cardID] = {};
                 }
 
                 // If this tag was in the previous version of the card, flag it
