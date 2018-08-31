@@ -4,7 +4,7 @@
   "description": "A web application that helps me review content",
   "main": "server.js",
   "scripts": {
-    "test": "mocha",
+    "test": "mocha --exit",
     "start": "node server.js"
   },
   "repository": {
