@@ -18,9 +18,8 @@ var generic_500_msg = {
 };
 
 exports.close = function(callBack) {
-    User.db.close((err) => {
-        callBack(err);
-    });
+    Email.close();
+    callBack();
 };
 
 getSaltAndHash = function(password, callBack) {
@@ -231,16 +230,30 @@ exports.validateAccount = function(validation_uri, callBack) {
 };
 
 /**
- * Register a new user using the provided password.
+ * @description Register a new user using the provided password, username and email.
+ * * Respond with status `200` if the username is taken.
+ * * If the email address is already taken, send an email to that address 
+ * notifying them of the signup.
+ * * If the input is invalid, e.g. a non alphanumeric username, raise an error 
+ * since it should have been caught on the client side.
+ * * Otherwise, register the user and send them a validation link.
  * 
  * @param {JSON} payload Expected keys: `username`, `password`, `email_address`
- * @param {function} callBack Function that takes a JSON param w/ `success`, 
- * `internal_error` and `message` as keys. 
+ * @param {function} callBack The first parameter is set if an error occured. The
+ * second parameter is a JSON object containing the keys `success`, `status` and 
+ * `message`. 
  */
 exports.registerUserAndPassword = function(payload, callBack) {
     var username = payload.username;
     var password = payload.password;
     var email = payload.email;
+
+    if (!username || !password || !email) {
+        callBack(
+            new Error("At least one of these wasn't provided: username, password, email")
+        );
+        return;
+    }
 
     // Apologies for the nesting nightmare below
     // Be the change that you wish to see in the world ;-)
@@ -262,14 +275,12 @@ exports.registerUserAndPassword = function(payload, callBack) {
                         account_validation_uri: validationURI,
                         account_is_valid: false
                     });
-
-                    if (debug) console.log(`Saving new user: ${email}`);
                     User.find({ email: user.email }, (error, existingUsers) => {
                         if (error) {
                             callBack(error);
                         } else {
                             if (existingUsers.length > 1) {
-                                // I hope it never comes to this, ever.
+                                console.error(`${existingUsers.length} have the same email: ${user.email}`);
                                 callBack(new Error(`${existingUsers.length} have the same email: ${user.email}`));
                             } else if (existingUsers.length === 1) {
                                 // Send an email to them notifying them of suspicious activity

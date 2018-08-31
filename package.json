@@ -34,6 +34,7 @@
     "nodemailer": "4.6.7",
     "path": "0.12.7",
     "sjcl": "1.0.7",
+    "validator": "^10.7.0",
     "why-is-node-running": "^2.0.2"
   },
   "devDependencies": {

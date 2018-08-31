@@ -39,7 +39,7 @@ exports.sendEmail = function(mailOptions, callBack) {
 /**
  * @description Clean up the resources before exiting this module.
  */
-exports.closeTransporter = function() {
+exports.close = function() {
     transporter.close();
 };
 

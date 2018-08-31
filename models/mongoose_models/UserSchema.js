@@ -4,6 +4,7 @@
  */
 
 var mongoose = require('mongoose');
+var isEmail = require("validator").isEmail;
 
 var userSchema = new mongoose.Schema(
     {
@@ -11,6 +12,7 @@ var userSchema = new mongoose.Schema(
             type: String,
             required: true,
             unique: [true, "This username is already taken"],
+            match: /[_\-A-Za-z0-9]+/
         },
         salt: Array,
         hash: Array,
@@ -21,7 +23,8 @@ var userSchema = new mongoose.Schema(
         email: {
             type: String,
             required: true,
-            unique: true
+            unique: true,
+            validate: [isEmail, 'Please provide a valid email address']
         },
         reset_password_uri: String,
         reset_password_timestamp: Number,
