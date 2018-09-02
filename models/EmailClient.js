@@ -45,7 +45,7 @@ exports.close = function() {
 
 // Close the SMTP pool before closing the application.
 process.on("SIGINT", function () {
-    exports.closeTransporter();
+    exports.close();
 });
 
 if (require.main === module) {

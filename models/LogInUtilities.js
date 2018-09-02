@@ -388,24 +388,14 @@ exports.authenticateUser = function(payload, callBack) {
 
                 // Case 2: The user has provided correct credentials
                 if (thereIsAMatch) {
-
-                    // Prevent unvalidated accounts from logging in..
-                    if (!user.account_is_valid) {
-                        sendAccountValidationURLToEmail(user, (email_confirmation) => {
-                            if (email_confirmation.success) email_confirmation.success = false; 
-                            callBack(email_confirmation);
-                        });
-                    } else {
-                        provideSessionToken(user, callBack);
-                    }       
-                    return;
+                    // Let users who have not validated their accounts log in too.
+                    provideSessionToken(user, callBack);     
                 } else {
                     // Case 3: The user provided wrong credentials
                     callBack({
                         success: false, status: 200,
                         message: "Incorrect username/email and/or password"
                     });
-                    return;
                 }
             });
         }

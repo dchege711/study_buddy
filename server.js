@@ -16,7 +16,9 @@ var port = process.env.PORT || 5000;
 
 // In Heroku's honesty we trust. Beware otherwise as headers can be spoofed
 // https://github.com/florianheinemann/express-sslify
-app.use(enforce.HTTPS({ trustProtoHeader: true}));
+if (process.env.NODE_ENV === "production") {
+    app.use(enforce.HTTPS({ trustProtoHeader: true}));
+}
 
 app.use(session({
     secret: "bad secret",

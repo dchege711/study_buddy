@@ -54,6 +54,8 @@ The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
 
 Objective: write tests using MochaJS. Prevent commits that fail the tests from being merged into master.
 
+I first needed to separate the production database from the test database. If I'm to present this to users, I can't risk wiping their data based on a test that went wrong!
+
 ### Add an Accounts Page
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
