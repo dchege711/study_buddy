@@ -33,6 +33,9 @@ db.on("error", console.error.bind(console, "Connection Error:"));
 
  /**
   * @description Close the MongoDB connection before closing the application.
+  * 
+  * @param {Function} callback The first parameter will be set in case of any 
+  * error
   */
 exports.closeMongooseConnection = function(callback) {
     mongoose.disconnect(callback);

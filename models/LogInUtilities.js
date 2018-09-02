@@ -291,12 +291,13 @@ exports.registerUserAndPassword = function(payload, callBack) {
                                         subject: `Did you try to register for a new Study Buddy Account?`,
                                         text: `Psst! Someone tried registering for a new Study Buddy ` +
                                             `account using your email address. If this was you, you ` +
-                                            `already have an account.\n\nForgot your password? Request a ` +
-                                            `reset at ${config.BASE_URL}/reset-password.\n\nCheers,\nStudy Buddy by c13u`
+                                            `already have an account. Your username is still ${existingUser.username}.` +
+                                            ` \n\nForgot your password? Request a reset at ` +
+                                            `${config.BASE_URL}/reset-password.\n\nCheers,\nStudy Buddy by c13u`
                                     }, (email_confirmation) => {
                                         if (email_confirmation.success) {
                                             callBack(null, {
-                                                success: true, status: 200,
+                                                success: false, status: 200,
                                                 message: `Please check ${existingUser.email} for an account validation link.`
                                             });
                                         } else {
@@ -318,7 +319,7 @@ exports.registerUserAndPassword = function(payload, callBack) {
                                                 sendAccountValidationURLToEmail(savedUser, (email_confirmation) => {
                                                     // Overwrite the message on success
                                                     if (email_confirmation.success) {
-                                                        email_confirmation.message = `We've sent a validation URL to ${savedUser.email}. Please validate before logging in`;
+                                                        email_confirmation.message = `Awesome! Please log in. We've also sent a validation URL to ${savedUser.email}. Validate your account soon.`;
                                                     }
                                                     callBack(null, email_confirmation);
                                                 });
@@ -617,7 +618,7 @@ exports.resetPassword = function(payload, callBack) {
  * 
  */
 exports.deleteAccount = function(userIDInApp, callBack) {
-    // Forgive Lord-of_Promises, I have not yet left the Land of Callbacks :-(
+    // Forgive me Lord-of-Promises, I have not yet left the Land of Callbacks :-(
     User.deleteMany({ userIDInApp: userIDInApp }, (err) => {
         if (err) { console.error(err); callBack(generic_500_msg); }
         else {
@@ -642,4 +643,37 @@ exports.deleteAccount = function(userIDInApp, callBack) {
             });
         }
     });
+};
+
+/**
+ * @description Delete all existing users from the database. This function only 
+ * works when `config.NODE_ENV == 'development'`
+ * 
+ * @param {Function} callBack The first parameter will be set in case of any error.
+ * The second parameter will be the number of accounts that were deleted.
+ */
+exports.deleteAllAccounts = function(callBack) {
+    if (config.NODE_ENV !== "development") {
+        callBack(
+            new Error(`Deleting all accounts is only supported in the dev environment.`)
+        );
+    } else {
+        User.find({}, (err, users) => {
+            if (err) callBack(err);
+            else {
+                let numAccountsDeleted = 0;
+                for (let i = 0; i < users.length; i++) {
+                    exports.deleteAccount(users[i].userIDInApp, (err) => {
+                        if (err) callBack(err);
+                        else {
+                            numAccountsDeleted += 1;
+                            if (numAccountsDeleted === users.length) {
+                                callBack(null, numAccountsDeleted);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
 };

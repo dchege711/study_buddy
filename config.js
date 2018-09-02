@@ -3,10 +3,10 @@
  */
 
 // Select the appropriate database
-let current_environment = process.env.NODE_ENV;
-if (current_environment === "production") {
+exports.NODE_ENV = process.env.NODE_ENV;
+if (exports.NODE_ENV === "production") {
     exports.MONGO_URI = process.env.STUDY_BUDDY_MLAB_MONGO_URI;
-} else if (current_environment === "development") {
+} else if (exports.NODE_ENV === "development") {
     exports.MONGO_URI = process.env.STUDY_BUDDY_MLAB_TEST_DB_URI;
 } else {
     throw Error("Please set the NODE_ENV environment variable.");

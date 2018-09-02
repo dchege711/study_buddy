@@ -3,10 +3,19 @@ var LogInUtilities = require("../models/LogInUtilities.js");
 
 describe("LogIn Utilities", function() {
 
+    before(function(done) {
+        LogInUtilities.deleteAllAccounts(done);
+    });
+
     after(function(done) {
-        LogInUtilities.deleteAccount()
-        dbConnection.closeMongooseConnection(() => {
-            LogInUtilities.close(done);
+        LogInUtilities.deleteAllAccounts(function(err) {
+            if (err) done(err);
+            else {
+                dbConnection.closeMongooseConnection(function(err) {
+                    if (err) done(err);
+                    else LogInUtilities.close(done);
+                });
+            }
         });            
     });
 
@@ -33,6 +42,23 @@ describe("LogIn Utilities", function() {
                     username: "test", password: "test_dummy_password",
                     email: "c13u.study.buddy@gmail.com"
                 }, done
+            );
+        });
+
+        // Remarks: a.b@gmail.com and ab@gmail.com will be regarded as different emails!
+        it("should prevent multiple users from sharing email/usernames", function(done) {
+            LogInUtilities.registerUserAndPassword(
+                {
+                    username: "test-dup", password: "test_dummy_password",
+                    email: "c13u.study.buddy@gmail.com"
+                },
+                function(err, signup_result) {
+                    if (err) done(err);
+                    else {
+                        if (signup_result.success) done(new Error(signup_result.message));
+                        else done();
+                    }
+                }
             );
         });
 
