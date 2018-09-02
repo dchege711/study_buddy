@@ -662,6 +662,7 @@ exports.deleteAllAccounts = function(callBack) {
             if (err) callBack(err);
             else {
                 let numAccountsDeleted = 0;
+                if (users.length == 0) callBack(null, numAccountsDeleted);
                 for (let i = 0; i < users.length; i++) {
                     exports.deleteAccount(users[i].userIDInApp, (err) => {
                         if (err) callBack(err);
