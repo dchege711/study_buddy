@@ -1,15 +1,10 @@
-const webdriver = require("selenium-webdriver");
-const config = require("../config.js");
+const TestSignUpFlow = require("./TestSignUpFlow.js");
 
-async function test() {
-    let driver = await new webdriver.Builder().build();
-    try {
-        await driver.get(`http://localhost:${config.PORT}/`);
-    } catch(err) {
-        console.error(err);
-    } finally {
-        await driver.quit();
-    }
+async function runTestSuite() {
+    await TestSignUpFlow.test()
+        .catch((err) =>{ 
+            console.error(err); 
+        });
 }
 
-test();
+runTestSuite();

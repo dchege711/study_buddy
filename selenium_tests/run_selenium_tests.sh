@@ -13,11 +13,19 @@ trap cleanup EXIT # Run the cleanup routine before exiting this script
 node ../server.js &
 sleep 1.5 # Enough time for the server to initialize
 
-echo -e "\n__________________\n\nTesting on chrome...\n__________________\n"
-SELENIUM_SERVER_JAR=./selenium-server-standalone-3.8.1.jar SELENIUM_BROWSER=chrome node Test.js
+browser_to_test=`echo "$1" | tr '[:upper:]' '[:lower:]'`
 
-echo -e "\n__________________\n\nTesting on safari...\n__________________\n"
-SELENIUM_SERVER_JAR=./selenium-server-standalone-3.8.1.jar SELENIUM_BROWSER=safari node Test.js
+if [ $browser_to_test == "" ] || [ $browser_to_test == "chrome" ]; then
+    echo -e "\n__________________\n\nTesting on chrome...\n__________________\n"
+    SELENIUM_SERVER_JAR=./selenium-server-standalone-3.8.1.jar SELENIUM_BROWSER=chrome node Test.js
+fi
 
-echo -e "\n__________________\n\nTesting on firefox...\n__________________\n"
-SELENIUM_SERVER_JAR=./selenium-server-standalone-3.8.1.jar SELENIUM_BROWSER=firefox node Test.js
+if [ $browser_to_test == "" ] || [ $browser_to_test == "safari" ]; then
+    echo -e "\n__________________\n\nTesting on safari...\n__________________\n"
+    SELENIUM_SERVER_JAR=./selenium-server-standalone-3.8.1.jar SELENIUM_BROWSER=safari node Test.js
+fi
+
+if [ $browser_to_test == "" ] || [ $browser_to_test == "firefox" ]; then
+    echo -e "\n__________________\n\nTesting on firefox...\n__________________\n"
+    SELENIUM_SERVER_JAR=./selenium-server-standalone-3.8.1.jar SELENIUM_BROWSER=firefox node Test.js
+fi

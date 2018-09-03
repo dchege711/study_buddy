@@ -18,3 +18,9 @@ exports.EMAIL_ADDRESS = process.env.STUDY_BUDDY_EMAIL_ADDRESS;
 exports.EMAIL_PASSWORD = process.env.STUDY_BUDDY_EMAIL_PASSWORD;
 
 exports.BASE_URL = "https://notes.c13u.com";
+
+exports.DEBUG_EMAIL_ADDRESS = process.env.STUDY_BUDDY_EMAIL_ADDRESS;
+exports.DEBUG_USERNAME = "test-study-buddy-user";
+exports.DEBUG_PASSWORD = "i_know_how_to_keep_passwords_safe_amirite?";
+exports.DEBUG_BASE_URL = `http://localhost:${exports.PORT}`;
+exports.DEBUG_OPERATION_TIMEOUT_MS = 3000; 
