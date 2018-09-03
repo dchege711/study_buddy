@@ -2,8 +2,9 @@
  * @description Access point for sensitive information.
  */
 
-// Select the appropriate database
+exports.PORT = process.env.PORT || 5000;
 exports.NODE_ENV = process.env.NODE_ENV;
+
 if (exports.NODE_ENV === "production") {
     exports.MONGO_URI = process.env.STUDY_BUDDY_MLAB_MONGO_URI;
 } else if (exports.NODE_ENV === "development") {

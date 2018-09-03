@@ -33,6 +33,7 @@
     "mongoose": "5.0.17",
     "nodemailer": "4.6.7",
     "path": "0.12.7",
+    "selenium-webdriver": "^4.0.0-alpha.1",
     "sjcl": "1.0.7",
     "validator": "^10.7.0",
     "why-is-node-running": "^2.0.2"

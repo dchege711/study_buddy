@@ -4,15 +4,18 @@ var MongoStore = require('connect-mongo')(session);
 var path = require("path");
 var bodyParser = require("body-parser");
 var cookieParser = require("cookie-parser");
+var enforce = require('express-sslify');
+
 var AccountRoutes = require("./routes/AuthenticationRoutes.js");
 var InAppRoutes = require("./routes/InAppRoutes.js");
-var enforce = require('express-sslify');
+var config = require("./config.js");
+
 
 // Needed to get a Mongoose instance running for this process
 const dbConnection = require("./models/MongooseClient.js");
 
 var app = express();
-var port = process.env.PORT || 5000;
+var port = config.PORT;
 
 // In Heroku's honesty we trust. Beware otherwise as headers can be spoofed
 // https://github.com/florianheinemann/express-sslify
