@@ -48,6 +48,8 @@ The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
 
 :soon: Hide the search results once someone clicks away.
 
+:soon: In the sidebar, display the median urgency so that the user can know how to adjust the cards to influence order.
+
 ### Add an Accounts Page
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
