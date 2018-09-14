@@ -50,6 +50,8 @@ The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
 
 :soon: In the sidebar, display the median urgency so that the user can know how to adjust the cards to influence order.
 
+:soon: Add utility in accounts to quickly modify the tags.
+
 ### Add an Accounts Page
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
