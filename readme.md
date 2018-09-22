@@ -48,6 +48,10 @@ The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
 
 :soon: Hide the search results once someone clicks away.
 
+:soon: In the sidebar, display the median urgency so that the user can know how to adjust the cards to influence order.
+
+:soon: Add utility in accounts to quickly modify the tags.
+
 ### Add a Test Suite for Continuous Testing
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
