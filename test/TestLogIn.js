@@ -20,7 +20,4 @@ describe("LogIn Utilities", function() {
     });
 });
 
-setTimeout(() => {
-    still_running();
-}, 5000);
-
+// setTimeout(() => { still_running(); }, 5000);
