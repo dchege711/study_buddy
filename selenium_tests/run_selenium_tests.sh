@@ -2,15 +2,14 @@
 
 # Clean up processes that run in the background
 function cleanup {
-    echo -e "\nClosing Study Buddy server...\n"
+    echo -e "\nClosing Study Buddy instance...\n"
     pkill node ../server.js
 }
 
 cleanup # Clean the workspace before running anything
 trap cleanup EXIT # Run the cleanup routine before exiting this script
 
-# Spin up the servers
-node ../server.js &
+node ../server.js & # Spin up the server
 sleep 1.5 # Enough time for the server to initialize
 
 browser_to_test=`echo "$1" | tr '[:upper:]' '[:lower:]'`
