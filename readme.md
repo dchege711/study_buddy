@@ -48,6 +48,10 @@ The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
 
 :soon: Hide the search results once someone clicks away.
 
+### Setup a Mail Server
+
+Using Gmail is great for testing, but Gmail restricts me from autheticating from suspicious devices (e.g. Heroku's servers). I have chosen to setup [MailGun](https://documentation.mailgun.com/en/latest/quickstart-sending.html#send-with-smtp-or-api) which provides 10,000 free emails per month.
+
 ### Add an Accounts Page
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
