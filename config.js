@@ -13,9 +13,9 @@ if (exports.NODE_ENV === "production") {
     throw Error("Please set the NODE_ENV environment variable.");
 }
 
-exports.EMAIL_ADDRESS = process.env.STUDY_BUDDY_EMAIL_ADDRESS;
-
-exports.EMAIL_PASSWORD = process.env.STUDY_BUDDY_EMAIL_PASSWORD;
+exports.EMAIL_ADDRESS = process.env.STUDY_BUDDY_DEFAULT_EMAIL_ADDRESS;
+exports.MAILGUN_LOGIN = process.env.STUDY_BUDDY_MAILGUN_LOGIN;
+exports.MAILGUN_PASSWORD = process.env.STUDY_BUDDY_MAILGUN_PASSWORD;
 
 exports.BASE_URL = "https://notes.c13u.com";
 

@@ -1,7 +1,5 @@
 # Study Buddy by c13u
 
-[![Build Status](https://travis-ci.com/dchege711/study_buddy.svg?branch=master)](https://travis-ci.com/dchege711/study_buddy)
-
 The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
 
 ## [Tasks](#tasks)
@@ -87,6 +85,12 @@ I first needed to separate the production database from the test database. If I'
 * **Performance Testing:**
 
   * Application performance on different connection speeds.
+
+### Setup a Mail Server
+
+<sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
+
+Using Gmail is great for testing, but Gmail restricts me from autheticating from suspicious devices (e.g. Heroku's servers). I have chosen to setup [MailGun](https://documentation.mailgun.com/en/latest/quickstart-sending.html#send-with-smtp-or-api) which provides 10,000 free emails per month.
 
 ### Add an Accounts Page
 

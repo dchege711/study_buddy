@@ -65,7 +65,6 @@ describe("LogIn Utilities", function() {
     });
 });
 
-
 // In case the process doesn't close, run this to discover why
 // var why_is_node_running = require("why-is-node-running");
 // setTimeout(why_is_node_running, 5000);

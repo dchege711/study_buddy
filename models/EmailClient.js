@@ -3,12 +3,12 @@ var config = require("../config.js");
 
 let transporter = nodemailer.createTransport({
     pool: true,
-    host: "smtp.gmail.com",
+    host: "smtp.mailgun.org",
     port: 587,
     secure: false,
     auth: {
-        user: config.EMAIL_ADDRESS,
-        pass: config.EMAIL_PASSWORD
+        user: config.MAILGUN_LOGIN,
+        pass: config.MAILGUN_PASSWORD
     }
 });
 
