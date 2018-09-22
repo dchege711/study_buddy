@@ -1,5 +1,6 @@
 const dbConnection = require("../models/MongooseClient.js");
 var LogInUtilities = require("../models/LogInUtilities.js");
+const config = require("../config.js");
 
 describe("LogIn Utilities", function() {
 
@@ -40,7 +41,7 @@ describe("LogIn Utilities", function() {
             LogInUtilities.registerUserAndPassword(
                 {
                     username: "test", password: "test_dummy_password",
-                    email: "c13u.study.buddy@gmail.com"
+                    email: config.DEBUG_EMAIL_ADDRESS
                 }, done
             );
         });
@@ -50,7 +51,7 @@ describe("LogIn Utilities", function() {
             LogInUtilities.registerUserAndPassword(
                 {
                     username: "test-dup", password: "test_dummy_password",
-                    email: "c13u.study.buddy@gmail.com"
+                    email: config.DEBUG_EMAIL_ADDRESS
                 },
                 function(err, signup_result) {
                     if (err) done(err);
