@@ -568,6 +568,7 @@
                 sendHTTPRequest("POST", state.post_url, payload, (response) => {
                     var saved_card = response.message;
                     my_cards_manager.update_card(saved_card);
+                    displayPopUp("Saved!", 1000);
                     if (render_saved_card) renderCard(saved_card);
 
                     if (rerender_sidebar) {
