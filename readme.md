@@ -30,6 +30,8 @@ The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
 
 ### To-do Items
 
+:soon: Do a writeup on how to use Study Buddy.
+
 :soon: Submit the web app to various forums. :sweat_smile:
 
 :soon: Learn how to handle subscriptions using Stripe.
