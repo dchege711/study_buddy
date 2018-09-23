@@ -319,7 +319,7 @@ exports.registerUserAndPassword = function(payload, callBack) {
                                                 sendAccountValidationURLToEmail(savedUser, (email_confirmation) => {
                                                     // Overwrite the message on success
                                                     if (email_confirmation.success) {
-                                                        email_confirmation.message = `Awesome! Please log in. We've also sent a validation URL to ${savedUser.email}. Validate your account soon.`;
+                                                        email_confirmation.message = `Welcome to Study Buddy! We've also sent a validation URL to ${savedUser.email}. Validate your account within 30 days.`;
                                                     }
                                                     callBack(null, email_confirmation);
                                                 });
@@ -352,7 +352,7 @@ exports.authenticateUser = function(payload, callBack) {
     var identifier_query;
     var submitted_identifier = payload.username_or_email;
     if (submitted_identifier === undefined) {
-        identifier_query = {path_that_doesnt_exist: "invalid@username!@"};
+        identifier_query = { path_that_doesnt_exist: "invalid@username!@" };
     } else {
         if (submitted_identifier.includes("@")) {
             identifier_query = { email: submitted_identifier };
