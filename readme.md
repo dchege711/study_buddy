@@ -52,6 +52,8 @@ The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
 
 :soon: Add utility in accounts to quickly modify the tags.
 
+:soon: Read about [building a user base](https://blog.inkdrop.info/how-ive-attracted-the-first-500-paid-users-for-my-saas-that-costs-5-mo-7a5b94b8e820)
+
 ### Add a Test Suite for Continuous Testing
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
