@@ -16,8 +16,8 @@ exports.home = function (req, res) {
     res.render("pages/home.ejs");
 };
 
-exports.help_page = function (req, res) {
-    res.render("pages/help_page.ejs");
+exports.wiki_page = function (req, res) {
+    res.render("pages/wiki_page.ejs");
 };
 
 exports.account_get = function (req, res) {

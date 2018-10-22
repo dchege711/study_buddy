@@ -8,7 +8,7 @@ router.post("/read-card", requireLogIn, inAppController.read_card);
 
 router.get("/home", requireLogIn, inAppController.home);
 
-router.get("/help", inAppController.help_page);
+router.get("/wiki", inAppController.wiki_page);
 
 router.get("/account", requireLogIn, inAppController.account_get);
 
