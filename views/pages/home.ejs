@@ -298,11 +298,11 @@
             }
 
             function displayPopUp(text, timeout_ms) {
-                var popup = document.getElementById("out_of_cards_popup");
+                var popup = document.getElementById("card_popup_element");
                 popup.innerHTML = text;
                 popup.style.visibility = "visible";
                 window.setTimeout(() => {
-                    makeInvisible("out_of_cards_popup")
+                    makeInvisible("card_popup_element")
                 }, timeout_ms);
             }
 
