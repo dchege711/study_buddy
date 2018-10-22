@@ -16,6 +16,10 @@ exports.home = function (req, res) {
     res.render("pages/home.ejs");
 };
 
+exports.wiki_page = function (req, res) {
+    res.render("pages/wiki_page.ejs");
+};
+
 exports.account_get = function (req, res) {
     res.render("pages/account_page.ejs", {account_info: req.session.user});
 };

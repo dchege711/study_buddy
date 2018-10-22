@@ -30,6 +30,8 @@ The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
 
 ### To-do Items
 
+:soon: Evaluate whether adding [https://introjs.com/](https://introjs.com/) is a good idea for first time users.
+
 :soon: Submit the web app to various forums. :sweat_smile:
 
 :soon: Learn how to handle subscriptions using Stripe.
@@ -183,7 +185,7 @@ I found CrackStation's piece on [salted password hashing](https://crackstation.n
 
 When someone tries registering for a new account with a used email address, I ask them to check the email address for a confirmation email. However, the email that I sent tells the email address owner that someone tried registering for an account using their email, and suggests a password reset since if the person who tried to register is legitimate, then they'd benefit from setting a new password. If a new user submits a username that's already in use, I let them know that the username is already in use - something had to give. With sufficient patience, it's possible to enumerate valid usernames, but at least usernames don't have to be obviously linked to a specific person. If need be, I could set up a CAPTCHA before revealing that a username is already taken to slow down enumeration of usernames.
 
-Once an account is registered, the user needs to click on a validation link sent to the submitted email. The user cannot log into Study Buddy before the email address is verified. I'll be (hopefully) short on space, so any unvalidated accounts older than 30 days will get deleted from the database.
+Once an account is registered, the user needs to click on a validation link sent to the submitted email. ~~The user cannot log into Study Buddy before the email address is verified. I'll be (hopefully) short on space, so any unvalidated accounts older than 30 days will get deleted from the database.~~ I observed a high bounce rate AND few signups. I'll allow accounts with unvalidated email addresses to sign in for at most 30 days.
 
 Logging in should be as painless as possible. Since the usernames only contain `[_\-A-Za-z0-9]+`, I can infer whether the submitted string was an email address or a username, and authenticate accordingly. If the username/email/password is incorrect, I send a generic `Invalid username/email or password` message without disclosing which is incorrect. Again, it's possible to enumerate usernames, so this is not entirely foolproof. If the credentials provided were correct ~~but the email account has not been verified, I resend a validation URL to their email, and request them to first validate their account. Otherwise,~~ I log them in to Study Buddy.
 

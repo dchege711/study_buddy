@@ -104,7 +104,6 @@
             /* Tooltip text */
             .tooltip .tooltiptext {
                 visibility: hidden;
-                width: 150px;
                 background-color: black;
                 color: #fff;
                 text-align: center;
@@ -115,8 +114,24 @@
                 /* Position the tooltip text - see examples below! */
                 position: absolute;
                 z-index: 1;
+            }
+
+            #review_mode_tooltip {
+                width: 300px;
                 top: -5px;
                 right: 105%;
+            }
+
+            #tagging_system_tooltip {
+                width: 120%;
+                top: -50px;
+                left: 60%;
+            }
+
+            #formatting_help_tooltip {
+                width: 120%;
+                top: -50px;
+                left: 60%;
             }
 
             /* Show the tooltip text when you mouse over the tooltip container */
@@ -153,9 +168,6 @@
         <div id="main_div">
 
             <div class="w3-container" id="status_bar">
-                <button class="w3-button w3-left" onclick="filterCards()">
-                    <b><i class="fa fa-refresh fa-fw" aria-hidden="true"></i> Apply Filters </b>
-                </button>
 
                 <div id="card_search_container" class="w3-half">
                     <div class="dropdown">
@@ -168,21 +180,36 @@
                 <label class="w3-right switch tooltip">
                     <input type="checkbox" id="review_mode_toggle" onchange="toggleReviewMode();">
                     <span class="slider round"></span>
-                    <span class="tooltiptext">
-                        Modifying the urgency of a card will automatically save the changes and display the next card on the queue.
+                    <span class="tooltiptext" id="review_mode_tooltip">
+                        After the urgency of a card has been modified, automatically 
+                        save the current card and load the next card. 
+                        <a href="/wiki#review_mode" target="_blank">Read more</a>
                     </span>
                 </label>
                 
             </div>
 
             <div>
-                <p id="filter_list" class="w3-right w3-container"></p>
+                <p class="w3-left w3-quarter w3-container tooltip">
+                    <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> The Tagging and Urgency System
+                    <span class="tooltiptext" id="tagging_system_tooltip">
+                        The tags with the most urgent cards appear earlier on the list. 
+                        "#probability (7)" means that there are 7 cards that have 'probability' as one of their tags. 
+                        <a href="/wiki/#tagging_system" target="_blank">Read more</a>
+                    </span>
+                </p>
+                <p id="filter_list" class="w3-right w3-threequarter w3-container"></p>
             </div>
 
             <div class="w3-container">
 
-                <div class="w3-container w3-left w3-quarter" id="side_bar">
-                    <div id="side_bar_contents"></div>  
+                <div class="w3-container w3-left w3-quarter">
+                    <button class="w3-button w3-blue w3-round-xxlarge" onclick="filterCards()">
+                        <b><i class="fa fa-refresh fa-fw" aria-hidden="true"></i> Display Cards with Selected Tags </b>
+                    </button>
+                    <div id="side_bar">
+                        <div id="side_bar_contents"></div> 
+                    </div>
                 </div>
                 
                 <div class="w3-container w3-right w3-threequarter" id="card_template">
@@ -203,7 +230,8 @@
                 headerLevelStart: 4, literalMidWordUnderscores: true,
                 literalMidWordAsterisks: true, simpleLineBreaks: true,
                 emoji: true, backslashEscapesHTMLTags: true, tables: true,
-                parseImgDimensions: true, simplifiedAutoLink: true
+                parseImgDimensions: true, simplifiedAutoLink: true,
+                strikethrough: true, tasklists: true
             });
             
             /* If a user is logged in, there'll be some metadata about them in 
@@ -257,9 +285,11 @@
 
                 var tags_html = "";
                 tags_in_decreasing_order.forEach((tag) => {
+                    let tag_prefix = "#";
+                    if (tag.charAt(0) == "#") tag_prefix = "";
                     tags_html += "<ul id='" + tag +
                         "' class='link' onclick='selectThisTag(`" + tag +
-                        "`);'> #" + tag + " (" + Object.keys(state.tags_and_ids[tag]).length +
+                        "`);'> " + tag_prefix + tag + " (" + Object.keys(state.tags_and_ids[tag]).length +
                         ")</ul>";
                 });
                 
@@ -295,11 +325,11 @@
             }
 
             function displayPopUp(text, timeout_ms) {
-                var popup = document.getElementById("out_of_cards_popup");
+                var popup = document.getElementById("card_popup_element");
                 popup.innerHTML = text;
                 popup.style.visibility = "visible";
                 window.setTimeout(() => {
-                    makeInvisible("out_of_cards_popup")
+                    makeInvisible("card_popup_element")
                 }, timeout_ms);
             }
 
@@ -568,6 +598,7 @@
                 sendHTTPRequest("POST", state.post_url, payload, (response) => {
                     var saved_card = response.message;
                     my_cards_manager.update_card(saved_card);
+                    displayPopUp("Saved!", 1000);
                     if (render_saved_card) renderCard(saved_card);
 
                     if (rerender_sidebar) {
@@ -658,6 +689,7 @@
                                         }
                                         document.getElementById("card_search_results").innerHTML = search_results_html;
                                     } else {
+                                        document.getElementById("card_search_results").innerHTML = "";
                                         reInitializeCards(search_results);
                                     }    
                                 }

@@ -30,6 +30,13 @@
         <div class="w3-container" id="card_description" 
             onkeydown="insertTabsIfNecessary(event); handleInputChange('card_description')">
         </div>
+        <p class="w3-right tooltip">
+            <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> Formatting Help
+            <span class="tooltiptext" id="formatting_help_tooltip">
+                You can use HTML, Markdown and LaTeX within your card's contents. 
+                <a href="/wiki/#formatting" target="_blank">Read more</a>
+            </span>
+        </p>
 
         <br />
 
@@ -74,7 +81,7 @@
         <div class="w3-center w3-third">
             <div class="popup">
                 <span class="popuptext w3-center w3-padding-small" 
-                 id="out_of_cards_popup"></span>
+                 id="card_popup_element"></span>
             </div>
         </div>
 

@@ -135,19 +135,7 @@
             function logInUser(formID, url) {
                 sendForm(formID, url, (results) => {
                     if (results.success) {
-                        localStorage.setItem(
-                            "session_info", JSON.stringify(results.message)
-                        );
-                        sendHTTPRequest(
-                            "POST", "/read-metadata",
-                            { userIDInApp: results.message.userIDInApp},
-                            (metadata_response) => {
-                                localStorage.setItem(
-                                    "metadata", JSON.stringify(metadata_response.message)
-                                );
-                                window.location = "/home";
-                            }
-                        );
+                        setupInitializationData(results);
                     } else {
                         alert(results.message);
                     }
@@ -155,15 +143,57 @@
 
                 return false;
             }
+            
+            /**
+             * @description Populate Local Storage with the necessary data to 
+             * display the users cards.
+             * 
+             * @param {JSON} `sessionInfoObject` A JSON document that identifies
+             * this session on the server.
+             * 
+             */ 
+            function setupInitializationData(sessionInfoObject) {
+                localStorage.setItem(
+                    "session_info", JSON.stringify(sessionInfoObject.message)
+                );
+                sendHTTPRequest(
+                    "POST", "/read-metadata",
+                    { userIDInApp: sessionInfoObject.message.userIDInApp},
+                    (metadata_response) => {
+                        localStorage.setItem(
+                            "metadata", JSON.stringify(metadata_response.message)
+                        );
+                        window.location = "/home";
+                    }
+                );
+            }
 
             /*
-            * @description Log in the user.
+            * @description Sign up a new user and log them in.
+            * 
             * @param {string} formID The ID of the form that has credentials
             * @param {string} url The URL at which the form will be processed
             */
             function signUpUser(formID, url) {
-                sendForm(formID, url, (results) => {
-                    alert(results.message);
+                var formElements = document.getElementById(formID).elements;
+                sendForm(formID, url, (signupResults) => {
+                    if (signupResults.success) {
+                        sendHTTPRequest(
+                            "POST", "/login",
+                            {
+                                username_or_email: formElements.email.value,
+                                password: formElements.password.value
+                            },
+                            (loginResults) => {
+                                alert(signupResults.message);
+                                if (loginResults.success) {
+                                    setupInitializationData(loginResults);
+                                }
+                            }
+                        )
+                    } else {
+                        alert(signupResults.message);
+                    }   
                 });
                 return false;
             }
