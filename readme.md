@@ -30,7 +30,7 @@ The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
 
 ### To-do Items
 
-:soon: Do a writeup on how to use Study Buddy.
+:soon: Evaluate whether adding [https://introjs.com/](https://introjs.com/) is a good idea for first time users.
 
 :soon: Submit the web app to various forums. :sweat_smile:
 
