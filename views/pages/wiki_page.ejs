@@ -82,7 +82,7 @@
                     </h3>
 
                     <p>
-                        Study Buddy flashcards support Markdown, LaTeX and syntax 
+                        Study Buddy flashcards support LaTeX, Markdown and syntax 
                         highlighting.
 
                         <table class="w3-table-all">
@@ -97,15 +97,15 @@
                             </tr>
 
                             <tr>
-                                <td>* Asterisks denote bullets<br></td>
-                                <td class="convert_to_html">* Asterisks denote bullets</td>
+                                <td>* Asterisks denote bullets. ~~Strikethrough~~, **bold**, *italics*</td>
+                                <td class="convert_to_html">* Asterisks denote bullets. ~~Strikethrough~~, **bold**, *italics*
+                                </td>
                             </tr>
                             
                             <tr>
                                 <td>
                                     <pre>
-                                        <code class="markdown">```python<br>def hello_world():<br>  print("Hello, World!")<br>```
-                                        </code>
+                                        <code class="markdown">```python<br>def hello_world():<br>  print("Hello, World!")<br>```</code>
                                     </pre>
                                     
                                 </td>
@@ -117,7 +117,37 @@
                                 </td>
                             </tr>
 
+                            <tr>
+                                <td>
+                                    <pre>
+                                        <code class="markdown">What happens under the hood when a C <br>program is being compiled? <br><br>[spoiler]<br>* The C code is translated to assembly.<br>* The compiler checks that calls of functions <br>match the declarations that were inserted in the <br>pre-processing stage.
+                                        </code>
+                                    </pre>
+                                </td>
+                                <td>
+                                    Effect: <em>The content that appears after the [spoiler] tag will be covered 
+                                    by a gray box. If you hover over or click on the gray box, 
+                                    the hidden text will appear. This is useful for quizzing yourself.</em>
+                                </td>
+                            </tr>
+
                         </table>
+
+                        <ul>
+                            <li>
+                                If you're new to LaTeX, the <a href="https://en.wikibooks.org/wiki/LaTeX">LaTeX Wikibook</a> 
+                                is a good introduction. ShareLaTeX docs (now owned by Overleaf) 
+                                has some <a href="https://www.overleaf.com/learn/latex/Learn_LaTeX_in_30_minutes"> 
+                                pretty good tutorials too!</a>
+                            </li>
+
+                            <li>
+                                I suggest using markdown to make your cards pretty. 
+                                Here's a <a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">
+                                Markdown Cheatsheet</a> to get you started. You can also use good old HTML in your cards.
+                            </li>
+
+                        </ul>
 
                     </p>
 
