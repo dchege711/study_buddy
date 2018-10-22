@@ -30,10 +30,12 @@
         <div class="w3-container" id="card_description" 
             onkeydown="insertTabsIfNecessary(event); handleInputChange('card_description')">
         </div>
-        <p class="w3-right">
-            <a href="/wiki#formatting" target="_blank">
-                <i class="fa fa-info-circle" aria-hidden="true"></i> Formatting Help
-            </a>
+        <p class="w3-right tooltip">
+            <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> Formatting Help
+            <span class="tooltiptext" id="formatting_help_tooltip">
+                You can use HTML, Markdown and LaTeX within your card's contents. 
+                <a href="/wiki/#formatting" target="_blank">Read more</a>
+            </span>
         </p>
 
         <br />

@@ -8,7 +8,7 @@
 <html>
 
     <head>
-        <title>Study Buddy Readme</title>
+        <title>Study Buddy Wiki</title>
         <link rel="stylesheet" href="/stylesheets/themes/atom-one-light.css">
         <script src="/static/highlight.pack.js"></script>
         <script src="/static/showdown.min.js"></script>
@@ -68,7 +68,7 @@
     
                         <ol>
                             <li><a href="#formatting">Formatting Cards</a></li>
-                            <li><a href="#tagging_system">The Tagging System</a></li>
+                            <li><a href="#tagging_system">The Tagging and Urgency System</a></li>
                             <li><a href="#review_mode">Review Mode</a></li>
                         </ol>
     
@@ -157,27 +157,65 @@
 
                 <div class="details_section">
 
-                        <h3 class="details_header" id="review_mode">
-                            Review Mode
-                            <sup><sup>
-                                <a href="#help_contents">back to the top</a>
-                            </sup></sup>
-                        </h3>
-    
-                        <p>
-                            Normally, reviewing a set of cards works like this:
-                            
-                            <ol>
-                                <li>Adjust the urgency of a card based on how confident you feel about its contents</li>
-                                <li>Click on the 'Save' button to store the changes</li>
-                                <li>Click on 'Next' to load the next card from the queue</li>
-                            </ol>
+                    <h3 class="details_header" id="tagging_system">
+                        The Tagging and Urgency System
+                        <sup><sup>
+                            <a href="#help_contents">back to the top</a>
+                        </sup></sup>
+                    </h3>
 
-                            If review mode is active, Study Buddy presses the 'Save' and 'Next' 
-                            buttons on your behalf.
-                        </p>
-    
-                    </div>
+                    <p>
+                        Study Buddy categorizes the cards using the tags provided. When 
+                        displaying a set of cards, the cards with higher urgency values are 
+                        shown first.
+                        <br><br>
+                        Tags are case-sensitive. When adding tags to a card, Study Buddy 
+                        offers an auto-complete feature in order to prevent near-duplicate tags like 
+                        <em>sorting_algorithms</em>, <em>sorting-algorithms</em> and <em>Sorting Algorithms</em>.
+                        <br><br>
+                        The importance of a tag is the sum of all the urgencies of the 
+                        cards that bear that tag. For instance, suppose we have this set of cards:
+                        <br>
+                        <table class="w3-table-all">
+                            <tr><th>Card ID</th><th>Urgency</th><th>Tags</th></tr>
+                            <tr><td>card_1</td><td>2.0</td><td>a, b</td></tr>
+                            <tr><td>card_2</td><td>6.0</td><td>b, c</td></tr>
+                            <tr><td>card_3</td><td>5.0</td><td>a</td></tr>
+                        </table>
+                        <br>
+                        Tag <strong>'b'</strong> will have an importance of 2.0 + 6.0 = 8.0.  
+                        It will therefore appear first in the list of tags as <em>#b (2)</em>. 
+                        The 2 means that you have 2 cards that have 'b' as one of their tags. 
+                        The hashtag is prepended because it's the conventional way of writing a tag.
+                        <br>
+                    </p>
+
+                </div>
+
+                <div class="details_section">
+
+                    <h3 class="details_header" id="review_mode">
+                        Review Mode
+                        <sup><sup>
+                            <a href="#help_contents">back to the top</a>
+                        </sup></sup>
+                    </h3>
+
+                    <p>
+                        Normally, reviewing a set of cards works like this:
+                        
+                        <ol>
+                            <li>Adjust the urgency of a card based on how confident you feel about its contents</li>
+                            <li>Click on the 'Save' button to store the changes</li>
+                            <li>Click on 'Next' to load the next card from the queue</li>
+                        </ol>
+
+                        If review mode is active, Study Buddy makes the review process 
+                        more convenient by pressing the 'Save' and 'Next' buttons on your behalf. 
+
+                    </p>
+
+                </div>
 
             </div>
 

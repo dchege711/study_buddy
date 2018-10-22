@@ -104,7 +104,6 @@
             /* Tooltip text */
             .tooltip .tooltiptext {
                 visibility: hidden;
-                width: 150px;
                 background-color: black;
                 color: #fff;
                 text-align: center;
@@ -115,8 +114,24 @@
                 /* Position the tooltip text - see examples below! */
                 position: absolute;
                 z-index: 1;
+            }
+
+            #review_mode_tooltip {
+                width: 300px;
                 top: -5px;
                 right: 105%;
+            }
+
+            #tagging_system_tooltip {
+                width: 120%;
+                top: -50px;
+                left: 60%;
+            }
+
+            #formatting_help_tooltip {
+                width: 120%;
+                top: -50px;
+                left: 60%;
             }
 
             /* Show the tooltip text when you mouse over the tooltip container */
@@ -165,9 +180,9 @@
                 <label class="w3-right switch tooltip">
                     <input type="checkbox" id="review_mode_toggle" onchange="toggleReviewMode();">
                     <span class="slider round"></span>
-                    <span class="tooltiptext">
-                        Modifying the urgency of a card will automatically save the 
-                        changes and display the next card on the queue. 
+                    <span class="tooltiptext" id="review_mode_tooltip">
+                        After the urgency of a card has been modified, automatically 
+                        save the current card and load the next card. 
                         <a href="/wiki#review_mode" target="_blank">Read more</a>
                     </span>
                 </label>
@@ -175,7 +190,14 @@
             </div>
 
             <div>
-                <p class="w3-left w3-quarter w3-container"><a href="/wiki/#tagging_system" target="_blank">More info about tags</a></p>
+                <p class="w3-left w3-quarter w3-container tooltip">
+                    <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> The Tagging and Urgency System
+                    <span class="tooltiptext" id="tagging_system_tooltip">
+                        The tags with the most urgent cards appear earlier on the list. 
+                        "#probability (7)" means that there are 7 cards that have 'probability' as one of their tags. 
+                        <a href="/wiki/#tagging_system" target="_blank">Read more</a>
+                    </span>
+                </p>
                 <p id="filter_list" class="w3-right w3-threequarter w3-container"></p>
             </div>
 
@@ -263,9 +285,11 @@
 
                 var tags_html = "";
                 tags_in_decreasing_order.forEach((tag) => {
+                    let tag_prefix = "#";
+                    if (tag.charAt(0) == "#") tag_prefix = "";
                     tags_html += "<ul id='" + tag +
                         "' class='link' onclick='selectThisTag(`" + tag +
-                        "`);'> #" + tag + " (" + Object.keys(state.tags_and_ids[tag]).length +
+                        "`);'> " + tag_prefix + tag + " (" + Object.keys(state.tags_and_ids[tag]).length +
                         ")</ul>";
                 });
                 
