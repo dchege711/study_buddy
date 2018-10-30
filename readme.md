@@ -42,7 +42,7 @@ The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
 
 :soon: Change the underlying DS for the cards manager from two max-oriented priority queues to a balanced binary search tree. That way, you can visit a any card on the tree much faster on average.
 
-:soon: Read into layout/reflow. Avoid inefficient operations where possible. Starting resources [here](https://gist.github.com/paulirish/5d52fb081b3570c81e3a), [here](https://developers.google.com/speed/docs/insights/browser-reflow) and [here](https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers).
+:soon: Read into layout/reflow. Avoid inefficient operations where possible. Starting resources [here](https://gist.github.com/paulirish/5d52fb081b3570c81e3a), [here](https://developers.google.com/speed/docs/insights/browser-reflow), [here](https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers) and [here](https://3perf.com/talks/web-perf-101/).
 
 :soon: Avail newly added tags in the autocomplete suggestions.
 
