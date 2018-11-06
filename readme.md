@@ -1,5 +1,7 @@
 # Study Buddy by c13u
 
+[![Build Status](https://travis-ci.com/dchege711/study_buddy.svg?branch=public_links_to_cards)](https://travis-ci.com/dchege711/study_buddy)
+
 The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
 
 ## [Tasks](#tasks)
@@ -55,6 +57,21 @@ The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
 :soon: Add utility in accounts to quickly modify the tags.
 
 :soon: Read about [building a user base](https://blog.inkdrop.info/how-ive-attracted-the-first-500-paid-users-for-my-saas-that-costs-5-mo-7a5b94b8e820)
+
+### Support Public and Sharable Cards
+
+Sub-objectives include:
+
+* Allow users to toggle a card as public
+  * Provide the option within the home page.
+  * Allow them to set their default settings public/private
+  * Add the relevant fields in the database
+
+* Allow users to share links to cards/collections
+  * Support Ctrl-C for a specific card's link
+  * Support Ctrl-C for cards bearing given tags (and a convenient method for doing so)
+
+* Update the Wiki Page on what public/private means
 
 ### Add a Test Suite for Continuous Testing
 

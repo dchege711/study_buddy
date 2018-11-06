@@ -66,6 +66,13 @@
             
             <div class="w3-quarter w3-right">
                 <p id="card_urgency_number"><strong></strong></p>
+                <label class="w3-right switch tooltip">
+                    <input type="checkbox" id="card_is_public_toggle" onchange="toggleOption('card_is_public_toggle');">
+                    <span class="slider round" id="card_is_public_label"></span>
+                    <span class="tooltiptext" id="card_is_public_tooltip">
+                        <a href="/wiki#public_cards" target="_blank">More about public cards</a>
+                    </span>
+                </label>
             </div>
 
         </div>

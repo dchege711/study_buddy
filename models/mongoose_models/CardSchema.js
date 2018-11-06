@@ -21,6 +21,7 @@ var cardSchema = new mongoose.Schema(
         urgency: { type: Number, default: 0 },
         metadataIndex: Number,
         createdById: Number,
+        isPublic: { type: Boolean, default: false },
         lastReviewed: { type: Date, default: Date.now }
     }, 
     {

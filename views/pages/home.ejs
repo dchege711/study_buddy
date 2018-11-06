@@ -89,10 +89,16 @@
                 border-radius: 50%;
             }
 
-            .slider.round::after {
-                position:relative;
-                right:70px;
+            #review_mode_label::after {
+                position: relative;
+                right: 70px;
                 content: "Review Mode"
+            }
+
+            #card_is_public_label::after {
+                position: relative;
+                right: 70px;
+                content: "Make Public"
             }
 
             /* Tooltip container */
@@ -132,6 +138,12 @@
                 width: 120%;
                 top: -50px;
                 right: 0%;
+            }
+
+            #card_is_public_tooltip {
+                width: 200%;
+                top: -30px;
+                right: 100%;
             }
 
             /* Show the tooltip text when you mouse over the tooltip container */
@@ -178,8 +190,8 @@
                 </div>
 
                 <label class="w3-right switch tooltip">
-                    <input type="checkbox" id="review_mode_toggle" onchange="toggleReviewMode();">
-                    <span class="slider round"></span>
+                    <input type="checkbox" id="review_mode_toggle" onchange="toggleOption('review_mode_toggle');">
+                    <span class="slider round" id="review_mode_label"></span>
                     <span class="tooltiptext" id="review_mode_tooltip">
                         After the urgency of a card has been modified, automatically 
                         save the current card and load the next card. 
@@ -253,7 +265,8 @@
                 current_card_tags: new Set([]),
                 current_card_tags_have_changed: false,
                 post_url: null,
-                review_mode_on: false
+                review_mode_toggle: false,
+                card_is_public_toggle: metadata.cardsAreByDefaultPrivate
             }
 
             if (!state.tags_and_ids) state.tags_and_ids = {};
@@ -333,8 +346,8 @@
                 }, timeout_ms);
             }
 
-            function toggleReviewMode() {
-                state.review_mode_on = document.getElementById("review_mode_toggle").checked;
+            function toggleOption(element_id) {
+                state[element_id] = document.getElementById(element_id).checked;
             }
 
             function makeInvisible(element_id) {
@@ -427,6 +440,9 @@
                 document.getElementById("card_urgency_number").innerText = card.urgency;
                 document.getElementById("card_description").removeAttribute("contenteditable");
                 document.getElementById("side_bar_contents").style.height = document.getElementById("card_template").style.height;
+                
+                document.getElementById("card_is_public_toggle").checked = card.isPublic;
+                state.card_is_public_toggle = card.isPublic;
 
                 // Reset the contents of the current_card variable
                 state.current_card_id = card._id;
@@ -495,6 +511,9 @@
                 document.getElementById("card_title").value = "";
                 document.getElementById("card_description").innerHTML = "";
                 document.getElementById("already_set_card_tags").innerHTML = "";
+                document.getElementById("card_is_public_toggle").checked = metadata.cardsAreByDefaultPrivate;
+
+                state.card_is_public_toggle = metadata.cardsAreByDefaultPrivate;
                 state.current_card_tags_have_changed = false;
 
                 document.getElementById("card_urgency").value = 0;
@@ -591,6 +610,7 @@
                 if (state.current_card_tags_have_changed) {
                     payload.tags = Array.from(state.current_card_tags).join(" ");
                 }
+                payload.isPublic = state.card_is_public_toggle;
                 
                 // If the tags or urgency has been changed, update the sidebar to reflect current info
                 var rerender_sidebar = state.current_card_tags_have_changed || state.changed_items.has("card_urgency");
