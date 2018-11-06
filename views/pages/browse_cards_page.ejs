@@ -1,0 +1,52 @@
+<!DOCTYPE <!DOCTYPE html>
+<html>
+    <head>
+        <% include ../partials/header.ejs %>
+        <title>Study Buddy: Browse Cards</title>
+        <script src="/static/AppUtilities.js"></script>
+        <link rel="stylesheet" href="/stylesheets/themes/atom-one-light.css">
+        <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+        <script src="/static/highlight.pack.js"></script>
+    </head>
+
+    <body>
+        <% include ../partials/navbar.ejs %>
+
+        <div id="main_div">
+            <div class="w3-container" id="search_div">
+
+                <div class="w3-threequarter">
+                    <div class="dropdown">
+                        <input type="text" id="search_input" placeholder="Search for cards, e.g. dynamic programming" 
+                            onkeyup="handleSearchInputChange(event);" class="w3-input dropbtn" />
+                        <div class="dropdown-content" id="search_autocomplete_results"></div>
+                    </div>
+                </div>
+
+                <div class="w3-quarter">
+                    <button class="w3-btn w3-blue" onclick="searchForCards()">Search for Cards</button>
+                </div>
+
+            </div>
+
+            <div id="search_results">
+
+            </div>
+
+        </div>
+
+    </body>
+
+    <script type="text/javascript">
+    
+        function handleSearchInputChange() {
+
+        }
+
+        function searchForCards() {
+
+        }
+
+    </script>
+
+</html>

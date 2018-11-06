@@ -63,9 +63,9 @@ The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
 Sub-objectives include:
 
 * Allow users to toggle a card as public
-  * Provide the option within the home page.
+  * (Done) Provide the option within the home page
   * Allow them to set their default settings public/private
-  * Add the relevant fields in the database
+  * (Done) Add the relevant fields in the database
 
 * Allow users to share links to cards/collections
   * Support Ctrl-C for a specific card's link
