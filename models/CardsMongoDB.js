@@ -181,9 +181,9 @@ exports.delete = function(payload, callBack) {
 };
 
 /**
- * Remove this card from the database.
+ * Search for cards with associated key words
  * 
- * @param {JSON} payload Expected keys: `key_words`
+ * @param {JSON} payload Expected keys: `key_words`, `createdById`
  * @param {Function} callBack Takes a JSON with `success`, `status` and `message` 
  * as keys. If successful `message` will contain abbreviated cards that only 
  * the `id`, `urgency` and `title` fields.
@@ -194,31 +194,71 @@ exports.search = function(payload, callBack) {
      * and should be preferred where possible. Note that the JS expression
      * is processed for EACH document in the collection. Yikes!
      */
-    Card
-        .find({
+    let queryObject = {
+        filter: {
             $and: [
                 { createdById: payload.userIDInApp },
                 { $text: { $search: payload.query_string } }
-            ]  
-            }, { score: { $meta: "textScore" } }
-        )
-        .sort({ score: { $meta: "textScore" } })
-        .limit(payload.limit)
+            ]
+        },
+        projection: "title tags urgency",
+        limit: payload.limit,
+        sortCriteria: { score: { $meta: "textScore" } }
+          
+    };
+    collectSearchResults(queryObject, callBack);
+};
+
+/**
+ * @description Search the database for cards matching the specified schema. 
+ * Return the results to the callback function that was passed in.
+ */
+let collectSearchResults = function(queryObject, callBack) {
+    Card
+        .find(queryObject.filter, queryObject.sortCriteria)
+        .sort(queryObject.sortCriteria)
+        .select(queryObject.projection)
+        .limit(queryObject.limit)
         .exec((err, cards) => {
             if (err) { console.log(err); callBack(generic_500_msg); }
             else {
-                search_results = new Array(cards.length);
-                cards.forEach((card, index) => {
-                    search_results[index] = {
-                        _id: card._id,
-                        urgency: card.urgency,
-                        title: card.title
-                    };
-                });
-                callBack({ success: true, status: 200, message: search_results });
+                callBack({ success: true, status: 200, message: cards });
             }
         });
-};
+}
+
+/**
+ * @description Find cards that satisfy the given criteria and are publicly 
+ * viewable.
+ * 
+ * @param {JSON} `payload` Expected keys are `card_id`, `user_id`, `query_string`. 
+ * The `user_id` in this case refers to the creator of the cards, 
+ * not the ID of the user/guest that makes the request. 
+ * 
+ * @param {Function} `callback`. The first parameter is set to any error that 
+ * occured. The second parameter contains an array of abbreviated cards
+ */
+exports.public_search = function(payload, callBack) {
+    let queryObject = {};
+    let mandatoryFields = [];
+    if (payload.user_id !== undefined) {
+        mandatoryFields.push({createdById: payload.user_id});
+    }
+    if (payload.card_id !== undefined) {
+        mandatoryFields.push({_id: payload.card_id });
+    }
+    if (payload.query_string !== undefined) {
+        mandatoryFields.push({ $text: { $search: payload.query_string } });
+    }
+
+    let queryObject = {
+        filter: { $and: mandatoryFields },
+        projection: "title tags",
+        limit: payload.limit,
+        sortCriteria: { score: { $meta: "textScore" } }
+    };
+    collectSearchResults(queryObject, callBack);
+}
 
 /**
  * @description For uniformity, tags should be delimited by white-space. If a 
