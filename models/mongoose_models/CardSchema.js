@@ -58,4 +58,20 @@ cardSchema.virtual("url").get(function () {
  * documents on a different database.
  * 
  */ 
-module.exports = mongoose.model('Card', cardSchema);
+let CardModel = mongoose.model('Card', cardSchema);
+module.exports = CardModel;
+
+if (require.main === module) {
+    // Run this script as main if you change the indexes
+    // http://thecodebarbarian.com/whats-new-in-mongoose-5-2-syncindexes
+    CardModel
+        .syncIndexes()
+        .then((msg) => { console.log(msg); })
+        .catch((err) => { console.error(err); });
+
+    CardModel
+        .listIndexes()
+        .then((indexes) => { console.log(indexes); })
+        .catch((err) => { console.error(err); });
+
+}
