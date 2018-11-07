@@ -194,6 +194,10 @@ exports.search = function(payload, callBack) {
      * and should be preferred where possible. Note that the JS expression
      * is processed for EACH document in the collection. Yikes!
      */
+
+    if (payload.query_string !== undefined) {
+        payload.query_string = splitTags(payload.query_string);
+    }
     let queryObject = {
         filter: {
             $and: [
@@ -208,6 +212,26 @@ exports.search = function(payload, callBack) {
     };
     collectSearchResults(queryObject, callBack);
 };
+
+/**
+ * @description Append a copy of the hyphenated/underscored words in the incoming 
+ * string without the hyphens/underscores. Useful for pre-processing search 
+ * queries. A person searching for `dynamic_programming` should be interested in 
+ * `dynamic programming` as well.
+ * 
+ * @param {String} s a string that may contain hyphenated/underscored words, e.g 
+ * `arrays dynamic_programming iterative-algorithms`.
+ * 
+ * @returns {String} a string with extra space delimited words, e.g. 
+ * `arrays dynamic_programming iterative-algorithms dynamic programming iterative algorithms`
+ */
+let splitTags = function(s) {
+    let possibleTags = s.match(/[\w|\d]+(\_|-){1}[\w|\d]+/g);
+    for (let i = 0; i < possibleTags.length; i++) {
+        s += " " + possibleTags[i].split(/[\_-]/g).join(" ");
+    }
+    return s;
+}
 
 /**
  * @description Search the database for cards matching the specified schema. 
@@ -247,7 +271,7 @@ exports.publicSearch = function(payload, callBack) {
         mandatoryFields.push({_id: payload.card_id });
     }
     if (payload.query_string !== undefined) {
-        mandatoryFields.push({ $text: { $search: payload.query_string } });
+        mandatoryFields.push({ $text: { $search: splitTags(payload.query_string) } });
     }
 
     let queryObject = {
@@ -302,5 +326,6 @@ let standardizeTagDelimiters = function() {
 };
 
 if (require.main === module) {
-    standardizeTagDelimiters();
+    // standardizeTagDelimiters();
+    console.log(splitTags("arrays dynamic_programming iterative-algorithms"));
 }
