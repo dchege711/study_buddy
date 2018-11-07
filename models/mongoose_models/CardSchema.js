@@ -30,7 +30,20 @@ var cardSchema = new mongoose.Schema(
     }
 );
 
-cardSchema.index( {title: "text", description: "text"} );
+/**
+ * Creating a text index enables case-insensitive search across the specified 
+ * fields. 
+ * https://docs.mongodb.com/manual/tutorial/control-results-of-text-search/
+ */
+cardSchema.index(
+    {
+        title: "text", description: "text", tags: "text"
+    },
+    {
+        weights: {title: 1, description: 1, tags: 2},
+        name: "TextIndex"
+    }
+);
 cardSchema.virtual("url").get(function () {
     return "/study-buddy/card/" + this._id;
 });
