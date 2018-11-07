@@ -71,6 +71,9 @@ Sub-objectives include:
   * Support Ctrl-C for a specific card's link
   * Support Ctrl-C for cards bearing given tags (and a convenient method for doing so)
 
+* Add functionality to the browse page
+  * Provide an endpoint that allows unauthenticated searches for public cards
+
 * Update the Wiki Page on what public/private means
 
 ### Add a Test Suite for Continuous Testing

@@ -238,9 +238,9 @@ let collectSearchResults = function(queryObject, callBack) {
  * @param {Function} `callback`. The first parameter is set to any error that 
  * occured. The second parameter contains an array of abbreviated cards
  */
-exports.public_search = function(payload, callBack) {
+exports.publicSearch = function(payload, callBack) {
     let queryObject = {};
-    let mandatoryFields = [];
+    let mandatoryFields = [{isPublic: true}];
     if (payload.user_id !== undefined) {
         mandatoryFields.push({createdById: payload.user_id});
     }
@@ -258,6 +258,22 @@ exports.public_search = function(payload, callBack) {
         sortCriteria: { score: { $meta: "textScore" } }
     };
     collectSearchResults(queryObject, callBack);
+}
+
+exports.readPublicCard = function(payload) {
+    return new Promise(function(resolve, reject) {
+        if (payload.card_id === undefined) {
+            resolve({});
+        } else {
+            Card
+                .findOne({isPublic: true, _id: payload.card_id})
+                .exec((err, matchingCard) => {
+                    if (err) reject(err);
+                    else resolve(matchingCard);
+                });
+        }
+        
+    });
 }
 
 /**

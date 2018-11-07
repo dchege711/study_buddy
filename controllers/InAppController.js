@@ -20,9 +20,23 @@ exports.wiki_page = function (req, res) {
     res.render("pages/wiki_page.ejs");
 };
 
+exports.read_public_card = function (req, res) {
+    CardsDB
+        .readPublicCard(req.body)
+        .then((matchingCard) => { res.json(matchingCard); })
+        .catch((err) => {convertObjectToResponse(err, null, res); })
+};
+
 exports.browse_page = function(req, res) {
-    res.render("pages/browse_cards_page.ejs");
-}
+    CardsDB.publicSearch(req.query, function(abbreviatedCards) {
+        res.render(
+            "pages/browse_cards_page.ejs", 
+            {
+                abbreviatedCards: abbreviatedCards
+            }
+        );
+    });
+};
 
 exports.account_get = function (req, res) {
     res.render("pages/account_page.ejs", {account_info: req.session.user});
