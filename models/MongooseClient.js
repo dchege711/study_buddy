@@ -8,7 +8,7 @@ var mongoose = require("mongoose");
 var config = require('../config');
 
 // Already 5 by default, but I might need to increase it one day...
-mongoose.connect(config.MONGO_URI, {poolSize: 12});
+mongoose.connect(config.MONGO_URI, {poolSize: 12, useNewUrlParser: true});
 
 // Get Mongoose to use the global promise library.
 mongoose.Promise = global.Promise;

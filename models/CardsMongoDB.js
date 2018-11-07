@@ -1,4 +1,4 @@
-// require('./MongooseClient');
+"use strict";
 
 var Card = require('./mongoose_models/CardSchema.js');
 var MetadataDB = require('./MetadataMongoDB');
@@ -239,7 +239,6 @@ let collectSearchResults = function(queryObject, callBack) {
  * occured. The second parameter contains an array of abbreviated cards
  */
 exports.publicSearch = function(payload, callBack) {
-    let queryObject = {};
     let mandatoryFields = [{isPublic: true}];
     if (payload.user_id !== undefined) {
         mandatoryFields.push({createdById: payload.user_id});

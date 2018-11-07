@@ -30,7 +30,7 @@
     "express": "4.16.3",
     "express-session": "1.15.6",
     "express-sslify": "^1.2.0",
-    "mongoose": "5.0.17",
+    "mongoose": "^5.3.10",
     "nodemailer": "^4.6.8",
     "path": "0.12.7",
     "selenium-webdriver": "^4.0.0-alpha.1",

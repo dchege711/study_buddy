@@ -32,7 +32,7 @@ exports.browse_page = function(req, res) {
         res.render(
             "pages/browse_cards_page.ejs", 
             {
-                abbreviatedCards: abbreviatedCards
+                abbreviatedCards: abbreviatedCards.message
             }
         );
     });
