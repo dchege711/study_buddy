@@ -15,22 +15,22 @@
         <div id="main_div">
             <div class="w3-container" id="search_div">
 
-                <div class="w3-threequarter">
-                    <div class="dropdown">
+                <form method="GET">
+                    <div class="dropdown w3-threequarter">
                         <input type="text" id="search_input" placeholder="Search for cards, e.g. dynamic programming" 
-                            onkeyup="handleSearchInputChange(event);" class="w3-input dropbtn" />
+                            onkeyup="handleSearchInputChange(event);" class="w3-input dropbtn" name="query_string" />
                         <div class="dropdown-content" id="search_autocomplete_results"></div>
                     </div>
-                </div>
+                    <input type="submit" class="w3-quarter w3-btn w3-blue" value="Search for Cards"></button>
 
-                <div class="w3-quarter">
-                    <button class="w3-btn w3-blue" onclick="searchForCards()">Search for Cards</button>
-                </div>
+                </form>
 
             </div>
 
             <div id="search_results">
-
+                <% for (let i = 0; i < abbreviatedCards.length; i++) { %>
+                    <p><%= abbreviatedCards[i].title %></p>
+                <% } %>
             </div>
 
         </div>
@@ -38,13 +38,15 @@
     </body>
 
     <script type="text/javascript">
-    
-        function handleSearchInputChange() {
 
+        let state = {
+            queryString: ""
         }
 
-        function searchForCards() {
-
+        let searchInputElement = document.getElementById("search_input");
+    
+        function handleSearchInputChange() {
+            state.queryString = searchInputElement.value;
         }
 
     </script>
