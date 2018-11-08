@@ -1,6 +1,6 @@
 /**
- * @description Set up the connection that will be used across
- * Study Buddy. There'a a nice tutorial at: 
+ * @description Set up the connection that will be used across the app. 
+ * There's a nice tutorial at: 
  * https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/mongoose
  */
 

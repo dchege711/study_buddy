@@ -1,9 +1,14 @@
 var LogInUtilities = require("../models/LogInUtilities.js");
 var convertObjectToResponse = require("./ControllerUtilities.js").convertObjectToResponse;
+const config = require("../config.js");
+
+const defaultTemplateObject = {
+    appName: config.APP_NAME
+};
 
 /**
  * @description Middleware designed to ensure that users are logged in before 
- * using certain URLs in Study Buddy
+ * using certain URLs
  */
 exports.requireLogIn = function (req, res, next) {
     if (!req.session.user) res.redirect("/login");
@@ -40,7 +45,7 @@ exports.handleLogIn = function (req, res) {
     } else if (req.cookies.session_token) {
         exports.logInBySessionToken(req, res, function () { res.redirect("/home"); });
     } else {
-        res.render("pages/welcome_page");
+        res.render("pages/welcome_page", defaultTemplateObject);
     }
 };
 
@@ -78,7 +83,7 @@ exports.logout = function (req, res) {
 };
 
 exports.send_validation_email_get = function (req, res) {
-    res.render("pages/send_validation_url.ejs");
+    res.render("pages/send_validation_url.ejs", defaultTemplateObject);
 };
 
 exports.send_validation_email_post = function (req, res) {
@@ -95,7 +100,7 @@ exports.verify_account = function (req, res) {
 };
 
 exports.reset_password_get = function (req, res) {
-    res.render("pages/reset_password_request.ejs");
+    res.render("pages/reset_password_request.ejs", defaultTemplateObject);
 };
 
 exports.reset_password_post = function (req, res) {
@@ -108,7 +113,7 @@ exports.reset_password_link_get = function (req, res) {
     var reset_password_uri = req.path.split("/reset-password-link/")[1];
     LogInUtilities.validatePasswordResetLink(reset_password_uri, (results) => {
         if (results.success) {
-            res.render("pages/reset_password.ejs");
+            res.render("pages/reset_password.ejs", defaultTemplateObject);
         } else {
             convertObjectToResponse(null, results, res);
         }

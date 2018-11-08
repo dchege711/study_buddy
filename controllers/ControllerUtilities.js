@@ -1,4 +1,5 @@
 var fs = require("fs");
+const appName = require("../config.js").APP_NAME;
 
 const generic_500_msg = {
     success: false, status: 500, message: "Internal Server Error"
@@ -15,15 +16,18 @@ const generic_500_msg = {
 exports.convertObjectToResponse = function (err, result_JSON, res) {
     let status = result_JSON.status;
     if (err) {
-        res.render("pages/5xx_error_page.ejs", { response_JSON: generic_500_msg });
+        res.render(
+            "pages/5xx_error_page.ejs", 
+            { response_JSON: generic_500_msg, appName: appName }
+        );
     } else if (status >= 200 && status < 300) {
         res.json(result_JSON);
     } else if (status >= 300 && status < 400) {
         res.redirect(status, result_JSON.redirect_url + "?msg=" + encodeURIComponent(result_JSON.message));
     } else if (status >= 400 && status < 500) {
-        res.render("pages/4xx_error_page.ejs", { response_JSON: result_JSON });
+        res.render("pages/4xx_error_page.ejs", { response_JSON: result_JSON, appName: appName });
     } else {
-        res.render("pages/5xx_error_page.ejs", { response_JSON: result_JSON });
+        res.render("pages/5xx_error_page.ejs", { response_JSON: result_JSON, appName: appName });
     }
 };
 

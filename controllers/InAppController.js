@@ -2,9 +2,14 @@ var CardsDB = require("../models/CardsMongoDB.js");
 var MetadataDB = require("../models/MetadataMongoDB.js");
 var controller_utils = require("./ControllerUtilities.js");
 var login_utils = require("../models/LogInUtilities.js");
+const appName = require("../config.js").APP_NAME;
 
 var convertObjectToResponse = controller_utils.convertObjectToResponse;
 var deleteTempFile = controller_utils.deleteTempFile;
+
+const defaultTemplateObject = {
+    appName: appName
+};
 
 exports.read_card = function (req, res) {
     CardsDB.read(req.body, function (card) {
@@ -13,11 +18,11 @@ exports.read_card = function (req, res) {
 };
 
 exports.home = function (req, res) {
-    res.render("pages/home.ejs");
+    res.render("pages/home.ejs", defaultTemplateObject);
 };
 
 exports.wiki_page = function (req, res) {
-    res.render("pages/wiki_page.ejs");
+    res.render("pages/wiki_page.ejs", defaultTemplateObject);
 };
 
 exports.read_public_card = function (req, res) {
@@ -32,14 +37,18 @@ exports.browse_page = function(req, res) {
         res.render(
             "pages/browse_cards_page.ejs", 
             {
-                abbreviatedCards: abbreviatedCards.message
+                abbreviatedCards: abbreviatedCards.message,
+                appName: appName
             }
         );
     });
 };
 
 exports.account_get = function (req, res) {
-    res.render("pages/account_page.ejs", {account_info: req.session.user});
+    res.render(
+        "pages/account_page.ejs", 
+        {account_info: req.session.user, appName: appName}
+    );
 };
 
 exports.read_metadata = function (req, res) {

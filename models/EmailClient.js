@@ -22,7 +22,7 @@ let transporter = nodemailer.createTransport({
  * @param {Function} callBack Takes a JSON with `success` and `message` as the keys
  */
 exports.sendEmail = function(mailOptions, callBack) {
-    mailOptions.from = `Study Buddy by c13u <${config.EMAIL_ADDRESS}>`;
+    mailOptions.from = `${config.APP_NAME} <${config.EMAIL_ADDRESS}>`;
     transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
             callBack({
@@ -50,7 +50,7 @@ process.on("SIGINT", function () {
 
 if (require.main === module) {
     this.sendEmail({
-        from: `Study Buddy by c13u <${config.EMAIL_ADDRESS}>`,
+        from: `${config.APP_NAME} <${config.EMAIL_ADDRESS}>`,
         to: "d.chege711@gmail.com", 
         subject: "Test Nodemailer Setup", 
         text: "This is plain text...",

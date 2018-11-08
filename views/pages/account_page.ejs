@@ -2,7 +2,7 @@
 <html>
 
     <head>
-        <title>Study Buddy Account Page</title>
+        <title><%= appName %>: Account Page</title>
         <% include ../partials/header.ejs %>
         <script src="/static/AppUtilities.js"></script>
         <script src="/static/MaxPriorityQueue.js"></script>
@@ -49,7 +49,7 @@
                         <br><br>
                         Email Address: <%= account_info.email %>
                         <br><br>
-                        Study Buddy Birthday: <%= account_info.user_reg_date %>
+                        <%= appName %> Birthday: <%= account_info.user_reg_date %>
                     </p>
 
                 </div>
@@ -84,10 +84,10 @@
 
                 <div class="account_section">
 
-                    <h3 class="account_header">Send an email to Study Buddy's Developer</h3>
+                    <h3 class="account_header">Send an email to the Developer</h3>
 
                     <p>
-                        Chege would love to hear your suggestions, feedback and criticism.
+                        I would love to hear your suggestions, feedback and criticism.
                         <br><br>
                         <a href="mailto:study.buddy@mail.c13u.com">
                             <i class="fa fa-envelope fa-fw" aria-hidden="true"></i> study.buddy@mail.c13u.com

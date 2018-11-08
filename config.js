@@ -1,7 +1,8 @@
 /**
- * @description Access point for sensitive information.
+ * @description Access point for sensitive/central information.
  */
 
+exports.APP_NAME = "Flashcards by c13u";
 exports.PORT = process.env.PORT || 5000;
 exports.NODE_ENV = process.env.NODE_ENV;
 

@@ -2,7 +2,7 @@
 <html>
 
     <head>
-        <title>Study Buddy</title>
+        <title><%= appName %>: Home</title>
         <% include ../partials/header.ejs %>
         <script src="/static/AppUtilities.js"></script>
         <script src="/static/MaxPriorityQueue.js"></script>
@@ -251,7 +251,7 @@
              */
             const metadata = JSON.parse(localStorage.getItem("metadata"))[0];
             
-            /* Useful for storing the state of the Study Buddy app. Wrapped 
+            /* Useful for storing the state of the app. Wrapped 
              * inside an object so that I can know when global variables are
              * being used and when they're not.
              */

@@ -68,7 +68,7 @@ function cards_manager(tags_and_ids, user_id) {
     };
 
     /**
-     * @description Initialize a card manager using a Study Buddy trash object.
+     * @description Initialize a card manager using a trash object.
      * 
      * @param {JSON} trashed_card_ids A JSON object whose keys are card IDs and 
      * the value is the timestamp on which they were trashed.
