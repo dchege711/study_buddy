@@ -227,6 +227,8 @@ exports.search = function(payload, callBack) {
  */
 let splitTags = function(s) {
     let possibleTags = s.match(/[\w|\d]+(\_|-){1}[\w|\d]+/g);
+    if (possibleTags === null) return s;
+    
     for (let i = 0; i < possibleTags.length; i++) {
         s += " " + possibleTags[i].split(/[\_-]/g).join(" ");
     }
@@ -327,5 +329,6 @@ let standardizeTagDelimiters = function() {
 
 if (require.main === module) {
     // standardizeTagDelimiters();
-    console.log(splitTags("arrays dynamic_programming iterative-algorithms"));
+    console.log(splitTags("there-are tags in this_string-delimited differently"));
+    console.log(splitTags("no tags present in this string"))
 }

@@ -7,6 +7,14 @@
         <link rel="stylesheet" href="/stylesheets/themes/atom-one-light.css">
         <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
         <script src="/static/highlight.pack.js"></script>
+
+        <style>
+            .box {
+                display: flex;
+                flex-flow: row wrap;
+                align-items: stretch;
+            }
+        </style>
     </head>
 
     <body>
@@ -27,9 +35,18 @@
 
             </div>
 
-            <div id="search_results">
-                <% for (let i = 0; i < abbreviatedCards.length; i++) { %>
-                    <p><%= abbreviatedCards[i].title %></p>
+            <div class="w3-container box" id="search_results">
+                <% if (abbreviatedCards.length === 0) { %>
+                    <div class="w3-container">
+                        <p>No cards found.</p>
+                    </div>
+                <% } else { %>
+                    <% for (let i = 0; i < abbreviatedCards.length; i++) { %>
+                        <div class="w3-card-4 w3-padding-small w3-margin">
+                            <header class="w3-container w3-blue"><h4><%= abbreviatedCards[i].title %></h4></header>
+                            <div class="w3-container"><p><strong>Tags: </strong><%= abbreviatedCards[i].tags %></p></div>
+                        </div>
+                    <% } %>
                 <% } %>
             </div>
 
