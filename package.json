@@ -1,5 +1,5 @@
 {
-  "name": "study_buddy",
+  "name": "flashcards_by_c13u",
   "version": "1.0.0",
   "description": "A web application that helps me review content",
   "main": "server.js",
@@ -13,8 +13,7 @@
   },
   "keywords": [
     "study",
-    "flash",
-    "cards"
+    "flashcards"
   ],
   "author": "Chege Gitau",
   "license": "ISC",

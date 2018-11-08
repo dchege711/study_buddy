@@ -1,3 +1,119 @@
+/************************ Navbar **********************************************/
+
+.topnav {
+    position: absolute;
+    padding: 10px;
+    width: 100%;
+    top: 0;
+}
+
+ul.topnav {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.link_button {
+    text-decoration: none;
+    color: black;
+    border-bottom: thin black solid;
+}
+
+.link_button:hover {
+    cursor: pointer;
+    background-color: inherit !important;
+    border-bottom: #2196F3 thick solid;
+}
+
+ul.topnav li {
+    display: block;
+    font-family: "Lobster";
+    font-size: 24px;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+ul.link, .link {
+    background:none;
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+    border:none; 
+}
+
+ul.link.chosen {
+    background: black;
+    color: white;
+    text-decoration: none;
+}
+
+ul.link:hover {
+    text-decoration: underline;
+}
+
+ul.topnav li a:hover:not(.active) {background-color: #121;}
+
+ul.topnav li.right {float: right;}
+
+ul.topnav li.left {float: left;}
+
+/************************ General rules ***************************************/
+
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    padding: 40px 0 0;
+    margin-bottom: 5em;
+    font-family: 'Montserrat', sans-serif;
+    background-color: rgb(245, 245, 245);          
+}
+
+#main_div {
+    flex: 1;
+    padding: 40px 0 0;
+}
+
+.underline_bold_text {
+    text-decoration: underline !important;
+    font-weight: bold !important;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+/* Popup container - can be anything you want */
+.popup {
+    position: relative;
+    display: inline-block;
+    max-width: 300px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* The actual popup */
+.popup .popuptext {
+    visibility: hidden;
+    width: 300px;
+    height: 30px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -80px;
+}
+
+/************************ Footer **********************************************/
 footer {
     position: fixed;
     left: 0;
@@ -9,9 +125,7 @@ footer {
     display: none;
 }
 
-.hidden {
-    display: none;
-}
+/************************ In-app Sidebar **************************************/
 
 #side_bar {
     overflow: scroll;
@@ -23,13 +137,27 @@ footer {
     height: 90vh;
 }
 
+.hidden {
+    display: none;
+}
+
+/************************ In-app Card Viewer **********************************/
+
 #status_bar {
     padding: 1%;
+}
+
+#card_container {
+    background-color: rgb(239, 239, 239);
 }
 
 #card_description {
     min-height: 50px;
     border-left: 5px solid grey;
+}
+
+div#card_description[contenteditable="true"] {
+    background-color: white;
 }
 
 .card_tag_button_text, .card_tag_button_remove {
@@ -96,127 +224,7 @@ blockquote {
     cursor: pointer;
 }
 
-body {
-    display: flex;
-    min-height: 100vh;
-    flex-direction: column;
-    padding: 40px 0 0;
-    margin-bottom: 5em;
-    font-family: 'Montserrat', sans-serif;          
-}
-
-#main_div {
-    flex: 1;
-    padding: 40px 0 0;
-}
-
-.underline_bold_text {
-    text-decoration: underline !important;
-    font-weight: bold !important;
-}
-
-.clickable {
-    cursor: pointer;
-}
-
-.topnav {
-    position: absolute;
-    padding: 10px;
-    width: 100%;
-    background-color: black;
-    color: white;
-    top: 0;
-}
-
-ul.topnav {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-}
-
-.link_button {
-    text-decoration: none;
-    color: white;
-    background-color: black;
-}
-
-button.link_button {
-    border: none;
-}
-
-.link_button:hover {
-    cursor: pointer;
-}
-
-ul.topnav li {
-    display: block;
-    color: white;
-    font-family: "Lobster";
-    font-size: 24px;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-}
-
-.navbar a:hover {
-    background-color: "#eb90ed";
-    color: white;
-}
-
 .card_borders {
     border-left: 5px solid #2196F3;
     border-bottom: thin solid #2196F3;
-}
-
-ul.link, .link {
-    background:none;
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-    border:none; 
-}
-
-ul.link.chosen {
-    background: black;
-    color: white;
-    text-decoration: none;
-}
-
-ul.link:hover {
-    text-decoration: underline;
-}
-
-ul.topnav li a:hover:not(.active) {background-color: #121;}
-
-ul.topnav li.right {float: right;}
-
-ul.topnav li.left {float: left;}
-
-/* Popup container - can be anything you want */
-.popup {
-    position: relative;
-    display: inline-block;
-    max-width: 300px;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-
-/* The actual popup */
-.popup .popuptext {
-    visibility: hidden;
-    width: 300px;
-    height: 30px;
-    background-color: #555;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 8px 0;
-    position: absolute;
-    z-index: 1;
-    bottom: 125%;
-    left: 50%;
-    margin-left: -80px;
 }
