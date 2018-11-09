@@ -1,0 +1,67 @@
+<!--
+    A toned down version of `./card_template.ejs`. This template doesn't have as 
+    many bells and whistles. It's meant to be read-only.
+-->
+
+<div id="card_container" class="w3-card w3-padding-large card_borders">
+
+    <div class="card-header w3-center w3-container">
+        <h4 id="card_title"></h4>
+    </div>
+
+    <div class="w3-container">
+
+        <div class="w3-container" id="card_description"></div>
+
+        <br />
+
+        <div>
+            <strong>Tags</strong><br>
+            <div id="already_set_card_tags"></div>
+        </div>
+
+        <br />
+
+        <div>
+            <strong>Card Popularity:</strong>
+            <p id="card_urgency"></p>
+        </div>
+
+    </div>
+
+    <div class="w3-bar w3-padding-16">
+        <button class="w3-left w3-third w3-btn w3-round-xxlarge" 
+            onClick="fetchPreviousCard()">
+            <b>
+                <i class="fa fa-chevron-left"></i> Previous</b>
+        </button>
+
+        <div class="w3-center w3-third">
+            <div class="popup">
+                <span class="popuptext w3-center w3-padding-small" 
+                 id="card_popup_element"></span>
+            </div>
+        </div>
+
+        <button class="w3-right w3-btn w3-third w3-round-xxlarge" onClick="fetchNextCard()">
+            <b>
+                <i class="fa fa-chevron-right"></i> Next</b>
+        </button>
+
+    </div>
+
+    <div class="w3-container w3-center w3-bar w3-padding-16">
+
+        <button class="w3-btn w3-round-xxlarge w3-left w3-red" onClick="flagCardForReview()">
+            <b>
+                <i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> Flag Card for Review
+            </b>
+        </button>
+
+        <button class="w3-btn w3-round-xxlarge w3-right w3-green" onClick="copyCardToOwnCollection()">
+            <b><i class="fa fa-floppy-o fa-fw" aria-hidden="true"></i> Copy Card to Own Collection</b>
+        </button>
+
+    </div>
+
+</div>
