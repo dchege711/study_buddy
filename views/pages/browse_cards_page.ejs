@@ -12,14 +12,13 @@
         <script type="text/javascript" async src="/static/highlight.pack.js"></script>
 
         <style>
-            .box {
+            .flexbox {
                 display: flex;
                 flex-flow: row wrap;
                 align-items: stretch;
             }
 
             div#card_container_holder {
-                border: solid blue;
                 z-index: 3; /* On top of the search results */
                 position: absolute;
                 display: block;
@@ -34,16 +33,8 @@
                 cursor: pointer;
             }
 
-            div#card_container_holder:focus {
-                visibility: visible;
-            }
-
-            div#card_container_holder:not(.focus) {
-                visibility: hidden;
-            }
-
             div#temp_container {
-                border: thick solid red;
+                border: none;
             }
 
         </style>
@@ -68,20 +59,25 @@
             </div>
 
             <div class="w3-container" id="temp_container">
-    
-                <div class="w3-container box" id="search_results">
-                    <% if (abbreviatedCards.length === 0) { %>
-                        <div class="w3-container">
-                            <p>No cards found.</p>
-                        </div>
-                    <% } else { %>
-                        <% for (let i = 0; i < abbreviatedCards.length; i++) { %>
-                            <div class="w3-card-4 w3-padding-small w3-margin search-result" onclick="displayFullCard('<%= abbreviatedCards[i]._id %>')">
-                                <header class="w3-container w3-blue"><h4><%= abbreviatedCards[i].title %></h4></header>
-                                <div class="w3-container"><p><strong>Tags: </strong><%= abbreviatedCards[i].tags %></p></div>
+
+                <div class="w3-container">
+
+                    <% include ../partials/sidebar_template.ejs %>
+
+                    <div class="w3-container w3-threequarter w3-right flexbox" id="search_results">
+                        <% if (abbreviatedCards.length === 0) { %>
+                            <div class="w3-container">
+                                <p>No cards found.</p>
                             </div>
+                        <% } else { %>
+                            <% for (let i = 0; i < abbreviatedCards.length; i++) { %>
+                                <div class="w3-card-4 w3-padding-small w3-margin search-result" onclick="displayFullCard('<%= abbreviatedCards[i]._id %>')">
+                                    <header class="w3-container w3-blue"><h4><%= abbreviatedCards[i].title %></h4></header>
+                                    <div class="w3-container"><p><strong>Tags: </strong><%= abbreviatedCards[i].tags %></p></div>
+                                </div>
+                            <% } %>
                         <% } %>
-                    <% } %>
+                    </div>
                 </div>
 
                 <div id="card_container_holder">
