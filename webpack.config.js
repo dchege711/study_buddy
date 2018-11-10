@@ -12,10 +12,7 @@
 
 const path = require("path");
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const CircularDependencyPlugin = require('circular-dependency-plugin')
-
-const libraryName = "c13u";
-const outputFile = `${libraryName}.js`;
+const CircularDependencyPlugin = require('circular-dependency-plugin');
 
 module.exports = {
     mode: "production",
