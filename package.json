@@ -6,7 +6,8 @@
   "scripts": {
     "test": "mocha",
     "start": "node server.js",
-    "debug": "node --trace-warnings server.js"
+    "debug": "node --trace-warnings server.js",
+    "build": "webpack --config webpack.config.js"
   },
   "repository": {
     "type": "git",
@@ -39,7 +40,14 @@
     "why-is-node-running": "^2.0.2"
   },
   "devDependencies": {
+    "@babel/core": "^7.1.5",
+    "babel": "^6.23.0",
+    "babel-loader": "^8.0.4",
+    "clean-webpack-plugin": "^0.1.19",
+    "highlightjs": "^9.12.0",
+    "mathjax": "^2.7.5",
     "mocha": "^5.2.0",
+    "showdown": "^1.8.7",
     "webpack": "^4.25.1",
     "webpack-cli": "^3.1.2"
   }

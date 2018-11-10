@@ -1,3 +1,9 @@
+"use strict";
+
+const showdown = require("showdown");
+const hljs = require("highlightjs");
+const MathJax = require("mathjax");
+
 /**
  * This script assumes that Showdown, MathJAX and HighlightJS have already been 
  * loaded onto the page. 
