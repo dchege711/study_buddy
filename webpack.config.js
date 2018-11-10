@@ -12,6 +12,7 @@
 
 const path = require("path");
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const CircularDependencyPlugin = require('circular-dependency-plugin')
 
 const libraryName = "c13u";
 const outputFile = `${libraryName}.js`;
@@ -22,21 +23,32 @@ module.exports = {
         CardTemplateController: "./public/static/CardTemplateController.js"
     },
     plugins: [
-        new CleanWebpackPlugin(['dist'])
+        new CleanWebpackPlugin(['dist']),
+        new CircularDependencyPlugin({
+            // exclude detection of files based on a RegExp
+            exclude: /a\.js|node_modules/,
+            // add errors to webpack instead of warnings
+            failOnError: true,
+            // set the current working directory for displaying module paths
+            cwd: process.cwd(),
+            onStart({ compilation }) {
+                console.log('circular-dependency-plugin: looking for webpack modules cycles...');
+            }
+          })
     ],
     output: {
         path: path.resolve(__dirname, "public", "dist"),
-        filename: "[name].js"
-        // library: libraryName,
-        // libraryTarget: "umd",
-        // umdNamedDefine: true
+        filename: "[name].bundle.min.js",
+        // https://webpack.js.org/guides/author-libraries/#authoring-a-library
+        library: "[name]",
+        libraryTarget: "var"
     },
-    optimization: {
-        // https://webpack.js.org/guides/code-splitting/
-        splitChunks: {
-            chunks: "all"
-        }
-    },
+    // optimization: {
+    //     // https://webpack.js.org/guides/code-splitting/
+    //     splitChunks: {
+    //         chunks: "all"
+    //     }
+    // },
     module: {
         rules: [
             {

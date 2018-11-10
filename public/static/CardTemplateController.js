@@ -34,9 +34,9 @@ let converter = new showdown.Converter({
  */
 function CardTemplateController(state, cardsManager) {
 
-    this.state = state;
+    // this.state = state;
     this.cardsManager = cardsManager;
-    this.userMetadata = userMetadata;
+    // this.userMetadata = userMetadata;
 
     /**
      * @description Set the collection of cards that will be accessible from the 
@@ -57,9 +57,9 @@ function CardTemplateController(state, cardsManager) {
     this.fetchNextCard = function() {
         this.cardsManager.next((card) => {
             if (card.title !== undefined) {
-                renderCard(card);
+                this.renderCard(card);
             } else {
-                this.displayPopUp("Out of cards!", 1500);
+                displayPopUp("Out of cards!", 1500);
             } 
         });
     };
@@ -71,9 +71,9 @@ function CardTemplateController(state, cardsManager) {
     this.fetchPreviousCard = function() {
         this.cardsManager.previous((card) => {
             if (card.title !== undefined) {
-                renderCard(card);
+                this.renderCard(card);
             } else {
-                this.displayPopUp("Out of cards!", 1500);
+                displayPopUp("Out of cards!", 1500);
             } 
         });
     };
@@ -228,4 +228,6 @@ function syncSpoilerBox() {
 function loadMathJAX() {
     MathJax.Hub.Queue(["Typeset", MathJax.Hub, "card_description"]);
 }
+
+module.exports = CardTemplateController;
 

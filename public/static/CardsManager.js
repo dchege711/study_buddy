@@ -203,14 +203,14 @@ function cards_manager(tags_and_ids, user_id) {
      * @param {Function} callback The function to be called once the card is
      * found
      */
-    function find_card(card_id, callback) {
+    function find_card(card_id, url="/read-card", callback) {
         var card = JSON.parse(localStorage.getItem(card_id));
         // var card = null;
         if (card) {
             // console.log("Cache: " + card.title);
             callback(card);
         } else {
-            sendHTTPRequest("POST", "/read-card", {
+            sendHTTPRequest("POST", url, {
                 userIDInApp: user_id, _id: card_id
             }, (results) => {
                 localStorage.setItem(card_id, JSON.stringify(results.message));

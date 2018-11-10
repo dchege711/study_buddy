@@ -5,8 +5,9 @@
         <title><%= appName %>: Browse/Search</title>
         <script src="/static/AppUtilities.js"></script>
         <link rel="stylesheet" href="/stylesheets/themes/atom-one-light.css">
-        <!-- <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script> -->
-        <script type="text/javascript" src="/dist/CardTemplateController.js"></script>
+        <script type="text/javascript" src="/static/CardsManager.js"></script>
+        <script type="text/javascript" src="/static/MaxPriorityQueue.js"></script>
+        <script type="text/javascript" src="/dist/CardTemplateController.bundle.min.js"></script>
 
         <style>
             .flexbox {
@@ -16,7 +17,7 @@
             }
 
             div#card_container_holder {
-                z-index: 3; /* On top of the search results */
+                z-index: 3; /* On top of everything else */
                 position: absolute;
                 display: block;
                 min-width: 80%;
@@ -89,6 +90,11 @@
 
     <script type="text/javascript">
 
+        let browsePageState = {
+            cardsManager: null,
+            cardTemplateController: null
+        }
+        
         let searchInputElement = document.getElementById("search_input");
         let cardContainerHolder = document.getElementById("card_container_holder");
     
@@ -98,6 +104,7 @@
 
         function displayFullCard(card_id) {
             cardContainerHolder.style.visibility = "visible";
+            browsePageState.cardsManager = cards_manager(null, 1);
         }
 
         function closeFullCardWindow() {
