@@ -4,14 +4,11 @@
     <head>
         <title><%= appName %>: Home</title>
         <% include ../partials/header.ejs %>
-        <script src="/static/AppUtilities.js"></script>
-        <script src="/static/MaxPriorityQueue.js"></script>
-        <script src="/static/CardsManager.js"></script>
+        <% include ../partials/syntax_highlighting_and_latex.ejs %>
+        <script type="text/javascript" async src="/static/showdown.min.js"></script>
+        <script type="text/javascript" src="/dist/CardsManager.bundle.min.js"></script>
+        <script type="text/javascript" src="/dist/CardTemplateController.bundle.min.js"></script>
         <script src="/static/TernarySearchTrie.js"></script>
-        <script src="/static/showdown.min.js"></script>
-        <link rel="stylesheet" href="/stylesheets/themes/atom-one-light.css">
-        <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
-        <script src="/static/highlight.pack.js"></script>
         <script type="text/javascript">
 
             /**
@@ -30,152 +27,12 @@
             window.addEventListener("keydown", arrowKeysForNavigation);
 
         </script>
-
-        <style>
-
-            .switch {
-                position: relative;
-                display: inline-block;
-                width: 60px;
-                height: 34px;
-            }
-
-            .switch input {display:none;}
-
-            .slider {
-                position: absolute;
-                cursor: pointer;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: #ccc;
-                -webkit-transition: .4s;
-                transition: .4s;
-            }
-
-            .slider:before {
-                position: absolute;
-                content: "";
-                height: 26px;
-                width: 26px;
-                left: 4px;
-                bottom: 4px;
-                background-color: white;
-                -webkit-transition: .4s;
-                transition: .4s;
-            }
-
-            input:checked + .slider {
-                background-color: #2196F3;
-            }
-
-            input:focus + .slider {
-                box-shadow: 0 0 1px #2196F3;
-            }
-
-            input:checked + .slider:before {
-                -webkit-transform: translateX(26px);
-                -ms-transform: translateX(26px);
-                transform: translateX(26px);
-            }
-
-            /* Rounded sliders */
-            .slider.round {
-                border-radius: 34px;
-            }
-
-            .slider.round:before {
-                border-radius: 50%;
-            }
-
-            #review_mode_label::after {
-                position: relative;
-                right: 70px;
-                content: "Review Mode"
-            }
-
-            #card_is_public_label::after {
-                position: relative;
-                right: 70px;
-                content: "Make Public"
-            }
-
-            /* Tooltip container */
-            .tooltip {
-                position: relative;
-                display: inline-block;
-            }
-
-            /* Tooltip text */
-            .tooltip .tooltiptext {
-                visibility: hidden;
-                background-color: black;
-                color: #fff;
-                text-align: center;
-                padding: 5px 0;
-                border-radius: 6px;
-                font-size: smaller;
-            
-                /* Position the tooltip text - see examples below! */
-                position: absolute;
-                z-index: 1;
-            }
-
-            #review_mode_tooltip {
-                width: 300px;
-                top: -5px;
-                right: 105%;
-            }
-
-            #tagging_system_tooltip {
-                width: 120%;
-                top: -50px;
-                left: 0%;
-            }
-
-            #formatting_help_tooltip {
-                width: 120%;
-                top: -50px;
-                right: 0%;
-            }
-
-            #card_is_public_tooltip {
-                width: 200%;
-                top: -30px;
-                right: 100%;
-            }
-
-            /* Show the tooltip text when you mouse over the tooltip container */
-            .tooltip:hover .tooltiptext {
-                visibility: visible;
-            }
-
-            #spoiler_box {
-                background: rgb(172, 172, 172);
-                cursor: pointer;
-                position: absolute;
-                z-index: 1;
-            }
-
-            #spoiler_box:hover {
-                opacity: 0;
-            }
-
-            #spoiler_box p {
-                font-size: larger;
-                text-align: center;
-                color: white;
-                padding: 10% 0 0 0;
-            }
-        
-        </style>
         
     </head>
 
-    <body onload="includeInAppButtons(); initializeSideBar(); initializeCards();">
+    <body onload="initializeSideBar(); initializeCards();">
 
-        <% include ../partials/navbar.ejs %>
+        <% include ../partials/logged_in_navbar.ejs %>
 
         <div id="main_div">
 
@@ -238,7 +95,7 @@
         <script type="text/javascript">
 
             /* The converter is used to turn the markdown in the cards into html. */
-            var converter = new showdown.Converter({
+            const converter = new showdown.Converter({
                 headerLevelStart: 4, literalMidWordUnderscores: true,
                 literalMidWordAsterisks: true, simpleLineBreaks: true,
                 emoji: true, backslashEscapesHTMLTags: true, tables: true,
@@ -250,6 +107,27 @@
              * Local Storage. 
              */
             const metadata = JSON.parse(localStorage.getItem("metadata"))[0];
+
+            // Maintain references to elements that get searched for often
+            const elementRefs = {
+                alreadySetTagsElement: document.getElementById("already_set_card_tags"),
+                cardDescriptionElement: document.getElementById("card_description"),
+                cardIsPublicToggleElement: document.getElementById("card_is_public"),
+                cardPopupElement: document.getElementById("card_popup_element"),
+                cardSearchInputElement: document.getElementById("card_search_input"),
+                cardSearchResultsElement: document.getElementById("card_search_results"),
+                cardTagInputElement: document.getElementById("card_tag_input"),
+                cardTemplateElement: document.getElementById("card_template"),
+                cardTitleElement: document.getElementById("card_title"),
+                cardUrgencyElement: document.getElementById("card_urgency"),
+                cardUrgencyNumberElement: document.getElementById("card_urgency_number"),
+                filterListElement: document.getElementById("filter_list"),
+                sideBarContentsElement: document.getElementById("side_bar_contents"),
+                spoilerElement: document.getElementById("spoiler"),
+                spoilerBoxElement: document.getElementById("spoiler_box"),
+                spoilerEndElement: document.getElementById("spoiler_end"),
+                tagsAutocompleteResultsElement: document.getElementById("tags_autocomplete_results")
+            };
             
             /* Useful for storing the state of the app. Wrapped 
              * inside an object so that I can know when global variables are
@@ -272,13 +150,11 @@
             if (!state.tags_and_ids) state.tags_and_ids = {};
             
             var tags_trie = ternary_search_trie(Object.keys(state.tags_and_ids))
+
+            let cardTemplateController = new CardTemplateController(state);
+
             
             var my_cards_manager = cards_manager(state.tags_and_ids, state.current_user_id);
-            
-            function includeInAppButtons() {
-                document.getElementById("logout_button").style.display = "inline";
-                document.getElementById("account_button").style.display = "inline";
-            }
 
             function initializeSideBar() {
                 var tags_in_decreasing_order = Object.keys(state.tags_and_ids);
@@ -306,7 +182,7 @@
                         ")</ul>";
                 });
                 
-                document.getElementById("side_bar_contents").innerHTML = tags_html;
+                elementRefs.sideBarContentsElement.innerHTML = tags_html;
             }
 
             function initializeCards() {
@@ -338,7 +214,7 @@
             }
 
             function displayPopUp(text, timeout_ms) {
-                var popup = document.getElementById("card_popup_element");
+                let popup = elementRefs.cardPopupElement;
                 popup.innerHTML = text;
                 popup.style.visibility = "visible";
                 window.setTimeout(() => {
@@ -371,12 +247,12 @@
                 // Communicate which cards are being displayed...
                 if (state.selected_tags.size == 0) {
                     tags_to_use = null;
-                    document.getElementById("filter_list").innerHTML = "Now showing: all";
+                    elementRefs.filterListElement.innerHTML = "Now showing: all";
                 } else {
                     tags_to_use = state.selected_tags;
                     var status_message = "Now showing: ";
                     status_message += Array.from(state.selected_tags).join(", ");
-                    document.getElementById("filter_list").innerHTML = status_message;
+                    elementRefs.filterListElement.innerHTML = status_message;
                 }
                 
                 // Update the cards being displayed
@@ -409,7 +285,7 @@
                 }
 
                 window.addEventListener("keydown", arrowKeysForNavigation);
-                document.getElementById("card_title").value = card.title;
+                elementRefs.cardTitleElement.value = card.title;
                 
                 // Workaround for allowing users to omit extra escaping backslashes
                 // in their LaTEX. I can't afford to do store this string on the server.
@@ -424,8 +300,7 @@
                     description_html += `<span id="spoiler_end"></span>`;
                 }
                 
-                let card_description_element = document.getElementById("card_description");
-                card_description_element.innerHTML = description_html;
+                elementRefs.cardDescriptionElement.innerHTML = description_html;
 
                 var tags_html = "";
                 var tags_array = card.tags.trim().split(" ");
@@ -435,13 +310,13 @@
                         state.current_card_tags.add(tags_array[i]);
                     }
                 }
-                document.getElementById("already_set_card_tags").innerHTML = tags_html;
-                document.getElementById("card_urgency").value = card.urgency;
-                document.getElementById("card_urgency_number").innerText = card.urgency;
-                document.getElementById("card_description").removeAttribute("contenteditable");
-                document.getElementById("side_bar_contents").style.height = document.getElementById("card_template").style.height;
+                elementRefs.alreadySetTagsElement.innerHTML = tags_html;
+                elementRefs.cardUrgencyElement.value = card.urgency;
+                elementRefs.cardUrgencyNumberElement.innerText = card.urgency;
+                elementRefs.cardDescriptionElement.removeAttribute("contenteditable");
+                elementRefs.sideBarContentsElement.style.height = elementRefs.cardTemplateElement.style.height;
                 
-                document.getElementById("card_is_public_toggle").checked = card.isPublic;
+                elementRefs.cardIsPublicToggleElement.checked = card.isPublic;
                 state.card_is_public_toggle = card.isPublic;
 
                 // Reset the contents of the current_card variable
@@ -478,7 +353,7 @@
                     let spoiler_box_html = `
                         <div id="spoiler_box" 
                         style="height:${spoiler_end_bbox.bottom - spoiler_bbox.top}px; 
-                        width:${document.getElementById("card_description").getBoundingClientRect().width - 30}px" 
+                        width:${elementRefs.cardDescriptionElement.getBoundingClientRect().width - 30}px" 
                         onclick="makeInvisible('spoiler_box')">
                         <p>Hover/Click to Reveal</p></div>
                     `;
@@ -501,25 +376,24 @@
             }
 
             function displayRawCardDescription() {
-                var description_element = document.getElementById("card_description");
-                description_element.innerText = state.raw_description;
-                description_element.setAttribute("contenteditable", "true");
+                elementRefs.cardDescriptionElement.innerText = state.raw_description;
+                elementRefs.cardDescriptionElement.setAttribute("contenteditable", "true");
                 window.removeEventListener("keydown", arrowKeysForNavigation);
             }
 
             function displayNewCard() {
-                document.getElementById("card_title").value = "";
-                document.getElementById("card_description").innerHTML = "";
-                document.getElementById("already_set_card_tags").innerHTML = "";
-                document.getElementById("card_is_public_toggle").checked = metadata.cardsAreByDefaultPrivate;
+                elementRefs.cardTitleElement.value = "";
+                elementRefs.cardDescriptionElement.innerHTML = "";
+                elementRefs.alreadySetTagsElement.innerHTML = "";
+                elementRefs.cardIsPublicToggleElement.checked = metadata.cardsAreByDefaultPrivate;
 
                 state.card_is_public_toggle = metadata.cardsAreByDefaultPrivate;
                 state.current_card_tags_have_changed = false;
 
-                document.getElementById("card_urgency").value = 0;
-                document.getElementById("card_urgency_number").innerText = "0";
-                document.getElementById("card_description").setAttribute("contenteditable", "true");
-                document.getElementById("side_bar_contents").style.height = document.getElementById("card_template").style.height;
+                elementRefs.cardUrgencyElement.value = 0;
+                elementRefs.cardUrgencyNumberElement.innerText = "0";
+                elementRefs.cardDescriptionElement.setAttribute("contenteditable", "true");
+                elementRefs.sideBarContentsElement.style.height = elementRefs.cardTemplateElement.style.height;
                 window.removeEventListener("keydown", arrowKeysForNavigation);
 
                 // Reset the contents of the current_card variable
@@ -537,7 +411,7 @@
 
             function handleTagsInputChange(event) {
                 window.removeEventListener("keydown", arrowKeysForNavigation);
-                var tag_being_entered = document.getElementById("card_tag_input").value;
+                var tag_being_entered = elementRefs.cardTagInputElement.value;
                 var key_press = event.key;
                 // If whitespace was added, create the new tag if need be.
                 if (key_press === " " || key_press === "Enter" || key_press === "Tab") {
@@ -551,7 +425,7 @@
                     for (let i = 0; i < matches.length; i++) {
                         autocomplete_html += `<button class="autocomplete_suggestion_button" onclick="updateTagsButtons('${matches[i]}');">${matches[i]}</button>`;
                     }
-                    document.getElementById("tags_autocomplete_results").innerHTML = autocomplete_html;
+                    elementRefs.tagsAutocompleteResultsElement.innerHTML = autocomplete_html;
                 }
                 
             }
@@ -559,12 +433,12 @@
             function updateTagsButtons(new_tag) {
                 if (!state.current_card_tags.has(new_tag)) {
                     state.current_card_tags.add(new_tag);
-                    document.getElementById("tags_autocomplete_results").innerHTML = "";
-                    document.getElementById("already_set_card_tags").insertAdjacentHTML(
+                    elementRefs.tagsAutocompleteResultsElement.innerHTML = "";
+                    elementRefs.alreadySetTagsElement.insertAdjacentHTML(
                         "beforeend",
                         `<button id="card_tag_text_${new_tag}" class="card_tag_button_text">${new_tag}</button><button id="card_tag_remove_${new_tag}" class="card_tag_button_remove" onclick="removeTagFromCard('${new_tag}')"> <i class="fa fa-times fa-fw" aria-hidden="true"></i> </button>`
                     );
-                    document.getElementById("card_tag_input").value = "";
+                    elementRefs.cardTagInputElement.value = "";
                     state.current_card_tags_have_changed = true;
                 }
             }
@@ -589,7 +463,7 @@
                     saveCard(false);
                     fetchNextCard();
                 } else {
-                    document.getElementById("card_urgency_number").innerText = document.getElementById("card_urgency").value;
+                    elementRefs.cardUrgencyNumberElement.innerText = elementRefs.cardUrgencyElement.value;
                 }
             }
 
@@ -603,7 +477,7 @@
                 }
 
                 if (state.changed_items.has("card_description")) {
-                    payload.description = String.raw`${document.getElementById("card_description").innerText}`;
+                    payload.description = String.raw`${elementRefs.cardDescriptionElement.innerText}`;
                 }
 
                 payload.createdById = state.current_user_id;
@@ -687,7 +561,7 @@
                 window.removeEventListener("keydown", arrowKeysForNavigation);
                 var key_press = event.key;
                 if (key_press === " " || key_press === "Enter") {
-                    var query_string = document.getElementById("card_search_input").value.trim();
+                    var query_string = elementRefs.cardSearchInputElement.value.trim();
                     if (key_press === " ") limit = 7;
                     else limit = Infinity;
                     if (query_string !== "") {
@@ -707,9 +581,9 @@
                                                 <ul onclick='reInitializeCards([${JSON.stringify(search_results[i])}]);'>
                                                 ${search_results[i].title}</ul>`;
                                         }
-                                        document.getElementById("card_search_results").innerHTML = search_results_html;
+                                        elementRefs.cardSearchResultsElement.innerHTML = search_results_html;
                                     } else {
-                                        document.getElementById("card_search_results").innerHTML = "";
+                                        elementRefs.cardSearchResultsElement.innerHTML = "";
                                         reInitializeCards(search_results);
                                     }    
                                 }
@@ -725,7 +599,7 @@
              * keys `_id`, and `urgency`
              */  
             function reInitializeCards(abbreviated_cards) {
-                document.getElementById("card_search_results").innerHTML = "";
+                elementRefs.cardSearchResultsElement.innerHTML = "";
                 my_cards_manager.initialize_from_minicards(
                     abbreviated_cards, 
                     () => {
