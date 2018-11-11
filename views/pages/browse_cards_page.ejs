@@ -3,11 +3,10 @@
     <head>
         <% include ../partials/header.ejs %>
         <title><%= appName %>: Browse/Search</title>
-        <script src="/static/AppUtilities.js"></script>
-        <link rel="stylesheet" href="/stylesheets/themes/atom-one-light.css">
-        <script type="text/javascript" src="/static/CardsManager.js"></script>
-        <script type="text/javascript" src="/static/MaxPriorityQueue.js"></script>
+        <script type="text/javascript" async src="/static/showdown.min.js"></script>
+        <script type="text/javascript" src="/dist/CardsManager.bundle.min.js"></script>
         <script type="text/javascript" src="/dist/CardTemplateController.bundle.min.js"></script>
+        <% include ../partials/syntax_highlighting_and_latex.ejs %>
 
         <style>
             .flexbox {
@@ -90,26 +89,107 @@
 
     <script type="text/javascript">
 
-        let browsePageState = {
-            cardsManager: null,
+        const converter = new showdown.Converter({
+            headerLevelStart: 4, literalMidWordUnderscores: true,
+            literalMidWordAsterisks: true, simpleLineBreaks: true,
+            emoji: true, backslashEscapesHTMLTags: true, tables: true,
+            parseImgDimensions: true, simplifiedAutoLink: true,
+            strikethrough: true, tasklists: true
+        });
+
+        let state = {
             cardTemplateController: null
-        }
-        
-        let searchInputElement = document.getElementById("search_input");
-        let cardContainerHolder = document.getElementById("card_container_holder");
+        };
+
+        const elementRefs = {
+            searchInputElement: document.getElementById("search_input"),
+            cardContainerHolderElement: document.getElementById("card_container_holder"),
+            cardTitleElement: document.getElementById("card_title"),
+            cardDescriptionElement: document.getElementById("card_description"),
+            cardTagsElement: document.getElementById("card_tags"),
+            cardPopularityElement: document.getElementById("card_popularity")
+
+        };
     
         function handleSearchInputChange() {
-            state.queryString = searchInputElement.value;
+            state.queryString = elementRefs.searchInputElement.value;
         }
 
         function displayFullCard(card_id) {
-            cardContainerHolder.style.visibility = "visible";
-            browsePageState.cardsManager = cards_manager(null, 1);
+            elementRefs.cardContainerHolderElement.style.visibility = "visible";
+            state.cardTemplateController = new CardTemplateController(null);
+            state.cardTemplateController
+                .initializeCards([{_id: card_id, urgency: 1}])
+                .then((card) => { renderCard(card); })
+                .catch((err) => { console.error(err); });
         }
 
-        function closeFullCardWindow() {
-            cardContainerHolder.style.visibility = "hidden";
+        function fetchPreviousCard() {
+            state.cardTemplateController.fetchPreviousCard()
+                .then((card) => { renderCard(card); })
+                .catch((err) => { console.error(err); });
         }
+
+        function fetchNextCard() {
+            state.cardTemplateController.fetchNextCard()
+                .then((card) => { renderCard(card); })
+                .catch((err) => { console.error(err); });
+        }
+
+        function makeInvisible(elementID) {
+            state.cardTemplateController.makeInvisible(elementID);
+        }
+
+        function flagCardForReview() {
+            console.log(`Flagged for review`);
+        }
+
+        function copyCardToOwnCollection() {
+            console.log(`Copied to own collection`);
+        }
+        
+        function renderCard(card) {
+    
+            if (!card.title && !card.description) {
+                state.cardTemplateController.displayPopUp(
+                    "Out of cards!", 1500
+                );
+                return;
+            }
+    
+            elementRefs.cardTitleElement.innerHTML = card.title;
+            
+            // Workaround for allowing users to omit extra escaping backslashes
+            // in their LaTEX. I can't afford to do store this string on the server.
+            let descriptionHTML = converter.makeHtml(
+                String.raw`${card.description.replace(/\\/g, "\\\\")}`
+            );
+            
+            if (descriptionHTML.match(/\[spoiler\]/i)) {
+                descriptionHTML = descriptionHTML.replace(
+                    /\[spoiler\]/i, "<span id='spoiler'>[spoiler]</span>"
+                );
+                descriptionHTML += `<span id="spoiler_end"></span>`;
+            }
+            
+            elementRefs.cardDescriptionElement.innerHTML = descriptionHTML;
+        
+            let tags_html = "";
+            let tags_array = card.tags.trim().split(" ");
+            for (let i = 0; i < tags_array.length; i++) {
+                if (tags_array[i].length > 0) {
+                    tags_html += `<button id="card_tag_text_${tags_array[i]}" class="card_tag_button_text">${tags_array[i]}</button>`;
+                }
+            }
+            elementRefs.cardTagsElement.innerHTML = tags_html;
+            elementRefs.cardPopularityElement.value = card.urgency;
+        
+            addSyntaxHighlighting();
+            renderLatex();
+
+            state.cardTemplateController.syncSpoilerBox();
+    
+        };
 
     </script>
 
