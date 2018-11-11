@@ -33,19 +33,21 @@ function sendForm(form_id, url, callBack) {
  * @param {JSON} payload The data that will be sent along with the request
  * @param {Function} callBack The function to call once req is successful
  */
-function sendHTTPRequest(method, url, payload, callBack) {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-            try {
-                let json_response_data = JSON.parse(this.responseText);
-                callBack(json_response_data);
-            } catch (err) { }
-        }
-    };
-    xhttp.open(method, url, true);
-    xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    xhttp.send(JSON.stringify(payload));
+function sendHTTPRequest(method, url, payload) {
+    return new Promise(function(resolve, reject) {
+        let xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                try {
+                    let json_response_data = JSON.parse(this.responseText);
+                    resolve(json_response_data);
+                } catch (err) { reject(err); }
+            }
+        };
+        xhttp.open(method, url, true);
+        xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhttp.send(JSON.stringify(payload));
+    });
 }
 
 /**
@@ -56,3 +58,7 @@ function processParams() {
     var params = (new URL(document.location)).searchParams;
     if (params.has("msg")) alert(params.get("msg"));
 }
+
+module.exports = {
+    sendForm: sendForm, processParams: processParams, sendHTTPRequest: sendHTTPRequest
+};
