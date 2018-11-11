@@ -60,5 +60,7 @@ function processParams() {
 }
 
 module.exports = {
-    sendForm: sendForm, processParams: processParams, sendHTTPRequest: sendHTTPRequest
+    sendForm: sendForm, 
+    processParams: processParams, 
+    sendHTTPRequest: sendHTTPRequest
 };
