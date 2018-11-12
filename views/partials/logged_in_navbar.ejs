@@ -1,3 +1,5 @@
+<script type="text/javascript" src="/dist/AppUtilities.bundle.min.js"></script>
+
 <div>
 
     <ul class="topnav" id="topnavitems">
@@ -34,10 +36,12 @@
      * @description Log out the currently logged in user.
      */
     function logOut() {
-        sendHTTPRequest("POST", "/logout", {}, (response) => {
-            localStorage.clear();
-            window.location = "/";
-        });
+        AppUtilities.sendHTTPRequest("POST", "/logout", {})
+            .then((response) => {
+                localStorage.clear();
+                window.location = "/";
+            })
+            .catch((err) => { console.error(err); });
     }
 
 </script>
