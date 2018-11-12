@@ -100,15 +100,17 @@ function CardsManager(tags_and_ids, user_id) {
      */
     cardsManagerObj.next = function() {
         return new Promise(function(resolve, reject) {
-            if (pqCardsToView.is_empty()) resolve({});
-
-            let next_card_id_urgency = transferItem(
-                pqCardsToView, pqCardsAlreadyViewed
-            );
-
-            findCard(next_card_id_urgency[0])
-                .then((card) => {resolve(card); })
-                .catch((err) => {reject(err); })
+            if (pqCardsToView.is_empty()) {
+                resolve(null);
+            } else {
+                let next_card_id_urgency = transferItem(
+                    pqCardsToView, pqCardsAlreadyViewed
+                );
+    
+                findCard(next_card_id_urgency[0])
+                    .then((card) => {resolve(card); })
+                    .catch((err) => {reject(err); });
+            }            
         });
     };
 
@@ -133,11 +135,15 @@ function CardsManager(tags_and_ids, user_id) {
      */
     cardsManagerObj.previous = function() {
         return new Promise(function(resolve, reject) {
-            if (pqCardsAlreadyViewed.is_empty()) resolve({});
-            let prev_card_id_urgency = transferItem(pqCardsAlreadyViewed, pqCardsToView);
-            findCard(prev_card_id_urgency[0])
-                .then((card) => {resolve(card); })
-                .catch((err) => {reject(err); })
+            if (pqCardsAlreadyViewed.is_empty()) {
+                resolve(null);
+            } else {
+                let prev_card_id_urgency = transferItem(pqCardsAlreadyViewed, pqCardsToView);
+                findCard(prev_card_id_urgency[0])
+                    .then((card) => {resolve(card); })
+                    .catch((err) => {reject(err); });
+            }
+            
         });
     };
 
@@ -225,9 +231,14 @@ function CardsManager(tags_and_ids, user_id) {
     cardsManagerObj.saveCard = function(card, url) {
         return new Promise(function(resolve, reject) {
             sendHTTPRequest("POST", url, card)
-                .then((savedCard) => {
-                    cardsManagerObj.update_card(savedCard);
-                    resolve(savedCard);
+                .then((results) => {
+                    if (results.success) {
+                        cardsManagerObj.update_card(results.message);
+                        resolve(results.message);
+                    } else {
+                        reject(results.message);
+                    }
+                    
                 })
                 .catch((err) => { reject(err); });
         })
