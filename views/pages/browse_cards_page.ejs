@@ -3,7 +3,6 @@
     <head>
         <% include ../partials/header.ejs %>
         <title><%= appName %>: Browse/Search</title>
-        <script type="text/javascript" src="/static/showdown.min.js"></script>
         <script type="text/javascript" src="/dist/CardsManager.bundle.min.js"></script>
         <script type="text/javascript" src="/dist/CardTemplateUtilities.bundle.min.js"></script>
         <% include ../partials/syntax_highlighting_and_latex.ejs %>
@@ -85,14 +84,6 @@
 
     <script type="text/javascript">
 
-        const converter = new showdown.Converter({
-            headerLevelStart: 4, literalMidWordUnderscores: true,
-            literalMidWordAsterisks: true, simpleLineBreaks: true,
-            emoji: true, backslashEscapesHTMLTags: true, tables: true,
-            parseImgDimensions: true, simplifiedAutoLink: true,
-            strikethrough: true, tasklists: true
-        });
-
         let cardsManager = null;
 
         const elementRefs = {
@@ -111,7 +102,7 @@
 
         function displayFullCard(card_id) {
             elementRefs.cardContainerHolderElement.style.visibility = "visible";
-            cardsManager = new CardsManager(null);
+            cardsManager = new CardsManager(null, null);
             cardsManager
                 .initializeFromMinicards([{_id: card_id, urgency: 1}])
                 .then(() => { 
@@ -148,30 +139,14 @@
         }
 
         function renderCard(card) {
-    
-            if (!card.title && !card.description) {
-                CardTemplateUtilities.displayPopUp(
-                    "Out of cards!", 1500
-                );
+            
+            if (!card) {
+                CardTemplateUtilities.displayPopUp("Out of cards!", 1500);
                 return;
             }
     
             elementRefs.cardTitleElement.innerHTML = card.title;
-            
-            // Workaround for allowing users to omit extra escaping backslashes
-            // in their LaTEX. I can't afford to do store this string on the server.
-            let descriptionHTML = converter.makeHtml(
-                String.raw`${card.description.replace(/\\/g, "\\\\")}`
-            );
-            
-            if (descriptionHTML.match(/\[spoiler\]/i)) {
-                descriptionHTML = descriptionHTML.replace(
-                    /\[spoiler\]/i, "<span id='spoiler'>[spoiler]</span>"
-                );
-                descriptionHTML += `<span id="spoiler_end"></span>`;
-            }
-            
-            elementRefs.cardDescriptionElement.innerHTML = descriptionHTML;
+            elementRefs.cardDescriptionElement.innerHTML = PrettifyCards.markdownToHTML(card.description);
         
             let tags_html = "";
             let tags_array = card.tags.trim().split(" ");
@@ -183,8 +158,8 @@
             elementRefs.cardTagsElement.innerHTML = tags_html;
             elementRefs.cardPopularityElement.value = card.urgency;
         
-            addSyntaxHighlighting();
-            renderLatex();
+            PrettifyCards.addSyntaxHighlighting();
+            PrettifyCards.renderLatex();
 
             CardTemplateUtilities.syncSpoilerBox();
     
