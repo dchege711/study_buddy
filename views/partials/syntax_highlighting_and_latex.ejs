@@ -1,23 +1,58 @@
 <link rel="stylesheet" href="/stylesheets/themes/atom-one-light.css">
 <script type="text/javascript" async src="/static/highlight.pack.js"></script>
 <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script type="text/javascript" src="/static/showdown.min.js"></script>
 
 <script type="text/javascript">
-    /**
-    * @description Syntax highlight any code snippets.
-    */
-    function addSyntaxHighlighting() {
-        let code_elements = document.querySelectorAll('pre code');
-        for (let i = 0; i < code_elements.length; i++) {
-            hljs.highlightBlock(code_elements[i]);
-        }
-    }
 
-    /**
-     * @description render latex on the page
-     */
-    function renderLatex() {
-        MathJax.Hub.Queue(["Typeset", MathJax.Hub, "card_description"]);
-    }
+    /* The converter is used to turn the markdown in the cards into html. */
+    const converter = new showdown.Converter({
+        headerLevelStart: 4, literalMidWordUnderscores: true,
+        literalMidWordAsterisks: true, simpleLineBreaks: true,
+        emoji: true, backslashEscapesHTMLTags: true, tables: true,
+        parseImgDimensions: true, simplifiedAutoLink: true,
+        strikethrough: true, tasklists: true
+    });
+
+    let PrettifyCards = {
+        
+        addSyntaxHighlighting: function () {
+            let code_elements = document.querySelectorAll('pre code');
+            for (let i = 0; i < code_elements.length; i++) {
+                hljs.highlightBlock(code_elements[i]);
+            }
+        },
+
+        /**
+         * @param {Array} elementIDs
+         * @returns {Void} Modifies the DOM in place
+         */
+        renderLatex: function (elementIDs) {
+            for (let i = 0; i < elementIDs.length; i++) {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, elementIDs[i]]);
+            }
+        },
+
+        /**
+         * @param {String} text a markdown formatted string
+         * @return {String} HTML version of the string
+         */
+        markdownToHTML: function(text) {
+            // Workaround for allowing users to omit extra escaping backslashes
+            // in their LaTEX. I can't afford to do store this string on the server.
+            let outputHTML = converter.makeHtml(
+                String.raw`${text.replace(/\\/g, "\\\\")}`
+            );
+            
+            if (outputHTML.match(/\[spoiler\]/i)) {
+                outputHTML = outputHTML.replace(
+                    /\[spoiler\]/i, "<span id='spoiler'>[spoiler]</span>"
+                );
+                outputHTML += `<span id="spoiler_end"></span>`;
+            }
+
+            return outputHTML;
+        }
+    };
 
 </script>
