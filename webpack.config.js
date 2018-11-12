@@ -17,16 +17,15 @@ const CircularDependencyPlugin = require('circular-dependency-plugin');
 module.exports = {
     mode: "production",
     entry: {
-        CardTemplateController: "./public/static/CardTemplateController.js"
+        CardTemplateUtilities: path.resolve(__dirname, "public", "static", "CardTemplateUtilities.js"),
+        CardsManager: path.resolve(__dirname, "public", "static", "CardsManager.js"),
+        AppUtilities: path.resolve(__dirname, "public", "static", "AppUtilities.js")
     },
     plugins: [
         new CleanWebpackPlugin(['dist']),
         new CircularDependencyPlugin({
-            // exclude detection of files based on a RegExp
             exclude: /a\.js|node_modules/,
-            // add errors to webpack instead of warnings
             failOnError: true,
-            // set the current working directory for displaying module paths
             cwd: process.cwd(),
             onStart({ compilation }) {
                 console.log('circular-dependency-plugin: looking for webpack modules cycles...');

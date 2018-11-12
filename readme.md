@@ -66,6 +66,7 @@ Sub-objectives include:
   * (Done) Provide the option within the home page
   * Allow them to set their default settings public/private
   * (Done) Add the relevant fields in the database
+  * Deleted cards should be taken off the public collection
 
 * Allow users to share links to cards/collections
   * Support Ctrl-C for a specific card's link
