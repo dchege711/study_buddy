@@ -4,10 +4,9 @@
 <head>
     <title><%= appName %>: Resend Validation URL</title>
     <% include ../partials/header.ejs %>
-    <script src="/static/AppUtilities.js"></script>
 </head>
 
-<body onload="processParams();">
+<body onload="AppUtilities.processParams();">
 
     <% include ../partials/navbar.ejs %>
 
@@ -40,12 +39,14 @@
 
         <script type="text/javascript">
             function sendValidationURL() {
-                sendForm("send_validation_url_form", location.href, (response) => {
-                    alert(response.message);
-                    if (response.success) {
-                        window.location = "/";
-                    }
-                });
+                AppUtilities
+                    .sendForm("send_validation_url_form", location.href)
+                    .then((response) => {
+                        alert(response.message);
+                        if (response.success) window.location = "/";
+                    })
+                    .catch((err) => { console.error(err); });
+                    
                 return false;
             }
         </script>
