@@ -3,26 +3,30 @@
  * 
  * @param {string} form_id The ID of the form
  * @param {string} url The url at which the form will be processed
- * @param {Function} callBack Function to call once done. Should take in a JSON
- * argument. 
+ * 
+ * @return {Promise} Should take in a JSON argument. 
  */
-function sendForm(form_id, url, callBack) {
+exports.sendForm = function(form_id, url) {
+    return new Promise(function(resolve, reject) {
+        let form = document.forms[form_id];
 
-    var form = document.forms[form_id];
+        if (form.checkValidity()) {
+            // Send the form to the server for further processing.
+            let elements = form.elements;
+            let payload = {};
+            for (let i = 0; i < elements.length; i++) {
+                payload[elements[i].name] = elements[i].value;
+            }
+            delete payload[""];
 
-    if (form.checkValidity()) {
-        // Send the form to the server for further processing.
-        var elements = form.elements;
-        var payload = {};
-        for (var i = 0; i < elements.length; i++) {
-            payload[elements[i].name] = elements[i].value;
+            exports.sendHTTPRequest("POST", url, payload)
+                .then((response) => { resolve(response); })
+                .catch((err) => { reject(err); })
+        } else {
+            form.reportValidity();
+            reject("Please fill in the form with valid inputs.");
         }
-        delete payload[""];
-
-        sendHTTPRequest("POST", url, payload, callBack);
-    } else {
-        form.reportValidity();
-    }
+    });
 }
 
 /**
@@ -31,9 +35,9 @@ function sendForm(form_id, url, callBack) {
  * @param {string} method The method to use, e.g. `POST`
  * @param {string} url The URL that the request will be sent to
  * @param {JSON} payload The data that will be sent along with the request
- * @param {Function} callBack The function to call once req is successful
+ * @return {Promise} 
  */
-function sendHTTPRequest(method, url, payload) {
+exports.sendHTTPRequest = function(method, url, payload) {
     return new Promise(function(resolve, reject) {
         let xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
@@ -41,7 +45,9 @@ function sendHTTPRequest(method, url, payload) {
                 try {
                     let json_response_data = JSON.parse(this.responseText);
                     resolve(json_response_data);
-                } catch (err) { reject(err); }
+                } catch (err) { 
+                    reject(err); 
+                }
             }
         };
         xhttp.open(method, url, true);
@@ -54,13 +60,7 @@ function sendHTTPRequest(method, url, payload) {
  * @description Parse the parameters that are passed in the URL and perform
  * the expected actions.
  */
-function processParams() {
+exports.processParams = function() {
     var params = (new URL(document.location)).searchParams;
     if (params.has("msg")) alert(params.get("msg"));
 }
-
-module.exports = {
-    sendForm: sendForm, 
-    processParams: processParams, 
-    sendHTTPRequest: sendHTTPRequest
-};
