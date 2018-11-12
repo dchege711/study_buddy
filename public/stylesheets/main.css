@@ -203,6 +203,8 @@ blockquote {
     border: none;
     border-bottom: 0.2px solid black;
     width: 100%;
+    min-height: 40px;
+    padding: 0;
     margin-right: 10%;
 }
 
@@ -227,4 +229,140 @@ blockquote {
 .card_borders {
     border-left: 5px solid #2196F3;
     border-bottom: thin solid #2196F3;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {display:none;}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+#review_mode_label::after {
+    position: relative;
+    right: 70px;
+    content: "Review Mode"
+}
+
+#card_is_public_label::after {
+    position: relative;
+    right: 70px;
+    content: "Make Public"
+}
+
+/* Tooltip container */
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+    visibility: hidden;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+    font-size: smaller;
+
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1;
+}
+
+#review_mode_tooltip {
+    width: 300px;
+    top: -5px;
+    right: 105%;
+}
+
+#tagging_system_tooltip {
+    width: 120%;
+    top: -50px;
+    left: 0%;
+}
+
+#formatting_help_tooltip {
+    width: 120%;
+    top: -50px;
+    right: 0%;
+}
+
+#card_is_public_tooltip {
+    width: 200%;
+    top: -30px;
+    right: 100%;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
+#spoiler_box {
+    background: rgb(172, 172, 172);
+    cursor: pointer;
+    position: absolute;
+    z-index: 1;
+}
+
+#spoiler_box:hover {
+    opacity: 0;
+}
+
+#spoiler_box p {
+    font-size: larger;
+    text-align: center;
+    color: white;
+    padding: 10% 0 0 0;
 }
