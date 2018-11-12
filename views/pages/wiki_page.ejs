@@ -9,10 +9,8 @@
 
     <head>
         <title><%= appName %>: Wiki</title>
-        <link rel="stylesheet" href="/stylesheets/themes/atom-one-light.css">
-        <script src="/static/highlight.pack.js"></script>
+        <% include ../partials/syntax_highlighting_and_latex.ejs %>
         <script src="/static/showdown.min.js"></script>
-        <script src="/static/AppUtilities.js"></script>
         <script type="text/x-mathjax-config">
             MathJax.Hub.Config({
               tex2jax: {
@@ -20,8 +18,6 @@
               }
             });
           </script>
-          <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
-
         <% include ../partials/header.ejs %>
 
         <style>
