@@ -4,9 +4,9 @@
     <head>
         <title><%= appName %>: Account Page</title>
         <% include ../partials/header.ejs %>
-        <script src="/static/AppUtilities.js"></script>
-        <script src="/static/MaxPriorityQueue.js"></script>
-        <script src="/static/CardsManager.js"></script>
+        <% include ../partials/syntax_highlighting_and_latex.ejs %>
+        <script type="text/javascript" src="/dist/CardsManager.bundle.min.js"></script>
+        <script type="text/javascript" src="/dist/CardTemplateUtilities.bundle.min.js"></script>
 
         <style>
 
@@ -32,9 +32,9 @@
 
     </head>
 
-    <body onload="includeInAppButtons();">
+    <body>
 
-        <% include ../partials/navbar.ejs %>
+        <% include ../partials/logged_in_navbar.ejs %>
 
         <div id="main_div">
 
@@ -159,16 +159,11 @@
         state.trashed_cards = state.metadata.trashed_cards[0];
         if (!state.trashed_cards) state.trashed_cards = {};
 
-        var my_cards_manager = cards_manager(
-            state.trashed_cards, 
-            state.metadata.createdById
+        let cardsManager = new CardsManager(
+            state.trashed_cards, state.metadata.createdById
         );
 
-        function includeInAppButtons() {
-            document.getElementById("logout_button").style.display = "inline";
-            document.getElementById("account_button").style.display = "inline";
-            document.getElementById("trash_button_text").innerHTML = `<i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> View ${Object.keys(state.trashed_cards).length} Trashed Cards`;
-        }
+        document.getElementById("trash_button_text").innerHTML = `<i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> View ${Object.keys(state.trashed_cards).length} Trashed Cards`;
 
         function downloadUserData() {
             window.open("/account/download-user-data");
@@ -176,22 +171,28 @@
 
         function confirmDeletion() {
             if (window.confirm("Deleting your account is irreversible. Continue?")) {
-                sendHTTPRequest("POST", "/account/delete-account", {}, (response) => {
-                    localStorage.clear();
-                    window.location = "/";
-                });
+                AppUtilities
+                    .sendHTTPRequest("POST", "/account/delete-account", {})
+                    .then((response) => {
+                        localStorage.clear();
+                        window.location = "/";
+                    })
+                    .catch((err) => { console.error(err); });
             }
         }
 
         function showCardsFromTrash() {
             if (Object.keys(state.trashed_cards).length > 0) {
+
                 state.card_container.style.display = "block";
                 state.trash_button.style.display = "none";
-                my_cards_manager.initialize_from_trash(state.trashed_cards, () => {
-                    my_cards_manager.next((card) => {
-                        renderTrashedCard(card);
-                    });
-                });
+
+                cardsManager
+                    .initializeFromTrash(state.trashed_cards)
+                    .then(() => { return cardsManager.next(); })
+                    .then((card) => { renderTrashedCard(card); })
+                    .catch((err) => { console.error(err); });
+    
             }
         }
 
@@ -201,54 +202,50 @@
         }
 
         function fetchNextCard() {
-            my_cards_manager.next((card) => {
-                if (card.title !== undefined) {
-                    renderTrashedCard(card);
-                } else {
-                    displayPopUp("Out of cards!", 1000);
-                }
-            });
+            cardsManager.next()
+                .then((card) => { renderTrashedCard(card); })
+                .catch((err) => { console.error(err); });
         }
 
         function fetchPreviousCard() {
-            my_cards_manager.previous((card) => {
-                if (card.title !== undefined) {
-                    renderTrashedCard(card);
-                } else {
-                    displayPopUp("Out of cards!", 1000);
-                }
-            });
-        }
-
-        function displayPopUp(text, timeout_ms) {
-            var popup = document.getElementById("out_of_cards_popup");
-            popup.innerHTML = text;
-            popup.style.visibility = "visible";
-            window.setTimeout(() => {
-                makeInvisible("out_of_cards_popup")
-            }, timeout_ms);
+            cardsManager.previous()
+                .then((card) => { renderTrashedCard(card); })
+                .catch((err) => { console.error(err); });
         }
 
         function renderTrashedCard(card) {
-            state.current_card_id = card._id;
-            state.current_card_title.innerText = card.title;
-            state.current_card_description.innerText = card.description;
-            state.current_card_tags.innerText = card.tags;
-            state.current_card_urgency_number.innerText = card.urgency;
+            if (!card) {
+                CardTemplateUtilities.displayPopUp("Out of cards!", 1000);
+            } else {
+                state.current_card_id = card._id;
+                state.current_card_title.innerText = card.title;
+                state.current_card_description.innerHTML = PrettifyCards.markdownToHTML(card.description);
+                state.current_card_tags.innerText = card.tags.replace(" ", ", ");
+                state.current_card_urgency_number.innerText = card.urgency;
+
+                PrettifyCards.addSyntaxHighlighting();
+                PrettifyCards.renderLatex(["card_title", "card_description"]);
+
+            }
+            
         }
 
         function modifyTrash(endpoint) {
-            sendHTTPRequest(
-                "POST", endpoint, 
-                { 
-                    _id: state.current_card_id,
-                    createdById: state.metadata.createdById
-                }, 
-                (confirmation) => {
-                displayPopUp(confirmation.message, 2000);
-                my_cards_manager.remove_card(state.current_card_id);
-                fetchNextCard();
-            });
+            AppUtilities
+                .sendHTTPRequest(
+                    "POST", endpoint, 
+                    { 
+                        _id: state.current_card_id,
+                        createdById: state.metadata.createdById
+                    }
+                )
+                .then((confirmation) => {
+                    CardTemplateUtilities.displayPopUp(confirmation.message, 2000);
+                    cardsManager.removeCard(state.current_card_id);
+                    fetchNextCard();
+                })
+                .catch((err) => { console.error(err); });
+
         }
 
         function makeInvisible(element_id) {
