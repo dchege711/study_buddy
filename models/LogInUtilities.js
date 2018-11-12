@@ -124,7 +124,7 @@ sendAccountValidationURLToEmail = function(userDetails, callBack) {
         Email.sendEmail(
             {
                 to: userDetails.email,
-                subject: "Please Validate Your ${config.APP_NAME} Account",
+                subject: `Please Validate Your ${config.APP_NAME} Account`,
                 text: `Welcome to ${config.APP_NAME}! Before you can log in, please click ` +
                     `on this link to validate your account.\n\n` + 
                     `${config.BASE_URL}/verify-account/${userDetails.account_validation_uri}` +
@@ -481,7 +481,7 @@ exports.sendResetLink = function(userIdentifier, callBack) {
                             // unwanted line breaks in the sent email.
                             Email.sendEmail({
                                 to: user.email,
-                                subject: "${config.APP_NAME} Password Reset",
+                                subject: `${config.APP_NAME} Password Reset`,
                                 text: `To reset your ${config.APP_NAME} password, ` + 
                                     `click on this link:\n\n${config.BASE_URL}` + 
                                     `/reset-password-link/${reset_password_uri}` + 
@@ -580,7 +580,7 @@ exports.resetPassword = function(payload, callBack) {
                             } else {
                                 Email.sendEmail({
                                     to: user.email,
-                                    subject: "${config.APP_NAME}: Your Password Has Been Reset",
+                                    subject: `${config.APP_NAME}: Your Password Has Been Reset`,
                                     text: `Your ${config.APP_NAME} password was reset on ${payload.reset_request_time}. ` +
                                         `If this wasn't you, please request another password reset at ` +
                                         `${config.BASE_URL}/reset-password`
