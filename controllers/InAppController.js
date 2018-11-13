@@ -64,9 +64,10 @@ exports.tags = function (req, res) {
 };
 
 exports.add_card = function (req, res) {
-    CardsDB.create(req.body, function (confirmation) {
-        res.json(confirmation);
-    });
+    CardsDB
+        .create(req.body)
+        .then((confirmation) => { res.json(confirmation); })
+        .catch((err) => { convertObjectToResponse(err, null, res); });
 };
 
 exports.search_cards = function (req, res) {
@@ -132,6 +133,15 @@ exports.delete_account = function(req, res) {
 exports.updateUserSettings = function(req, res) {
     MetadataDB
         .updateUserSettings(req.body)
-        .then((confirmation) => {res.json(confirmation)})
+        .then((confirmation) => { res.json(confirmation); })
+        .catch((err) => { convertObjectToResponse(err, null, res); });
+};
+
+exports.duplicateCard = function(req, res) {
+    let duplicateCardArgs = req.body;
+    duplicateCardArgs.userIDInApp = req.session.user.userIDInApp;
+    CardsDB
+        .duplicateCard(duplicateCardArgs)
+        .then((confirmation) => { res.json(confirmation); })
         .catch((err) => { convertObjectToResponse(err, null, res); });
 };
