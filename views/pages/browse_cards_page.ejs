@@ -86,6 +86,12 @@
 
         let cardsManager = null;
 
+        let state = {
+            currentCardID: null
+        }
+
+        const USER_INFO = AppUtilities.getAccountInfo();
+
         const elementRefs = {
             searchInputElement: document.getElementById("search_input"),
             cardContainerHolderElement: document.getElementById("card_container_holder"),
@@ -130,12 +136,28 @@
             CardTemplateUtilities.makeInvisible(elementID);
         }
 
-        function flagCardForReview() {
-            console.log(`Flagged for review`);
-        }
-
         function copyCardToOwnCollection() {
-            console.log(`Copied to own collection`);
+            if (USER_INFO === null) {
+                if (window.confirm("No account found. Would you like to go to the login page first?")) {
+                    window.location = "/login";
+                }
+                return;
+            }
+            AppUtilities
+                .sendHTTPRequest(
+                    "POST", "/duplicate-card", 
+                    { 
+                        cardID: state.currentCardID,
+                        newCardIsPrivate: USER_INFO.cardsAreByDefaultPrivate
+                    })
+                .then((confirmation) => {
+                    let ownCard = confirmation.message;
+                    CardTemplateUtilities.displayPopUp(
+                        `Added ${ownCard.title} to your collection!`, 1000
+                    );
+                    localStorage.setItem(ownCard._id, JSON.stringify(ownCard));
+                })
+                .catch((err) => { console.error(err); });
         }
 
         function renderCard(card) {
@@ -157,6 +179,7 @@
             }
             elementRefs.cardTagsElement.innerHTML = tags_html;
             elementRefs.cardPopularityElement.value = card.urgency;
+            state.currentCardID = card._id;
         
             PrettifyCards.addSyntaxHighlighting();
             PrettifyCards.renderLatex(["card_description"]);
