@@ -97,6 +97,7 @@
              * Local Storage. 
              */
             const metadata = JSON.parse(localStorage.getItem("metadata"))[0];
+            const userSettings = AppUtilities.getAccountInfo();
 
             // Maintain references to elements that get searched for often
             const elementRefs = {
@@ -134,7 +135,7 @@
                 currentCardTagsHaveChanged: false,
                 cardPostURL: null,
                 reviewModeToggle: false,
-                card_is_public_toggle: metadata.cardsAreByDefaultPrivate
+                card_is_public_toggle: userSettings.cardsAreByDefaultPrivate
             }
 
             if (!state.tagsAndIDs) state.tagsAndIDs = {};
@@ -286,7 +287,7 @@
                 state.rawDescription = card.description;
 
                 PrettifyCards.addSyntaxHighlighting();
-                PrettifyCards.renderLatex();
+                PrettifyCards.renderLatex(["card_description"]);
 
                 CardTemplateUtilities.syncSpoilerBox();
             }
@@ -301,9 +302,9 @@
                 elementRefs.cardTitleElement.value = "";
                 elementRefs.cardDescriptionElement.innerHTML = "";
                 elementRefs.alreadySetTagsElement.innerHTML = "";
-                elementRefs.cardIsPublicToggleElement.checked = metadata.cardsAreByDefaultPrivate;
+                elementRefs.cardIsPublicToggleElement.checked = userSettings.cardsAreByDefaultPrivate;
 
-                state.cardIsPublicToggle = metadata.cardsAreByDefaultPrivate;
+                state.cardIsPublicToggle = userSettings.cardsAreByDefaultPrivate;
                 state.currentCardTagsHaveChanged = false;
 
                 elementRefs.cardUrgencyElement.value = 0;
