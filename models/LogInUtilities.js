@@ -95,6 +95,7 @@ provideSessionToken = function(user, callBack) {
             var new_token = Token({
                 token_id: session_token, userIDInApp: user.userIDInApp,
                 username: user.username, email: user.email,
+                cardsAreByDefaultPrivate: user.cardsAreByDefaultPrivate,
                 user_reg_date: new Date(user.createdAt).toDateString()
             });
             new_token.save((error, saved_token) => {

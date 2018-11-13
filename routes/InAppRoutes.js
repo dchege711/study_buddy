@@ -34,4 +34,6 @@ router.get("/account/download-user-data", requireLogIn, inAppController.download
 
 router.post("/account/delete-account", requireLogIn, inAppController.delete_account);
 
+router.post("/account/update-settings", requireLogIn, inAppController.updateUserSettings);
+
 module.exports = router;

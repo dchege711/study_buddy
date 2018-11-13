@@ -29,7 +29,8 @@ var userSchema = new mongoose.Schema(
         reset_password_uri: String,
         reset_password_timestamp: Number,
         account_validation_uri: String,
-        account_is_valid: Boolean
+        account_is_valid: Boolean,
+        cardsAreByDefaultPrivate: {type: Boolean, default: true }
     },
     {
         timestamps: true,

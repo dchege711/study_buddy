@@ -1,3 +1,6 @@
+"use strict";
+
+const User = require("./mongoose_models/UserSchema.js");
 var Metadata = require('./mongoose_models/MetadataCardSchema');
 var Card = require('./mongoose_models/CardSchema.js');
 var fs = require("fs");
@@ -582,3 +585,43 @@ function updateMetadataWithCardDetails(savedCard, metadataDoc, callBack) {
     callBack();
 }
 
+/**
+ * @description Update the settings of the given user.
+ * @returns {Promise}
+ */
+exports.updateUserSettings = function(newUserSettings) {
+    let userIDInApp = newUserSettings.userIDInApp;
+    delete newUserSettings.userIDInApp;
+
+    return new Promise(function(resolve, reject) {
+        User
+            .findOne({userIDInApp: userIDInApp})
+            .exec()
+            .then((existingUser) => {
+                if (!existingUser) {
+                    resolve({
+                        message: "No user found. User settings not updated!",
+                        success: false
+                    });
+                    return;
+                }
+                let keys = Object.keys(newUserSettings);
+                for (let i = 0; i < keys.length; i++) {
+                    // Only add fields that we've already defined
+                    if (existingUser[keys[i]] != undefined) {
+                        existingUser[keys[i]] = newUserSettings[keys[i]];
+                    }
+                }
+                return existingUser.save();
+            })
+            .then((_) => {
+                resolve({
+                    message: "User settings updated!", success: true
+                });
+            })
+            .catch((err) => {
+                console.error(err);
+                reject({message: "Internal Server Error", success: false, status: 500});
+            })
+    });
+}

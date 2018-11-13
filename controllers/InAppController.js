@@ -128,3 +128,10 @@ exports.delete_account = function(req, res) {
         }
     );
 };
+
+exports.updateUserSettings = function(req, res) {
+    MetadataDB
+        .updateUserSettings(req.body)
+        .then((confirmation) => {res.json(confirmation)})
+        .catch((err) => { convertObjectToResponse(err, null, res); });
+};
