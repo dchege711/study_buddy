@@ -18,45 +18,37 @@ var debug = false;
  * `internal_error` and `message` as keys.
  */
 exports.create = function(payload, callBack) {
-    var card = new Card({
-        title: payload.title,
-        description: payload.description,
-        tags: payload.tags,
-        createdById: payload.createdById,
-        urgency: payload.urgency
-    });
+    return new Promise(function(resolve, reject) {
 
-    /*
-     * How many cards before we need a new metadata JSON?
-     * 
-     * (400 + 150 * num_id_metadata) * 5 bytes/char <= 16MB
-     * num_id_metadata <= 21330. So let's say 15,000 cards max
-     * 
-     * Will that ever happen, probably not!
-     */
-    card.save(function(error, savedCard) {
-        if (error) {
-            callBack({
-                "success": false, "internal_error": true,
-                "message": error
-            });
-        } else {
-            // Update the metadata object with this card's details
-            savedCard.previousTags = card.tags;
-            MetadataDB.update([savedCard], (response) => {
-                if (response.success) {
-                    callBack({
-                        "success": true, "internal_error": false,
-                        "message": savedCard
-                    });
-                } else {
-                    callBack({
-                        "success": false, "internal_error": false,
-                        "message": response.message
-                    });
-                }
-            });
-        }
+        let card = new Card({
+            title: payload.title,
+            description: payload.description,
+            tags: payload.tags,
+            createdById: payload.createdById,
+            urgency: payload.urgency,
+            isPublic: payload.cardsAreByDefaultPrivate
+        });
+        if (payload.parent !== undefined) card.parent = payload.parent;
+
+        card
+            .save()
+            .then((savedCard) => {
+                savedCard.previousTags = card.tags;
+                MetadataDB.update([savedCard], (response) => {
+                    if (response.success) {
+                        resolve({
+                            "success": true, "internal_error": false,
+                            "message": savedCard
+                        });
+                    } else {
+                        reject({
+                            "success": false, "internal_error": false,
+                            "message": response.message
+                        });
+                    }
+                });
+            })
+            .catch((err) => { reject(err); })
     });
 };
 
@@ -108,7 +100,6 @@ exports.read = function(payload, callBack) {
  * `internal_error` and `message` as keys.
  */
 exports.update = function(cardJSON, callBack) {
-    var _id = cardJSON._id;
 
     // findByIdAndUpdate will give me the old, not the updated, document.
     // I need to find the card, save it, and then call MetadataDB.update if need be
@@ -300,6 +291,32 @@ exports.readPublicCard = function(payload) {
         
     });
 }
+
+exports.duplicateCard = function(payload) {
+    // Fetch the card to be duplicated
+    return new Promise(function(resolve, reject) {
+        let queryObject = { _id: payload.cardID, isPublic: true };
+        Card
+            .findOne(queryObject).exec()
+            .then((preExistingCard) => {            
+                preExistingCard.numChildren = preExistingCard.numChildren + 1;
+                return preExistingCard.save();
+            })
+            .then((savedPreExistingCard) => {
+                return exports.create({
+                    title: savedPreExistingCard.title, 
+                    description: savedPreExistingCard.description,
+                    tags: savedPreExistingCard.tags, 
+                    parent: savedPreExistingCard._id,
+                    createdById: payload.userIDInApp,
+                    isPublic: payload.cardsAreByDefaultPrivate
+                });
+            })
+            .then((confirmation) => { resolve(confirmation); })
+            .catch((err) => { console.error(err); reject(err); })
+    });
+        
+};
 
 /**
  * @description For uniformity, tags should be delimited by white-space. If a 
