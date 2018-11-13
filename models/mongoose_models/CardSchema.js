@@ -30,7 +30,8 @@ var cardSchema = new mongoose.Schema(
     }, 
     {
         timestamps: true,
-        collection: "c13u_study_buddy"
+        collection: "c13u_study_buddy",
+        strict: true
     }
 );
 

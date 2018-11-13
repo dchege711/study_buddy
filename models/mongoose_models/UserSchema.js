@@ -35,7 +35,8 @@ var userSchema = new mongoose.Schema(
     {
         timestamps: true,
         autoIndex: false,
-        collection: "study_buddy_users"
+        collection: "study_buddy_users",
+        strict: true
     }
 );
 
