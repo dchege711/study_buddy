@@ -15,7 +15,11 @@ exports.sendForm = function(form_id, url) {
             let elements = form.elements;
             let payload = {};
             for (let i = 0; i < elements.length; i++) {
-                payload[elements[i].name] = elements[i].value;
+                if (elements[i].type == "checkbox") {
+                    payload[elements[i].name] = elements[i].checked;
+                } else {
+                    payload[elements[i].name] = elements[i].value;
+                }
             }
             delete payload[""];
 
@@ -63,4 +67,26 @@ exports.sendHTTPRequest = function(method, url, payload) {
 exports.processParams = function() {
     var params = (new URL(document.location)).searchParams;
     if (params.has("msg")) alert(params.get("msg"));
+}
+
+
+/**
+ * @description Fetch information about the user from Local Storage
+ */
+exports.getAccountInfo = function() {
+    let retrievedAccountInfo = localStorage.getItem("session_info");
+    if (retrievedAccountInfo === null) return retrievedAccountInfo;
+    else return JSON.parse(retrievedAccountInfo);
+}
+
+/**
+ * @description Set new information about the user in Local Storage
+ */
+exports.updateAccountInfo = function(newInfo) {
+    let existingInfo = exports.getAccountInfo();
+    if (existingInfo === null) existingInfo = {};
+    Object.keys(newInfo).forEach((key) => {
+        existingInfo[key] = newInfo[key];
+    });
+    localStorage.setItem("session_info", JSON.stringify(existingInfo));
 }
