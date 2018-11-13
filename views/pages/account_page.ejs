@@ -52,6 +52,22 @@
                         <%= appName %> Birthday: <%= account_info.user_reg_date %>
                     </p>
 
+                    <form id="accountSettingsForm" method="POST">
+                    
+                        <% if (account_info.cardsAreByDefaultPrivate) { %>
+                            <input type="checkbox" class="w3-check" name="cardsAreByDefaultPrivate" checked>
+                        <% } else { %>
+                            <input type="checkbox" class="w3-check" name="cardsAreByDefaultPrivate">
+                        <% } %>
+
+                        <label class="w3-label" for="cardsAreByDefaultPrivate">If checked, your cards will be set to private unless you mark them public</label>
+
+                        <input type="text" style="display:none" name="userIDInApp" value="<%= account_info.userIDInApp %>">
+                        
+                        <br><br>
+                        <input type="submit" class="w3-btn w3-round-xxlarge w3-left w3-blue" value="Save Changes" onclick="return updateAccountSettings();">
+                    </form>
+
                 </div>
 
                 <div class="account_section">
@@ -252,6 +268,14 @@
             document.getElementById(element_id).style.visibility = "hidden";
         }
 
+        function updateAccountSettings() {
+            AppUtilities
+                .sendForm("accountSettingsForm", "/account/update-settings")
+                .then((confirmation) => { alert(confirmation.message); })
+                .catch((err) => { console.error(err); });
+
+            return false;
+        }
     </script>
 
 </html>
