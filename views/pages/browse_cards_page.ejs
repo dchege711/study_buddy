@@ -41,7 +41,7 @@
                 <form method="GET">
                     <div class="dropdown w3-threequarter">
                         <input type="text" id="search_input" placeholder="Search for cards, e.g. dynamic programming" 
-                            onkeyup="handleSearchInputChange(event);" class="w3-input dropbtn" name="query_string" />
+                            onkeyup="handleSearchInputChange(event);" class="w3-input dropbtn" name="queryString" />
                         <div class="dropdown-content" id="search_autocomplete_results"></div>
                     </div>
                     <input type="submit" class="w3-quarter w3-btn w3-blue" value="Search for Cards"></button>
@@ -106,11 +106,11 @@
             state.queryString = elementRefs.searchInputElement.value;
         }
 
-        function displayFullCard(card_id) {
+        function displayFullCard(cardID) {
             elementRefs.cardContainerHolderElement.style.visibility = "visible";
             cardsManager = new CardsManager(null, null);
             cardsManager
-                .initializeFromMinicards([{_id: card_id, urgency: 1}])
+                .initializeFromMinicards([{_id: cardID, urgency: 1}])
                 .then(() => { 
                     cardsManager
                         .next()

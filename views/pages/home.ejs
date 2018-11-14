@@ -117,7 +117,8 @@
                 spoilerElement: document.getElementById("spoiler"),
                 spoilerBoxElement: document.getElementById("spoiler_box"),
                 spoilerEndElement: document.getElementById("spoiler_end"),
-                tagsAutocompleteResultsElement: document.getElementById("tags_autocomplete_results")
+                tagsAutocompleteResultsElement: document.getElementById("tags_autocomplete_results"),
+                shareableLinkElement: document.getElementById("shareable_link")
             };
             
             /* Useful for storing the state of the app. Wrapped 
@@ -280,6 +281,7 @@
                 
                 elementRefs.cardIsPublicToggleElement.checked = card.isPublic;
                 state.cardIsPublicToggle = card.isPublic;
+                elementRefs.shareableLinkElement.innerText = `${document.location.origin}/browse/?cardID=${card._id}`;
 
                 // Reset the contents of the current_card variable
                 state.currentCardID = card._id;

@@ -257,14 +257,14 @@ let collectSearchResults = function(queryObject, callBack) {
  */
 exports.publicSearch = function(payload, callBack) {
     let mandatoryFields = [{isPublic: true}];
-    if (payload.user_id !== undefined) {
-        mandatoryFields.push({createdById: payload.user_id});
+    if (payload.userID !== undefined) {
+        mandatoryFields.push({createdById: payload.userID});
     }
-    if (payload.card_id !== undefined) {
-        mandatoryFields.push({_id: payload.card_id });
+    if (payload.cardID !== undefined) {
+        mandatoryFields.push({_id: payload.cardID });
     }
-    if (payload.query_string !== undefined) {
-        mandatoryFields.push({ $text: { $search: splitTags(payload.query_string) } });
+    if (payload.queryString !== undefined) {
+        mandatoryFields.push({ $text: { $search: splitTags(payload.queryString) } });
     }
 
     let queryObject = {
