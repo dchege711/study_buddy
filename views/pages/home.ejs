@@ -409,7 +409,7 @@
                 cardsManager
                     .saveCard(payload, state.cardPostURL)
                     .then((savedCard) => {
-                        console.log(savedCard);
+                        CardTemplateUtilities.displayPopUp("Card saved!", 1000);
                         if (renderSavedCard) renderCard(savedCard);
                         if (rerenderSideBar) {
                             savedCard.tags.split(" ").forEach(tag => {

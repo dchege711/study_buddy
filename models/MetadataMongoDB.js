@@ -140,6 +140,14 @@ exports.readTags = function(payload, callBack) {
  * `internal_error` and `message` as keys.
  */
 exports.update = function (savedCards, callBack) {
+    /*
+     * How many cards before we need a new metadata JSON?
+     * 
+     * (400 + 150 * num_id_metadata) * 5 bytes/char <= 16MB
+     * num_id_metadata <= 21330. So let's say 15,000 cards max
+     * 
+     * Will that ever happen, probably not!
+     */
     if (savedCards[0].metadataIndex === undefined) {
         savedCards[0].metadataIndex = 0;
     }
@@ -259,8 +267,8 @@ exports.send_to_trash = function (payload, callBack) {
                             });
                         } else {
 
-                            metadataStats = metadataDoc.stats[0];
-                            metadataNodeInfo = metadataDoc.node_information[0];
+                            let metadataStats = metadataDoc.stats[0];
+                            let metadataNodeInfo = metadataDoc.node_information[0];
                             var trashed_card_id = card_JSON._id;
 
                             // Remove the card from the lists that the user previews from
@@ -522,8 +530,8 @@ function updateMetadataWithCardDetails(savedCard, metadataDoc, callBack) {
         if (debug) console.log("Created new nodes item for " + savedCard.title);
     }
 
-    metadataStats = metadataDoc.stats[0];
-    metadataNodeInfo = metadataDoc.node_information[0];
+    let metadataStats = metadataDoc.stats[0];
+    let metadataNodeInfo = metadataDoc.node_information[0];
 
     // Save this card in the stats field where it only appears once
     if (metadataStats[cardID] === undefined) {
