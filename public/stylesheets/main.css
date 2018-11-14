@@ -89,7 +89,7 @@ body {
 .popup {
     position: relative;
     display: inline-block;
-    max-width: 300px;
+    max-width: 350px;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -99,18 +99,18 @@ body {
 /* The actual popup */
 .popup .popuptext {
     visibility: hidden;
-    width: 300px;
-    height: 30px;
+    width: 350px;
+    height: 35px;
     background-color: #555;
     color: #fff;
     text-align: center;
-    border-radius: 6px;
-    padding: 8px 0;
+    border-radius: 3px;
+    padding: 0;
     position: absolute;
-    z-index: 1;
-    bottom: 125%;
+    z-index: 10 !important;
+    bottom: -35px;
     left: 50%;
-    margin-left: -80px;
+    margin-left: -175px;
 }
 
 /************************ Footer **********************************************/
