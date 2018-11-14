@@ -2,13 +2,13 @@ var CardsDB = require("../models/CardsMongoDB.js");
 var MetadataDB = require("../models/MetadataMongoDB.js");
 var controller_utils = require("./ControllerUtilities.js");
 var login_utils = require("../models/LogInUtilities.js");
-const appName = require("../config.js").APP_NAME;
+const config = require("../config.js");
 
 var convertObjectToResponse = controller_utils.convertObjectToResponse;
 var deleteTempFile = controller_utils.deleteTempFile;
 
 const defaultTemplateObject = {
-    appName: appName
+    APP_NAME: config.APP_NAME, BASE_URL: config.BASE_URL
 };
 
 exports.read_card = function (req, res) {

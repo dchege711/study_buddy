@@ -2,7 +2,7 @@
 <html>
 
     <head>
-        <title><%= appName %>: Account Page</title>
+        <title><%= APP_NAME %>: Account Page</title>
         <% include ../partials/header.ejs %>
         <% include ../partials/syntax_highlighting_and_latex.ejs %>
         <script type="text/javascript" src="/dist/CardsManager.bundle.min.js"></script>
@@ -49,7 +49,7 @@
                         <br><br>
                         Email Address: <%= account_info.email %>
                         <br><br>
-                        <%= appName %> Birthday: <%= account_info.user_reg_date %>
+                        <%= APP_NAME %> Birthday: <%= account_info.user_reg_date %>
                     </p>
 
                     <form id="accountSettingsForm" method="POST">

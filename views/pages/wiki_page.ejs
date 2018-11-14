@@ -8,7 +8,7 @@
 <html>
 
     <head>
-        <title><%= appName %>: Wiki</title>
+        <title><%= APP_NAME %>: Wiki</title>
         <% include ../partials/syntax_highlighting_and_latex.ejs %>
         <script src="/static/showdown.min.js"></script>
         <script type="text/x-mathjax-config">
@@ -66,6 +66,7 @@
                             <li><a href="#formatting">Formatting Cards</a></li>
                             <li><a href="#tagging_system">The Tagging and Urgency System</a></li>
                             <li><a href="#review_mode">Review Mode</a></li>
+                            <li><a href="#public_cards">Public vs. Private Cards</a></li>
                         </ol>
     
                     </div>
@@ -80,7 +81,7 @@
                     </h3>
 
                     <p>
-                        <%= appName %> supports LaTeX, Markdown and syntax highlighting.
+                        <%= APP_NAME %> supports LaTeX, Markdown and syntax highlighting.
 
                         <table class="w3-table-all">
                             <tr>
@@ -160,11 +161,11 @@
                     </h3>
 
                     <p>
-                        <%= appName %> categorizes the cards using the tags provided. When 
+                        <%= APP_NAME %> categorizes the cards using the tags provided. When 
                         displaying a set of cards, the cards with higher urgency values are 
                         shown first.
                         <br><br>
-                        Tags are case-sensitive. When adding tags to a card, <%= appName %> 
+                        Tags are case-sensitive. When adding tags to a card, <%= APP_NAME %> 
                         offers an auto-complete feature in order to reduce the number of near-duplicate tags like 
                         [<em>sorting_algorithms</em>, <em>sorting-algorithms</em>, <em>Sorting Algorithms</em>].
                         <br><br>
@@ -205,9 +206,31 @@
                             <li>Click on 'Next' to load the next card from the queue</li>
                         </ol>
 
-                        If review mode is active, <%= appName %> makes the review process 
+                        If review mode is active, <%= APP_NAME %> makes the review process 
                         more convenient by pressing the 'Save' and 'Next' buttons on your behalf. 
 
+                    </p>
+
+                </div>
+
+                <div class="details_section">
+
+                    <h3 class="details_header" id="public_cards">
+                        Public vs. Private Cards
+                        <sup><sup>
+                            <a href="#help_contents">back to the top</a>
+                        </sup></sup>
+                    </h3>
+
+                    <p>
+                        A private flashcard is only visible to you. It will not appear 
+                        in the search results at <%= BASE_URL %>/browse.
+                    </p>
+
+                    <p>
+                        In contrast, a public card will appear in the search results as 
+                        a read-only card. Any user that wishes to add the card to their own 
+                        collection will get a separate copy of the card.
                     </p>
 
                 </div>

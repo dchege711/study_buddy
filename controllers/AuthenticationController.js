@@ -3,7 +3,7 @@ var convertObjectToResponse = require("./ControllerUtilities.js").convertObjectT
 const config = require("../config.js");
 
 const defaultTemplateObject = {
-    appName: config.APP_NAME
+    APP_NAME: config.APP_NAME
 };
 
 /**
