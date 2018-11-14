@@ -26,7 +26,7 @@ exports.create = function(payload, callBack) {
             tags: payload.tags,
             createdById: payload.createdById,
             urgency: payload.urgency,
-            isPublic: payload.cardsAreByDefaultPrivate
+            isPublic: payload.isPublic
         });
         if (payload.parent !== undefined) card.parent = payload.parent;
 
@@ -317,6 +317,24 @@ exports.duplicateCard = function(payload) {
     });
         
 };
+
+exports.flagCard = function(payload) {
+    let flagsToUpdate = {};
+    if (payload.markedForReview) flagsToUpdate.numTimesMarkedForReview = 1;
+    if (payload.markedAsDuplicate) flagsToUpdate.numTimesMarkedAsDuplicate = 1;
+    return new Promise(function(resolve, reject) {
+        Card
+            .findOneAndUpdate({_id: payload.cardID}, {$inc: flagsToUpdate})
+            .exec()
+            .then((cardToUpdate) => {
+                resolve({ message: `Card flagged successfully!` });
+            })
+            .catch((err) => {
+                console.error(err); 
+                reject(err); 
+            });
+    });
+}
 
 /**
  * @description For uniformity, tags should be delimited by white-space. If a 

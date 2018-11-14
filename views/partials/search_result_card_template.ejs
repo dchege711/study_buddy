@@ -57,13 +57,19 @@
 
     <div class="w3-container w3-center w3-bar w3-padding-16">
 
-        <button class="w3-btn w3-round-xxlarge w3-left w3-red" onClick="flagCardForReview()">
+        <button class="w3-btn w3-round-xlarge w3-third w3-left w3-red" onClick="flagCard('markedForReview')">
             <b>
                 <i class="fa fa-exclamation-circle fa-fw" aria-hidden="true"></i> Flag Card for Review
             </b>
         </button>
 
-        <button class="w3-btn w3-round-xxlarge w3-right w3-green" onClick="copyCardToOwnCollection()">
+        <button class="w3-btn w3-round-xlarge w3-third w3-center w3-blue" onClick="flagCard('markedAsDuplicate')">
+            <b>
+                <i class="fa fa-exclamation-circle fa-fw" aria-hidden="true"></i> Flag Card as Duplicate
+            </b>
+        </button>
+
+        <button class="w3-btn w3-round-xlarge w3-third w3-right w3-green" onClick="copyCardToOwnCollection()">
             <b><i class="fa fa-plus-square fa-fw" aria-hidden="true"></i>
                 Add Card to My Collection</b>
         </button>

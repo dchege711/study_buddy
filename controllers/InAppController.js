@@ -145,3 +145,10 @@ exports.duplicateCard = function(req, res) {
         .then((confirmation) => { res.json(confirmation); })
         .catch((err) => { convertObjectToResponse(err, null, res); });
 };
+
+exports.flagCard = function(req, res) {
+    CardsDB
+        .flagCard(req.body)
+        .then((confirmation) => { res.json(confirmation); })
+        .catch((err) => { convertObjectToResponse(err, null, res); });
+};

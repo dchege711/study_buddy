@@ -136,6 +136,19 @@
             CardTemplateUtilities.makeInvisible(elementID);
         }
 
+        function flagCard(reason) {
+            let flagObject = { cardID: state.currentCardID };
+            flagObject[reason] = true;
+            AppUtilities
+                .sendHTTPRequest("POST", "/flag-card", flagObject)
+                .then((confirmation) => {
+                    CardTemplateUtilities.displayPopUp(
+                        confirmation.message, 10000
+                    );
+                })
+                .catch((err) => { console.error(err); });
+        }
+
         function copyCardToOwnCollection() {
             if (USER_INFO === null) {
                 if (window.confirm("No account found. Would you like to go to the login page first?")) {
