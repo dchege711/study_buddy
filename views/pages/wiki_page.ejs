@@ -10,7 +10,6 @@
     <head>
         <title><%= APP_NAME %>: Wiki</title>
         <% include ../partials/syntax_highlighting_and_latex.ejs %>
-        <script src="/static/showdown.min.js"></script>
         <script type="text/x-mathjax-config">
             MathJax.Hub.Config({
               tex2jax: {
@@ -224,13 +223,32 @@
 
                     <p>
                         A private flashcard is only visible to you. It will not appear 
-                        in the search results at <%= BASE_URL %>/browse.
+                        in the search results at <a href="<%= BASE_URL %>/browse"><%= BASE_URL %>/browse</a>.
                     </p>
 
                     <p>
                         In contrast, a public card will appear in the search results as 
                         a read-only card. Any user that wishes to add the card to their own 
                         collection will get a separate copy of the card.
+                    </p>
+
+                    <p>
+                        By default, your cards are private. 
+                        <a href="<%= BASE_URL %>/account"><%= BASE_URL %>/account</a> provides 
+                        an option for setting the default from that point in time onwards.
+                    </p>
+
+                    <p>
+                        Please share your cards in order to benefit other users. 
+                        Each card has a shareable link that you can send to others. Note that 
+                        if the card is set to 'private', the link won't work.
+                    </p>
+
+                    <p>
+                        As a general guideline, the cards should have relevant titles and 
+                        clear language. Where possible, credit your sources. If any of the 
+                        cards in <a href="<%= BASE_URL %>/browse"><%= BASE_URL %>/browse</a> 
+                        are inappropriate or duplicates, please flag them as so.
                     </p>
 
                 </div>
@@ -246,14 +264,6 @@
 
     <script>
 
-        var converter = new showdown.Converter({
-            headerLevelStart: 4, literalMidWordUnderscores: true,
-            literalMidWordAsterisks: true, simpleLineBreaks: true,
-            emoji: true, backslashEscapesHTMLTags: true, tables: true,
-            parseImgDimensions: true, simplifiedAutoLink: true,
-            strikethrough: true, tasklists: true
-        });
-
         function markupPage() {
 
             let domElements = document.getElementsByClassName("convert_to_html");
@@ -262,17 +272,9 @@
                     String.raw`${domElements[i].textContent.replace(/\\/g, "\\\\")}`
                 );
             }
-
-            let codeElements = document.querySelectorAll('pre code');
-            for (let i = 0; i < codeElements.length; i++) {
-                hljs.highlightBlock(codeElements[i]);
-            }
-
+            PrettifyCards.addSyntaxHighlighting();
+            
         }
-
-        
-
-        
 
     </script>
 

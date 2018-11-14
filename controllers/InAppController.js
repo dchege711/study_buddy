@@ -38,7 +38,7 @@ exports.browse_page = function(req, res) {
             "pages/browse_cards_page.ejs", 
             {
                 abbreviatedCards: abbreviatedCards.message,
-                appName: appName
+                APP_NAME: config.APP_NAME
             }
         );
     });
@@ -47,7 +47,7 @@ exports.browse_page = function(req, res) {
 exports.account_get = function (req, res) {
     res.render(
         "pages/account_page.ejs", 
-        {account_info: req.session.user, appName: appName}
+        {account_info: req.session.user, APP_NAME: config.APP_NAME}
     );
 };
 
