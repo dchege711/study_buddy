@@ -95,6 +95,7 @@ provideSessionToken = function(user, callBack) {
             var new_token = Token({
                 token_id: session_token, userIDInApp: user.userIDInApp,
                 username: user.username, email: user.email,
+                cardsAreByDefaultPrivate: user.cardsAreByDefaultPrivate,
                 user_reg_date: new Date(user.createdAt).toDateString()
             });
             new_token.save((error, saved_token) => {
@@ -124,8 +125,8 @@ sendAccountValidationURLToEmail = function(userDetails, callBack) {
         Email.sendEmail(
             {
                 to: userDetails.email,
-                subject: "Please Validate Your Study Buddy Account",
-                text: `Welcome to Study Buddy! Before you can log in, please click ` +
+                subject: `Please Validate Your ${config.APP_NAME} Account`,
+                text: `Welcome to ${config.APP_NAME}! Before you can log in, please click ` +
                     `on this link to validate your account.\n\n` + 
                     `${config.BASE_URL}/verify-account/${userDetails.account_validation_uri}` +
                     `\n\nAgain, glad to have you onboard!`
@@ -288,12 +289,12 @@ exports.registerUserAndPassword = function(payload, callBack) {
                                 Email.sendEmail(
                                     {
                                         to: existingUser.email,
-                                        subject: `Did you try to register for a new Study Buddy Account?`,
-                                        text: `Psst! Someone tried registering for a new Study Buddy ` +
+                                        subject: `Did you try to register for a new ${config.APP_NAME} Account?`,
+                                        text: `Psst! Someone tried registering for a new ${config.APP_NAME} ` +
                                             `account using your email address. If this was you, you ` +
                                             `already have an account. Your username is still ${existingUser.username}.` +
                                             ` \n\nForgot your password? Request a reset at ` +
-                                            `${config.BASE_URL}/reset-password.\n\nCheers,\nStudy Buddy by c13u`
+                                            `${config.BASE_URL}/reset-password.\n\nCheers,\n${config.APP_NAME}` 
                                     }, (email_confirmation) => {
                                         if (email_confirmation.success) {
                                             callBack(null, {
@@ -319,7 +320,7 @@ exports.registerUserAndPassword = function(payload, callBack) {
                                                 sendAccountValidationURLToEmail(savedUser, (email_confirmation) => {
                                                     // Overwrite the message on success
                                                     if (email_confirmation.success) {
-                                                        email_confirmation.message = `Welcome to Study Buddy! We've also sent a validation URL to ${savedUser.email}. Validate your account within 30 days.`;
+                                                        email_confirmation.message = `Welcome to ${config.APP_NAME}! We've also sent a validation URL to ${savedUser.email}. Validate your account within 30 days.`;
                                                     }
                                                     callBack(null, email_confirmation);
                                                 });
@@ -481,8 +482,8 @@ exports.sendResetLink = function(userIdentifier, callBack) {
                             // unwanted line breaks in the sent email.
                             Email.sendEmail({
                                 to: user.email,
-                                subject: "Study Buddy Password Reset",
-                                text: `To reset your Study Buddy password, ` + 
+                                subject: `${config.APP_NAME} Password Reset`,
+                                text: `To reset your ${config.APP_NAME} password, ` + 
                                     `click on this link:\n\n${config.BASE_URL}` + 
                                     `/reset-password-link/${reset_password_uri}` + 
                                     `\n\nThe link is only valid for 2 hours. If you did not ` +
@@ -580,8 +581,8 @@ exports.resetPassword = function(payload, callBack) {
                             } else {
                                 Email.sendEmail({
                                     to: user.email,
-                                    subject: "Study Buddy: Your Password Has Been Reset",
-                                    text: `Your Study Buddy password was reset on ${payload.reset_request_time}. ` +
+                                    subject: `${config.APP_NAME}: Your Password Has Been Reset`,
+                                    text: `Your ${config.APP_NAME} password was reset on ${payload.reset_request_time}. ` +
                                         `If this wasn't you, please request another password reset at ` +
                                         `${config.BASE_URL}/reset-password`
                                 },

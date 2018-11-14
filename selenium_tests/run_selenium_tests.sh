@@ -2,7 +2,7 @@
 
 # Clean up processes that run in the background
 function cleanup {
-    echo -e "\nClosing Study Buddy instance...\n"
+    echo -e "\nClosing the app instance...\n"
     pkill node ../server.js
 }
 

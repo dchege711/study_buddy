@@ -10,6 +10,8 @@ router.get("/home", requireLogIn, inAppController.home);
 
 router.get("/wiki", inAppController.wiki_page);
 
+router.get("/browse", inAppController.browse_page);
+
 router.get("/account", requireLogIn, inAppController.account_get);
 
 router.post("/read-metadata", requireLogIn, inAppController.read_metadata);
@@ -26,10 +28,16 @@ router.post("/delete-card", requireLogIn, inAppController.delete_card);
 
 router.post("/trash-card", requireLogIn, inAppController.trash_card);
 
+router.post("/duplicate-card", requireLogIn, inAppController.duplicateCard);
+
+router.post("/flag-card", inAppController.flagCard);
+
 router.post("/restore-from-trash", requireLogIn, inAppController.restore_from_trash);
 
 router.get("/account/download-user-data", requireLogIn, inAppController.download_user_data);
 
 router.post("/account/delete-account", requireLogIn, inAppController.delete_account);
+
+router.post("/account/update-settings", requireLogIn, inAppController.updateUserSettings);
 
 module.exports = router;

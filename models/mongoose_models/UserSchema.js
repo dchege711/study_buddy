@@ -29,12 +29,14 @@ var userSchema = new mongoose.Schema(
         reset_password_uri: String,
         reset_password_timestamp: Number,
         account_validation_uri: String,
-        account_is_valid: Boolean
+        account_is_valid: Boolean,
+        cardsAreByDefaultPrivate: {type: Boolean, default: true }
     },
     {
         timestamps: true,
         autoIndex: false,
-        collection: "study_buddy_users"
+        collection: "study_buddy_users",
+        strict: true
     }
 );
 

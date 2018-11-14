@@ -2,16 +2,12 @@
 <html>
 
     <head>
-        <title>Study Buddy</title>
+        <title><%= APP_NAME %>: Home</title>
         <% include ../partials/header.ejs %>
-        <script src="/static/AppUtilities.js"></script>
-        <script src="/static/MaxPriorityQueue.js"></script>
-        <script src="/static/CardsManager.js"></script>
+        <% include ../partials/syntax_highlighting_and_latex.ejs %>
+        <script type="text/javascript" src="/dist/CardsManager.bundle.min.js"></script>
+        <script type="text/javascript" src="/dist/CardTemplateUtilities.bundle.min.js"></script>
         <script src="/static/TernarySearchTrie.js"></script>
-        <script src="/static/showdown.min.js"></script>
-        <link rel="stylesheet" href="/stylesheets/themes/atom-one-light.css">
-        <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
-        <script src="/static/highlight.pack.js"></script>
         <script type="text/javascript">
 
             /**
@@ -30,140 +26,12 @@
             window.addEventListener("keydown", arrowKeysForNavigation);
 
         </script>
-
-        <style>
-
-            .switch {
-                position: relative;
-                display: inline-block;
-                width: 60px;
-                height: 34px;
-            }
-
-            .switch input {display:none;}
-
-            .slider {
-                position: absolute;
-                cursor: pointer;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: #ccc;
-                -webkit-transition: .4s;
-                transition: .4s;
-            }
-
-            .slider:before {
-                position: absolute;
-                content: "";
-                height: 26px;
-                width: 26px;
-                left: 4px;
-                bottom: 4px;
-                background-color: white;
-                -webkit-transition: .4s;
-                transition: .4s;
-            }
-
-            input:checked + .slider {
-                background-color: #2196F3;
-            }
-
-            input:focus + .slider {
-                box-shadow: 0 0 1px #2196F3;
-            }
-
-            input:checked + .slider:before {
-                -webkit-transform: translateX(26px);
-                -ms-transform: translateX(26px);
-                transform: translateX(26px);
-            }
-
-            /* Rounded sliders */
-            .slider.round {
-                border-radius: 34px;
-            }
-
-            .slider.round:before {
-                border-radius: 50%;
-            }
-
-            .slider.round::after {
-                position:relative;
-                right:70px;
-                content: "Review Mode"
-            }
-
-            /* Tooltip container */
-            .tooltip {
-                position: relative;
-                display: inline-block;
-            }
-
-            /* Tooltip text */
-            .tooltip .tooltiptext {
-                visibility: hidden;
-                background-color: black;
-                color: #fff;
-                text-align: center;
-                padding: 5px 0;
-                border-radius: 6px;
-                font-size: smaller;
-            
-                /* Position the tooltip text - see examples below! */
-                position: absolute;
-                z-index: 1;
-            }
-
-            #review_mode_tooltip {
-                width: 300px;
-                top: -5px;
-                right: 105%;
-            }
-
-            #tagging_system_tooltip {
-                width: 120%;
-                top: -50px;
-                left: 0%;
-            }
-
-            #formatting_help_tooltip {
-                width: 120%;
-                top: -50px;
-                right: 0%;
-            }
-
-            /* Show the tooltip text when you mouse over the tooltip container */
-            .tooltip:hover .tooltiptext {
-                visibility: visible;
-            }
-
-            #spoiler_box {
-                background: rgb(172, 172, 172);
-                cursor: pointer;
-                position: absolute;
-                z-index: 1;
-            }
-
-            #spoiler_box:hover {
-                opacity: 0;
-            }
-
-            #spoiler_box p {
-                font-size: larger;
-                text-align: center;
-                color: white;
-                padding: 10% 0 0 0;
-            }
-        
-        </style>
         
     </head>
 
-    <body onload="includeInAppButtons(); initializeSideBar(); initializeCards();">
+    <body onload="initializeSideBar(); initializeCards();">
 
-        <% include ../partials/navbar.ejs %>
+        <% include ../partials/logged_in_navbar.ejs %>
 
         <div id="main_div">
 
@@ -178,8 +46,8 @@
                 </div>
 
                 <label class="w3-right switch tooltip">
-                    <input type="checkbox" id="review_mode_toggle" onchange="toggleReviewMode();">
-                    <span class="slider round"></span>
+                    <input type="checkbox" id="reviewModeToggle" onchange="toggleOption('reviewModeToggle');">
+                    <span class="slider round" id="review_mode_label"></span>
                     <span class="tooltiptext" id="review_mode_tooltip">
                         After the urgency of a card has been modified, automatically 
                         save the current card and load the next card. 
@@ -224,117 +92,110 @@
 
 
         <script type="text/javascript">
-
-            /* The converter is used to turn the markdown in the cards into html. */
-            var converter = new showdown.Converter({
-                headerLevelStart: 4, literalMidWordUnderscores: true,
-                literalMidWordAsterisks: true, simpleLineBreaks: true,
-                emoji: true, backslashEscapesHTMLTags: true, tables: true,
-                parseImgDimensions: true, simplifiedAutoLink: true,
-                strikethrough: true, tasklists: true
-            });
             
             /* If a user is logged in, there'll be some metadata about them in 
              * Local Storage. 
              */
             const metadata = JSON.parse(localStorage.getItem("metadata"))[0];
+            const userSettings = AppUtilities.getAccountInfo();
+
+            // Maintain references to elements that get searched for often
+            const elementRefs = {
+                alreadySetTagsElement: document.getElementById("already_set_card_tags"),
+                cardDescriptionElement: document.getElementById("card_description"),
+                cardIsPublicToggleElement: document.getElementById("card_is_public_toggle"),
+                cardPopupElement: document.getElementById("card_popup_element"),
+                cardSearchInputElement: document.getElementById("card_search_input"),
+                cardSearchResultsElement: document.getElementById("card_search_results"),
+                cardTagInputElement: document.getElementById("card_tag_input"),
+                cardTemplateElement: document.getElementById("card_template"),
+                cardTitleElement: document.getElementById("card_title"),
+                cardUrgencyElement: document.getElementById("card_urgency"),
+                cardUrgencyNumberElement: document.getElementById("card_urgency_number"),
+                filterListElement: document.getElementById("filter_list"),
+                sideBarContentsElement: document.getElementById("side_bar_contents"),
+                spoilerElement: document.getElementById("spoiler"),
+                spoilerBoxElement: document.getElementById("spoiler_box"),
+                spoilerEndElement: document.getElementById("spoiler_end"),
+                tagsAutocompleteResultsElement: document.getElementById("tags_autocomplete_results"),
+                shareableLinkElement: document.getElementById("shareable_link")
+            };
             
-            /* Useful for storing the state of the Study Buddy app. Wrapped 
+            /* Useful for storing the state of the app. Wrapped 
              * inside an object so that I can know when global variables are
              * being used and when they're not.
              */
             var state = {
-                changed_items: new Set([]),
-                current_card_id: null,
-                current_user_id: metadata.createdById,
-                raw_description: null,
-                selected_tags: new Set([]),
-                tags_and_ids: metadata.node_information[0],
-                current_card_tags: new Set([]),
-                current_card_tags_have_changed: false,
-                post_url: null,
-                review_mode_on: false
+                changedItems: new Set([]),
+                currentCardID: null,
+                currentUserID: metadata.createdById,
+                rawDescription: null,
+                selectedTags: new Set([]),
+                tagsAndIDs: metadata.node_information[0],
+                currentCardTags: new Set([]),
+                currentCardTagsHaveChanged: false,
+                cardPostURL: null,
+                reviewModeToggle: false,
+                card_is_public_toggle: userSettings.cardsAreByDefaultPrivate
             }
 
-            if (!state.tags_and_ids) state.tags_and_ids = {};
+            if (!state.tagsAndIDs) state.tagsAndIDs = {};
             
-            var tags_trie = ternary_search_trie(Object.keys(state.tags_and_ids))
-            
-            var my_cards_manager = cards_manager(state.tags_and_ids, state.current_user_id);
-            
-            function includeInAppButtons() {
-                document.getElementById("logout_button").style.display = "inline";
-                document.getElementById("account_button").style.display = "inline";
-            }
+            var tags_trie = ternary_search_trie(Object.keys(state.tagsAndIDs))
+
+            let cardsManager = new CardsManager(state.tagsAndIDs, state.currentUserID);
 
             function initializeSideBar() {
-                var tags_in_decreasing_order = Object.keys(state.tags_and_ids);
-                tags_in_decreasing_order.sort(function (tag_a, tag_b) {
-                    var tag_a_importance = 0;
-                    var tag_b_importance = 0;
+                var tagsInDecreasingOrder = Object.keys(state.tagsAndIDs);
+                tagsInDecreasingOrder.sort(function (tagA, tagB) {
+                    var importanceTagA = 0;
+                    var importanceTagB = 0;
 
-                    Object.keys(state.tags_and_ids[tag_b]).forEach((card_id) => {
-                        tag_b_importance += state.tags_and_ids[tag_b][card_id]["urgency"]
+                    Object.keys(state.tagsAndIDs[tagB]).forEach((cardID) => {
+                        importanceTagB += state.tagsAndIDs[tagB][cardID]["urgency"]
                     });
 
-                    Object.keys(state.tags_and_ids[tag_a]).forEach((card_id) => {
-                        tag_a_importance += state.tags_and_ids[tag_a][card_id]["urgency"]
+                    Object.keys(state.tagsAndIDs[tagA]).forEach((cardID) => {
+                        importanceTagA += state.tagsAndIDs[tagA][cardID]["urgency"]
                     });
-                    return tag_b_importance - tag_a_importance;
+                    return importanceTagB - importanceTagA;
                 });
 
-                var tags_html = "";
-                tags_in_decreasing_order.forEach((tag) => {
+                let tagsHTML = "";
+                tagsInDecreasingOrder.forEach((tag) => {
                     let tag_prefix = "#";
                     if (tag.charAt(0) == "#") tag_prefix = "";
-                    tags_html += "<ul id='" + tag +
+                    tagsHTML += "<ul id='" + tag +
                         "' class='link' onclick='selectThisTag(`" + tag +
-                        "`);'> " + tag_prefix + tag + " (" + Object.keys(state.tags_and_ids[tag]).length +
+                        "`);'> " + tag_prefix + tag + " (" + Object.keys(state.tagsAndIDs[tag]).length +
                         ")</ul>";
                 });
                 
-                document.getElementById("side_bar_contents").innerHTML = tags_html;
+                elementRefs.sideBarContentsElement.innerHTML = tagsHTML;
             }
 
             function initializeCards() {
-                my_cards_manager.initialize(null, () => {
-                    my_cards_manager.next((card) => {
-                        renderCard(card);
-                    });
-                });
-            }
-
-            function fetchNextCard() {
-                my_cards_manager.next((card) => {
-                    if (card.title !== undefined) {
-                        renderCard(card);
-                    } else {
-                        displayPopUp("Out of cards!", 1500);
-                    } 
-                });
+                cardsManager
+                    .initializeFromTags(null)
+                    .then(() => { return cardsManager.next(); })
+                    .then((card) => { renderCard(card); })
+                    .catch((err) => { console.error(err); });
             }
 
             function fetchPreviousCard() {
-                my_cards_manager.previous((card) => {
-                    if (card.title !== undefined) {
-                        renderCard(card);
-                    } else {
-                        displayPopUp("Out of cards!", 1500);
-                    } 
-                });
+                cardsManager.previous()
+                    .then((card) => { renderCard(card); })
+                    .catch((err) => { console.error(err); });
+            }
+    
+            function fetchNextCard() {
+                cardsManager.next()
+                    .then((card) => { renderCard(card); })
+                    .catch((err) => { console.error(err); });
             }
 
-            function displayPopUp(text, timeout_ms) {
-                var popup = document.getElementById("card_popup_element");
-                popup.innerHTML = text;
-                popup.style.visibility = "visible";
-                window.setTimeout(() => {
-                    makeInvisible("card_popup_element")
-                }, timeout_ms);
-            }
-
-            function toggleReviewMode() {
-                state.review_mode_on = document.getElementById("review_mode_toggle").checked;
+            function toggleOption(element_id) {
+                state[element_id] = document.getElementById(element_id).checked;
             }
 
             function makeInvisible(element_id) {
@@ -342,10 +203,10 @@
             }
 
             function selectThisTag(tag) {
-                if (state.selected_tags.has(tag)) {
-                    state.selected_tags.delete(tag);
+                if (state.selectedTags.has(tag)) {
+                    state.selectedTags.delete(tag);
                 } else {
-                    state.selected_tags.add(tag);
+                    state.selectedTags.add(tag);
                 }                
                 document.getElementById(tag).classList.toggle("chosen");
             }
@@ -353,208 +214,159 @@
             function filterCards() {
                 
                 // I apologize for this embarassing line. :-(
-                var tags_to_use;
+                let tagsToUse;
 
                 // Communicate which cards are being displayed...
-                if (state.selected_tags.size == 0) {
-                    tags_to_use = null;
-                    document.getElementById("filter_list").innerHTML = "Now showing: all";
+                if (state.selectedTags.size == 0) {
+                    tagsToUse = null;
+                    elementRefs.filterListElement.innerHTML = "Now showing: all";
                 } else {
-                    tags_to_use = state.selected_tags;
-                    var status_message = "Now showing: ";
-                    status_message += Array.from(state.selected_tags).join(", ");
-                    document.getElementById("filter_list").innerHTML = status_message;
+                    tagsToUse = state.selectedTags;
+                    let statusMessage = "Now showing: ";
+                    statusMessage += Array.from(state.selectedTags).join(", ");
+                    elementRefs.filterListElement.innerHTML = statusMessage;
                 }
-                
-                // Update the cards being displayed
-                my_cards_manager.initialize(tags_to_use, () => {
-                    my_cards_manager.next((card) => {
-                        renderCard(card);
-                    });
 
-                    state.selected_tags.forEach((tag) => {
-                        document.getElementById(tag).classList.toggle("chosen");
+                // Update the cards being displayed
+                cardsManager
+                    .initializeFromTags(null)
+                    .then(() => { return cardsManager.next(); })
+                    .then((card) => { 
+                        renderCard(card);
+                        state.selectedTags.forEach((tag) => {
+                            document.getElementById(tag).classList.toggle("chosen");
+                        })
+                        state.selectedTags.clear();
                     })
-                    state.selected_tags.clear();
-                });
+                    .catch((err) => { console.error(err); });
             }
 
             function renderCard(card) {
 
-                state.current_card_tags.clear();
-                state.current_card_tags_have_changed = false;
-                state.changed_items = new Set([]);
+                if (!card) {
+                    CardTemplateUtilities.displayPopUp(
+                        "Out of cards!", 1500
+                    );
+                    return;
+                }
 
+                state.currentCardTags.clear();
+                state.currentCardTagsHaveChanged = false;
+                state.changedItems = new Set([]);
+
+                // Reset card contents
                 if (!card.description) card.description = "";
                 if (!card.tags) card.tags = "";
                 if (!card.title) card.title = "";
                 if (!card.urgency) card.urgency = 0;
 
-                if (!card.title) {
-                    displayNewCard();
-                    return;
-                }
-
                 window.addEventListener("keydown", arrowKeysForNavigation);
-                document.getElementById("card_title").value = card.title;
+                elementRefs.cardTitleElement.value = card.title;
                 
-                // Workaround for allowing users to omit extra escaping backslashes
-                // in their LaTEX. I can't afford to do store this string on the server.
-                var description_html = converter.makeHtml(
-                    String.raw`${card.description.replace(/\\/g, "\\\\")}`
-                );
-                
-                if (description_html.match(/\[spoiler\]/i)) {
-                    description_html = description_html.replace(
-                        /\[spoiler\]/i, "<span id='spoiler'>[spoiler]</span>"
-                    );
-                    description_html += `<span id="spoiler_end"></span>`;
-                }
-                
-                let card_description_element = document.getElementById("card_description");
-                card_description_element.innerHTML = description_html;
+                elementRefs.cardDescriptionElement.innerHTML = PrettifyCards.markdownToHTML(card.description);;
 
-                var tags_html = "";
-                var tags_array = card.tags.trim().split(" ");
-                for (let i = 0; i < tags_array.length; i++) {
-                    if (tags_array[i].length > 0) {
-                        tags_html += `<button id="card_tag_text_${tags_array[i]}" class="card_tag_button_text">${tags_array[i]}</button><button id="card_tag_remove_${tags_array[i]}" class="card_tag_button_remove" onclick="removeTagFromCard('${tags_array[i]}')"> <i class="fa fa-times fa-fw" aria-hidden="true"></i> </button>`;
-                        state.current_card_tags.add(tags_array[i]);
+                let tagsHTML = "";
+                var tagsArray = card.tags.trim().split(" ");
+                for (let i = 0; i < tagsArray.length; i++) {
+                    if (tagsArray[i].length > 0) {
+                        tagsHTML += `<button id="card_tag_text_${tagsArray[i]}" class="card_tag_button_text">${tagsArray[i]}</button><button id="card_tag_remove_${tagsArray[i]}" class="card_tag_button_remove" onclick="removeTagFromCard('${tagsArray[i]}')"> <i class="fa fa-times fa-fw" aria-hidden="true"></i> </button>`;
+                        state.currentCardTags.add(tagsArray[i]);
                     }
                 }
-                document.getElementById("already_set_card_tags").innerHTML = tags_html;
-                document.getElementById("card_urgency").value = card.urgency;
-                document.getElementById("card_urgency_number").innerText = card.urgency;
-                document.getElementById("card_description").removeAttribute("contenteditable");
-                document.getElementById("side_bar_contents").style.height = document.getElementById("card_template").style.height;
+                elementRefs.alreadySetTagsElement.innerHTML = tagsHTML;
+                elementRefs.cardUrgencyElement.value = card.urgency;
+                elementRefs.cardUrgencyNumberElement.innerText = card.urgency;
+                elementRefs.cardDescriptionElement.removeAttribute("contenteditable");
+                elementRefs.sideBarContentsElement.style.height = elementRefs.cardTemplateElement.style.height;
+                
+                elementRefs.cardIsPublicToggleElement.checked = card.isPublic;
+                state.cardIsPublicToggle = card.isPublic;
+                elementRefs.shareableLinkElement.innerText = `${document.location.origin}/browse/?cardID=${card._id}`;
 
                 // Reset the contents of the current_card variable
-                state.current_card_id = card._id;
-                state.post_url = "/update-card";
-                state.raw_description = card.description;
+                state.currentCardID = card._id;
+                state.cardPostURL = "/update-card";
+                state.rawDescription = card.description;
 
-                // hljs.configure({ useBR: true });
-                
-                let code_elements = document.querySelectorAll('pre code');
-                for (let i = 0; i < code_elements.length; i++) {
-                    hljs.highlightBlock(code_elements[i]);
-                }
+                PrettifyCards.addSyntaxHighlighting();
+                PrettifyCards.renderLatex(["card_description"]);
 
-                loadMathJAX();
-                syncSpoilerBox();
-            }
-            
-            /**
-             * @description Set the dimensions of the spoiler cover so that it
-             * hides the intended content.
-             */ 
-            function syncSpoilerBox() {
-                // These two elements exist whenever there is a spoiler. 
-                // We use them to determine the height of the obscuring cover.
-                let spoiler = document.getElementById("spoiler");
-                let spoiler_end = document.getElementById("spoiler_end");
-
-                if (spoiler && spoiler_end) {
-                    let spoiler_bbox = spoiler.getBoundingClientRect();
-                    let spoiler_end_bbox = spoiler_end.getBoundingClientRect();
-                    // Only the difference matters. No biggie that the coordinates are not absolute.
-                    // Reduce the width because the card_description HTMLElement is padded
-                    let spoiler_box_html = `
-                        <div id="spoiler_box" 
-                        style="height:${spoiler_end_bbox.bottom - spoiler_bbox.top}px; 
-                        width:${document.getElementById("card_description").getBoundingClientRect().width - 30}px" 
-                        onclick="makeInvisible('spoiler_box')">
-                        <p>Hover/Click to Reveal</p></div>
-                    `;
-                    console.log(spoiler_box_html);
-                    let existing_spoiler_cover = document.getElementById("spoiler_box");
-                    if (existing_spoiler_cover) {
-                        existing_spoiler_cover.innerHTML = spoiler_box_html;
-                    } else {
-                        spoiler.insertAdjacentHTML("beforebegin", spoiler_box_html);
-                    }
-                }
-            }
-            
-            /**
-             * @description Reload MathJAX to render new LaTEX
-             * http://docs.mathjax.org/en/latest/advanced/typeset.html
-             */
-            function loadMathJAX() {
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub, "card_description"]);
+                CardTemplateUtilities.syncSpoilerBox();
             }
 
             function displayRawCardDescription() {
-                var description_element = document.getElementById("card_description");
-                description_element.innerText = state.raw_description;
-                description_element.setAttribute("contenteditable", "true");
+                elementRefs.cardDescriptionElement.innerText = state.rawDescription;
+                elementRefs.cardDescriptionElement.setAttribute("contenteditable", "true");
                 window.removeEventListener("keydown", arrowKeysForNavigation);
             }
 
             function displayNewCard() {
-                document.getElementById("card_title").value = "";
-                document.getElementById("card_description").innerHTML = "";
-                document.getElementById("already_set_card_tags").innerHTML = "";
-                state.current_card_tags_have_changed = false;
+                elementRefs.cardTitleElement.value = "";
+                elementRefs.cardDescriptionElement.innerHTML = "";
+                elementRefs.alreadySetTagsElement.innerHTML = "";
+                elementRefs.cardIsPublicToggleElement.checked = userSettings.cardsAreByDefaultPrivate;
 
-                document.getElementById("card_urgency").value = 0;
-                document.getElementById("card_urgency_number").innerText = "0";
-                document.getElementById("card_description").setAttribute("contenteditable", "true");
-                document.getElementById("side_bar_contents").style.height = document.getElementById("card_template").style.height;
+                state.cardIsPublicToggle = userSettings.cardsAreByDefaultPrivate;
+                state.currentCardTagsHaveChanged = false;
+
+                elementRefs.cardUrgencyElement.value = 0;
+                elementRefs.cardUrgencyNumberElement.innerText = "0";
+                elementRefs.cardDescriptionElement.setAttribute("contenteditable", "true");
+                elementRefs.sideBarContentsElement.style.height = elementRefs.cardTemplateElement.style.height;
                 window.removeEventListener("keydown", arrowKeysForNavigation);
 
                 // Reset the contents of the current_card variable
-                state.changed_items.clear();
-                state.current_card_tags.clear();
-                state.current_card_id = null;
-                state.raw_description = "";
-                state.post_url = "/add-card";
+                state.changedItems.clear();
+                state.currentCardTags.clear();
+                state.currentCardID = null;
+                state.rawDescription = "";
+                state.cardPostURL = "/add-card";
             }
 
             function handleInputChange(element_id) {
                 window.removeEventListener("keydown", arrowKeysForNavigation);
-                state.changed_items.add(element_id);
+                state.changedItems.add(element_id);
             }
 
             function handleTagsInputChange(event) {
                 window.removeEventListener("keydown", arrowKeysForNavigation);
-                var tag_being_entered = document.getElementById("card_tag_input").value;
-                var key_press = event.key;
+                let tagBeingEntered = elementRefs.cardTagInputElement.value;
+                let keyPress = event.key;
                 // If whitespace was added, create the new tag if need be.
-                if (key_press === " " || key_press === "Enter" || key_press === "Tab") {
-                    updateTagsButtons(tag_being_entered.trim());
+                if (keyPress === " " || keyPress === "Enter" || keyPress === "Tab") {
+                    updateTagsButtons(tagBeingEntered.trim());
                 } else {
                     // Provide autocomplete results
-                    autocomplete_html = ""
-                    var matches = tags_trie.keys_with_prefix(tag_being_entered);
-                    var num_results_to_show = 5;
-                    if (matches.length < 5) num_results_to_show = matches.length;
+                    let autocompleteHTML = ""
+                    let matches = tags_trie.keys_with_prefix(tagBeingEntered);
+                    let numResultsToShow = 5;
+                    if (matches.length < 5) numResultsToShow = matches.length;
                     for (let i = 0; i < matches.length; i++) {
-                        autocomplete_html += `<button class="autocomplete_suggestion_button" onclick="updateTagsButtons('${matches[i]}');">${matches[i]}</button>`;
+                        autocompleteHTML += `<button class="autocomplete_suggestion_button" onclick="updateTagsButtons('${matches[i]}');">${matches[i]}</button>`;
                     }
-                    document.getElementById("tags_autocomplete_results").innerHTML = autocomplete_html;
+                    elementRefs.tagsAutocompleteResultsElement.innerHTML = autocompleteHTML;
                 }
                 
             }
 
             function updateTagsButtons(new_tag) {
-                if (!state.current_card_tags.has(new_tag)) {
-                    state.current_card_tags.add(new_tag);
-                    document.getElementById("tags_autocomplete_results").innerHTML = "";
-                    document.getElementById("already_set_card_tags").insertAdjacentHTML(
+                if (!state.currentCardTags.has(new_tag)) {
+                    state.currentCardTags.add(new_tag);
+                    elementRefs.tagsAutocompleteResultsElement.innerHTML = "";
+                    elementRefs.alreadySetTagsElement.insertAdjacentHTML(
                         "beforeend",
                         `<button id="card_tag_text_${new_tag}" class="card_tag_button_text">${new_tag}</button><button id="card_tag_remove_${new_tag}" class="card_tag_button_remove" onclick="removeTagFromCard('${new_tag}')"> <i class="fa fa-times fa-fw" aria-hidden="true"></i> </button>`
                     );
-                    document.getElementById("card_tag_input").value = "";
-                    state.current_card_tags_have_changed = true;
+                    elementRefs.cardTagInputElement.value = "";
+                    state.currentCardTagsHaveChanged = true;
                 }
             }
 
             function removeTagFromCard(tag) {
                 document.getElementById(`card_tag_text_${tag}`).remove();
                 document.getElementById(`card_tag_remove_${tag}`).remove();
-                state.current_card_tags.delete(tag);
-                state.current_card_tags_have_changed = true;
+                state.currentCardTags.delete(tag);
+                state.currentCardTagsHaveChanged = true;
             }
 
             function insertTabsIfNecessary(event) {
@@ -566,96 +378,97 @@
 
             function handleCardUrgencyChange() {
                 handleInputChange("card_urgency");
-                if (state.review_mode_on) {
+                if (state.reviewModeToggle) {
                     saveCard(false);
                     fetchNextCard();
                 } else {
-                    document.getElementById("card_urgency_number").innerText = document.getElementById("card_urgency").value;
+                    elementRefs.cardUrgencyNumberElement.innerText = elementRefs.cardUrgencyElement.value;
                 }
             }
 
-            function saveCard(render_saved_card=true) {
-                var payload = {};
-                state.changed_items.forEach((element_id) => {
+            function saveCard(renderSavedCard=true) {
+                let payload = {};
+                state.changedItems.forEach((element_id) => {
                     payload[element_id.split("card_")[1]] = document.getElementById(element_id).value;
                 });
-                if (state.current_card_id) {
-                    payload._id = state.current_card_id;
+                if (state.currentCardID) {
+                    payload._id = state.currentCardID;
                 }
 
-                if (state.changed_items.has("card_description")) {
-                    payload.description = String.raw`${document.getElementById("card_description").innerText}`;
+                if (state.changedItems.has("card_description")) {
+                    payload.description = String.raw`${elementRefs.cardDescriptionElement.innerText}`;
                 }
 
-                payload.createdById = state.current_user_id;
-                if (state.current_card_tags_have_changed) {
-                    payload.tags = Array.from(state.current_card_tags).join(" ");
+                payload.createdById = state.currentUserID;
+                if (state.currentCardTagsHaveChanged) {
+                    payload.tags = Array.from(state.currentCardTags).join(" ");
                 }
+                payload.isPublic = state.card_is_public_toggle;
                 
                 // If the tags or urgency has been changed, update the sidebar to reflect current info
-                var rerender_sidebar = state.current_card_tags_have_changed || state.changed_items.has("card_urgency");
-                
-                sendHTTPRequest("POST", state.post_url, payload, (response) => {
-                    var saved_card = response.message;
-                    my_cards_manager.update_card(saved_card);
-                    displayPopUp("Saved!", 1000);
-                    if (render_saved_card) renderCard(saved_card);
+                let rerenderSideBar = state.currentCardTagsHaveChanged || state.changedItems.has("card_urgency");
 
-                    if (rerender_sidebar) {
-                        saved_card.tags.split(" ").forEach(tag => {
-                            if (tag !== "") {
-                                tag = tag.trim();
-                                if (!state.tags_and_ids.hasOwnProperty(tag)) {
-                                    state.tags_and_ids[tag] = {};
+                cardsManager
+                    .saveCard(payload, state.cardPostURL)
+                    .then((savedCard) => {
+                        CardTemplateUtilities.displayPopUp("Card saved!", 1000);
+                        if (renderSavedCard) renderCard(savedCard);
+                        if (rerenderSideBar) {
+                            savedCard.tags.split(" ").forEach(tag => {
+                                if (tag !== "") {
+                                    tag = tag.trim();
+                                    if (!state.tagsAndIDs.hasOwnProperty(tag)) {
+                                        state.tagsAndIDs[tag] = {};
+                                    }
+                                    state.tagsAndIDs[tag][savedCard._id] = {urgency: savedCard.urgency};
                                 }
-                                state.tags_and_ids[tag][saved_card._id] = {urgency: saved_card.urgency};
-                            }
-                        });
-                        initializeSideBar();
-                    }
-                });
+                            });
+                            initializeSideBar();
+                        }
+                    })
 
             }
             
             function moveCardToTrash() {
                 // Remove the card from the ones that get displayed
-                var removed_card_id = my_cards_manager.remove_card(state.current_card_id);
-                if (removed_card_id === state.current_card_id) {
+                var removed_card_id = cardsManager.removeCard(state.currentCardID);
+                if (removed_card_id === state.currentCardID) {
                     // Move on to the next card in the PQ
-                    if (my_cards_manager.num_next() > 0) {
+                    if (cardsManager.numNext() > 0) {
                         fetchNextCard();
-                    } else if (my_cards_manager.num_prev() > 0) {
+                    } else if (cardsManager.numPrev() > 0) {
                         fetchPreviousCard();
                     } else {
                         displayNewCard();
                     }
 
                     // Request the server to trash the card
-                    sendHTTPRequest("POST", "/trash-card", 
+                    AppUtilities.sendHTTPRequest("POST", "/trash-card", 
                         {
-                            _id: removed_card_id, createdById: state.current_user_id
-                        }, 
-                        (trash_confirmation) => {
-                            displayPopUp(trash_confirmation.message, 10000);
-                    });
+                            _id: removed_card_id, createdById: state.currentUserID
+                        })
+                        .then((trash_confirmation) => {
+                            CardTemplateUtilities.displayPopUp(trash_confirmation.message, 10000);
+                        })
+                        .catch((err) => { console.error(err); });
 
                 }
             }
 
             function restoreFromTrash(card_to_restore_id, card_to_restore_urgency) {
-                sendHTTPRequest(
+                AppUtilities.sendHTTPRequest(
                     "POST", "/restore-from-trash", 
                     {
-                        createdById: state.current_user_id,
+                        createdById: state.currentUserID,
                         _id: card_to_restore_id,
-                    },
-                    (response) => {
+                    })
+                    .then((response) => {
                         if (response.message === card_to_restore_id) {
-                            my_cards_manager.insert_card(card_to_restore_id, card_to_restore_urgency);
+                            cardsManager.insertCard(card_to_restore_id, card_to_restore_urgency);
                             fetchPreviousCard();
                         }
-                    }
-                );
+                    })
+                    .catch((err) => { console.error(err); });
             }
             
             /*
@@ -665,10 +478,10 @@
              */
             function searchCards(event) {
                 window.removeEventListener("keydown", arrowKeysForNavigation);
-                var key_press = event.key;
-                if (key_press === " " || key_press === "Enter") {
-                    var query_string = document.getElementById("card_search_input").value.trim();
-                    if (key_press === " ") limit = 7;
+                var keyPress = event.key;
+                if (keyPress === " " || keyPress === "Enter") {
+                    var query_string = elementRefs.cardSearchInputElement.value.trim();
+                    if (keyPress === " ") limit = 7;
                     else limit = Infinity;
                     if (query_string !== "") {
                         sendHTTPRequest(
@@ -680,16 +493,16 @@
                             (response) => {
                                 if (response.success) {
                                     var search_results = response.message;
-                                    if (key_press === " ") {
+                                    if (keyPress === " ") {
                                         var search_results_html = "";
                                         for (let i = 0; i < search_results.length; i++) {
                                             search_results_html += `
                                                 <ul onclick='reInitializeCards([${JSON.stringify(search_results[i])}]);'>
                                                 ${search_results[i].title}</ul>`;
                                         }
-                                        document.getElementById("card_search_results").innerHTML = search_results_html;
+                                        elementRefs.cardSearchResultsElement.innerHTML = search_results_html;
                                     } else {
-                                        document.getElementById("card_search_results").innerHTML = "";
+                                        elementRefs.cardSearchResultsElement.innerHTML = "";
                                         reInitializeCards(search_results);
                                     }    
                                 }
@@ -705,15 +518,11 @@
              * keys `_id`, and `urgency`
              */  
             function reInitializeCards(abbreviated_cards) {
-                document.getElementById("card_search_results").innerHTML = "";
-                my_cards_manager.initialize_from_minicards(
-                    abbreviated_cards, 
-                    () => {
-                        my_cards_manager.next((card) => {
-                            renderCard(card);
-                        });
-                    }
-                );
+                elementRefs.cardSearchResultsElement.innerHTML = "";
+                cardsManager.initializeFromMinicards(abbreviated_cards)
+                    .then(() => { return cardsManager.next(); })
+                    .then((card) => { renderCard(card); })
+                    .catch((err) => { console.error(err); });
             }
 
         </script>

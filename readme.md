@@ -1,4 +1,6 @@
-# Study Buddy by c13u
+# Flashcards by c13u
+
+[![Build Status](https://travis-ci.com/dchege711/study_buddy.svg?branch=public_links_to_cards)](https://travis-ci.com/dchege711/study_buddy)
 
 The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
 
@@ -56,6 +58,25 @@ The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
 
 :soon: Read about [building a user base](https://blog.inkdrop.info/how-ive-attracted-the-first-500-paid-users-for-my-saas-that-costs-5-mo-7a5b94b8e820)
 
+### Support Public and Sharable Cards
+
+Sub-objectives include:
+
+* Allow users to toggle a card as public
+  * (Done) Provide the option within the home page
+  * (Done) Allow them to set their default settings public/private
+  * (Done) Add the relevant fields in the database
+  * Deleted cards should be taken off the public collection
+
+* Allow users to share links to cards/collections
+  * (Done) Support Ctrl-C for a specific card's link
+  * Support Ctrl-C for cards bearing given tags (and a convenient method for doing so)
+
+* Add functionality to the browse page
+  * (Done) Provide an endpoint that allows unauthenticated searches for public cards
+
+* Update the Wiki Page on what public/private means
+
 ### Add a Test Suite for Continuous Testing
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
@@ -104,7 +125,7 @@ Using Gmail is great for testing, but Gmail restricts me from autheticating from
 
 <sub><sup>[:arrow_up: Back to top](#tasks)</sup></sub>
 
-I think the barebones for the Study Buddy Account page are:
+I think the barebones for the Flashcards by c13u Account page are:
 
 * Being able to download one's data. (Implemented)
 * Being able to delete one's account. (Implemented)
@@ -135,7 +156,7 @@ Two immediate concerns come to mind:
 
 I need a tags convention. I chose white-space delimited tags. For instance, multiple card tags would be entered as follows: `string_processing algorithms dynamic_programming`.
 
-I currently have 100 cards and 63 unique tags. Ideally, I want to have as many cards as I want and the fewest tags possible while making sure that the tags are descriptive. I can't afford to have near tags such as `searching` and `search` at the same time. Who knows if 3 weeks from now I'll start tagging cards using `information_retrieval` instead of `search`. There are three levels at which I can approach this. Level 1 is the least sophisticated while Level 3 is the most sophisticated. I'll start by implementing Level 1. If Level 1 isn't satisfactory (based on how I use Study Buddy), I'll implement Level 2, and maybe even Level 3.
+I currently have 100 cards and 63 unique tags. Ideally, I want to have as many cards as I want and the fewest tags possible while making sure that the tags are descriptive. I can't afford to have near tags such as `searching` and `search` at the same time. Who knows if 3 weeks from now I'll start tagging cards using `information_retrieval` instead of `search`. There are three levels at which I can approach this. Level 1 is the least sophisticated while Level 3 is the most sophisticated. I'll start by implementing Level 1. If Level 1 isn't satisfactory (based on how I use Flashcards by c13u), I'll implement Level 2, and maybe even Level 3.
 
 #### Level 1 (Implemented)
 
@@ -185,11 +206,11 @@ I found CrackStation's piece on [salted password hashing](https://crackstation.n
 
 When someone tries registering for a new account with a used email address, I ask them to check the email address for a confirmation email. However, the email that I sent tells the email address owner that someone tried registering for an account using their email, and suggests a password reset since if the person who tried to register is legitimate, then they'd benefit from setting a new password. If a new user submits a username that's already in use, I let them know that the username is already in use - something had to give. With sufficient patience, it's possible to enumerate valid usernames, but at least usernames don't have to be obviously linked to a specific person. If need be, I could set up a CAPTCHA before revealing that a username is already taken to slow down enumeration of usernames.
 
-Once an account is registered, the user needs to click on a validation link sent to the submitted email. ~~The user cannot log into Study Buddy before the email address is verified. I'll be (hopefully) short on space, so any unvalidated accounts older than 30 days will get deleted from the database.~~ I observed a high bounce rate AND few signups. I'll allow accounts with unvalidated email addresses to sign in for at most 30 days.
+Once an account is registered, the user needs to click on a validation link sent to the submitted email. ~~The user cannot log into Flashcards by c13u before the email address is verified. I'll be (hopefully) short on space, so any unvalidated accounts older than 30 days will get deleted from the database.~~ I observed a high bounce rate AND few signups. I'll allow accounts with unvalidated email addresses to sign in for at most 30 days.
 
-Logging in should be as painless as possible. Since the usernames only contain `[_\-A-Za-z0-9]+`, I can infer whether the submitted string was an email address or a username, and authenticate accordingly. If the username/email/password is incorrect, I send a generic `Invalid username/email or password` message without disclosing which is incorrect. Again, it's possible to enumerate usernames, so this is not entirely foolproof. If the credentials provided were correct ~~but the email account has not been verified, I resend a validation URL to their email, and request them to first validate their account. Otherwise,~~ I log them in to Study Buddy.
+Logging in should be as painless as possible. Since the usernames only contain `[_\-A-Za-z0-9]+`, I can infer whether the submitted string was an email address or a username, and authenticate accordingly. If the username/email/password is incorrect, I send a generic `Invalid username/email or password` message without disclosing which is incorrect. Again, it's possible to enumerate usernames, so this is not entirely foolproof. If the credentials provided were correct ~~but the email account has not been verified, I resend a validation URL to their email, and request them to first validate their account. Otherwise,~~ I log them in to Flashcards by c13u.
 
-Users can reset their passwords in case they forget them. First, the user submits the email address associated with their Study Buddy account. If the account exists, I send an email containing a password reset link that is valid for 2 hours, or until it's used, whichever comes earlier.
+Users can reset their passwords in case they forget them. First, the user submits the email address associated with their Flashcards by c13u account. If the account exists, I send an email containing a password reset link that is valid for 2 hours, or until it's used, whichever comes earlier.
 
 ### Make card navigation more user-friendly
 
@@ -233,7 +254,7 @@ I found the [highlight.js](https://highlightjs.org/) library useful for syntax h
 
 [MathJAX](https://www.mathjax.org/) renders my LaTEX. At first I had problems getting LaTEX to render properly, but I realized that by default, MathJAX expects LaTEX to be already on the DOM. I dug through its documentation and I found out that MathJAX allows manual reloads. I therefore added a function that requests MathJAX to re-render the contents of the card template every time I load a different card.
 
-Since I'm targeting users that store somewhat detailed flashcards, I felt that Markdown (in addition to LaTEX and syntax highlighting) will prove more useful. Manually converting markdown to HTML is a project by itself. Since it's not the main purpose of Study Buddy, I was happy to import [Showdown](https://github.com/showdownjs/showdown). The library looks mature and the documentation is sound.
+Since I'm targeting users that store somewhat detailed flashcards, I felt that Markdown (in addition to LaTEX and syntax highlighting) will prove more useful. Manually converting markdown to HTML is a project by itself. Since it's not the main purpose of Flashcards by c13u, I was happy to import [Showdown](https://github.com/showdownjs/showdown). The library looks mature and the documentation is sound.
 
 I've also added support for one spoiler per card. The format is:
 

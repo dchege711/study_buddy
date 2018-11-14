@@ -2,9 +2,14 @@ var CardsDB = require("../models/CardsMongoDB.js");
 var MetadataDB = require("../models/MetadataMongoDB.js");
 var controller_utils = require("./ControllerUtilities.js");
 var login_utils = require("../models/LogInUtilities.js");
+const config = require("../config.js");
 
 var convertObjectToResponse = controller_utils.convertObjectToResponse;
 var deleteTempFile = controller_utils.deleteTempFile;
+
+const defaultTemplateObject = {
+    APP_NAME: config.APP_NAME, BASE_URL: config.BASE_URL
+};
 
 exports.read_card = function (req, res) {
     CardsDB.read(req.body, function (card) {
@@ -13,15 +18,37 @@ exports.read_card = function (req, res) {
 };
 
 exports.home = function (req, res) {
-    res.render("pages/home.ejs");
+    res.render("pages/home.ejs", defaultTemplateObject);
 };
 
 exports.wiki_page = function (req, res) {
-    res.render("pages/wiki_page.ejs");
+    res.render("pages/wiki_page.ejs", defaultTemplateObject);
+};
+
+exports.read_public_card = function (req, res) {
+    CardsDB
+        .readPublicCard(req.body)
+        .then((matchingCard) => { res.json(matchingCard); })
+        .catch((err) => {convertObjectToResponse(err, null, res); })
+};
+
+exports.browse_page = function(req, res) {
+    CardsDB.publicSearch(req.query, function(abbreviatedCards) {
+        res.render(
+            "pages/browse_cards_page.ejs", 
+            {
+                abbreviatedCards: abbreviatedCards.message,
+                APP_NAME: config.APP_NAME
+            }
+        );
+    });
 };
 
 exports.account_get = function (req, res) {
-    res.render("pages/account_page.ejs", {account_info: req.session.user});
+    res.render(
+        "pages/account_page.ejs", 
+        {account_info: req.session.user, APP_NAME: config.APP_NAME}
+    );
 };
 
 exports.read_metadata = function (req, res) {
@@ -37,9 +64,10 @@ exports.tags = function (req, res) {
 };
 
 exports.add_card = function (req, res) {
-    CardsDB.create(req.body, function (confirmation) {
-        res.json(confirmation);
-    });
+    CardsDB
+        .create(req.body)
+        .then((confirmation) => { res.json(confirmation); })
+        .catch((err) => { convertObjectToResponse(err, null, res); });
 };
 
 exports.search_cards = function (req, res) {
@@ -100,4 +128,27 @@ exports.delete_account = function(req, res) {
             }
         }
     );
+};
+
+exports.updateUserSettings = function(req, res) {
+    MetadataDB
+        .updateUserSettings(req.body)
+        .then((confirmation) => { res.json(confirmation); })
+        .catch((err) => { convertObjectToResponse(err, null, res); });
+};
+
+exports.duplicateCard = function(req, res) {
+    let duplicateCardArgs = req.body;
+    duplicateCardArgs.userIDInApp = req.session.user.userIDInApp;
+    CardsDB
+        .duplicateCard(duplicateCardArgs)
+        .then((confirmation) => { res.json(confirmation); })
+        .catch((err) => { convertObjectToResponse(err, null, res); });
+};
+
+exports.flagCard = function(req, res) {
+    CardsDB
+        .flagCard(req.body)
+        .then((confirmation) => { res.json(confirmation); })
+        .catch((err) => { convertObjectToResponse(err, null, res); });
 };

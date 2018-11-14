@@ -1,6 +1,6 @@
 /**
- * @description Set up the connection that will be used across
- * Study Buddy. There'a a nice tutorial at: 
+ * @description Set up the connection that will be used across the app. 
+ * There's a nice tutorial at: 
  * https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/mongoose
  */
 
@@ -8,7 +8,7 @@ var mongoose = require("mongoose");
 var config = require('../config');
 
 // Already 5 by default, but I might need to increase it one day...
-mongoose.connect(config.MONGO_URI, {poolSize: 12});
+mongoose.connect(config.MONGO_URI, {poolSize: 12, useNewUrlParser: true});
 
 // Get Mongoose to use the global promise library.
 mongoose.Promise = global.Promise;

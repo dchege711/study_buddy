@@ -1,3 +1,6 @@
+"use strict";
+
+const User = require("./mongoose_models/UserSchema.js");
 var Metadata = require('./mongoose_models/MetadataCardSchema');
 var Card = require('./mongoose_models/CardSchema.js');
 var fs = require("fs");
@@ -137,6 +140,14 @@ exports.readTags = function(payload, callBack) {
  * `internal_error` and `message` as keys.
  */
 exports.update = function (savedCards, callBack) {
+    /*
+     * How many cards before we need a new metadata JSON?
+     * 
+     * (400 + 150 * num_id_metadata) * 5 bytes/char <= 16MB
+     * num_id_metadata <= 21330. So let's say 15,000 cards max
+     * 
+     * Will that ever happen, probably not!
+     */
     if (savedCards[0].metadataIndex === undefined) {
         savedCards[0].metadataIndex = 0;
     }
@@ -256,8 +267,8 @@ exports.send_to_trash = function (payload, callBack) {
                             });
                         } else {
 
-                            metadataStats = metadataDoc.stats[0];
-                            metadataNodeInfo = metadataDoc.node_information[0];
+                            let metadataStats = metadataDoc.stats[0];
+                            let metadataNodeInfo = metadataDoc.node_information[0];
                             var trashed_card_id = card_JSON._id;
 
                             // Remove the card from the lists that the user previews from
@@ -519,8 +530,8 @@ function updateMetadataWithCardDetails(savedCard, metadataDoc, callBack) {
         if (debug) console.log("Created new nodes item for " + savedCard.title);
     }
 
-    metadataStats = metadataDoc.stats[0];
-    metadataNodeInfo = metadataDoc.node_information[0];
+    let metadataStats = metadataDoc.stats[0];
+    let metadataNodeInfo = metadataDoc.node_information[0];
 
     // Save this card in the stats field where it only appears once
     if (metadataStats[cardID] === undefined) {
@@ -582,3 +593,43 @@ function updateMetadataWithCardDetails(savedCard, metadataDoc, callBack) {
     callBack();
 }
 
+/**
+ * @description Update the settings of the given user.
+ * @returns {Promise}
+ */
+exports.updateUserSettings = function(newUserSettings) {
+    let userIDInApp = newUserSettings.userIDInApp;
+    delete newUserSettings.userIDInApp;
+
+    return new Promise(function(resolve, reject) {
+        User
+            .findOne({userIDInApp: userIDInApp})
+            .exec()
+            .then((existingUser) => {
+                if (!existingUser) {
+                    resolve({
+                        message: "No user found. User settings not updated!",
+                        success: false
+                    });
+                    return;
+                }
+                let keys = Object.keys(newUserSettings);
+                for (let i = 0; i < keys.length; i++) {
+                    // Only add fields that we've already defined
+                    if (existingUser[keys[i]] != undefined) {
+                        existingUser[keys[i]] = newUserSettings[keys[i]];
+                    }
+                }
+                return existingUser.save();
+            })
+            .then((_) => {
+                resolve({
+                    message: "User settings updated!", success: true
+                });
+            })
+            .catch((err) => {
+                console.error(err);
+                reject({message: "Internal Server Error", success: false, status: 500});
+            })
+    });
+}

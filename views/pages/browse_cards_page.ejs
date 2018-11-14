@@ -1,0 +1,206 @@
+<!DOCTYPE <!DOCTYPE html>
+<html>
+    <head>
+        <% include ../partials/header.ejs %>
+        <title><%= APP_NAME %>: Browse/Search</title>
+        <script type="text/javascript" src="/dist/CardsManager.bundle.min.js"></script>
+        <script type="text/javascript" src="/dist/CardTemplateUtilities.bundle.min.js"></script>
+        <% include ../partials/syntax_highlighting_and_latex.ejs %>
+
+        <style>
+            .flexbox {
+                display: flex;
+                flex-flow: row wrap;
+                align-items: stretch;
+            }
+
+            div#card_container_holder {
+                z-index: 3; /* On top of everything else */
+                position: absolute;
+                display: block;
+                min-width: 80%;
+                margin-left: 10%;
+                margin-right: 10%;
+                top: 30%;
+                visibility: hidden;
+            }
+
+            div.search-result {
+                cursor: pointer;
+            }
+
+        </style>
+    </head>
+
+    <body>
+        <% include ../partials/navbar.ejs %>
+
+        <div id="main_div">
+            <div class="w3-container" id="search_div">
+
+                <form method="GET">
+                    <div class="dropdown w3-threequarter">
+                        <input type="text" id="search_input" placeholder="Search for cards, e.g. dynamic programming" 
+                            onkeyup="handleSearchInputChange(event);" class="w3-input dropbtn" name="queryString" />
+                        <div class="dropdown-content" id="search_autocomplete_results"></div>
+                    </div>
+                    <input type="submit" class="w3-quarter w3-btn w3-blue" value="Search for Cards"></button>
+
+                </form>
+
+            </div>
+
+            <div class="w3-container" id="temp_container">
+
+                <div class="w3-container">
+
+                    <% include ../partials/sidebar_template.ejs %>
+
+                    <div class="w3-container w3-threequarter w3-right flexbox" id="search_results">
+                        <% if (abbreviatedCards.length === 0) { %>
+                            <div class="w3-container">
+                                <p>No cards found.</p>
+                            </div>
+                        <% } else { %>
+                            <% for (let i = 0; i < abbreviatedCards.length; i++) { %>
+                                <div class="w3-card-4 w3-padding-small w3-margin search-result" onclick="displayFullCard('<%= abbreviatedCards[i]._id %>')">
+                                    <header class="w3-container w3-blue"><h4><%= abbreviatedCards[i].title %></h4></header>
+                                    <div class="w3-container"><p><strong>Tags: </strong><%= abbreviatedCards[i].tags %></p></div>
+                                </div>
+                            <% } %>
+                        <% } %>
+                    </div>
+                </div>
+
+                <div id="card_container_holder">
+                    <% include ../partials/search_result_card_template.ejs %>
+                </div>
+
+            </div>
+
+        </div>
+
+    </body>
+
+    <script type="text/javascript">
+
+        let cardsManager = null;
+
+        let state = {
+            currentCardID: null
+        }
+
+        const USER_INFO = AppUtilities.getAccountInfo();
+
+        const elementRefs = {
+            searchInputElement: document.getElementById("search_input"),
+            cardContainerHolderElement: document.getElementById("card_container_holder"),
+            cardTitleElement: document.getElementById("card_title"),
+            cardDescriptionElement: document.getElementById("card_description"),
+            cardTagsElement: document.getElementById("card_tags"),
+            cardPopularityElement: document.getElementById("card_popularity")
+
+        };
+    
+        function handleSearchInputChange() {
+            state.queryString = elementRefs.searchInputElement.value;
+        }
+
+        function displayFullCard(cardID) {
+            elementRefs.cardContainerHolderElement.style.visibility = "visible";
+            cardsManager = new CardsManager(null, null);
+            cardsManager
+                .initializeFromMinicards([{_id: cardID, urgency: 1}])
+                .then(() => { 
+                    cardsManager
+                        .next()
+                        .then((card) => { renderCard(card); })
+                        .catch((err) => { console.error(err); });
+                })
+                .catch((err) => { console.error(err); });
+        }
+
+        function fetchPreviousCard() {
+            cardsManager.previous()
+                .then((card) => { renderCard(card); })
+                .catch((err) => { console.error(err); });
+        }
+
+        function fetchNextCard() {
+            cardsManager.next()
+                .then((card) => { renderCard(card); })
+                .catch((err) => { console.error(err); });
+        }
+
+        function makeInvisible(elementID) {
+            CardTemplateUtilities.makeInvisible(elementID);
+        }
+
+        function flagCard(reason) {
+            let flagObject = { cardID: state.currentCardID };
+            flagObject[reason] = true;
+            AppUtilities
+                .sendHTTPRequest("POST", "/flag-card", flagObject)
+                .then((confirmation) => {
+                    CardTemplateUtilities.displayPopUp(
+                        confirmation.message, 10000
+                    );
+                })
+                .catch((err) => { console.error(err); });
+        }
+
+        function copyCardToOwnCollection() {
+            if (USER_INFO === null) {
+                if (window.confirm("No account found. Would you like to go to the login page first?")) {
+                    window.location = "/login";
+                }
+                return;
+            }
+            AppUtilities
+                .sendHTTPRequest(
+                    "POST", "/duplicate-card", 
+                    { 
+                        cardID: state.currentCardID,
+                        newCardIsPrivate: USER_INFO.cardsAreByDefaultPrivate
+                    })
+                .then((confirmation) => {
+                    let ownCard = confirmation.message;
+                    CardTemplateUtilities.displayPopUp(
+                        `Added ${ownCard.title} to your collection!`, 1000
+                    );
+                    localStorage.setItem(ownCard._id, JSON.stringify(ownCard));
+                })
+                .catch((err) => { console.error(err); });
+        }
+
+        function renderCard(card) {
+            
+            if (!card) {
+                CardTemplateUtilities.displayPopUp("Out of cards!", 1500);
+                return;
+            }
+    
+            elementRefs.cardTitleElement.innerHTML = card.title;
+            elementRefs.cardDescriptionElement.innerHTML = PrettifyCards.markdownToHTML(card.description);
+        
+            let tags_html = "";
+            let tags_array = card.tags.trim().split(" ");
+            for (let i = 0; i < tags_array.length; i++) {
+                if (tags_array[i].length > 0) {
+                    tags_html += `<button id="card_tag_text_${tags_array[i]}" class="card_tag_button_text">${tags_array[i]}</button>`;
+                }
+            }
+            elementRefs.cardTagsElement.innerHTML = tags_html;
+            elementRefs.cardPopularityElement.value = card.urgency;
+            state.currentCardID = card._id;
+        
+            PrettifyCards.addSyntaxHighlighting();
+            PrettifyCards.renderLatex(["card_description"]);
+
+            CardTemplateUtilities.syncSpoilerBox();
+    
+        };
+
+    </script>
+
+</html>

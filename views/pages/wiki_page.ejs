@@ -1,6 +1,6 @@
 <!--
-    Contains information that is helpful to new Study Buddy users. Explains the 
-    features and how to make the most out of Study Buddy
+    Contains information that is helpful to new users. Explains the 
+    features and how to make the most out of the app.
 -->
 
 <!DOCTYPE html>
@@ -8,11 +8,8 @@
 <html>
 
     <head>
-        <title>Study Buddy Wiki</title>
-        <link rel="stylesheet" href="/stylesheets/themes/atom-one-light.css">
-        <script src="/static/highlight.pack.js"></script>
-        <script src="/static/showdown.min.js"></script>
-        <script src="/static/AppUtilities.js"></script>
+        <title><%= APP_NAME %>: Wiki</title>
+        <% include ../partials/syntax_highlighting_and_latex.ejs %>
         <script type="text/x-mathjax-config">
             MathJax.Hub.Config({
               tex2jax: {
@@ -20,8 +17,6 @@
               }
             });
           </script>
-          <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
-
         <% include ../partials/header.ejs %>
 
         <style>
@@ -70,6 +65,7 @@
                             <li><a href="#formatting">Formatting Cards</a></li>
                             <li><a href="#tagging_system">The Tagging and Urgency System</a></li>
                             <li><a href="#review_mode">Review Mode</a></li>
+                            <li><a href="#public_cards">Public vs. Private Cards</a></li>
                         </ol>
     
                     </div>
@@ -84,8 +80,7 @@
                     </h3>
 
                     <p>
-                        Study Buddy flashcards support LaTeX, Markdown and syntax 
-                        highlighting.
+                        <%= APP_NAME %> supports LaTeX, Markdown and syntax highlighting.
 
                         <table class="w3-table-all">
                             <tr>
@@ -165,11 +160,11 @@
                     </h3>
 
                     <p>
-                        Study Buddy categorizes the cards using the tags provided. When 
+                        <%= APP_NAME %> categorizes the cards using the tags provided. When 
                         displaying a set of cards, the cards with higher urgency values are 
                         shown first.
                         <br><br>
-                        Tags are case-sensitive. When adding tags to a card, Study Buddy 
+                        Tags are case-sensitive. When adding tags to a card, <%= APP_NAME %> 
                         offers an auto-complete feature in order to reduce the number of near-duplicate tags like 
                         [<em>sorting_algorithms</em>, <em>sorting-algorithms</em>, <em>Sorting Algorithms</em>].
                         <br><br>
@@ -210,9 +205,50 @@
                             <li>Click on 'Next' to load the next card from the queue</li>
                         </ol>
 
-                        If review mode is active, Study Buddy makes the review process 
+                        If review mode is active, <%= APP_NAME %> makes the review process 
                         more convenient by pressing the 'Save' and 'Next' buttons on your behalf. 
 
+                    </p>
+
+                </div>
+
+                <div class="details_section">
+
+                    <h3 class="details_header" id="public_cards">
+                        Public vs. Private Cards
+                        <sup><sup>
+                            <a href="#help_contents">back to the top</a>
+                        </sup></sup>
+                    </h3>
+
+                    <p>
+                        A private flashcard is only visible to you. It will not appear 
+                        in the search results at <a href="<%= BASE_URL %>/browse"><%= BASE_URL %>/browse</a>.
+                    </p>
+
+                    <p>
+                        In contrast, a public card will appear in the search results as 
+                        a read-only card. Any user that wishes to add the card to their own 
+                        collection will get a separate copy of the card.
+                    </p>
+
+                    <p>
+                        By default, your cards are private. 
+                        <a href="<%= BASE_URL %>/account"><%= BASE_URL %>/account</a> provides 
+                        an option for setting the default from that point in time onwards.
+                    </p>
+
+                    <p>
+                        Please share your cards in order to benefit other users. 
+                        Each card has a shareable link that you can send to others. Note that 
+                        if the card is set to 'private', the link won't work.
+                    </p>
+
+                    <p>
+                        As a general guideline, the cards should have relevant titles and 
+                        clear language. Where possible, credit your sources. If any of the 
+                        cards in <a href="<%= BASE_URL %>/browse"><%= BASE_URL %>/browse</a> 
+                        are inappropriate or duplicates, please flag them as so.
                     </p>
 
                 </div>
@@ -228,14 +264,6 @@
 
     <script>
 
-        var converter = new showdown.Converter({
-            headerLevelStart: 4, literalMidWordUnderscores: true,
-            literalMidWordAsterisks: true, simpleLineBreaks: true,
-            emoji: true, backslashEscapesHTMLTags: true, tables: true,
-            parseImgDimensions: true, simplifiedAutoLink: true,
-            strikethrough: true, tasklists: true
-        });
-
         function markupPage() {
 
             let domElements = document.getElementsByClassName("convert_to_html");
@@ -244,17 +272,9 @@
                     String.raw`${domElements[i].textContent.replace(/\\/g, "\\\\")}`
                 );
             }
-
-            let codeElements = document.querySelectorAll('pre code');
-            for (let i = 0; i < codeElements.length; i++) {
-                hljs.highlightBlock(codeElements[i]);
-            }
-
+            PrettifyCards.addSyntaxHighlighting();
+            
         }
-
-        
-
-        
 
     </script>
 

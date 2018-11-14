@@ -18,18 +18,37 @@ var cardSchema = new mongoose.Schema(
         title: { type: String, default: "" },
         description: { type: String, default: "" },
         tags: { type: String, lowercase: true, trim: true, default: "" },
-        urgency: { type: Number, default: 0 },
-        metadataIndex: Number,
-        createdById: Number,
-        lastReviewed: { type: Date, default: Date.now }
+        urgency: { type: Number, default: 10 },
+        metadataIndex: { type: Number, default: 0 },
+        createdById: { type: Number, required: true}, 
+        isPublic: { type: Boolean, default: false },
+        lastReviewed: { type: Date, default: Date.now },
+        parent: { type: String, default: "" },
+        numChildren: { type: Number, default: 0 },
+        numTimesMarkedAsDuplicate: { type: Number, default: 0 },
+        numTimesMarkedForReview: { type: Number, default: 0 }
     }, 
     {
         timestamps: true,
-        collection: "c13u_study_buddy"
+        collection: "c13u_study_buddy",
+        strict: true
     }
 );
 
-cardSchema.index( {title: "text", description: "text"} );
+/**
+ * Creating a text index enables case-insensitive search across the specified 
+ * fields. 
+ * https://docs.mongodb.com/manual/tutorial/control-results-of-text-search/
+ */
+cardSchema.index(
+    {
+        title: "text", description: "text", tags: "text"
+    },
+    {
+        weights: {title: 1, description: 1, tags: 2},
+        name: "TextIndex"
+    }
+);
 cardSchema.virtual("url").get(function () {
     return "/study-buddy/card/" + this._id;
 });
@@ -44,4 +63,20 @@ cardSchema.virtual("url").get(function () {
  * documents on a different database.
  * 
  */ 
-module.exports = mongoose.model('Card', cardSchema);
+let CardModel = mongoose.model('Card', cardSchema);
+module.exports = CardModel;
+
+if (require.main === module) {
+    // Run this script as main if you change the indexes
+    // http://thecodebarbarian.com/whats-new-in-mongoose-5-2-syncindexes
+    CardModel
+        .syncIndexes()
+        .then((msg) => { console.log(msg); })
+        .catch((err) => { console.error(err); });
+
+    CardModel
+        .listIndexes()
+        .then((indexes) => { console.log(indexes); })
+        .catch((err) => { console.error(err); });
+
+}

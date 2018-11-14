@@ -255,3 +255,5 @@ if (typeof require !== "undefined" && require.main === module) {
         console.log(item);
     }
 }
+
+module.exports = max_PQ;

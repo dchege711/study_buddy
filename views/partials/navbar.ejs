@@ -2,34 +2,21 @@
 
     <ul class="topnav" id="topnavitems">
         <li class="left">
-            <a href="/" class="link_button"><strong>Study Buddy</strong></a>
+            <a href="/" class="link_button"><strong><%= APP_NAME %></strong></a>
         </li>
 
-        <li class="right">
-            <button id="logout_button" class="link_button hidden" onClick="logOut();">
-                Log Out
-            </button>
+        <li class="left">
+            <a href="/home" class="link_button">Home</a>
         </li>
 
-        <li class="right hidden">
-            <a id="account_button" href="/account" class="link_button hidden">
-                Your Account
-            </a>
+        <li class="left">
+            <a href="/browse" class="link_button">Browse/Search</a>
+        </li>
+
+        <li class="left">
+            <a href="/wiki" class="link_button">Wiki</a>
         </li>
 
     </ul>
 
 </div>
-
-<script type="text/javascript">
-    /**
-     * @description Log out the currently logged in user.
-     */
-    function logOut() {
-        sendHTTPRequest("POST", "/logout", {}, (response) => {
-            localStorage.clear();
-            window.location = "/";
-        });
-    }
-
-</script>

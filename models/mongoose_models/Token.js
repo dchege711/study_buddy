@@ -19,7 +19,8 @@ var tokenSchema = new mongoose.Schema(
     },
     {
         autoIndex: false,
-        collection: "study_buddy_tokens"
+        collection: "study_buddy_tokens",
+        strict: true
     }
 );
 
