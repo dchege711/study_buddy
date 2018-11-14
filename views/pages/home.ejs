@@ -229,7 +229,7 @@
 
                 // Update the cards being displayed
                 cardsManager
-                    .initializeFromTags(null)
+                    .initializeFromTags(tagsToUse)
                     .then(() => { return cardsManager.next(); })
                     .then((card) => { 
                         renderCard(card);
