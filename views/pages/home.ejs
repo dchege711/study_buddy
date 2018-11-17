@@ -484,13 +484,12 @@
                     if (keyPress === " ") limit = 7;
                     else limit = Infinity;
                     if (query_string !== "") {
-                        sendHTTPRequest(
-                            "POST", "/search-cards",
-                            {
-                                query_string: query_string,
-                                limit: limit
-                            },
-                            (response) => {
+                        AppUtilities
+                            .sendHTTPRequest(
+                                "POST", "/search-cards",
+                                { query_string: query_string, limit: limit}
+                            )
+                            .then((response) => {
                                 if (response.success) {
                                     var search_results = response.message;
                                     if (keyPress === " ") {
@@ -506,8 +505,8 @@
                                         reInitializeCards(search_results);
                                     }    
                                 }
-                            }
-                        );
+                            })
+                            .catch((err) => { console.error(err); });
                     }
                 }
             }
