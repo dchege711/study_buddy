@@ -4,7 +4,9 @@
   "description": "A web application that helps me review content",
   "main": "server.js",
   "scripts": {
-    "test": "mocha",
+    "test": "mocha './tests/mocha_tests/functionality_tests/*.js'",
+    "unit_tests": "mocha --recursive './tests/mocha_tests/unit_tests/*.js'", 
+    "mocha": "mocha --recursive './tests/mocha_tests/*.js",
     "start": "node server.js",
     "debug": "node --trace-warnings server.js",
     "build": "webpack --config webpack.config.js"
