@@ -40,7 +40,7 @@
                 <div id="card_search_container" class="w3-half">
                     <div class="dropdown">
                         <input type="text" id="card_search_input" placeholder="Search card descriptions and titles..." onkeydown="searchCards(event)"
-                            class="dropbtn" />
+                            class="dropbtn" onblur="document.getElementById('card_search_results').innerHTML = '';" />
                         <div class="dropdown-content" id="card_search_results"></div>
                     </div>
                 </div>
@@ -484,13 +484,11 @@
                     if (keyPress === " ") limit = 7;
                     else limit = Infinity;
                     if (query_string !== "") {
-                        sendHTTPRequest(
-                            "POST", "/search-cards",
-                            {
-                                query_string: query_string,
-                                limit: limit
-                            },
-                            (response) => {
+                        AppUtilities
+                            .sendHTTPRequest(
+                                "POST", "/search-cards",
+                                {query_string: query_string, limit: limit})
+                            .then((response) => {
                                 if (response.success) {
                                     var search_results = response.message;
                                     if (keyPress === " ") {
@@ -506,8 +504,8 @@
                                         reInitializeCards(search_results);
                                     }    
                                 }
-                            }
-                        );
+                            })
+                            .catch((err) => { console.log(err); });
                     }
                 }
             }
