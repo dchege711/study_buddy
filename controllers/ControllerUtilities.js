@@ -38,3 +38,20 @@ exports.deleteTempFile = function(filepath) {
         if (err) console.error(err); 
     });
 };
+
+/**
+ * @description Most of my controller code involves waiting for results from a 
+ * promise, and then sending that response via the `res` object. This method 
+ * prevents unnecessarily duplicated code.
+ * 
+ * @param {Promise} pendingPromise the promise should be such that calling 
+ * `then` delivers the message that needs to be sent to the user.
+ * 
+ * @param {Response} res a reference to the Express Response object associated 
+ * with the pending request 
+ */
+exports.sendResponseFromPromise = function(pendingPromise, res) {
+    pendingPromise
+        .then((results) => { exports.convertObjectToResponse(null, results, res); })
+        .catch((err) => { exports.convertObjectToResponse(err, null, res)});
+};
