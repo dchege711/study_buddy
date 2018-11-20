@@ -219,8 +219,8 @@ function CardsManager(tags_and_ids, user_id) {
             if (card) resolve(card);
             sendHTTPRequest("POST", url, {userIDInApp: user_id, _id: card_id})
                 .then((results) => {
-                    localStorage.setItem(card_id, JSON.stringify(results.message));
-                    resolve(results.message);
+                    localStorage.setItem(card_id, JSON.stringify(results.message[0]));
+                    resolve(results.message[0]);
                 })
                 .catch((err) => {
                     reject(err);
