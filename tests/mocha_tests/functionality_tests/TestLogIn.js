@@ -1,6 +1,8 @@
-const dbConnection = require("../models/MongooseClient.js");
-var LogInUtilities = require("../models/LogInUtilities.js");
-const config = require("../config.js");
+"use strict";
+
+const dbConnection = require("../../../models/MongooseClient.js");
+var LogInUtilities = require("../../../models/LogInUtilities.js");
+const config = require("../../../config.js");
 
 describe("LogIn Utilities", function() {
 
