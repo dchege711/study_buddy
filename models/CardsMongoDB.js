@@ -1,52 +1,32 @@
 "use strict";
 
-var Card = require('./mongoose_models/CardSchema.js');
-var MetadataDB = require('./MetadataMongoDB');
-
-var generic_500_msg = { 
-    success: false, status: 500, message: "Internal Server Error" 
-};
-
-var debug = false;
+const Card = require('./mongoose_models/CardSchema.js');
+const MetadataDB = require('./MetadataMongoDB.js');
 
 /**
  * Create a new card and add it to the user's current cards.
  * 
- * @param {JSON} payload Expected keys: `title`, `description`, 
- * `tags`, `createdById`, `urgency`, and `idInApp`
- * @param {Function} callBack Takes a JSON with `success`, 
- * `internal_error` and `message` as keys.
+ * @param {JSON} payload Expected keys: `title`, `description`, `tags`, 
+ * `createdById`, `urgency`, `isPublic` and `parent`.
+ * 
+ * @returns {Promise} takes a JSON object with `success`, `status` and `message` 
+ * as its keys. If successful, the message will contain the saved card.
  */
-exports.create = function(payload, callBack) {
+exports.create = function(payload) {
     return new Promise(function(resolve, reject) {
-
-        let card = new Card({
-            title: payload.title,
-            description: payload.description,
-            tags: payload.tags,
-            createdById: payload.createdById,
-            urgency: payload.urgency,
-            isPublic: payload.isPublic
-        });
-        if (payload.parent !== undefined) card.parent = payload.parent;
-
-        card
-            .save()
+        let returnedValues = {};
+        Card
+            .create(payload)
             .then((savedCard) => {
-                savedCard.previousTags = card.tags;
-                MetadataDB.update([savedCard], (response) => {
-                    if (response.success) {
-                        resolve({
-                            "success": true, "internal_error": false,
-                            "message": savedCard
-                        });
-                    } else {
-                        reject({
-                            "success": false, "internal_error": false,
-                            "message": response.message
-                        });
-                    }
-                });
+                returnedValues.savedCard = savedCard;
+                savedCard.previousTags = savedCard.tags;
+                return MetadataDB.update([savedCard]);
+            })
+            .then((confirmation) => { 
+                if (confirmation.success) {
+                    confirmation.message = returnedValues.savedCard;
+                }
+                resolve(confirmation);
             })
             .catch((err) => { reject(err); })
     });
@@ -57,96 +37,76 @@ exports.create = function(payload, callBack) {
  * 
  * @param {JSON} payload Must contain `userIDInApp` as one of the keys.
  * If `_id` is not one of the keys, fetch all the user's cards.
- * @param {Function} callBack Takes a JSON with `success`, `internal_error` 
- * and `message` as keys.
+ * 
+ * @returns {Promise} resolves with a JSON doc with `success`, `status` and  
+ * `message` as keys. If successful, `message` will be an array of all matching 
+ * cards.
  */
-exports.read = function(payload, callBack) {
-    var _id = payload._id;
-    if (_id === undefined) {
-        var cursor = Card.find({ createdById: payload.userIDInApp}).cursor();
-        var allRelevantCards = [];
-        cursor.on("data", (card) => {
-            allRelevantCards.push(card);
-        });
-        cursor.on("close", () => {
-            callBack({
-                "success": true, "internal_error": false,
-                "message": allRelevantCards
-            });
-        });
-    } else {
-        Card.findById(_id, function(error, card) {
-            if (error) {
-                callBack({
-                    "success": false, "internal_error": true,
-                    "message": error
+exports.read = function(payload) {
+    let query = {createdById: payload.userIDInApp};
+    if (payload._id !== undefined) query._id = payload._id;
+    return new Promise(function(resolve, reject) {
+        Card
+            .find(query).exec()
+            .then((cards) => {
+                resolve({
+                    success: true, status: 200, message: cards
                 });
-            } else {
-                callBack({
-                    "success": true, "internal_error": false,
-                    "message": card
-                });
-            }
-        });
-    }
+            })
+            .catch((err) => { reject(err); });
+    });
 };
 
 /**
- * Update an existing card.
+ * Update an existing card. Some fields of the card are treated as constants, 
+ * e.g. `createdById` and `createdAt`
  * 
  * @param {JSON} cardJSON The parts of the card that have been updated. Must
- * include the card's `id`
- * @param {Function} callBack Takes a JSON with `success`,
- * `internal_error` and `message` as keys.
+ * include `_id` as an attribute, otherwise no changes will be made. 
+ * 
+ * @returns {Promise} resolves with a JSON doc with `success`, `status` and  
+ * `message` as keys. If successful, `message` will be the updated card.
  */
-exports.update = function(cardJSON, callBack) {
+exports.update = function(cardJSON) {
+
+    let prevResults = {};
+    const EDITABLE_ATTRIBUTES = new Set([
+        "title", "description", "tags", "urgency", "isPublic", "numChildren",
+        "numTimesMarkedAsDuplicate", "numTimesMarkedForReview"
+    ]);
 
     // findByIdAndUpdate will give me the old, not the updated, document.
     // I need to find the card, save it, and then call MetadataDB.update if need be
 
-    Card.findById(cardJSON._id, function(error, card) {
-        if (error) {
-            callBack({
-                "success": false, "internal_error": true,
-                "message": error
-            });
-        } else {
-            var previousTags = card.tags;
-            // Overwrite the contents that changed
-            Object.keys(cardJSON).forEach(card_key => {
-                card[card_key] = cardJSON[card_key];
-            });
-            card.save(function(error, savedCard) {
-                if (error) {
-                    callBack({
-                        "success": false, "internal_error": true,
-                        "message": error
-                    });
+    return new Promise(function(resolve, reject) {
+        Card
+            .findById(cardJSON._id).exec()
+            .then((existingCard) => {
+                if (existingCard === null) {
+                    resolve({success: false, status: 200, message: null});
                 } else {
-                    if (cardJSON.hasOwnProperty("tags") || cardJSON.hasOwnProperty("urgency")) {
-                        savedCard.previousTags = previousTags;
-                        MetadataDB.update([savedCard], (response) => {
-                            if (response.success) {
-                                callBack({
-                                    "success": true, "internal_error": false,
-                                    "message": savedCard
-                                });
-                            } else {
-                                callBack({
-                                    "success": false, "internal_error": false,
-                                    "message": response.message
-                                });
-                            }
-                        });
-                    } else {
-                        callBack({
-                            "success": true, "internal_error": false,
-                            "message": savedCard
-                        });
-                    }
+                    prevResults.previousTags = existingCard.tags;
+                    Object.keys(cardJSON).forEach(cardKey => {
+                        if (EDITABLE_ATTRIBUTES.has(cardKey)) {
+                            existingCard[cardKey] = cardJSON[cardKey];
+                        }
+                    });
+                    return existingCard.save();
                 }
-            });
-        }
+            })
+            .then((savedCard) => {
+                if (cardJSON.hasOwnProperty("tags") || cardJSON.hasOwnProperty("urgency")) {
+                    savedCard.previousTags = prevResults.previousTags;
+                    prevResults.savedCard = savedCard;
+                    return MetadataDB.update([savedCard]);
+                } else {
+                    resolve({success: true, status: 200, message: savedCard});
+                }
+            })
+            .then((_) => {
+                resolve({success: true, status: 200, message: prevResults.savedCard});
+            })
+            .catch((err) => { reject(err); });
     });
 };
 
@@ -154,46 +114,46 @@ exports.update = function(cardJSON, callBack) {
  * Remove this card from the database.
  * 
  * @param {JSON} payload The card to be removed
- * @param {Function} callBack Takes a JSON with `success`,
- * `internal_error` and `message` as keys.
+ * @return {Promise} resolves with a JSON keyed by `success`, `status` and 
+ * `message` as keys.
  */
-exports.delete = function(payload, callBack) {
-    Card.findByIdAndRemove(
-        payload._id, (error, removedCard) => {
-        if (error) {
-            callBack({
-                "success": false, "internal_error": true,
-                "message": error
-            });
-        } else {
-            MetadataDB.remove(removedCard, callBack);
-        }
+exports.delete = function(payload) {
+    return new Promise(function(resolve, reject) {
+        Card
+            .findByIdAndRemove(payload._id).exec()
+            .then((removedCard) => {
+                return MetadataDB.remove(removedCard);
+            })
+            .then((confirmation) => {
+                resolve(confirmation);
+            })
+            .catch((err) => { reject(err); });
     });
 };
 
 /**
- * Search for cards with associated key words
+ * @description Search for cards with associated key words
  * 
  * @param {JSON} payload Expected keys: `key_words`, `createdById`
- * @param {Function} callBack Takes a JSON with `success`, `status` and `message` 
+ * @returns {Promise} resolves with a JSON with `success`, `status` and `message` 
  * as keys. If successful `message` will contain abbreviated cards that only 
  * the `id`, `urgency` and `title` fields.
  */
-exports.search = function(payload, callBack) {
+exports.search = function(payload) {
     /**
      * $expr is faster than $where because it does not execute JavaScript 
      * and should be preferred where possible. Note that the JS expression
      * is processed for EACH document in the collection. Yikes!
      */
 
-    if (payload.query_string !== undefined) {
-        payload.query_string = splitTags(payload.query_string);
+    if (payload.queryString !== undefined) {
+        payload.queryString = splitTags(payload.queryString);
     }
     let queryObject = {
         filter: {
             $and: [
                 { createdById: payload.userIDInApp },
-                { $text: { $search: payload.query_string } }
+                { $text: { $search: payload.queryString } }
             ]
         },
         projection: "title tags urgency",
@@ -201,7 +161,7 @@ exports.search = function(payload, callBack) {
         sortCriteria: { score: { $meta: "textScore" } }
           
     };
-    collectSearchResults(queryObject, callBack);
+    return collectSearchResults(queryObject);
 };
 
 /**
@@ -229,19 +189,23 @@ let splitTags = function(s) {
 /**
  * @description Search the database for cards matching the specified schema. 
  * Return the results to the callback function that was passed in.
+ * 
+ * @returns {Promise} resolves with a JSON object. If `success` is set, then 
+ * the `message` attribute will be an array of matching cards.
  */
-let collectSearchResults = function(queryObject, callBack) {
-    Card
-        .find(queryObject.filter, queryObject.sortCriteria)
-        .sort(queryObject.sortCriteria)
-        .select(queryObject.projection)
-        .limit(queryObject.limit)
-        .exec((err, cards) => {
-            if (err) { console.log(err); callBack(generic_500_msg); }
-            else {
-                callBack({ success: true, status: 200, message: cards });
-            }
-        });
+let collectSearchResults = function(queryObject) {
+    return new Promise(function(resolve, reject) {
+        Card
+            .find(queryObject.filter, queryObject.sortCriteria)
+            .sort(queryObject.sortCriteria)
+            .select(queryObject.projection)
+            .limit(queryObject.limit)
+            .exec()
+            .then((cards) => {
+                resolve({success: true, status: 200, message: cards});
+            })
+            .catch((err) => { reject(err); });
+    });
 }
 
 /**
@@ -252,10 +216,10 @@ let collectSearchResults = function(queryObject, callBack) {
  * The `user_id` in this case refers to the creator of the cards, 
  * not the ID of the user/guest that makes the request. 
  * 
- * @param {Function} `callback`. The first parameter is set to any error that 
- * occured. The second parameter contains an array of abbreviated cards
+ * @param {Promise} resolves with a JSON object. If `success` is set, then 
+ * the `message` attribute will be an array of matching cards.
  */
-exports.publicSearch = function(payload, callBack) {
+exports.publicSearch = function(payload) {
     let mandatoryFields = [{isPublic: true}];
     if (payload.userID !== undefined) {
         mandatoryFields.push({createdById: payload.userID});
@@ -273,7 +237,7 @@ exports.publicSearch = function(payload, callBack) {
         limit: payload.limit,
         sortCriteria: { score: { $meta: "textScore" } }
     };
-    collectSearchResults(queryObject, callBack);
+    return collectSearchResults(queryObject);
 }
 
 exports.readPublicCard = function(payload) {
@@ -282,11 +246,13 @@ exports.readPublicCard = function(payload) {
             resolve({});
         } else {
             Card
-                .findOne({isPublic: true, _id: payload.card_id})
-                .exec((err, matchingCard) => {
-                    if (err) reject(err);
-                    else resolve(matchingCard);
-                });
+                .findOne({isPublic: true, _id: payload.card_id}).exec()
+                .then((matchingCard) => {
+                    resolve({
+                        success: true, status: 200, message: matchingCard
+                    });
+                })
+                .catch((err) => { reject(err); });
         }
         
     });
