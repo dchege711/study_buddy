@@ -1,7 +1,7 @@
 const { Builder, Condition, until } = require("selenium-webdriver");
 const firefox = require("selenium-webdriver/firefox");
 const chrome = require("selenium-webdriver/chrome");
-const config = require("../config.js");
+const config = require("../../config.js");
 
 /**
  * @description Test common actions that occur from the login page.

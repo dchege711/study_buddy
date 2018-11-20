@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "mocha './tests/mocha_tests/functionality_tests/*.js'",
-    "unit_tests": "mocha --recursive './tests/mocha_tests/unit_tests/*.js'", 
+    "unit_tests": "mocha --recursive './tests/mocha_tests/unit_tests/TestCardsMongoDB.js'", 
     "mocha": "mocha --recursive './tests/mocha_tests/*.js",
     "start": "node server.js",
     "debug": "node --trace-warnings server.js",
