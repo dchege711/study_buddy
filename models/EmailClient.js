@@ -21,16 +21,14 @@ let transporter = nodemailer.createTransport({
  * 
  * @returns {Promise} takes a JSON with `success` and `message` as the keys
  */
-exports.sendEmail = function(mailOptions, callBack) {
+exports.sendEmail = function(mailOptions) {
     mailOptions.from = `${config.APP_NAME} <${config.EMAIL_ADDRESS}>`;
     return new Promise(function(resolve, reject) {
         transporter.sendMail(mailOptions)
         .then((info) => {
             resolve({success: true, status: 200, message: info});
         })
-        .catch((err) => {
-            reject({success: false, message: error, status: 500});
-        })
+        .catch((err) => { reject(err); });
     });
 };
 

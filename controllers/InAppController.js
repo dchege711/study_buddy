@@ -1,20 +1,21 @@
-var CardsDB = require("../models/CardsMongoDB.js");
-var MetadataDB = require("../models/MetadataMongoDB.js");
-var controller_utils = require("./ControllerUtilities.js");
-var login_utils = require("../models/LogInUtilities.js");
+"use strict";
+
+const CardsDB = require("../models/CardsMongoDB.js");
+const MetadataDB = require("../models/MetadataMongoDB.js");
+const controllerUtils = require("./ControllerUtilities.js");
+const loginUtilities = require("../models/LogInUtilities.js");
 const config = require("../config.js");
 
-var convertObjectToResponse = controller_utils.convertObjectToResponse;
-var deleteTempFile = controller_utils.deleteTempFile;
+const convertObjectToResponse = controllerUtils.convertObjectToResponse;
+const deleteTempFile = controllerUtils.deleteTempFile;
+const sendResponseFromPromise = controllerUtils.sendResponseFromPromise;
 
 const defaultTemplateObject = {
     APP_NAME: config.APP_NAME, BASE_URL: config.BASE_URL
 };
 
 exports.read_card = function (req, res) {
-    CardsDB.read(req.body, function (card) {
-        res.json(card);
-    });
+    sendResponseFromPromise(CardsDB.read(req.body), res);
 };
 
 exports.home = function (req, res) {
@@ -26,22 +27,22 @@ exports.wiki_page = function (req, res) {
 };
 
 exports.read_public_card = function (req, res) {
-    CardsDB
-        .readPublicCard(req.body)
-        .then((matchingCard) => { res.json(matchingCard); })
-        .catch((err) => {convertObjectToResponse(err, null, res); })
+    sendResponseFromPromise(CardsDB.readPublicCard(req.body), res);
 };
 
 exports.browse_page = function(req, res) {
-    CardsDB.publicSearch(req.query, function(abbreviatedCards) {
-        res.render(
-            "pages/browse_cards_page.ejs", 
-            {
-                abbreviatedCards: abbreviatedCards.message,
-                APP_NAME: config.APP_NAME
-            }
-        );
-    });
+    CardsDB
+        .publicSearch(req.query)
+        .then((abbreviatedCards) => {
+            res.render(
+                "pages/browse_cards_page.ejs", 
+                {
+                    abbreviatedCards: abbreviatedCards.message,
+                    APP_NAME: config.APP_NAME
+                }
+            );
+        })
+        .catch((err) => {convertObjectToResponse(err, null, res); });
 };
 
 exports.account_get = function (req, res) {
@@ -52,103 +53,75 @@ exports.account_get = function (req, res) {
 };
 
 exports.read_metadata = function (req, res) {
-    MetadataDB.read(req.body, function (metadata) {
-        res.json(metadata);
-    });
+    sendResponseFromPromise(MetadataDB.read(req.body), res);
 };
 
 exports.tags = function (req, res) {
-    MetadataDB.readTags(req.body, function (tags) {
-        res.json(tags);
-    });
+    sendResponseFromPromise(MetadataDB.readTags(req.body), res);
 };
 
 exports.add_card = function (req, res) {
-    CardsDB
-        .create(req.body)
-        .then((confirmation) => { res.json(confirmation); })
-        .catch((err) => { convertObjectToResponse(err, null, res); });
+    sendResponseFromPromise(CardsDB.create(req.body), res);
 };
 
 exports.search_cards = function (req, res) {
-    var payload = req.body;
+    let payload = req.body;
     payload.userIDInApp = req.session.user.userIDInApp;
-    CardsDB.search(payload, (search_results) => {
-        convertObjectToResponse(null, search_results, res);
-    });
+    sendResponseFromPromise(CardsDB.search(req.body), res);
 };
 
 exports.update_card = function (req, res) {
-    CardsDB.update(req.body, function (confirmation) {
-        res.json(confirmation);
-    });
+    sendResponseFromPromise(CardsDB.update(req.body), res);
 };
 
 exports.delete_card = function (req, res) {
-    MetadataDB.delete_from_trash(req.body, function(confirmation) {
-        res.json(confirmation);
-    });
+    sendResponseFromPromise(MetadataDB.delete_from_trash(req.body), res);
 };
 
 exports.trash_card = function (req, res) {
-    MetadataDB.send_to_trash(req.body, function (confirmation) {
-        res.json(confirmation);
-    });
+    sendResponseFromPromise(MetadataDB.send_to_trash(req.body), res);
 };
 
 exports.restore_from_trash = function (req, res) {
-    MetadataDB.restore_from_trash(req.body, function (confirmation) {
-        res.json(confirmation);
-    });
+    sendResponseFromPromise(MetadataDB.restore_from_trash(req.body), res);
 };
 
 exports.download_user_data = function(req, res) {
-    MetadataDB.write_cards_to_json_file(req.session.user.userIDInApp, (err, filepath, filename) => {
-        if (err) { convertObjectToResponse(err, null, res); }
-        else {
+    MetadataDB
+        .writeCardsToJSONFile(req.session.user.userIDInApp)
+        .then(([filepath, filename]) => {
             res.download(filepath, filename, (err) => {
                 if (err) { console.error(err); }
                 else { deleteTempFile(filepath); }
             });
-        }
-    });
+        })
+        .catch((err) => { convertObjectToResponse(err, null, res); });
 };
 
 exports.delete_account = function(req, res) {
-    login_utils.deleteAccount(
-        req.session.user.userIDInApp, (err, confirmation) => {
-            if (err) convertObjectToResponse(err, null, res);
-            else {
-                delete req.session.user;
-                res.setHeader(
-                    "Set-Cookie",
-                    [`session_token=null;Expires=Thu, 01 Jan 1970 00:00:00 GMT`]
-                );
-                convertObjectToResponse(null, confirmation, res);
-            }
-        }
-    );
+    loginUtilities
+        .deleteAccount(req.session.user.userIDInApp)
+        .then((confirmation) => {
+            delete req.session.user;
+            res.setHeader(
+                "Set-Cookie",
+                [`session_token=null;Expires=Thu, 01 Jan 1970 00:00:00 GMT`]
+            );
+            convertObjectToResponse(null, confirmation, res);
+        })
+        .catch((err) => { convertObjectToResponse(err, null, res); });
 };
 
 exports.updateUserSettings = function(req, res) {
-    MetadataDB
-        .updateUserSettings(req.body)
-        .then((confirmation) => { res.json(confirmation); })
-        .catch((err) => { convertObjectToResponse(err, null, res); });
+    sendResponseFromPromise(MetadataDB.updateUserSettings(req.body), res);
 };
 
 exports.duplicateCard = function(req, res) {
     let duplicateCardArgs = req.body;
     duplicateCardArgs.userIDInApp = req.session.user.userIDInApp;
-    CardsDB
-        .duplicateCard(duplicateCardArgs)
-        .then((confirmation) => { res.json(confirmation); })
-        .catch((err) => { convertObjectToResponse(err, null, res); });
+    sendResponseFromPromise(CardsDB.duplicateCard(duplicateCardArgs), res);
 };
 
 exports.flagCard = function(req, res) {
-    CardsDB
-        .flagCard(req.body)
-        .then((confirmation) => { res.json(confirmation); })
-        .catch((err) => { convertObjectToResponse(err, null, res); });
+    sendResponseFromPromise(CardsDB.flagCard(req.body), res);
 };

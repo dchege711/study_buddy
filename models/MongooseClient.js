@@ -38,13 +38,13 @@ db.on("error", console.error.bind(console, "Connection Error:"));
   * error
   */
 exports.closeMongooseConnection = function(callback) {
-    mongoose.disconnect(callback);
+    return mongoose.disconnect();
 };
 
 process.on("SIGINT", function () {
-    exports.closeMongooseConnection(function () {
-        process.exit(0);
-    });
+    exports.closeMongooseConnection()
+        .then(() => { process.exit(0); })
+        .catch((err) => { console.error(err); process.exit(1); });
 });
 
 exports.mongooseConnection = db;
