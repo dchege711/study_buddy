@@ -213,6 +213,7 @@ blockquote {
     font-size: smaller;
     position: absolute;
     background: white;
+    z-index: 10;
 }
 
 #card_search_results ul {

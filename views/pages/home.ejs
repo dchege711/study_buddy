@@ -40,7 +40,7 @@
                 <div id="card_search_container" class="w3-half">
                     <div class="dropdown">
                         <input type="text" id="card_search_input" placeholder="Search card descriptions and titles..." onkeydown="searchCards(event)"
-                            class="dropbtn" />
+                            class="dropbtn" onblur="document.getElementById('card_search_results').innerHTML = '';" />
                         <div class="dropdown-content" id="card_search_results"></div>
                     </div>
                 </div>
