@@ -55,13 +55,13 @@ exports.handleLogIn = function (req, res) {
     }
 };
 
-exports.register_user = function (req, res) {
+exports.registerUser = function (req, res) {
     sendResponseFromPromise(
         LogInUtilities.registerUserAndPassword(req.body), res
     );
 };
 
-exports.login = function (req, res, next) {
+exports.loginUser = function (req, res, next) {
     LogInUtilities
         .authenticateUser(req.body)
         .then((confirmation) => {
@@ -79,7 +79,7 @@ exports.login = function (req, res, next) {
         .catch((err) => { convertObjectToResponse(err, null, res); });
 };
 
-exports.logout = function (req, res) {
+exports.logoutUser = function (req, res) {
     var session_token = req.session.user.token_id;
     delete req.session.user;
     LogInUtilities
@@ -94,34 +94,34 @@ exports.logout = function (req, res) {
         .catch((err) => { convertObjectToResponse(err, null, res); });
 };
 
-exports.send_validation_email_get = function (req, res) {
+exports.sendValidationEmailGet = function (req, res) {
     res.render("pages/send_validation_url.ejs", defaultTemplateObject);
 };
 
-exports.send_validation_email_post = function (req, res) {
+exports.sendValidationEmailPost = function (req, res) {
     sendResponseFromPromise(
         LogInUtilities.sendAccountValidationLink(req.body), res
     );
 };
 
-exports.verify_account = function (req, res) {
+exports.verifyAccount = function (req, res) {
     var verification_uri = req.path.split("/verify-account/")[1];
     sendResponseFromPromise(
         LogInUtilities.validateAccount(verification_uri), res
     );
 };
 
-exports.reset_password_get = function (req, res) {
+exports.resetPasswordGet = function (req, res) {
     res.render("pages/reset_password_request.ejs", defaultTemplateObject);
 };
 
-exports.reset_password_post = function (req, res) {
+exports.resetPasswordPost = function (req, res) {
     sendResponseFromPromise(
         LogInUtilities.sendResetLink(req.body), res
     );
 };
 
-exports.reset_password_link_get = function (req, res) {
+exports.resetPasswordLinkGet = function (req, res) {
     var reset_password_uri = req.path.split("/reset-password-link/")[1];
     LogInUtilities
         .validatePasswordResetLink(reset_password_uri)
@@ -135,7 +135,7 @@ exports.reset_password_link_get = function (req, res) {
         .catch((err) => { convertObjectToResponse(err, null, res); });
 };
 
-exports.reset_password_link_post =  function (req, res) {
+exports.resetPasswordLinkPost =  function (req, res) {
     var reset_password_uri = req.path.split("/reset-password-link/")[1];
     LogInUtilities
         .validatePasswordResetLink(reset_password_uri)
