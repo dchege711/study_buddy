@@ -44,7 +44,7 @@ exports.create = function(payload) {
  */
 exports.read = function(payload) {
     let query = {createdById: payload.userIDInApp};
-    if (payload._id !== undefined) query._id = payload._id;
+    if (payload.cardID !== undefined) query._id = payload.cardID;
     return new Promise(function(resolve, reject) {
         Card
             .find(query).exec()
@@ -80,7 +80,7 @@ exports.update = function(cardJSON) {
 
     return new Promise(function(resolve, reject) {
         Card
-            .findById(cardJSON._id).exec()
+            .findById(cardJSON.cardID).exec()
             .then((existingCard) => {
                 if (existingCard === null) {
                     resolve({success: false, status: 200, message: null});
@@ -120,7 +120,7 @@ exports.update = function(cardJSON) {
 exports.delete = function(payload) {
     return new Promise(function(resolve, reject) {
         Card
-            .findByIdAndRemove(payload._id).exec()
+            .findByIdAndRemove(payload.cardID).exec()
             .then((removedCard) => {
                 return MetadataDB.remove(removedCard);
             })
@@ -246,18 +246,19 @@ exports.publicSearch = function(payload) {
  * @description Read a card that has been set to 'public'
  * @param {JSON} payload The `card_id` property should be set to a valid ID
  * @returns {Promise} resolves with a JSON object. If `success` is set, then 
- * the `message` attribute will contain the matching card in JSON format
+ * the `message` attribute will contain a single-element array containing the 
+ * matching card if any.
  */
 exports.readPublicCard = function(payload) {
     return new Promise(function(resolve, reject) {
-        if (payload.card_id === undefined) {
-            resolve({});
+        if (payload.cardID === undefined) {
+            resolve([{}]);
         } else {
             Card
-                .findOne({isPublic: true, _id: payload.card_id}).exec()
+                .findOne({isPublic: true, _id: payload.cardID}).exec()
                 .then((matchingCard) => {
                     resolve({
-                        success: true, status: 200, message: matchingCard
+                        success: true, status: 200, message: [matchingCard]
                     });
                 })
                 .catch((err) => { reject(err); });

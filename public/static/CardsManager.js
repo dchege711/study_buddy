@@ -3,7 +3,7 @@
 var max_PQ = require("./MaxPriorityQueue.js");
 var sendHTTPRequest = require("./AppUtilities.js").sendHTTPRequest;
 
-function CardsManager(tags_and_ids, user_id) {
+function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card") {
 
     /* Holds the attributes and methods of the CardsManager module */
     var cardsManagerObj = {};
@@ -34,14 +34,14 @@ function CardsManager(tags_and_ids, user_id) {
             pqCardsToView = max_PQ();
 
             // A card may have many tags, so don't repeatedly add it to the PQ
-            var already_seen_ids = new Set([]);
+            let already_seen_ids = new Set([]);
             tags_to_use.forEach(function(tag) {
-                for (var card_id in tags_and_ids[tag]) {
-                    if (already_seen_ids.has(card_id) === false) {
+                for (let cardID in tags_and_ids[tag]) {
+                    if (already_seen_ids.has(cardID) === false) {
                         pqCardsToView.insert(
-                            [card_id, tags_and_ids[tag][card_id].urgency]
+                            [cardID, tags_and_ids[tag][cardID].urgency]
                         );
-                        already_seen_ids.add(card_id);
+                        already_seen_ids.add(cardID);
                     }
                 }
             });
@@ -79,7 +79,7 @@ function CardsManager(tags_and_ids, user_id) {
      * 
      * @param {Function} callBack Function to call once everything is complete.
      */
-    cardsManagerObj.initializeFromTrash = function (trashed_card_ids, callBack) {
+    cardsManagerObj.initializeFromTrash = function (trashed_card_ids) {
         return new Promise(function(resolve, reject) {
             pqCardsAlreadyViewed = max_PQ();
             pqCardsToView = max_PQ();
@@ -209,20 +209,20 @@ function CardsManager(tags_and_ids, user_id) {
      * @description Search for the card with the given ID. First search in the
      * browser, then query the database if necessary.
      * 
-     * @param {String} card_id The ID of the card that's to be fetched
+     * @param {String} cardID The ID of the card that's to be fetched
      * @param {Function} callback The function to be called once the card is
      * found
      */
-    function findCard(card_id, url="/read-card") {
+    function findCard(cardID) {
         return new Promise(function(resolve, reject) {
-            let card = JSON.parse(localStorage.getItem(card_id));
+            let card = JSON.parse(localStorage.getItem(cardID));
             if (card) { 
                 resolve(card); 
             } else {
-                sendHTTPRequest("POST", url, {userIDInApp: user_id, _id: card_id})
+                sendHTTPRequest("POST", cardSourceURL, {userIDInApp: userID, cardID: cardID})
                     .then((results) => {
                         results = JSON.parse(results);
-                        localStorage.setItem(card_id, JSON.stringify(results.message[0]));
+                        localStorage.setItem(cardID, JSON.stringify(results.message[0]));
                         resolve(results.message[0]);
                     })
                     .catch((err) => {

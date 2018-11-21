@@ -109,7 +109,7 @@
 
         function displayFullCard(cardID) {
             elementRefs.cardContainerHolderElement.style.visibility = "visible";
-            cardsManager = new CardsManager(null, null);
+            cardsManager = new CardsManager(null, null, cardSourceURL="/read-public-card");
             cardsManager
                 .initializeFromMinicards([{_id: cardID, urgency: 1}])
                 .then(() => { return cardsManager.next(); })

@@ -392,7 +392,7 @@
                     payload[element_id.split("card_")[1]] = document.getElementById(element_id).value;
                 });
                 if (state.currentCardID) {
-                    payload._id = state.currentCardID;
+                    payload.cardID = state.currentCardID;
                 }
 
                 if (state.changedItems.has("card_description")) {
@@ -446,7 +446,7 @@
                     // Request the server to trash the card
                     AppUtilities.sendHTTPRequest("POST", "/trash-card", 
                         {
-                            _id: removed_card_id, createdById: state.currentUserID
+                            cardID: removed_card_id, createdById: state.currentUserID
                         })
                         .then((trash_confirmation) => {
                             trash_confirmation = JSON.parse(trash_confirmation);
@@ -462,7 +462,7 @@
                     "POST", "/restore-from-trash", 
                     {
                         createdById: state.currentUserID,
-                        _id: card_to_restore_id,
+                        cardID: card_to_restore_id,
                     })
                     .then((response) => {
                         response = JSON.parse(response);
