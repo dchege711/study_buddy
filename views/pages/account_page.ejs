@@ -256,6 +256,7 @@
                     }
                 )
                 .then((confirmation) => {
+                    confirmation = JSON.parse(confirmation);
                     CardTemplateUtilities.displayPopUp(confirmation.message, 2000);
                     cardsManager.removeCard(state.current_card_id);
                     fetchNextCard();
@@ -271,7 +272,10 @@
         function updateAccountSettings() {
             AppUtilities
                 .sendForm("accountSettingsForm", "/account/update-settings")
-                .then((confirmation) => { alert(confirmation.message); })
+                .then((confirmation) => { 
+                    confirmation = JSON.parse(confirmation);
+                    alert(confirmation.message); 
+                })
                 .catch((err) => { console.error(err); });
 
             return false;

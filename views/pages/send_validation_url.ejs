@@ -42,6 +42,7 @@
                 AppUtilities
                     .sendForm("send_validation_url_form", location.href)
                     .then((response) => {
+                        response = JSON.parse(response);
                         alert(response.message);
                         if (response.success) window.location = "/";
                     })

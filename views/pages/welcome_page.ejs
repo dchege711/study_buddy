@@ -136,6 +136,7 @@
                 AppUtilities
                     .sendForm(formID, url)
                     .then((results) => {
+                        results = JSON.parse(results);
                         if (results.success) {
                             setupInitializationData(results);
                         } else {
@@ -164,6 +165,7 @@
                         "POST", "/read-metadata",
                         { userIDInApp: sessionInfoObject.message.userIDInApp})
                     .then((metadataResponse) => {
+                        metadataResponse = JSON.parse(metadataResponse);
                         localStorage.setItem(
                             "metadata", JSON.stringify(metadataResponse.message)
                         );
@@ -186,6 +188,7 @@
                 AppUtilities
                     .sendForm(formID, url)
                     .then((signupResults) => {
+                        signupResults = JSON.parse(signupResults);
                         alert(signupResults.message);
                         if (signupResults.success) {
                             return AppUtilities.sendHTTPRequest(
@@ -200,6 +203,7 @@
                         }
                     })
                     .then((loginResults) => {
+                        loginResults = JSON.parse(loginResults);
                         setupInitializationData(loginResults);
                     })
                     .catch((err) => { console.error(err); })
@@ -214,6 +218,7 @@
                 AppUtilities
                     .sendForm(formID, '/reset-password')
                     .then((resetResults) => {
+                        resetResults = JSON.parse(resetResults);
                         if (resetResults.success) {
                             document.getElementById(formID).innerHTML = `
                                 <p>${resetResults.message}</p>
