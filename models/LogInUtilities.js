@@ -90,7 +90,7 @@ let getIdInAppAndValidationURI = async function() {
                 .catch((err) => { console.error(err); reject(err); })
         });
         if (conflictingUser === null) {
-            return Promise.resolve(randomID, validationURI);
+            return Promise.resolve([randomID, validationURI]);
         }
         lookingForUniqueIDAndURL = false;
     }
@@ -145,7 +145,7 @@ let sendAccountValidationURLToEmail = function(userDetails) {
     return new Promise(function(resolve, reject) {
         if (!userDetails.email || !userDetails.account_validation_uri) {
             reject(
-                new Error(`Missing email address and validation_uri in ${userDetails.username}`)
+                new Error(`Email address == ${userDetails.email} and validation_uri == ${userDetails.account_validation_uri}`)
             );
         } else {
             Email
@@ -187,15 +187,19 @@ exports.sendAccountValidationLink = function(payload) {
                         success: true, status: 200,
                         message: `If ${payload.email} has an account, we've sent a validation URL`
                     });
-                } else if (user.account_validation_uri === undefined) {
+                    return Promise.reject("DUMMY");
+                } else if (user.account_validation_uri !== "verified") {
                     user.account_is_valid = false;
                     let idAndValidationURL = await getIdInAppAndValidationURI();
                     user.account_validation_uri = idAndValidationURL[1];
                     return user.save();
                 } else {
-                    return user.save();
+                    resolve({
+                        success: true, status: 200,
+                        message: `${payload.email} has already validated their account.`
+                    });
+                    return Promise.reject("DUMMY");
                 }
-                
             })
             .then((savedUser) => {
                 return sendAccountValidationURLToEmail(savedUser);
@@ -203,7 +207,7 @@ exports.sendAccountValidationLink = function(payload) {
             .then((emailConfirmation) => {
                 resolve(emailConfirmation);
             })
-            .catch((err) => { reject(err); });
+            .catch((err) => { if (err !== "DUMMY") reject(err); });
     });
 };
 
@@ -218,11 +222,11 @@ exports.validateAccount = function(validationURI) {
             .findOne({account_validation_uri: validationURI}).exec()
             .then((user) => {
                 if (user === null) {
-                    reject({
-                        success: false, status: 200,
-                        message: `The validation URL is either incorrect or stale. 
-                        Please request for a new one from ${config.BASE_URL}/send-validation-email`
-                    })
+                    resolve({
+                        success: false, status: 303, redirect_url: `/send-validation-email`,
+                        message: `The validation URL is either incorrect or stale. Please request for a new one from ${config.BASE_URL}/send-validation-email`
+                    });
+                    return Promise.reject("DUMMY");
                 } else {
                     user.account_validation_uri = "verified";
                     user.account_is_valid = true;
@@ -231,11 +235,11 @@ exports.validateAccount = function(validationURI) {
             })
             .then((savedUser) => {
                 resolve({
-                    success: true, status: 303,
+                    success: true, status: 303, redirect_url: `/login`,
                     message: `Successfully validated ${savedUser.email}. Redirecting you to login`
                 });
             })
-            .catch((err) => { reject(err); });
+            .catch((err) => { if (err !== "DUMMY") reject(err); });
     });
 };
 
@@ -266,7 +270,8 @@ exports.registerUserAndPassword = function(payload) {
             resolve({
                 success: false, status: 200,
                 message: "At least one of these wasn't provided: username, password, email"
-            }); 
+            });
+            return;
         }
 
         User
@@ -283,13 +288,14 @@ exports.registerUserAndPassword = function(payload) {
                     success: false, status: 200,
                     message: rejectionReason
                 });
+                return Promise.reject("DUMMY");
             })
             .then(([salt, hash]) => {
                 results.salt = salt; 
                 results.hash = hash;
                 return getIdInAppAndValidationURI();
             })
-            .then((userID, validationURI) => {
+            .then(([userID, validationURI]) => {
                 return User.create({
                     username: username, salt: results.salt, hash: results.hash,
                     userIDInApp: userID, email: email, account_is_valid: false,
@@ -315,7 +321,9 @@ exports.registerUserAndPassword = function(payload) {
                 }
                 resolve(emailConfirmation);
             })
-            .catch((err) => { reject(err); });
+            .catch((err) => { 
+                if (err !== "DUMMY") reject(err); 
+            });
     });
 };
 
@@ -348,7 +356,7 @@ exports.authenticateUser = function(payload) {
         User
             .findOne(identifierQuery).exec()
             .then((user) => {
-                if (user === undefined) {
+                if (user === null) {
                     resolve({
                         success: false, status: 200, 
                         message: "Incorrect username/email and/or password"
@@ -436,7 +444,8 @@ exports.sendResetLink = function(userIdentifier) {
             .then(async (user) => {
                 if (user !== null) {
                     let confirmation = await exports.sendResetLink(userIdentifier);
-                    resolve(confirmation)
+                    resolve(confirmation);
+                    return Promise.reject("DUMMY");
                 } else {
                     return User.findOne({email: userIdentifier.email}).exec();
                 }
@@ -447,10 +456,11 @@ exports.sendResetLink = function(userIdentifier) {
                         success: true, status: 200,
                         message: `If ${userIdentifier.email} has an account, we've sent a password reset link`
                     });
+                    return Promise.reject("DUMMY");
                 } else {
-                    user.reset_password_uri = resetPasswordURI;
-                    user.reset_password_timestamp = Date.now();
-                    return user.save();
+                    userWithMatchingEmail.reset_password_uri = resetPasswordURI;
+                    userWithMatchingEmail.reset_password_timestamp = Date.now();
+                    return userWithMatchingEmail.save();
                 }
             })
             .then((savedUser) => {
@@ -465,8 +475,13 @@ exports.sendResetLink = function(userIdentifier) {
                         `request a password reset, please ignore this email.`
                 })
             })
-            .then((emailConfirmation) => { resolve(emailConfirmation); })
-            .catch((err) => { reject(err); });
+            .then((_) => { 
+                resolve({
+                    success: true, status: 200,
+                    message: `If ${userIdentifier.email} has an account, we've sent a password reset link`
+                }); 
+            })
+            .catch((err) => { if (err !== "DUMMY") reject(err); });
     });
 };
 
@@ -485,7 +500,7 @@ exports.validatePasswordResetLink = function(resetPasswordURI) {
                     resolve({
                         success: false, status: 404, message: "Page Not Found"
                     });
-                } else if (Date.now() > users[0].reset_password_timestamp + 2 * 3600 * 1000) {
+                } else if (Date.now() > user.reset_password_timestamp + 2 * 3600 * 1000) {
                     resolve({ 
                         success: false, status: 303, redirect_url: `${config.BASE_URL}/reset-password`, 
                         message: "Expired link. Please submit another reset request." 

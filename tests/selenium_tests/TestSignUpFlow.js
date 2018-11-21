@@ -20,7 +20,7 @@ exports.test = async function(headless=true) {
     
     try {
         await driver
-            .get(config.DEBUG_BASE_URL);
+            .get(config.BASE_URL);
 
         console.log("\nCreating a new account...\n");
 
@@ -67,7 +67,7 @@ exports.test = async function(headless=true) {
 
         await driver
             .wait(
-                until.urlIs(`${config.DEBUG_BASE_URL}/home`), 
+                until.urlIs(`${config.BASE_URL}/home`), 
                 config.DEBUG_OPERATION_TIMEOUT_MS
             ).then((logged_in) => {
                 console.log(`\tLogged in: ${logged_in}`);
@@ -90,7 +90,7 @@ exports.test = async function(headless=true) {
 
         await driver
             .wait(
-                until.urlIs(`${config.DEBUG_BASE_URL}/account`),
+                until.urlIs(`${config.BASE_URL}/account`),
                 config.DEBUG_OPERATION_TIMEOUT_MS
             );
 
@@ -102,7 +102,7 @@ exports.test = async function(headless=true) {
         
         await driver
             .wait(
-                until.urlIs(`${config.DEBUG_BASE_URL}/login`),
+                until.urlIs(`${config.BASE_URL}/login`),
                 config.DEBUG_OPERATION_TIMEOUT_MS
             )
             .then((logged_out) => {
