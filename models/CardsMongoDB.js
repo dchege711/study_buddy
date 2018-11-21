@@ -148,6 +148,8 @@ exports.search = function(payload) {
 
     if (payload.queryString !== undefined) {
         payload.queryString = splitTags(payload.queryString);
+    } else {
+        return Promise.resolve({success: true, status: 200, message: []})
     }
     let queryObject = {
         filter: {
@@ -216,7 +218,7 @@ let collectSearchResults = function(queryObject) {
  * The `user_id` in this case refers to the creator of the cards, 
  * not the ID of the user/guest that makes the request. 
  * 
- * @param {Promise} resolves with a JSON object. If `success` is set, then 
+ * @returns {Promise} resolves with a JSON object. If `success` is set, then 
  * the `message` attribute will be an array of matching cards.
  */
 exports.publicSearch = function(payload) {
@@ -240,6 +242,12 @@ exports.publicSearch = function(payload) {
     return collectSearchResults(queryObject);
 }
 
+/**
+ * @description Read a card that has been set to 'public'
+ * @param {JSON} payload The `card_id` property should be set to a valid ID
+ * @returns {Promise} resolves with a JSON object. If `success` is set, then 
+ * the `message` attribute will contain the matching card in JSON format
+ */
 exports.readPublicCard = function(payload) {
     return new Promise(function(resolve, reject) {
         if (payload.card_id === undefined) {
@@ -258,6 +266,17 @@ exports.readPublicCard = function(payload) {
     });
 }
 
+/**
+ * @description Create a copy of the referenced card and add it to the user's 
+ * collection
+ * 
+ * @param {JSON} payload The `cardID` and `userIDInApp` and 
+ * `cardsAreByDefaultPrivate` attributes should be set appropriately.
+ * 
+ * @returns {Promise} takes a JSON object with `success`, `status` and `message` 
+ * as its keys. If successful, the message will contain the saved card. This 
+ * response is the same as that of `CardsMongoDB.create(payload)`.
+ */
 exports.duplicateCard = function(payload) {
     // Fetch the card to be duplicated
     return new Promise(function(resolve, reject) {
@@ -284,6 +303,16 @@ exports.duplicateCard = function(payload) {
         
 };
 
+/**
+ * @description Increase the counter of the specified file. This allows 
+ * moderators to deal with the most flagged cards first. 
+ * 
+ * @param {JSON} payload The `cardID` must be set. `markedForReview` and 
+ * `markedAsDuplicate` are optional. If set, they should be booleans.
+ * 
+ * @returns {Promise} takes a JSON object with `success`, `status` and `message` 
+ * as its keys. If successful, the message will contain the saved card.
+ */
 exports.flagCard = function(payload) {
     let flagsToUpdate = {};
     if (payload.markedForReview) flagsToUpdate.numTimesMarkedForReview = 1;
@@ -292,11 +321,12 @@ exports.flagCard = function(payload) {
         Card
             .findOneAndUpdate({_id: payload.cardID}, {$inc: flagsToUpdate})
             .exec()
-            .then((cardToUpdate) => {
-                resolve({ message: `Card flagged successfully!` });
+            .then((_) => {
+                resolve({
+                    status: 200, success: true, message: `Card flagged successfully!`
+                });
             })
             .catch((err) => {
-                console.error(err); 
                 reject(err); 
             });
     });
