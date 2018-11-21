@@ -42,11 +42,20 @@ exports.sendForm = function(form_id, url) {
  * @return {Promise} 
  */
 exports.sendHTTPRequest = function(method, url, payload, contentType="application/json") {
-    return new Promise(function(resolve) {
+    return new Promise(function(resolve, reject) {
         let xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 200) {
-                resolve(this.response);
+            if (this.readyState == 4) {
+                let status = this.status;
+                if (status < 300) {
+                    resolve(this.response);
+                } else if (status >= 300 && status < 400) {
+                    reject(new Error(`Request was redirected to ${this.responseURL}.`));
+                    window.location = this.responseURL;
+                } else {
+                    reject(new Error(`Request returned a response status (${status})`));
+                    document.write(this.response);
+                }
             }
         };
         xhttp.open(method, url, true);

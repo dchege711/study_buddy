@@ -16,19 +16,26 @@ const generic_500_msg = {
 exports.convertObjectToResponse = function (err, result_JSON, res) {
     if (err) {
         console.error(err);
+        res.type(".html");
+        res.status(500);
         res.render(
             "pages/5xx_error_page.ejs", 
             { response_JSON: generic_500_msg, APP_NAME: APP_NAME }
         );
     } else {
-        let status = result_JSON.status;
+        let status = result_JSON.status || 200;
+        res.status(status);
         if (status >= 200 && status < 300) {
+            res.type("application/json");
             res.json(result_JSON);
         } else if (status >= 300 && status < 400) {
+            res.type('html');
             res.redirect(status, result_JSON.redirect_url + "?msg=" + encodeURIComponent(result_JSON.message));
         } else if (status >= 400 && status < 500) {
+            res.type('html');
             res.render("pages/4xx_error_page.ejs", { response_JSON: result_JSON, APP_NAME: APP_NAME });
         } else {
+            res.type('html');
             res.render("pages/5xx_error_page.ejs", { response_JSON: result_JSON, APP_NAME: APP_NAME });
         }
     }
