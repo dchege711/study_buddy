@@ -108,8 +108,8 @@ function CardsManager(tags_and_ids, user_id) {
                 );
     
                 findCard(next_card_id_urgency[0])
-                    .then((card) => {resolve(card); })
-                    .catch((err) => {reject(err); });
+                    .then((card) => { resolve(card); })
+                    .catch((err) => { reject(err); });
             }            
         });
     };
@@ -216,15 +216,19 @@ function CardsManager(tags_and_ids, user_id) {
     function findCard(card_id, url="/read-card") {
         return new Promise(function(resolve, reject) {
             let card = JSON.parse(localStorage.getItem(card_id));
-            if (card) resolve(card);
-            sendHTTPRequest("POST", url, {userIDInApp: user_id, _id: card_id})
-                .then((results) => {
-                    localStorage.setItem(card_id, JSON.stringify(results.message[0]));
-                    resolve(results.message[0]);
-                })
-                .catch((err) => {
-                    reject(err);
-                });
+            if (card) { 
+                resolve(card); 
+            } else {
+                sendHTTPRequest("POST", url, {userIDInApp: user_id, _id: card_id})
+                    .then((results) => {
+                        results = JSON.parse(results);
+                        localStorage.setItem(card_id, JSON.stringify(results.message[0]));
+                        resolve(results.message[0]);
+                    })
+                    .catch((err) => {
+                        reject(err);
+                    });
+            }
         });  
     }
 
@@ -232,6 +236,7 @@ function CardsManager(tags_and_ids, user_id) {
         return new Promise(function(resolve, reject) {
             sendHTTPRequest("POST", url, card)
                 .then((results) => {
+                    results = JSON.parse(results);
                     if (results.success) {
                         cardsManagerObj.update_card(results.message);
                         resolve(results.message);

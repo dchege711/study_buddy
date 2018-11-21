@@ -449,6 +449,7 @@
                             _id: removed_card_id, createdById: state.currentUserID
                         })
                         .then((trash_confirmation) => {
+                            trash_confirmation = JSON.parse(trash_confirmation);
                             CardTemplateUtilities.displayPopUp(trash_confirmation.message, 10000);
                         })
                         .catch((err) => { console.error(err); });
@@ -464,6 +465,7 @@
                         _id: card_to_restore_id,
                     })
                     .then((response) => {
+                        response = JSON.parse(response);
                         if (response.message === card_to_restore_id) {
                             cardsManager.insertCard(card_to_restore_id, card_to_restore_urgency);
                             fetchPreviousCard();
@@ -481,16 +483,17 @@
                 window.removeEventListener("keydown", arrowKeysForNavigation);
                 var keyPress = event.key;
                 if (keyPress === " " || keyPress === "Enter") {
-                    var query_string = elementRefs.cardSearchInputElement.value.trim();
+                    var queryString = elementRefs.cardSearchInputElement.value.trim();
                     if (keyPress === " ") limit = 7;
                     else limit = Infinity;
-                    if (query_string !== "") {
+                    if (queryString !== "") {
                         AppUtilities
                             .sendHTTPRequest(
                                 "POST", "/search-cards",
-                                { query_string: query_string, limit: limit}
+                                { queryString: queryString, limit: limit}
                             )
                             .then((response) => {
+                                response = JSON.parse(response);
                                 if (response.success) {
                                     var search_results = response.message;
                                     if (keyPress === " ") {

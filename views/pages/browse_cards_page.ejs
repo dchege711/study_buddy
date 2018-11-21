@@ -112,12 +112,8 @@
             cardsManager = new CardsManager(null, null);
             cardsManager
                 .initializeFromMinicards([{_id: cardID, urgency: 1}])
-                .then(() => { 
-                    cardsManager
-                        .next()
-                        .then((card) => { renderCard(card); })
-                        .catch((err) => { console.error(err); });
-                })
+                .then(() => { return cardsManager.next(); })
+                .then((card) => { renderCard(card); })
                 .catch((err) => { console.error(err); });
         }
 
@@ -143,6 +139,7 @@
             AppUtilities
                 .sendHTTPRequest("POST", "/flag-card", flagObject)
                 .then((confirmation) => {
+                    confirmation = JSON.parse(confirmation);
                     CardTemplateUtilities.displayPopUp(
                         confirmation.message, 10000
                     );
@@ -165,6 +162,7 @@
                         newCardIsPrivate: USER_INFO.cardsAreByDefaultPrivate
                     })
                 .then((confirmation) => {
+                    confirmation = JSON.parse(confirmation);
                     let ownCard = confirmation.message;
                     CardTemplateUtilities.displayPopUp(
                         `Added ${ownCard.title} to your collection!`, 1000

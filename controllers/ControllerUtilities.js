@@ -15,6 +15,7 @@ const generic_500_msg = {
  */
 exports.convertObjectToResponse = function (err, result_JSON, res) {
     if (err) {
+        console.error(err);
         res.render(
             "pages/5xx_error_page.ejs", 
             { response_JSON: generic_500_msg, APP_NAME: APP_NAME }

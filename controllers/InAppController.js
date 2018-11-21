@@ -75,15 +75,15 @@ exports.update_card = function (req, res) {
 };
 
 exports.delete_card = function (req, res) {
-    sendResponseFromPromise(MetadataDB.delete_from_trash(req.body), res);
+    sendResponseFromPromise(MetadataDB.deleteCardFromTrash(req.body), res);
 };
 
 exports.trash_card = function (req, res) {
-    sendResponseFromPromise(MetadataDB.send_to_trash(req.body), res);
+    sendResponseFromPromise(MetadataDB.sendCardToTrash(req.body), res);
 };
 
 exports.restore_from_trash = function (req, res) {
-    sendResponseFromPromise(MetadataDB.restore_from_trash(req.body), res);
+    sendResponseFromPromise(MetadataDB.restoreCardFromTrash(req.body), res);
 };
 
 exports.download_user_data = function(req, res) {
