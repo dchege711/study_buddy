@@ -4,12 +4,12 @@
   "description": "A web application that helps me review content",
   "main": "server.js",
   "scripts": {
-    "test": "mocha './tests/mocha_tests/functionality_tests/*.js'",
-    "unit_tests": "mocha --recursive './tests/mocha_tests/unit_tests/TestCardsMongoDB.js'", 
-    "mocha": "mocha --recursive './tests/mocha_tests/*.js",
+    "test": "nyc --reporter=text mocha './tests/mocha_tests/functionality_tests/*.js'",
+    "unit_tests": "nyc --reporter=text mocha --recursive './tests/mocha_tests/unit_tests/TestCardsMongoDB.js'",
+    "mocha": "nyc --reporter=text mocha --recursive './tests/mocha_tests/*.js",
     "start": "npm run build && node server.js",
     "debug": "node --trace-warnings server.js",
-    "ui_tests": "cd tests/selenium_tests/ && ./run_selenium_tests.sh && cd ../../",
+    "ui_tests": "cd tests/selenium_tests/ && nyc --reporter=text ./run_selenium_tests.sh && cd ../../",
     "build": "webpack --config webpack.config.js"
   },
   "repository": {
@@ -51,6 +51,7 @@
     "highlightjs": "^9.12.0",
     "mathjax": "^2.7.5",
     "mocha": "^5.2.0",
+    "nyc": "^13.1.0",
     "showdown": "^1.8.7",
     "webpack": "^4.25.1",
     "webpack-cli": "^3.1.2"
