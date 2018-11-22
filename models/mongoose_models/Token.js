@@ -4,6 +4,7 @@
  */
 
 var mongoose = require('mongoose');
+var isEmail = require("validator").isEmail;
 
 var tokenSchema = new mongoose.Schema(
     {
@@ -14,7 +15,12 @@ var tokenSchema = new mongoose.Schema(
         },
         userIDInApp: String,
         username: String, 
-        email: String,
+        email: {
+            type: String,
+            required: true,
+            unique: true,
+            validate: [isEmail, 'Please provide a valid email address']
+        },
         user_reg_date: String
     },
     {

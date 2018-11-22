@@ -30,6 +30,7 @@ var cardSchema = new mongoose.Schema(
     }, 
     {
         timestamps: true,
+        autoIndex: true,
         collection: "c13u_study_buddy",
         strict: true
     }
@@ -49,9 +50,6 @@ cardSchema.index(
         name: "TextIndex"
     }
 );
-cardSchema.virtual("url").get(function () {
-    return "/study-buddy/card/" + this._id;
-});
 
 /*
  * The schema has now been compiled into a mongoose model. I can now use it
