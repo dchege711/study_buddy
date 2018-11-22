@@ -17,12 +17,15 @@ exports.test = async function(headless=true) {
     } else {
         driver = await new Builder().build();
     }
+
+    let numTotalTests = 0, numTestsPassed = 0, testLabel = "";
     
     try {
         await driver
             .get(config.BASE_URL);
 
-        console.log("\nCreating a new account...\n");
+        testLabel = "Creating and logging into a new account";
+        numTotalTests += 1;
 
         await driver
             .findElement({ id: "display_signup_form" }).click();
@@ -46,34 +49,23 @@ exports.test = async function(headless=true) {
         await driver
             .sleep(config.DEBUG_OPERATION_TIMEOUT_MS);
             
-        await driver
-            .switchTo().alert().accept();
-
-        console.log("\nLogging into the new account...\n");
-
-        await driver
-            .findElement({ id: "display_login_form" }).click();
-        
-        await driver
-            .findElement({ name: "username_or_email"})
-            .sendKeys(config.DEBUG_EMAIL_ADDRESS);
-
-        await driver
-            .findElement({ id: "login_password" })
-            .sendKeys(config.DEBUG_PASSWORD);
-
-        await driver
-            .findElement({ id: "login_submit" }).click();
+        await driver.switchTo().alert().accept();
 
         await driver
             .wait(
                 until.urlIs(`${config.BASE_URL}/home`), 
                 config.DEBUG_OPERATION_TIMEOUT_MS
-            ).then((logged_in) => {
-                console.log(`\tLogged in: ${logged_in}`);
+            ).then((loggedIn) => {
+                if (loggedIn) {
+                    numTestsPassed += 1;
+                    console.log(`✔ ${testLabel}`);
+                } else {
+                    console.log(`✖ ${testLabel}`);
+                }
             });
 
-        console.log("\nDeleting the new account...\n");
+        testLabel = "Deleting the new account";
+        numTotalTests += 1;
 
         await driver
             .wait(
@@ -105,13 +97,19 @@ exports.test = async function(headless=true) {
                 until.urlIs(`${config.BASE_URL}/login`),
                 config.DEBUG_OPERATION_TIMEOUT_MS
             )
-            .then((logged_out) => {
-                console.log(`\tDeleted account: ${logged_out}`);
+            .then((loggedOut) => {
+                if (loggedOut) {
+                    numTestsPassed += 1;
+                    console.log(`✔ ${testLabel}`);
+                } else {
+                    console.log(`✖ ${testLabel}`);
+                }
             });
 
     } catch(err) {
         console.error(err);
     } finally {
         await driver.quit();
+        return Promise.resolve([numTestsPassed, numTotalTests]);
     }
 }
