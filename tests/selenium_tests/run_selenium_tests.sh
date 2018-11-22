@@ -14,17 +14,17 @@ sleep 1.5 # Enough time for the server to initialize
 
 browser_to_test=`echo "$1" | tr '[:upper:]' '[:lower:]'`
 
-if [[ $browser_to_test == "" ]] || [[ $browser_to_test == "chrome" ]]; then
+if [[ $browser_to_test == "all" ]] || [[ $browser_to_test == "chrome" ]]; then
     echo -e "\n__________________\n\nTesting on chrome...\n__________________\n"
-    SELENIUM_SERVER_JAR=./selenium-server-standalone-3.8.1.jar SELENIUM_BROWSER=chrome node Test.js
+    SELENIUM_SERVER_JAR=./selenium-server-standalone-3.8.1.jar SELENIUM_BROWSER=chrome node Test.js $2
 fi
 
-if [[ $browser_to_test == "" ]] || [[ $browser_to_test == "safari" ]]; then
+if [[ $browser_to_test == "all" ]] || [[ $browser_to_test == "safari" ]]; then
     echo -e "\n__________________\n\nTesting on safari...\n__________________\n"
-    SELENIUM_SERVER_JAR=./selenium-server-standalone-3.8.1.jar SELENIUM_BROWSER=safari node Test.js
+    SELENIUM_SERVER_JAR=./selenium-server-standalone-3.8.1.jar SELENIUM_BROWSER=safari node Test.js $2
 fi
 
-if [[ $browser_to_test == "" ]] || [[ $browser_to_test == "firefox" ]]; then
+if [[ $browser_to_test == "all" ]] || [[ $browser_to_test == "firefox" ]]; then
     echo -e "\n__________________\n\nTesting on firefox...\n__________________\n"
-    SELENIUM_SERVER_JAR=./selenium-server-standalone-3.8.1.jar SELENIUM_BROWSER=firefox node Test.js
+    SELENIUM_SERVER_JAR=./selenium-server-standalone-3.8.1.jar SELENIUM_BROWSER=firefox node Test.js $2
 fi

@@ -3,7 +3,6 @@
 const stanfordCrypto = require('sjcl');
 const User = require("./mongoose_models/UserSchema.js");
 const MetadataDB = require("./MetadataMongoDB.js");
-const Card = require('./mongoose_models/CardSchema.js');
 const Metadata = require("./mongoose_models/MetadataCardSchema");
 const Token = require("./mongoose_models/Token.js");
 const Email = require("./EmailClient.js");
@@ -12,10 +11,6 @@ const config = require("../config.js");
 const DIGITS = "0123456789";
 const LOWER_CASE = "abcdefghijklmnopqrstuvwxyz";
 const UPPER_CASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-const generic500Message = {
-    success: false, status: 500, message: "Internal Server Error"
-};
 
 exports.close = function() {
     return new Promise(function(resolve, reject) {
