@@ -2,27 +2,29 @@
 
 ## Tests to automate
 
-* (Done) Creating a new account
-* (Done) Asserting that the validation link was sent
-* (Done) Clicking the validation link
-* (Done) Logging into a new account
-* (Done) Logging out of an account
-* Changing the password
-* Downloading data
-* (Done) Update settings for account
-* (Done) Deleting an account
-* Saving a card
-* Trashing a card
-* Filtering cards based on tags
-* Searching card descriptions and titles
-* Review Mode
-* Restoring a card from the trash
-* The previous and next buttons
-* Searching for public cards
-* Filtering public cards by tag
-* Viewing more of a public card
-* Flagging public card for review/multiplicity
-* Adding a public card to one's collection
+| Task | UI Sanity Test | API Test |
+| --- | --- | --- |
+| Creating a new account | Done | |
+| Asserting that the validation link was sent | | |
+| Clicking the validation link | | |
+| Logging into an account | | |
+| Logging out of an account | | |
+| Changing the password | | |
+| Downloading data | | |
+| Update settings for account | | |
+| Deleting an account | Done | |
+| Saving a card | | |
+| Trashing a card | | |
+| Filtering cards based on tags | | |
+| Searching card descriptions and titles | | |
+| Review Mode | | |
+| Restoring a card from the trash | | |
+| The previous and next buttons | | |
+| Searching for public cards | | |
+| Filtering public cards by tag | | |
+| Viewing more of a public card | | |
+| Flagging public card for review/multiplicity | | |
+| Adding a public card to one's collection | | |
 
 [Standard](https://www.softwaretestinghelp.com/web-application-testing/) testing for web applications include:
 
