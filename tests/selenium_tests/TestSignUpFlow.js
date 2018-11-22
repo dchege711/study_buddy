@@ -24,7 +24,7 @@ exports.test = async function(headless=true) {
         await driver
             .get(config.BASE_URL);
 
-        testLabel = "Creating and logging into a new account";
+        testLabel = "Creating a new account";
         numTotalTests += 1;
 
         await driver
