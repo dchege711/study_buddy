@@ -4,12 +4,12 @@
   "description": "A web application that helps me review content",
   "main": "server.js",
   "scripts": {
-    "test": "nyc --reporter=text mocha './tests/mocha_tests/functionality_tests/*.js'",
-    "unit_tests": "nyc --reporter=text mocha --recursive './tests/mocha_tests/unit_tests/TestCardsMongoDB.js'",
-    "mocha": "nyc --reporter=text mocha --recursive './tests/mocha_tests/*.js",
+    "test": "nyc --reporter=lcov --reporter=text mocha './tests/mocha_tests/functionality_tests/*.js'",
+    "unit_tests": "nyc --reporter=lcov --reporter=text mocha --recursive './tests/mocha_tests/unit_tests/TestCardsMongoDB.js'",
+    "mocha": "nyc --reporter=lcov --reporter=text mocha --recursive './tests/mocha_tests/*.js",
     "start": "npm run build && node server.js",
     "debug": "node --trace-warnings server.js",
-    "ui_tests": "cd tests/selenium_tests/ && nyc --reporter=text ./run_selenium_tests.sh && cd ../../",
+    "ui_tests": "cd tests/selenium_tests/ && nyc --reporter=text --reporter=lcov ./run_selenium_tests.sh && cd ../../",
     "build": "webpack --config webpack.config.js"
   },
   "repository": {
