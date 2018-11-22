@@ -9,6 +9,7 @@
     "mocha": "mocha --recursive './tests/mocha_tests/*.js",
     "start": "npm run build && node server.js",
     "debug": "node --trace-warnings server.js",
+    "ui_tests": "cd tests/selenium_tests/ && ./run_selenium_tests.sh && cd ../../",
     "build": "webpack --config webpack.config.js"
   },
   "repository": {
