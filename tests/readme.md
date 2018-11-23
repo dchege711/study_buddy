@@ -4,20 +4,20 @@
 
 | Task | UI Sanity Test | API Test |
 | --- | --- | --- |
-| Creating a new account | Done | |
-| Asserting that the validation link was sent | | |
-| Clicking the validation link | | |
-| Logging into an account | | |
-| Logging out of an account | | |
+| Creating a new account | Done | Done |
+| Asserting that the validation link was sent | N/A | Done |
+| Clicking the validation link | Done | |
+| Logging into an account | Done | |
+| Logging out of an account | Done | |
 | Changing the password | | |
 | Downloading data | | |
 | Update settings for account | | |
-| Deleting an account | Done | |
-| Saving a card | | |
+| Deleting an account | Done | Done |
+| Saving a card | | Done |
 | Trashing a card | | |
 | Filtering cards based on tags | | |
 | Searching card descriptions and titles | | |
-| Review Mode | | |
+| Review Mode | | N/A |
 | Restoring a card from the trash | | |
 | The previous and next buttons | | |
 | Searching for public cards | | |
