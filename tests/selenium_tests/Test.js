@@ -1,6 +1,6 @@
 "use strict";
 
-const TestSignUpFlow = require("./TestSignUpFlow.js");
+const TestAuthActions = require("./TestAuthActions.js");
 const LoginUtils = require("../../models/LogInUtilities.js");
 const dbConnection = require("../../models/MongooseClient.js");
 
@@ -14,7 +14,7 @@ async function runTestSuite(headless=true) {
 
 
     console.log(`Testing signup paths...`);
-    await TestSignUpFlow
+    await TestAuthActions
         .test(headless=headless)
         .then(([numTestsPassed, numTotalTests]) => {
             console.log(`\n${numTestsPassed}/${numTotalTests} tests passed!`);
