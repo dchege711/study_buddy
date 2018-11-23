@@ -12,6 +12,9 @@ const DIGITS = "0123456789";
 const LOWER_CASE = "abcdefghijklmnopqrstuvwxyz";
 const UPPER_CASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
+/**
+ * @description Clean up resources before exiting the script.
+ */
 exports.close = function() {
     return new Promise(function(resolve, reject) {
         Email.close();
@@ -562,6 +565,26 @@ exports.resetPassword = function(payload) {
 
     });
 };
+
+/**
+ * @description Fetch the User object as represented in the database. 
+ * 
+ * @returns {Promise} resolves with a JSON keyed by `status`, `message` and 
+ * `success`. If `success` is set, the `message` property will contain the `user`
+ * object.
+ */
+exports.getAccountDetails = function(identifierQuery) {
+    return new Promise(function(resolve, reject) {
+        User
+            .findOne(identifierQuery)
+            .select("-salt -hash")
+            .exec()
+            .then((user) => { 
+                resolve({success: true, status: 200, message: user});
+            })
+            .catch((err) => { reject(err); });
+    });
+}
 
 
 /**
