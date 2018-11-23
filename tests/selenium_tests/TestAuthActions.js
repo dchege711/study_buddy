@@ -4,6 +4,9 @@ const chrome = require("selenium-webdriver/chrome");
 const config = require("../../config.js");
 const LoginUtils = require("../../models/LogInUtilities.js");
 
+const TIMEOUT = config.DEBUG_OPERATION_TIMEOUT_MS;
+const BASE_URL = config.BASE_URL;
+
 /**
  * @description Test common actions that occur from the login page.
  */
@@ -39,75 +42,46 @@ exports.test = async function(headless=true) {
     }
     
     try {
-        await driver
-            .get(config.BASE_URL)
+
+        /**********************************************************************/
 
         testLabel = "Create a new account";
         numTotalTests += 1;
 
         await driver
-            .findElement({ id: "display_signup_form" }).click();
+            .get(BASE_URL)
+            .then(() => { return driver.findElement({id: "display_signup_form"}); })
+            .then((webElement) => { return webElement.click(); })
+            .then(() => { return driver.findElement({name: "email"}); })
+            .then((webElement) => { return webElement.sendKeys(config.DEBUG_EMAIL_ADDRESS); })
+            .then(() => { return driver.findElement({name: "username"}); })
+            .then((webElement) => { return webElement.sendKeys(config.DEBUG_USERNAME); })
+            .then(() => { return driver.findElement({id: "signup_password"})})
+            .then((webElement) => { webElement.sendKeys(config.DEBUG_PASSWORD); })
+            .then(() => { return driver.findElement({ id: "signup_submit" }); })
+            .then((webElement) => { return webElement.click(); })
+            .then(() => { return driver.sleep(TIMEOUT); })
+            .then(() => { return driver.switchTo().alert().accept(); })
+            .then(() => { return driver.wait(until.urlIs(`${BASE_URL}/home`), TIMEOUT); })
+            .then((_) => { return driver.manage(); })
+            .then((options) => { return options.getCookie("session_token"); })
+            .then((optionsCookie) => { printTestResult(optionsCookie !== null, testLabel); })
+            .catch((err) => { console.error(err); printTestResult(false, testLabel); });
 
-        await driver
-            .findElement({ name: "email" })
-            .sendKeys(config.DEBUG_EMAIL_ADDRESS);
-
-        await driver
-            .findElement({ name: "username" })
-            .sendKeys(config.DEBUG_USERNAME);
-
-        await driver
-            .findElement({ id: "signup_password" })
-            .sendKeys(config.DEBUG_PASSWORD);
-
-        await driver
-            .findElement({ id: "signup_submit" }).click();
-
-        // Investigate why waiting for an alert doesn't work...
-        await driver
-            .sleep(config.DEBUG_OPERATION_TIMEOUT_MS);
-            
-        await driver.switchTo().alert().accept();
-
-        await driver
-            .wait(
-                until.urlIs(`${config.BASE_URL}/home`), 
-                config.DEBUG_OPERATION_TIMEOUT_MS
-            ).then((_) => {
-                return driver.manage().getCookie("session_token")
-            })
-            .then((cookie) => {
-                printTestResult(cookie !== null, testLabel);
-            });
+        /**********************************************************************/
 
         testLabel = "LocalStorage is cleared upon logging out"
         numTotalTests += 1;
 
         await driver
-            .wait(
-                until.elementLocated({ id: "logout_button" }), 
-                config.DEBUG_OPERATION_TIMEOUT_MS
-            )
-            .then((logOutButton) => {
-                driver.wait(
-                    until.elementIsVisible(logOutButton),
-                    config.DEBUG_OPERATION_TIMEOUT_MS
-                ).then((_) => {
-                    logOutButton.click();
-                });
-            });
+            .wait(until.elementLocated({ id: "logout_button" }), TIMEOUT)
+            .click()
+            .then(() => { return driver.wait(until.urlIs(`${BASE_URL}/`), TIMEOUT); })
+            .then((_) => { return driver.executeScript("return window.localStorage;"); })
+            .then((storedContent) => { printTestResult(storedContent.length === 0, testLabel); })
+            .catch((err) => { console.error(err); printTestResult(false, testLabel); });
 
-        await driver
-            .wait(
-                until.urlIs(`${config.BASE_URL}/`),
-                config.DEBUG_OPERATION_TIMEOUT_MS
-            );
-
-        await driver
-            .executeScript("return window.localStorage")
-            .then((storedContent) => {
-                printTestResult(storedContent.length === 0, testLabel);
-            });
+        /**********************************************************************/
 
         testLabel = "Cookies are cleared upon logging out"
         numTotalTests += 1;
@@ -115,29 +89,26 @@ exports.test = async function(headless=true) {
         await driver
             .manage()
             .getCookie("session_token")
-            .then((cookie) => {
-                printTestResult(cookie === null, testLabel);
-            })
-            .catch((err) => {
-                if (err.name === "NoSuchCookieError") {
-                    printTestResult(true, testLabel);
-                } else {
-                    throw(err);
-                }
+            .then((optionsCookie) => { printTestResult(optionsCookie === null, testLabel); })
+            .catch((err) => { 
+                if (err.name === "NoSuchCookieError") { printTestResult(true, testLabel); }
+                else { console.error(err); printTestResult(false, testLabel); } 
             });
+        
+        /**********************************************************************/
 
         testLabel = "Need to resubmit password after logging out"
         numTotalTests += 1;
 
         await driver
-            .get(`${config.BASE_URL}/home`)
-            .then(function() { return driver.getCurrentUrl(); })
+            .get(`${BASE_URL}/home`)
+            .then(() => { return driver.getCurrentUrl(); })
             .then((currentURL) => {
-                printTestResult(
-                    (currentURL === `${config.BASE_URL}/login` 
-                        || currentURL === `${config.BASE_URL}/`), 
-                    testLabel);
-            });
+                printTestResult(currentURL === `${BASE_URL}/login`, testLabel);
+            })
+            .catch((err) => { console.error(err); printTestResult(false, testLabel); });
+
+        /**********************************************************************/
 
         testLabel = "Log into the new account";
         numTotalTests += 1;
@@ -146,14 +117,17 @@ exports.test = async function(headless=true) {
             .findElement({name: "username_or_email"})
             .sendKeys(config.DEBUG_EMAIL_ADDRESS)
             .then(() => { return driver.findElement({name: "password"}); })
-            .then((element) => { element.sendKeys(config.DEBUG_PASSWORD); })
+            .then((webElement) => { webElement.sendKeys(config.DEBUG_PASSWORD); })
             .then(() => { return driver.findElement({id: "login_submit"}); })
-            .then((element) => { return element.click(); })
+            .then((webElement) => { return webElement.click(); })
             .then(() => { return driver.getCurrentUrl(); })
             .then((_) => { return driver.executeScript("return window.localStorage;")})
             .then((storedContent) => {
                 printTestResult(storedContent.metadata !== undefined, testLabel);
-            });
+            })
+            .catch((err) => { console.error(err); printTestResult(false, testLabel); });
+
+        /**********************************************************************/
 
         testLabel = "Validate the new account & login by session token";
         numTotalTests += 1;
@@ -169,7 +143,7 @@ exports.test = async function(headless=true) {
             .then((results) => {
                 if (results.success) {
                     return driver.get(
-                        `${config.BASE_URL}/verify-account/${results.message.account_validation_uri}`
+                        `${BASE_URL}/verify-account/${results.message.account_validation_uri}`
                     );
                 } else {
                     return Promise.reject("User wasn't found in the database");
@@ -177,50 +151,46 @@ exports.test = async function(headless=true) {
             })
             .then(() => { return driver.getCurrentUrl(); })
             .then((currentURL) => {
-                printTestResult(
-                    (currentURL === `${config.BASE_URL}/home`), 
-                    testLabel);
-            });
+                printTestResult(currentURL === `${BASE_URL}/home`, testLabel);
+            })
+            .catch((err) => { console.error(err); printTestResult(false, testLabel); });
+
+        /**********************************************************************/
 
         testLabel = "Request a password reset"
         
+        /**********************************************************************/
 
         testLabel = "Delete the new account";
         numTotalTests += 1;
 
-        await driver
-            .wait(
-                until.elementLocated({ id: "account_button" }), 
-                config.DEBUG_OPERATION_TIMEOUT_MS
-            ).then((account_button) => {
-                driver.wait(
-                    until.elementIsVisible(account_button),
-                    config.DEBUG_OPERATION_TIMEOUT_MS
-                ).then((_) => {
-                    account_button.click();
-                })
-            });
+        // await driver
+        //     .wait(until.elementLocated({ id: "account_button" }), TIMEOUT)
+        //     .then((accountButton) => { return accountButton.click(); })
+        //     .then(async () => { return await driver.wait(until.urlIs(`${BASE_URL}/account`), TIMEOUT); })
+        //     .then((_) => { return driver.findElement({ id: "delete_account_button" }); })
+        //     .then((webElement) => { webElement.click(); })
+        //     .then(() => { return driver.switchTo(); })
+        //     .then((targetLocator) => { return targetLocator.alert(); })
+        //     .then((alertPromise) => { return alertPromise.accept(); })
+        //     .then(() => { return driver.wait(until.urlIs(`${BASE_URL}/login`), TIMEOUT); })
+        //     .then((loggedOut) => { printTestResult(loggedOut, testLabel); })
+        //     .catch((err) => { console.error(err); printTestResult(false, testLabel); });
 
         await driver
-            .wait(
-                until.urlIs(`${config.BASE_URL}/account`),
-                config.DEBUG_OPERATION_TIMEOUT_MS
-            );
+            .wait(until.elementLocated({id: "account_button"}), TIMEOUT)
+            .then((accountButton) => { accountButton.click(); })
+            .then(() => { return driver.wait(until.urlIs(`${config.BASE_URL}/account`), TIMEOUT); })
+            .then(() => { return driver.findElement({id: "delete_account_button"}); })
+            .then((webElement) => { return webElement.click(); })
+            .then(() => { return driver.switchTo().alert().accept(); })
+            .then(() => { return driver.wait(until.urlIs(`${config.BASE_URL}/login`), TIMEOUT); })
+            .then((loggedOut) => { printTestResult(loggedOut, testLabel); })
+            .catch((err) => { console.error(err); printTestResult(false, testLabel); });
 
-        await driver
-            .findElement({ id: "delete_account_button" }).click();
+        /**********************************************************************/
 
-        await driver
-            .switchTo().alert().accept();
-        
-        await driver
-            .wait(
-                until.urlIs(`${config.BASE_URL}/login`),
-                config.DEBUG_OPERATION_TIMEOUT_MS
-            )
-            .then((loggedOut) => {
-                printTestResult(loggedOut, testLabel);
-            });
+        driver.wait(until.alertIsPresent, TIMEOUT)
 
     } catch(err) {
         console.error(err);
