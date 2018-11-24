@@ -500,7 +500,7 @@ exports.validatePasswordResetLink = function(resetPasswordURI) {
                     });
                 } else if (Date.now() > user.reset_password_timestamp + 2 * 3600 * 1000) {
                     resolve({ 
-                        success: false, status: 303, redirect_url: `${config.BASE_URL}/reset-password`, 
+                        success: false, status: 200, redirect_url: `${config.BASE_URL}/reset-password`, 
                         message: "Expired link. Please submit another reset request." 
                     });
                 } else {
@@ -527,6 +527,7 @@ exports.resetPassword = function(payload) {
             .then((user) => {
                 if (user === null) {
                     resolve({success: false, status: 404, message: "Page Not Found"});
+                    return Promise.reject("DUMMY");
                 } else {
                     prevResults.user = user;
                     return getSaltAndHash(payload.password);
@@ -554,14 +555,14 @@ exports.resetPassword = function(payload) {
             .then((emailConfirmation) => {
                 if (emailConfirmation.success) {
                     resolve({
-                        success: true, status: 303, redirect_url: "/",
+                        success: true, status: 200, redirect_url: "/",
                         message: `Password successfully reset. Log in with your new password.`
                     });
                 } else {
                     resolve(emailConfirmation);
                 }
             })
-            .catch((err) => { reject(err); });
+            .catch((err) => { if (err !== "DUMMY") reject(err); });
 
     });
 };
