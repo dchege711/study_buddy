@@ -9,7 +9,7 @@
 | Clicking the validation link | Done | |
 | Logging into an account | Done | |
 | Logging out of an account | Done | |
-| Changing the password | | |
+| Changing the password | Done | |
 | Downloading data | | |
 | Update settings for account | | |
 | Deleting an account | Done | Done |
