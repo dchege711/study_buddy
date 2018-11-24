@@ -44,7 +44,7 @@
                         id="display_signup_form" onclick="return displayForm('signup_form')">
                         ... or Sign Up for a New Account</button>
 
-                    <p class="link" onclick="return displayForm('password_reset_form')" style="text-decoration: underline">
+                    <p class="link" id="forgot_password_link" onclick="window.location = '/reset-password';" style="text-decoration: underline">
                         Forgot password?
                     </p>
 
@@ -81,26 +81,6 @@
 
                     <button class="w3-button w3-center w3-blue" 
                         id="display_login_form" onclick="return displayForm('login_form')">
-                        ... or go back to LogIn</button>
-                </form>
-
-                <form class="w3-padding-large w3-center hidden tab_content" id="password_reset_form" method="post">
-                    <label for="email">Enter the email address associated with the account: </label>
-                    <input class="w3-input" type="email" name="email" required/>
-                    
-                    <br />
-                    <br />
-
-                    <button class="w3-button w3-center w3-green" type="submit" 
-                        onclick="return passwordResetRequest('password_reset_form')">
-                        Send Password Reset Link
-                    </button>
-                    
-                    <br />
-                    <br />
-                    
-                    <button class="w3-button w3-center w3-blue" 
-                        onclick="return displayForm('login_form')">
                         ... or go back to LogIn</button>
                 </form>
 
@@ -207,33 +187,6 @@
                         setupInitializationData(loginResults);
                     })
                     .catch((err) => { console.error(err); })
-
-                return false;
-            }
-            
-            /**
-             * @description Request a password reset.
-             */ 
-            function passwordResetRequest(formID) {
-                AppUtilities
-                    .sendForm(formID, '/reset-password')
-                    .then((resetResults) => {
-                        resetResults = JSON.parse(resetResults);
-                        if (resetResults.success) {
-                            document.getElementById(formID).innerHTML = `
-                                <p>${resetResults.message}</p>
-
-                                <br />
-                                <br />
-                                
-                                <button class="w3-button w3-center w3-blue" 
-                                    onclick="return displayForm('login_form')">
-                                    ... go back to LogIn</button>`;
-                        } else {
-                            console.error(resetResults.message);
-                        }
-                    })
-                    .catch((err) => { console.error(err); });
 
                 return false;
             }
