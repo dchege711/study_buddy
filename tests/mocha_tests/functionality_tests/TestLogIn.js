@@ -4,17 +4,14 @@ const dbConnection = require("../../../models/MongooseClient.js");
 var LogInUtilities = require("../../../models/LogInUtilities.js");
 const config = require("../../../config.js");
 
-describe("LogIn Utilities", function() {
+describe("Test LoginUtilities\n", function() {
 
     before(function() {
         return LogInUtilities.deleteAllAccounts([]);
     });
 
     after(function() {
-        LogInUtilities
-            .deleteAllAccounts([])
-            .then(function() { return dbConnection.closeMongooseConnection(); })
-            .then(function() { return LogInUtilities.close(); });           
+        return LogInUtilities.deleteAllAccounts([]);        
     });
 
     describe("#registerUserAndPassword()", function() {
@@ -55,7 +52,3 @@ describe("LogIn Utilities", function() {
 
     });
 });
-
-// In case the process doesn't close, run this to discover why
-// var why_is_node_running = require("why-is-node-running");
-// setTimeout(why_is_node_running, 5000);

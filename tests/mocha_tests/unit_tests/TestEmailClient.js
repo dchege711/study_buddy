@@ -3,12 +3,8 @@
 const emailClient = require("../../../models/EmailClient.js");
 const config = require("../../../config.js");
 
-describe("models/EmailClient.js", function() {
+describe("Test EmailClient\n", function() {
 
-    after(function(done) {
-        emailClient.close();
-        done();           
-    });
 
     describe("Sending an email...", function() {
 
