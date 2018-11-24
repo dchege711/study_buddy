@@ -14,8 +14,8 @@
     "start": "npm run build && node server.js",
     "debug": "node --trace-warnings server.js",
 
-    "test": "nyc mocha --recursive './tests/mocha_tests/*/*.js'",
-    "unit_tests": "nyc mocha --recursive './tests/mocha_tests/unit_tests/TestCardsMongoDB.js'",
+    "test": "nyc mocha --no-warnings --recursive --sort './tests/mocha_tests/*/*.js'",
+    "unit_tests": "nyc mocha --no-warnings --recursive --sort './tests/mocha_tests/unit_tests/TestCardsMongoDB.js'",
     "selenium": "cd tests/selenium_tests/ && nyc ./run_selenium_tests.sh firefox headless && cd ../../"
     
   },
