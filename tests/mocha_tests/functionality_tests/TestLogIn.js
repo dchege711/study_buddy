@@ -6,63 +6,51 @@ const config = require("../../../config.js");
 
 describe("LogIn Utilities", function() {
 
-    before(function(done) {
-        LogInUtilities.deleteAllAccounts(done);
+    before(function() {
+        return LogInUtilities.deleteAllAccounts([]);
     });
 
-    after(function(done) {
-        LogInUtilities.deleteAllAccounts(function(err) {
-            if (err) done(err);
-            else {
-                dbConnection.closeMongooseConnection(function(err) {
-                    if (err) done(err);
-                    else LogInUtilities.close(done);
-                });
-            }
-        });            
+    after(function() {
+        LogInUtilities
+            .deleteAllAccounts([])
+            .then(function() { return dbConnection.closeMongooseConnection(); })
+            .then(function() { return LogInUtilities.close(); });           
     });
 
     describe("#registerUserAndPassword()", function() {
 
         it("should reject incorrect signup info", function(done) {
-            LogInUtilities.registerUserAndPassword(
-                { 
+            LogInUtilities
+                .registerUserAndPassword({ 
                     username: "test711@!", password: "dummy_password",
                     email: "c13u.study.buddygmail.com" 
-                },
-                function(err, signup_result) {
-                    if (err) done();
-                    else {
-                        done(new Error(signup_result.message));
-                    }
-                }
-            );
+                })
+                .then(function(signupResult) {
+                    done(new Error(signupResult.message));
+                })
+                .catch(function(_) { done(); });
         });
 
-        it("should sign up users with valid info", function(done) {
-            LogInUtilities.registerUserAndPassword(
-                {
+        it("should sign up users with valid info", function() {
+            return LogInUtilities
+                .registerUserAndPassword({
                     username: "test", password: "test_dummy_password",
                     email: config.DEBUG_EMAIL_ADDRESS
-                }, done
-            );
+                });
         });
 
         // Remarks: a.b@gmail.com and ab@gmail.com will be regarded as different emails!
         it("should prevent multiple users from sharing email/usernames", function(done) {
-            LogInUtilities.registerUserAndPassword(
-                {
+            LogInUtilities
+                .registerUserAndPassword({
                     username: "test-dup", password: "test_dummy_password",
                     email: config.DEBUG_EMAIL_ADDRESS
-                },
-                function(err, signup_result) {
-                    if (err) done(err);
-                    else {
-                        if (signup_result.success) done(new Error(signup_result.message));
-                        else done();
-                    }
-                }
-            );
+                })
+                .then(function(signupResult) {
+                    if (signupResult.success) done(new Error(signupResult.message));
+                    else done();
+                })
+                .catch(function(err) { done(err); });
         });
 
     });

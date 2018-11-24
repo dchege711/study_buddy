@@ -5,26 +5,29 @@ const CardsDB = require("../../../models/CardsMongoDB.js");
 const Card = require("../../../models/mongoose_models/CardSchema.js");
 const SampleCards = require("../../SampleCards.js");
 const dummyAccount = require("../../DummyAccountUtils.js");
+const LogInUtilities = require("../../../models/LogInUtilities.js");
 
 var dummyUser;
 
-describe("Testing the interface to the cards DB...", function() {
+describe("TestCardsMongoDB..", function() {
 
     // Set the dummy account variable.
-    before(function(done) {
+    before(async function(done) {
+
+        await LogInUtilities.deleteAllAccounts([]);
+        
         dummyAccount
             .getDummyAccount()
-            .then(function(accountInfo) {
-                dummyUser = accountInfo; done();
-            })
+            .then(function(accountInfo) { console.log("Ah!"); dummyUser = accountInfo; done(); })
             .catch(function(err) { done(err); });
+
     });
 
-    after(function(done) {
-        dbConnection
-            .closeMongooseConnection()
-            .then(function() { done(); })
-            .catch(function (err) { done(err); });
+    after(function() {
+        LogInUtilities
+            .deleteAllAccounts([])
+            .then(function() { return dbConnection.closeMongooseConnection(); })
+            .then(function() { return LogInUtilities.close(); }); 
     });
 
     describe("Method sanity tests...", function() {
