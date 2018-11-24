@@ -45,17 +45,28 @@ app.set("view engine", "ejs");
 app.use("/", AccountRoutes);
 app.use("/", InAppRoutes);
 
-app.listen(port, function() {
-    console.log(`App is running on port ${port}`);
+app.use(function (err, req, res, next) {
+    console.error(err.stack)
+    res.status(500).render(
+        "pages/5xx_error_page.ejs", 
+        { 
+            response_JSON: {status: 500, message: "Internal Server Error"}, 
+            APP_NAME: config.APP_NAME 
+        }
+    );
 });
 
-/**
- * Setup default error catcher.
- */
-app.use(function (error, req, res, next) {
-    console.error(error.stack);
-    res.render(
+// Handling 404: https://expressjs.com/en/starter/faq.html
+app.use(function (req, res, next) {
+    res.status(404).render(
         "pages/4xx_error_page.ejs", 
-        {response_JSON: {status: 404, message: "Page Not Found"}}
+        {
+            response_JSON: {status: 404, message: "Page Not Found"},
+            APP_NAME: config.APP_NAME
+        }
     );
+});
+
+app.listen(port, function() {
+    console.log(`App is running on port ${port}`);
 });

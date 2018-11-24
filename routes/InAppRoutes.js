@@ -4,39 +4,41 @@ var requireLogIn = require("../controllers/AuthenticationController.js").require
 
 var router = express.Router();
 
-router.post("/read-card", requireLogIn, inAppController.read_card);
+router.post("/read-card", requireLogIn, inAppController.readCard);
+
+router.post("/read-public-card", inAppController.readPublicCard);
 
 router.get("/home", requireLogIn, inAppController.home);
 
-router.get("/wiki", inAppController.wiki_page);
+router.get("/wiki", inAppController.wikiPage);
 
-router.get("/browse", inAppController.browse_page);
+router.get("/browse", inAppController.browsePage);
 
-router.get("/account", requireLogIn, inAppController.account_get);
+router.get("/account", requireLogIn, inAppController.accountGet);
 
-router.post("/read-metadata", requireLogIn, inAppController.read_metadata);
+router.post("/read-metadata", requireLogIn, inAppController.readMetadata);
 
 router.post("/tags", inAppController.tags);
 
-router.post("/add-card", requireLogIn, inAppController.add_card);
+router.post("/add-card", requireLogIn, inAppController.addCard);
 
-router.post("/search-cards", requireLogIn, inAppController.search_cards);
+router.post("/search-cards", requireLogIn, inAppController.searchCards);
 
-router.post("/update-card", requireLogIn, inAppController.update_card);
+router.post("/update-card", requireLogIn, inAppController.updateCard);
 
-router.post("/delete-card", requireLogIn, inAppController.delete_card);
+router.post("/delete-card", requireLogIn, inAppController.deleteCard);
 
-router.post("/trash-card", requireLogIn, inAppController.trash_card);
+router.post("/trash-card", requireLogIn, inAppController.trashCard);
 
 router.post("/duplicate-card", requireLogIn, inAppController.duplicateCard);
 
 router.post("/flag-card", inAppController.flagCard);
 
-router.post("/restore-from-trash", requireLogIn, inAppController.restore_from_trash);
+router.post("/restore-from-trash", requireLogIn, inAppController.restoreCardFromTrash);
 
-router.get("/account/download-user-data", requireLogIn, inAppController.download_user_data);
+router.get("/account/download-user-data", requireLogIn, inAppController.downloadUserData);
 
-router.post("/account/delete-account", requireLogIn, inAppController.delete_account);
+router.post("/account/delete-account", requireLogIn, inAppController.deleteAccount);
 
 router.post("/account/update-settings", requireLogIn, inAppController.updateUserSettings);
 

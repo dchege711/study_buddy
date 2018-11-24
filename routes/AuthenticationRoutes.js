@@ -6,24 +6,24 @@ var router = express.Router();
 router.get("/", auth_controller.handleLogIn);
 router.get("/login", auth_controller.handleLogIn);
 
-router.post("/register-user", auth_controller.register_user);
+router.post("/register-user", auth_controller.registerUser);
 
-router.post("/login", auth_controller.login);
+router.post("/login", auth_controller.loginUser);
 
-router.post("/logout", auth_controller.logout);
+router.post("/logout", auth_controller.logoutUser);
 
-router.get("/send-validation-email", auth_controller.send_validation_email_get);
+router.get("/send-validation-email", auth_controller.sendValidationEmailGet);
 
-router.post("/send-validation-email", auth_controller.send_validation_email_post);
+router.post("/send-validation-email", auth_controller.sendValidationEmailPost);
 
-router.get("/verify-account/*", auth_controller.verify_account);
+router.get("/verify-account/*", auth_controller.verifyAccount);
 
-router.get("/reset-password", auth_controller.reset_password_get);
+router.get("/reset-password", auth_controller.resetPasswordGet);
 
-router.post("/reset-password", auth_controller.reset_password_post);
+router.post("/reset-password", auth_controller.resetPasswordPost);
 
-router.get("/reset-password-link/*", auth_controller.reset_password_link_get);
+router.get("/reset-password-link/*", auth_controller.resetPasswordLinkGet);
 
-router.post("/reset-password-link/*", auth_controller.reset_password_link_post);
+router.post("/reset-password-link/*", auth_controller.resetPasswordLinkPost);
 
 module.exports = router;

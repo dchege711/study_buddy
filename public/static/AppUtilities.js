@@ -41,21 +41,25 @@ exports.sendForm = function(form_id, url) {
  * @param {JSON} payload The data that will be sent along with the request
  * @return {Promise} 
  */
-exports.sendHTTPRequest = function(method, url, payload) {
+exports.sendHTTPRequest = function(method, url, payload, contentType="application/json") {
     return new Promise(function(resolve, reject) {
         let xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 200) {
-                try {
-                    let json_response_data = JSON.parse(this.responseText);
-                    resolve(json_response_data);
-                } catch (err) { 
-                    reject(err); 
+            if (this.readyState == 4) {
+                let status = this.status;
+                if (status < 300) {
+                    resolve(this.response);
+                } else if (status >= 300 && status < 400) {
+                    reject(new Error(`Request was redirected to ${this.responseURL}.`));
+                    window.location = this.responseURL;
+                } else {
+                    reject(new Error(`Request returned a response status (${status})`));
+                    document.write(this.response);
                 }
             }
         };
         xhttp.open(method, url, true);
-        xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhttp.setRequestHeader("Content-Type", contentType);
         xhttp.send(JSON.stringify(payload));
     });
 }
@@ -68,7 +72,6 @@ exports.processParams = function() {
     var params = (new URL(document.location)).searchParams;
     if (params.has("msg")) alert(params.get("msg"));
 }
-
 
 /**
  * @description Fetch information about the user from Local Storage

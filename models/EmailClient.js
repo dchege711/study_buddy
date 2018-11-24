@@ -19,20 +19,16 @@ let transporter = nodemailer.createTransport({
  * which is an object with the keys `filename`, `content`, `path`, `href`,
  * `contentType`, `contentDisposition`, `cid`, `encoding`, `headers`, `raw`.
  * 
- * @param {Function} callBack Takes a JSON with `success` and `message` as the keys
+ * @returns {Promise} takes a JSON with `success` and `message` as the keys
  */
-exports.sendEmail = function(mailOptions, callBack) {
+exports.sendEmail = function(mailOptions) {
     mailOptions.from = `${config.APP_NAME} <${config.EMAIL_ADDRESS}>`;
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            callBack({
-                success: false, message: error
-            });
-        } else {
-            callBack({
-                success: true, message: info
-            });
-        }
+    return new Promise(function(resolve, reject) {
+        transporter.sendMail(mailOptions)
+        .then((info) => {
+            resolve({success: true, status: 200, message: info});
+        })
+        .catch((err) => { reject(err); });
     });
 };
 
@@ -47,15 +43,3 @@ exports.close = function() {
 process.on("SIGINT", function () {
     exports.close();
 });
-
-if (require.main === module) {
-    this.sendEmail({
-        from: `${config.APP_NAME} <${config.EMAIL_ADDRESS}>`,
-        to: "d.chege711@gmail.com", 
-        subject: "Test Nodemailer Setup", 
-        text: "This is plain text...",
-        html: "<p>Where does <em>the HTML</em> go?</p>"
-    }, (results) => {
-        console.log(results.message);
-    });
-}

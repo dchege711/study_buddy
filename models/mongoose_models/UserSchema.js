@@ -40,8 +40,4 @@ var userSchema = new mongoose.Schema(
     }
 );
 
-userSchema.virtual("url").get(function() {
-    return "/study-buddy/user/" + this._id;
-});
-
 module.exports = mongoose.model('User', userSchema);
