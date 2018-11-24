@@ -1,6 +1,6 @@
 # Flashcards by c13u
 
-[![Build Status](https://travis-ci.com/dchege711/study_buddy.svg?branch=public_links_to_cards)](https://travis-ci.com/dchege711/study_buddy)
+[![Build Status](https://travis-ci.com/dchege711/study_buddy.svg?branch=enhance_browse_page)](https://travis-ci.com/dchege711/study_buddy)
 
 The web app is live at [https://notes.c13u.com/](https://notes.c13u.com/)
 
