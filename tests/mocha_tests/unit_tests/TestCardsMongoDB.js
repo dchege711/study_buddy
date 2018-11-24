@@ -9,25 +9,21 @@ const LogInUtilities = require("../../../models/LogInUtilities.js");
 
 var dummyUser;
 
-describe("TestCardsMongoDB..", function() {
+describe("Test CardsMongoDB\n", function() {
 
     // Set the dummy account variable.
-    before(async function(done) {
+    before(function(done) {
 
-        await LogInUtilities.deleteAllAccounts([]);
-        
-        dummyAccount
-            .getDummyAccount()
-            .then(function(accountInfo) { console.log("Ah!"); dummyUser = accountInfo; done(); })
+        LogInUtilities
+            .deleteAllAccounts([])
+            .then(function (_) { return dummyAccount.getDummyAccount(); })
+            .then(function(accountInfo) { dummyUser = accountInfo; done(); })
             .catch(function(err) { done(err); });
 
     });
 
     after(function() {
-        LogInUtilities
-            .deleteAllAccounts([])
-            .then(function() { return dbConnection.closeMongooseConnection(); })
-            .then(function() { return LogInUtilities.close(); }); 
+        return LogInUtilities.deleteAllAccounts([]);
     });
 
     describe("Method sanity tests...", function() {
@@ -55,13 +51,13 @@ describe("TestCardsMongoDB..", function() {
                 .then(function(results) {
                     let cards = results.message;
                     for (let i = 0; i < cards.length; i++) {
-                        cardIDs.add(cards[i]._id);
+                        cardIDs.add(cards[i]._id.toString());
                     }
                     return Card.find({createdById: dummyUser.userIDInApp}).exec();
                 })
                 .then(function(cards) {
                     for (let i = 0; i < cards.length; i++) {
-                        if (!cardIDs.delete(cards[i]._id)) {
+                        if (!cardIDs.delete(cards[i]._id.toString())) {
                             done(new Error("CardsMongoDB.read() is skipping some cards."));
                             return Promise.reject("BREAK");
                         }
@@ -107,6 +103,7 @@ describe("TestCardsMongoDB..", function() {
                     prevResults.originalCard = existingCard;
                     existingCard.urgency = existingCard.urgency - 2;
                     existingCard.createdById = "This value should not be saved";
+                    existingCard.cardID = existingCard._id;
                     return CardsDB.update(existingCard);
                 })
                 .then(function(results) {
@@ -114,7 +111,7 @@ describe("TestCardsMongoDB..", function() {
                     let prevCard = prevResults.originalCard;
                     if (savedCard.urgency === prevCard.urgency) {
                         done(new Error("The urgency attribute should have been modified, but it wasn't."));
-                    } else if (savedCard.createdById !== dummyUser.userIDInApp) {
+                    } else if (savedCard.createdById.toString() !== dummyUser.userIDInApp.toString()) {
                         done(new Error("The createdById attribute should be treated as a constant."));
                     } else {
                         done();

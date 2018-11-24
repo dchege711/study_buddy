@@ -4,6 +4,7 @@ const stanfordCrypto = require('sjcl');
 const User = require("./mongoose_models/UserSchema.js");
 const MetadataDB = require("./MetadataMongoDB.js");
 const Metadata = require("./mongoose_models/MetadataCardSchema");
+const Card = require("./mongoose_models/CardSchema");
 const Token = require("./mongoose_models/Token.js");
 const Email = require("./EmailClient.js");
 const config = require("../config.js");
@@ -269,59 +270,61 @@ exports.registerUserAndPassword = function(payload) {
                 success: false, status: 200,
                 message: "At least one of these wasn't provided: username, password, email"
             });
-            return;
-        }
+        } else {
 
-        User
-            .findOne({ $or: [{ username: username }, { email: email }]}).exec()
-            .then((existingUser) => {
-                if (existingUser === null) return getSaltAndHash(password);
-                let rejectionReason = null;
-                if (existingUser.username === username) {
-                    rejectionReason = "Username already taken."
-                } else {
-                    rejectionReason = "Email already taken."
-                }
-                resolve({
-                    success: false, status: 200,
-                    message: rejectionReason
+            User
+                .findOne({ $or: [{ username: username }, { email: email }]}).exec()
+                .then((existingUser) => {
+                    if (existingUser === null) return getSaltAndHash(password);
+                    let rejectionReason = null;
+                    if (existingUser.username === username) {
+                        rejectionReason = "Username already taken."
+                    } else {
+                        rejectionReason = "Email already taken."
+                    }
+                    resolve({
+                        success: false, status: 200,
+                        message: rejectionReason
+                    });
+                    return Promise.reject("DUMMY");
+                })
+                .then(([salt, hash]) => {
+                    results.salt = salt; 
+                    results.hash = hash;
+                    return getIdInAppAndValidationURI();
+                })
+                .then(([userID, validationURI]) => {
+                    return User.create({
+                        username: username, salt: results.salt, hash: results.hash,
+                        userIDInApp: userID, email: email, account_is_valid: false,
+                        account_validation_uri: validationURI
+                    });
+                })
+                .then((savedUser) => {
+                    prevResults.savedUser = savedUser;
+                    return MetadataDB.create({
+                        userIDInApp: savedUser.userIDInApp,
+                        metadataIndex: 0
+                    });
+                })
+                .then((metadataConfirmation) => {
+                    if (!metadataConfirmation.success) {
+                        resolve(metadataConfirmation); return Promise.reject("DUMMY")
+                    } else {
+                        return sendAccountValidationURLToEmail(prevResults.savedUser);
+                    }
+                })
+                .then((emailConfirmation) => {
+                    if (emailConfirmation.success) {
+                        emailConfirmation.message = `Welcome to ${config.APP_NAME}! We've also sent a validation URL to ${email}. Validate your account within 30 days.`;
+                    }
+                    resolve(emailConfirmation);
+                })
+                .catch((err) => { 
+                    if (err !== "DUMMY") reject(err); 
                 });
-                return Promise.reject("DUMMY");
-            })
-            .then(([salt, hash]) => {
-                results.salt = salt; 
-                results.hash = hash;
-                return getIdInAppAndValidationURI();
-            })
-            .then(([userID, validationURI]) => {
-                return User.create({
-                    username: username, salt: results.salt, hash: results.hash,
-                    userIDInApp: userID, email: email, account_is_valid: false,
-                    account_validation_uri: validationURI
-                });
-            })
-            .then((savedUser) => {
-                prevResults.savedUser = savedUser;
-                return MetadataDB.create({
-                    userIDInApp: savedUser.userIDInApp,
-                    metadataIndex: 0
-                });
-            })
-            .then((metadataConfirmation) => {
-                if (!metadataConfirmation.success) {
-                    resolve(metadataConfirmation);
-                }
-                return sendAccountValidationURLToEmail(prevResults.savedUser);
-            })
-            .then((emailConfirmation) => {
-                if (emailConfirmation.success) {
-                    emailConfirmation.message = `Welcome to ${config.APP_NAME}! We've also sent a validation URL to ${email}. Validate your account within 30 days.`;
-                }
-                resolve(emailConfirmation);
-            })
-            .catch((err) => { 
-                if (err !== "DUMMY") reject(err); 
-            });
+
+        }
     });
 };
 
@@ -600,10 +603,13 @@ exports.deleteAccount = function(userIDInApp) {
         User
             .deleteMany({userIDInApp: userIDInApp}).exec()
             .then(() => {
-                return Token.deleteMany({userIDInApp: userIDInApp}).exec()
+                return Token.deleteMany({userIDInApp: userIDInApp}).exec();
             })
             .then(() => {
-                return Metadata.deleteMany({createdById: userIDInApp}).exec()
+                return Metadata.deleteMany({createdById: userIDInApp}).exec();
+            })
+            .then(() => {
+                return Card.deleteMany({createdById: userIDInApp}).exec();
             })
             .then(() => {
                 resolve({
