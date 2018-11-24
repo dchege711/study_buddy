@@ -62,7 +62,7 @@ exports.read = function(payload) {
  * e.g. `createdById` and `createdAt`
  * 
  * @param {JSON} cardJSON The parts of the card that have been updated. Must
- * include `_id` as an attribute, otherwise no changes will be made. 
+ * include `cardID` as an attribute, otherwise no changes will be made. 
  * 
  * @returns {Promise} resolves with a JSON doc with `success`, `status` and  
  * `message` as keys. If successful, `message` will be the updated card.
