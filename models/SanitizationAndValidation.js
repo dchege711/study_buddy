@@ -31,7 +31,10 @@ exports.sanitizeCard = function(card) {
         let outputHTML = converter.makeHtml(
             String.raw`${card.description.replace(/\\/g, "\\\\")}`
         );
-        
+
+        // Otherwise, the HTML renders with '&nbsp;' literals instead of spaces
+        outputHTML = xss(outputHTML).replace(/&amp;nbsp;/g, "&nbsp;");
+
         if (outputHTML.match(/\[spoiler\]/i)) {
             outputHTML = outputHTML.replace(
                 /\[spoiler\]/i, "<span id='spoiler'>[spoiler]</span>"
@@ -39,7 +42,7 @@ exports.sanitizeCard = function(card) {
             outputHTML += `<span id="spoiler_end"></span>`;
         }
 
-        card.descriptionHTML = xss(outputHTML);
+        card.descriptionHTML = outputHTML;
     }
 
     if (card.urgency !== undefined) {
@@ -74,7 +77,7 @@ exports.sanitizeQuery = function(query) {
 
     let keys = Object.keys(query);
     for (let i = 0; i < keys.length; i++) {
-        if (/^\$/.test(query[key])) delete query[key];
+        if (/^\$/.test(query[keys[i]])) delete query[keys[i]];
     }
     return query;
 }

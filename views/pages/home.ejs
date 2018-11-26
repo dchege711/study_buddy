@@ -244,9 +244,7 @@
             function renderCard(card) {
 
                 if (!card) {
-                    CardTemplateUtilities.displayPopUp(
-                        "Out of cards!", 1500
-                    );
+                    CardTemplateUtilities.displayPopUp("Out of cards!", 1500);
                     return;
                 }
 
@@ -263,7 +261,7 @@
                 window.addEventListener("keydown", arrowKeysForNavigation);
                 elementRefs.cardTitleElement.value = card.title;
                 
-                elementRefs.cardDescriptionElement.innerHTML = PrettifyCards.markdownToHTML(card.description);;
+                elementRefs.cardDescriptionElement.innerHTML = card.descriptionHTML;
 
                 let tagsHTML = "";
                 var tagsArray = card.tags.trim().split(" ");

@@ -235,7 +235,7 @@
             } else {
                 state.current_card_id = card._id;
                 state.current_card_title.innerText = card.title;
-                state.current_card_description.innerHTML = PrettifyCards.markdownToHTML(card.description);
+                state.current_card_description.innerHTML = card.descriptionHTML;
                 state.current_card_tags.innerText = card.tags.replace(" ", ", ");
                 state.current_card_urgency_number.innerText = card.urgency;
 
