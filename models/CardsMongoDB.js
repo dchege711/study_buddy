@@ -377,12 +377,36 @@ let standardizeTagDelimiters = function() {
             
     });
     cursor.on("close", () => {
-        if (debug) console.log("Finished the operation");
+        console.log("Finished the operation");
     });
 };
 
+/**
+ * @description The `descriptionHTML` field was introduced later on in the 
+ * project. To avoid conditionals for documents created before the change, this 
+ * method adds the `descriptionHTML` field to all cards in the database.
+ * 
+ * @param {MongooseClient} connection An instance of the mongoose connection 
+ * object. Needed so that it can be closed at the end of the script.
+ */
+let insertDescriptionHTML = function(connection) {
+    let cursor = Card.find({}).cursor();
+    cursor.on("data", (card) => {
+        let currentCard = card;
+        currentCard = cardSanitizer(currentCard);
+        currentCard.save((err, savedCard) => {
+            if (err) console.log(err);
+            else console.log(`Updated ${savedCard.title}`);
+        });
+    });
+    cursor.on("close", () => {
+        console.log("Finished the operation");
+        connection.closeMongooseConnection();
+    });
+}
+
 if (require.main === module) {
+    const dbConnection = require("../models/MongooseClient.js");
     // standardizeTagDelimiters();
-    console.log(splitTags("there-are tags in this_string-delimited differently"));
-    console.log(splitTags("no tags present in this string"))
+    insertDescriptionHTML(dbConnection);
 }

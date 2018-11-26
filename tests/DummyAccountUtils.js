@@ -35,14 +35,9 @@ if (require.main === module) {
 
     const dbConnection = require("../models/MongooseClient.js");
 
-    // Only exit once done is set to true...
-    // var done = (function wait () { if (!done) setTimeout(wait, 1000) })();
-    var done = true;
-
-    exports
-        .getDummyAccount()
+    exports.getDummyAccount()
         .then(async (loggedInUser) => {
-            let cards = sampleCards.getRandomCards(60);
+            let cards = sampleCards.getRandomCards(10);
             for (let i = 0; i < cards.length; i++) {
                 let card = cards[i];
                 card.createdById = loggedInUser.userIDInApp;
@@ -51,8 +46,8 @@ if (require.main === module) {
                 await CardsDB.create(card);
                 console.log(`Added ${card.title}`);
             }
-            done = true;
         })
-        .catch((err) => { console.error(err); done = true; });
+        .then(() => { return dbConnection.closeMongooseConnection(); })
+        .catch((err) => { console.error(err); });
 }
 
