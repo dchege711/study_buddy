@@ -134,6 +134,13 @@
         }
 
         function flagCard(reason) {
+            if (USER_INFO === null) {
+                if (window.confirm("Please login/signup first. May I take you to the login page?")) {
+                    window.location = "/login";
+                }
+                return;
+            }
+            
             let flagObject = { cardID: state.currentCardID };
             flagObject[reason] = true;
             AppUtilities
@@ -149,7 +156,7 @@
 
         function copyCardToOwnCollection() {
             if (USER_INFO === null) {
-                if (window.confirm("No account found. Would you like to go to the login page first?")) {
+                if (window.confirm("Please login/signup first. May I take you to the login page?")) {
                     window.location = "/login";
                 }
                 return;
