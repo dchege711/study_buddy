@@ -37,7 +37,7 @@ if (require.main === module) {
 
     exports.getDummyAccount()
         .then(async (loggedInUser) => {
-            let cards = sampleCards.getRandomCards(10);
+            let cards = sampleCards.getRandomCards(50);
             for (let i = 0; i < cards.length; i++) {
                 let card = cards[i];
                 card.createdById = loggedInUser.userIDInApp;
