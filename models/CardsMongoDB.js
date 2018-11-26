@@ -2,6 +2,10 @@
 
 const Card = require('./mongoose_models/CardSchema.js');
 const MetadataDB = require('./MetadataMongoDB.js');
+const sanitizer = require("./SanitizationAndValidation.js");
+
+const cardSanitizer = sanitizer.sanitizeCard;
+const querySanitizer = sanitizer.sanitizeQuery;
 
 /**
  * Create a new card and add it to the user's current cards.
@@ -16,7 +20,7 @@ exports.create = function(payload) {
     return new Promise(function(resolve, reject) {
         let returnedValues = {};
         Card
-            .create(payload)
+            .create(cardSanitizer(payload))
             .then((savedCard) => {
                 returnedValues.savedCard = savedCard;
                 savedCard.previousTags = savedCard.tags;
@@ -43,6 +47,7 @@ exports.create = function(payload) {
  * cards.
  */
 exports.read = function(payload) {
+    payload = querySanitizer(payload);
     let query = {createdById: payload.userIDInApp};
     if (payload.cardID !== undefined) query._id = payload.cardID;
     return new Promise(function(resolve, reject) {
@@ -71,16 +76,19 @@ exports.update = function(cardJSON) {
 
     let prevResults = {};
     const EDITABLE_ATTRIBUTES = new Set([
-        "title", "description", "tags", "urgency", "isPublic", "numChildren",
-        "numTimesMarkedAsDuplicate", "numTimesMarkedForReview"
+        "title", "description", "descriptionHTML", "tags", "urgency", "isPublic", 
+        "numChildren", "numTimesMarkedAsDuplicate", "numTimesMarkedForReview"
     ]);
+
+    let query = querySanitizer({cardID: cardJSON.cardID});
+    cardJSON = cardSanitizer(cardJSON);
 
     // findByIdAndUpdate will give me the old, not the updated, document.
     // I need to find the card, save it, and then call MetadataDB.update if need be
 
     return new Promise(function(resolve, reject) {
         Card
-            .findById(cardJSON.cardID).exec()
+            .findById(query.cardID).exec()
             .then((existingCard) => {
                 if (existingCard === null) {
                     resolve({success: false, status: 200, message: null});
@@ -118,6 +126,7 @@ exports.update = function(cardJSON) {
  * `message` as keys.
  */
 exports.delete = function(payload) {
+    payload = querySanitizer(payload);
     return new Promise(function(resolve, reject) {
         Card
             .findByIdAndRemove(payload.cardID).exec()
@@ -145,6 +154,8 @@ exports.search = function(payload) {
      * and should be preferred where possible. Note that the JS expression
      * is processed for EACH document in the collection. Yikes!
      */
+
+    payload = querySanitizer(payload);
 
     if (payload.queryString !== undefined) {
         payload.queryString = splitTags(payload.queryString);
@@ -222,6 +233,8 @@ let collectSearchResults = function(queryObject) {
  * the `message` attribute will be an array of matching cards.
  */
 exports.publicSearch = function(payload) {
+    payload = querySanitizer(payload);
+
     let mandatoryFields = [{isPublic: true}];
     if (payload.userID !== undefined) {
         mandatoryFields.push({createdById: payload.userID});
@@ -250,6 +263,7 @@ exports.publicSearch = function(payload) {
  * matching card if any.
  */
 exports.readPublicCard = function(payload) {
+    payload = querySanitizer(payload);
     return new Promise(function(resolve, reject) {
         if (payload.cardID === undefined) {
             resolve([{}]);
@@ -281,12 +295,19 @@ exports.readPublicCard = function(payload) {
 exports.duplicateCard = function(payload) {
     // Fetch the card to be duplicated
     return new Promise(function(resolve, reject) {
-        let queryObject = { _id: payload.cardID, isPublic: true };
+        let queryObject = querySanitizer({ _id: payload.cardID, isPublic: true });
         Card
             .findOne(queryObject).exec()
-            .then((preExistingCard) => {            
-                preExistingCard.numChildren = preExistingCard.numChildren + 1;
-                return preExistingCard.save();
+            .then((preExistingCard) => { 
+                if (preExistingCard === null) {
+                    resolve({
+                        success: false, status: 200, message: "Card not found!"
+                    });
+                    return Promise.reject("DUMMY");
+                } else {
+                    preExistingCard.numChildren = preExistingCard.numChildren + 1;
+                    return preExistingCard.save();
+                }           
             })
             .then((savedPreExistingCard) => {
                 return exports.create({
@@ -299,7 +320,7 @@ exports.duplicateCard = function(payload) {
                 });
             })
             .then((confirmation) => { resolve(confirmation); })
-            .catch((err) => { console.error(err); reject(err); })
+            .catch((err) => { if (err !== "DUMMY") reject(err); })
     });
         
 };
@@ -315,6 +336,7 @@ exports.duplicateCard = function(payload) {
  * as its keys. If successful, the message will contain the saved card.
  */
 exports.flagCard = function(payload) {
+    payload = sanitizeQuery(payload);
     let flagsToUpdate = {};
     if (payload.markedForReview) flagsToUpdate.numTimesMarkedForReview = 1;
     if (payload.markedAsDuplicate) flagsToUpdate.numTimesMarkedAsDuplicate = 1;
