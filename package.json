@@ -4,25 +4,39 @@
   "description": "A web application that helps me review content",
   "main": "server.js",
   "nyc": {
-    "reporter": ["lcov", "text"],
-    "exclude": ["tests", "build", "coverage", "node_modules", "models/mongoose_models"],
-    "include": ["models", "views", "controllers"]
+    "reporter": [
+      "lcov",
+      "text"
+    ],
+    "exclude": [
+      "tests",
+      "build",
+      "coverage",
+      "node_modules",
+      "models/mongoose_models"
+    ],
+    "include": [
+      "models",
+      "views",
+      "controllers"
+    ]
   },
   "scripts": {
-
     "build": "webpack --config webpack.config.js",
     "start": "npm run build && node server.js",
     "debug": "node --trace-warnings server.js",
     "test": "npm run mocha_tests && npm run selenium_tests",
     "mocha_tests": "nyc mocha --no-warnings --recursive --sort './tests/mocha_tests/*/*.js'",
     "selenium_tests": "cd tests/selenium_tests/ && nyc ./run_selenium_tests.sh firefox headless && cd ../../"
-    
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dchege711/study_buddy.git"
   },
-  "keywords": ["study", "flashcards"],
+  "keywords": [
+    "study",
+    "flashcards"
+  ],
   "author": "Chege Gitau",
   "license": "ISC",
   "bugs": {
@@ -40,10 +54,10 @@
     "mongoose": "^5.3.11",
     "nodemailer": "^4.6.8",
     "path": "0.12.7",
-    "selenium-webdriver": "^4.0.0-alpha.1",
+    "showdown": "1.9.0",
     "sjcl": "1.0.7",
     "validator": "^10.7.1",
-    "why-is-node-running": "^2.0.2"
+    "xss": "1.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.1.5",
@@ -55,8 +69,9 @@
     "mathjax": "^2.7.5",
     "mocha": "^5.2.0",
     "nyc": "^13.1.0",
-    "showdown": "^1.8.7",
+    "selenium-webdriver": "4.0.0-alpha.1",
     "webpack": "^4.25.1",
-    "webpack-cli": "^3.1.2"
+    "webpack-cli": "^3.1.2",
+    "why-is-node-running": "2.0.2"
   }
 }

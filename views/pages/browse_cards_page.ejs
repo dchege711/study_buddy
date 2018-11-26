@@ -180,7 +180,7 @@
             }
     
             elementRefs.cardTitleElement.innerHTML = card.title;
-            elementRefs.cardDescriptionElement.innerHTML = PrettifyCards.markdownToHTML(card.description);
+            elementRefs.cardDescriptionElement.innerHTML = card.descriptionHTML;
         
             let tags_html = "";
             let tags_array = card.tags.trim().split(" ");

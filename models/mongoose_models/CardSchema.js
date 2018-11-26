@@ -15,15 +15,16 @@ var mongoose = require('mongoose');
 
 var cardSchema = new mongoose.Schema(
     {
-        title: { type: String, default: "" },
-        description: { type: String, default: "" },
+        title: { type: String, default: "", trim: true },
+        description: { type: String, trim: true, default: "" },
+        descriptionHTML: { type: String, trim: true, default: "" },
         tags: { type: String, lowercase: true, trim: true, default: "" },
         urgency: { type: Number, default: 10 },
         metadataIndex: { type: Number, default: 0 },
         createdById: { type: Number, required: true}, 
         isPublic: { type: Boolean, default: false },
         lastReviewed: { type: Date, default: Date.now },
-        parent: { type: String, default: "" },
+        parent: { type: String, trim: true, default: "" },
         numChildren: { type: Number, default: 0 },
         numTimesMarkedAsDuplicate: { type: Number, default: 0 },
         numTimesMarkedForReview: { type: Number, default: 0 }
