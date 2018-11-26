@@ -350,34 +350,41 @@ function removeCardFromMetadataTrash(cardIdentifier) {
  * to the written JSON file. The 2nd argument is the name of the JSON file.
  */
 exports.writeCardsToJSONFile = function (userIDInApp) {
-    let prevResults = {cardData: []};
 
     return new Promise(function(resolve, reject) {
         Card
             .find({ createdById: userIDInApp}).exec()
             .then((cards) => {
+                let cardData = [];
                 for (let i = 0; i < cards.length; i++) {
-                    prevResults.cardData.push({
+                    cardData.push({
                         title: cards[i].title, description: cards[i].description,
                         tags: cards[i].tags, urgency: cards[i].urgency,
                         createdAt: cards[i].createdAt, isPublic: cards[i].isPublic
                     });
                 }
 
-                prevResults.jsonFileName = `flashcards_${userIDInApp}.json`;
-                prevResults.jsonFilePath = `${process.cwd()}/${jsonFileName}`;;
+                let jsonFileName = `flashcards_${userIDInApp}.json`;
+                let jsonFilePath = `${process.cwd()}/${jsonFileName}`;;
 
-                return fs.open(prevResults.jsonFilePath, "w");
-            })
-            .then((fileDescriptor) => {
-                prevResults.fileDescriptor = fileDescriptor;
-                return fs.write(fileDescriptor, JSON.stringify(prevResults.cardData));
-            })
-            .then(() => {
-                return fs.close(prevResults.fileDescriptor);
-            })
-            .then(() => {
-                resolve([prevResults.jsonFilePath, prevResults.jsonFileName]);
+                fs.open(jsonFilePath, "w", (err, fileDescriptor) => {
+                    if (err) { reject(err); } 
+                    else {
+                        fs.write(fileDescriptor, JSON.stringify(cardData), (writeErr) => {
+                            if (writeErr) {
+                                reject(writeErr);
+                            } else {
+                                fs.close(fileDescriptor, (closeErr) => {
+                                    if (closeErr) {
+                                        reject(closeErr);
+                                    } else {
+                                        resolve([jsonFilePath, jsonFileName]);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
             })
             .catch((err) => { reject(err); });
     });       
