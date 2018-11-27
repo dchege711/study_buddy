@@ -452,14 +452,14 @@
                         })
                         .then((trash_confirmation) => {
                             trash_confirmation = JSON.parse(trash_confirmation);
-                            CardTemplateUtilities.displayPopUp(trash_confirmation.message, 10000);
+                            CardTemplateUtilities.displayPopUp(trash_confirmation.message, 5000);
                         })
                         .catch((err) => { console.error(err); });
 
                 }
             }
 
-            function restoreFromTrash(card_to_restore_id, card_to_restore_urgency) {
+            function restoreCardFromTrash(card_to_restore_id, card_to_restore_urgency) {
                 AppUtilities.sendHTTPRequest(
                     "POST", "/restore-from-trash", 
                     {
@@ -468,9 +468,10 @@
                     })
                     .then((response) => {
                         response = JSON.parse(response);
-                        if (response.message === card_to_restore_id) {
+                        if (response.success === true) {
                             cardsManager.insertCard(card_to_restore_id, card_to_restore_urgency);
                             fetchPreviousCard();
+                            CardTemplateUtilities.displayPopUp(response.message, 5000);
                         }
                     })
                     .catch((err) => { console.error(err); });
