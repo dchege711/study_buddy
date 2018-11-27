@@ -148,6 +148,14 @@ footer {
 
 /************************ In-app Card Viewer **********************************/
 
+/* Source: https://stackoverflow.com/questions/12991351/css-force-image-resize-and-keep-aspect-ratio */
+/* img {
+    display: block;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+} */
+
 #status_bar {
     padding: 1%;
 }

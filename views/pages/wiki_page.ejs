@@ -95,7 +95,7 @@
 
                             <tr>
                                 <td>* Asterisks denote bullets. ~~Strikethrough~~, **bold**, *italics*</td>
-                                <td class="convert_to_html">* Asterisks denote bullets. ~~Strikethrough~~, **bold**, *italics*
+                                <td><li>Asterisks denote bullets. <del>Strikethrough</del>, <strong>bold</strong>, <em>italics</em></li>
                                 </td>
                             </tr>
                             
@@ -146,6 +146,24 @@
 
                         </ul>
 
+                    </p>
+
+                    <p>
+                        <h5>Images</h5>
+
+                        To insert images, I suggest using Markdown. Specify the size of your image 
+                        so that it renders well on the card. For now, <%= APP_NAME %> doesn't host any images. 
+                        Use image hosting sites such as Imgur and then paste the hyperlink to your flashcard. 
+                        For example, 
+                        <br />
+                        <br />
+                        <code class="markdown">![bayes](https://imgs.xkcd.com/comics/modified_bayes_theorem.png =60%x80%)</code>
+                        <br />
+                        <br />
+                        renders this image (the dimensions have the format WIDTH x HEIGHT):
+                        <br />
+                        <br />
+                        <img src="https://imgs.xkcd.com/comics/modified_bayes_theorem.png" width="60%" height="80%">
                     </p>
 
                 </div>
@@ -265,14 +283,17 @@
     <script>
 
         function markupPage() {
+            PrettifyCards.addSyntaxHighlighting();
 
+            /*
             let domElements = document.getElementsByClassName("convert_to_html");
             for (let i = 0; i < domElements.length; i++) {
                 domElements[i].innerHTML = converter.makeHtml(
                     String.raw`${domElements[i].textContent.replace(/\\/g, "\\\\")}`
                 );
             }
-            PrettifyCards.addSyntaxHighlighting();
+            */
+            
             
         }
 
