@@ -29,7 +29,7 @@
         
     </head>
 
-    <body onload="initializeSideBar(); initializeCards();">
+    <body onload="initializeHomepage();">
 
         <% include ../partials/logged_in_navbar.ejs %>
 
@@ -96,8 +96,36 @@
             /* If a user is logged in, there'll be some metadata about them in 
              * Local Storage. 
              */
-            const metadata = JSON.parse(localStorage.getItem("metadata"))[0];
+            let metadata, state, tags_trie, cardsManager;
             const userSettings = AppUtilities.getAccountInfo();
+
+            function initializeHomepage() {
+                AppUtilities.refreshMetadata()
+                    .then((metadataDoc) => {
+                        metadata = metadataDoc;
+                        state = {
+                            changedItems: new Set([]),
+                            currentCardID: null,
+                            currentUserID: metadata.createdById,
+                            rawDescription: null,
+                            selectedTags: new Set([]),
+                            tagsAndIDs: metadata.node_information[0],
+                            currentCardTags: new Set([]),
+                            currentCardTagsHaveChanged: false,
+                            cardPostURL: null,
+                            reviewModeToggle: false,
+                            card_is_public_toggle: userSettings.cardsAreByDefaultPrivate
+                        }
+                        if (!state.tagsAndIDs) state.tagsAndIDs = {};
+
+                        tags_trie = ternary_search_trie(Object.keys(state.tagsAndIDs));
+                        cardsManager = new CardsManager(state.tagsAndIDs, state.currentUserID);
+
+                        initializeSideBar(); 
+                        initializeCards();
+                    })
+                    .catch((err) => { console.error(err); });
+            }
 
             // Maintain references to elements that get searched for often
             const elementRefs = {
@@ -120,30 +148,6 @@
                 tagsAutocompleteResultsElement: document.getElementById("tags_autocomplete_results"),
                 shareableLinkElement: document.getElementById("shareable_link")
             };
-            
-            /* Useful for storing the state of the app. Wrapped 
-             * inside an object so that I can know when global variables are
-             * being used and when they're not.
-             */
-            var state = {
-                changedItems: new Set([]),
-                currentCardID: null,
-                currentUserID: metadata.createdById,
-                rawDescription: null,
-                selectedTags: new Set([]),
-                tagsAndIDs: metadata.node_information[0],
-                currentCardTags: new Set([]),
-                currentCardTagsHaveChanged: false,
-                cardPostURL: null,
-                reviewModeToggle: false,
-                card_is_public_toggle: userSettings.cardsAreByDefaultPrivate
-            }
-
-            if (!state.tagsAndIDs) state.tagsAndIDs = {};
-            
-            var tags_trie = ternary_search_trie(Object.keys(state.tagsAndIDs))
-
-            let cardsManager = new CardsManager(state.tagsAndIDs, state.currentUserID);
 
             function initializeSideBar() {
                 var tagsInDecreasingOrder = Object.keys(state.tagsAndIDs);

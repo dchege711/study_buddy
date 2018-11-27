@@ -93,3 +93,25 @@ exports.updateAccountInfo = function(newInfo) {
     });
     localStorage.setItem("session_info", JSON.stringify(existingInfo));
 }
+
+/**
+ * @description Reload the metadata document from the server. Useful if more 
+ * cards have been added, e.g. from the `/browse` page.
+ * 
+ * @returns {Promise} resolves with the new metadata.
+ */
+exports.refreshMetadata = function() {
+    let accountInfo = exports.getAccountInfo();
+    if (accountInfo === null) return Promise.resolve(null);
+
+    return new Promise(function(resolve, reject) {
+        exports
+            .sendHTTPRequest("POST", "/read-metadata", {userIDInApp: accountInfo.userIDInApp})
+            .then((metadataResponse) => {
+                let metadataDoc = JSON.parse(metadataResponse).message;
+                localStorage.setItem("metadata", JSON.stringify(metadataDoc));
+                resolve(metadataDoc[0]);
+            })
+            .catch((err) => { reject(err); });
+    });
+}
