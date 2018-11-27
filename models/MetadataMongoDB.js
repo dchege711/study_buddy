@@ -4,6 +4,7 @@ const User = require("./mongoose_models/UserSchema.js");
 const Metadata = require('./mongoose_models/MetadataCardSchema');
 const Card = require('./mongoose_models/CardSchema.js');
 const fs = require("fs");
+const querySanitizer = require("./SanitizationAndValidation.js").sanitizeQuery;
 
 /**
  * @description Create & save a new metadata document for a user
@@ -12,6 +13,7 @@ const fs = require("fs");
  * `message` as keys.
  */
 exports.create = function (payload) {
+    payload = querySanitizer(payload);
     return new Promise(function(resolve, reject) {
         if (payload.userIDInApp === undefined || payload.metadataIndex === undefined) {
             reject(new Error("Please provide a userIDInApp and a metadataIndex."));
@@ -51,6 +53,7 @@ exports.create = function (payload) {
  * JSON `Metadata` objects 
  */
 exports.read = function (payload) {
+    payload = querySanitizer(payload);
     return new Promise(function(resolve, reject) {
         Metadata
             .find({createdById: payload.userIDInApp}).exec()
@@ -72,6 +75,7 @@ exports.read = function (payload) {
  * `text` and `size`.
  */
 exports.readTags = function(payload) {
+    payload = querySanitizer(payload);
     let cursor = Metadata.find(payload).cursor();
     let tags = {};
     cursor.on("data", (metadataDoc) => {
@@ -160,6 +164,7 @@ exports.update = async function (savedCards) {
  * and `message`
  */
 exports.delete = function (payload) {
+    payload = querySanitizer(payload);
     return new Promise(function(resolve, reject) {
         Metadata
             .deleteMany({createdById: payload.userIDInApp}).exec()
@@ -171,17 +176,18 @@ exports.delete = function (payload) {
 };
 
 /**
- * @param {JSON} payload Must contain `_id` that has the id of the card
+ * @param {JSON} payload Must contain `cardID` that has the id of the card
  * to be placed into trash, and `userIDInApp`, the ID of the user who owns
  * the card.
  * @returns {Promise} resolves with a JSON keyed by `success`, `status` and  
  * `message`
  */
 exports.sendCardToTrash = function (payload) {
+    payload = querySanitizer(payload);
     let prevResults = {};
     return new Promise(function(resolve, reject) {
         Card
-            .findOne({_id: payload._id, createdById: payload.createdById}).exec()
+            .findOne({_id: payload.cardID, createdById: payload.createdById}).exec()
             .then((card) => {
                 if (card === null) {
                     resolve({
@@ -240,17 +246,18 @@ exports.sendCardToTrash = function (payload) {
 /**
  * @description Restore a card from the trash, back into the user's list of
  * current cards.
- * @param {JSON} restoreCardArgs Expected keys: `_id`, `createdById`
+ * @param {JSON} restoreCardArgs Expected keys: `cardID`, `createdById`
  * @returns {Promise} resolves with a JSON keyed by `success`, `status` and  
  * `message`
  */
 exports.restoreCardFromTrash = function (restoreCardArgs) {
     let prevResults = {};
+    restoreCardArgs = querySanitizer(restoreCardArgs);
 
     return new Promise(function(resolve, reject) {
         Card
             .findOne({
-                _id: restoreCardArgs._id, createdById: restoreCardArgs.createdById
+                _id: restoreCardArgs.cardID, createdById: restoreCardArgs.createdById
             }).exec()
             .then((card) => {
                 if (card === null) {
@@ -281,15 +288,16 @@ exports.restoreCardFromTrash = function (restoreCardArgs) {
 /**
  * @description Permanently delete a card from the user's trash.
  * 
- * @param {JSON} restoreCardArgs Expected keys: `_id`, `createdById`
+ * @param {JSON} restoreCardArgs Expected keys: `cardID`, `createdById`
  * @returns {Promise} resolves with a JSON keyed by `success`, `status` and  
  * `message`
  */
 exports.deleteCardFromTrash = function(deleteCardArgs) {
+    deleteCardArgs = querySanitizer(deleteCardArgs);
     return new Promise(function(resolve, reject) {
         Card
             .findOneAndRemove({
-                _id: deleteCardArgs._id,
+                _id: deleteCardArgs.cardID,
                 createdById: deleteCardArgs.createdById
             }).exec()
             .then((deletedCard) => {
@@ -326,15 +334,17 @@ function removeCardFromMetadataTrash(cardIdentifier) {
         Metadata
             .find({createdById: cardIdentifier.createdById}).exec()
             .then((matchingMetadataDocs) => {
+                if (matchingMetadataDocs.length === 0) resolve({});
                 for (let i = 0; i < matchingMetadataDocs.length; i++) {
                     let metadataDoc = matchingMetadataDocs[i];
                     if (cardIdentifier._id in metadataDoc.trashed_cards[0]) {
                         delete metadataDoc.trashed_cards[0][cardIdentifier._id];
                         metadataDoc.markModified("trashed_cards");
                         resolve(metadataDoc);
+                        return;
                     }
                 }
-                reject(new Error(`${cardIdentifier} wasn't found in the metadata.`));
+                resolve(matchingMetadataDocs[0]);
             })
             .catch((err) => { reject(err); });
     });
@@ -350,10 +360,10 @@ function removeCardFromMetadataTrash(cardIdentifier) {
  * to the written JSON file. The 2nd argument is the name of the JSON file.
  */
 exports.writeCardsToJSONFile = function (userIDInApp) {
-
+    let query = sanitizeQuery({userIDInApp: userIDInApp});
     return new Promise(function(resolve, reject) {
         Card
-            .find({ createdById: userIDInApp}).exec()
+            .find({ createdById: query.userIDInApp}).exec()
             .then((cards) => {
                 let cardData = [];
                 for (let i = 0; i < cards.length; i++) {
@@ -478,6 +488,7 @@ function updateMetadataWithCardDetails(savedCard, metadataDoc) {
  * `message`
  */
 exports.updateUserSettings = function(newUserSettings) {
+    newUserSettings = querySanitizer(newUserSettings);
 
     let supportedChanges = new Set(["cardsAreByDefaultPrivate"]);
     let validChanges = [];
