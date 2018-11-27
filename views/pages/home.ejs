@@ -404,6 +404,7 @@
                 payload.createdById = state.currentUserID;
                 if (state.currentCardTagsHaveChanged) {
                     payload.tags = Array.from(state.currentCardTags).join(" ");
+                    state.currentCardTags.forEach((tag) => { tags_trie.put(tag); });
                 }
                 payload.isPublic = state.card_is_public_toggle;
                 
