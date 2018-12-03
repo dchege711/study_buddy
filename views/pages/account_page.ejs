@@ -32,7 +32,7 @@
 
     </head>
 
-    <body>
+    <body onload="initializeAccountPage();">
 
         <% include ../partials/logged_in_navbar.ejs %>
 
@@ -159,27 +159,38 @@
     </body>
 
     <script type="text/javascript">
-        var state = {
-            metadata: JSON.parse(localStorage.getItem("metadata"))[0],
-            card_container: document.getElementById("card_container"),
-            trash_button: document.getElementById("trash_button"),
-            trashed_card_index: 0,
-            current_card_id: null,
-            current_card_title: document.getElementById("card_title"),
-            current_card_description: document.getElementById("card_description"),
-            current_card_tags: document.getElementById("card_tags"),
-            current_card_urgency_number: document.getElementById("card_urgency_number"),
-            current_card_delete_button: document.getElementById("card_delete_button"),
-            current_card_restore_button: document.getElementById("card_restore_button")
+
+        let state, cardsManager;
+
+        function initializeAccountPage() {
+            AppUtilities.refreshMetadata()
+                .then((metadataDoc) => {
+                    state = {
+                        metadata: metadataDoc,
+                        card_container: document.getElementById("card_container"),
+                        trash_button: document.getElementById("trash_button"),
+                        trashed_card_index: 0,
+                        current_card_id: null,
+                        current_card_title: document.getElementById("card_title"),
+                        current_card_description: document.getElementById("card_description"),
+                        current_card_tags: document.getElementById("card_tags"),
+                        current_card_urgency_number: document.getElementById("card_urgency_number"),
+                        current_card_delete_button: document.getElementById("card_delete_button"),
+                        current_card_restore_button: document.getElementById("card_restore_button")
+                    }
+
+                    state.trashed_cards = state.metadata.trashed_cards[0];
+                    if (!state.trashed_cards) state.trashed_cards = {};
+
+                    cardsManager = new CardsManager(
+                        state.trashed_cards, state.metadata.createdById
+                    );
+
+                    document.getElementById("trash_button_text").innerHTML = `<i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> View ${Object.keys(state.trashed_cards).length} Trashed Cards`;
+                    
+                })
+                .catch((err) => { console.error(err); });
         }
-        state.trashed_cards = state.metadata.trashed_cards[0];
-        if (!state.trashed_cards) state.trashed_cards = {};
-
-        let cardsManager = new CardsManager(
-            state.trashed_cards, state.metadata.createdById
-        );
-
-        document.getElementById("trash_button_text").innerHTML = `<i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> View ${Object.keys(state.trashed_cards).length} Trashed Cards`;
 
         function downloadUserData() {
             window.open("/account/download-user-data");
