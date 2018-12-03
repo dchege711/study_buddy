@@ -283,7 +283,12 @@
                 
                 elementRefs.cardIsPublicToggleElement.checked = card.isPublic;
                 state.cardIsPublicToggle = card.isPublic;
-                elementRefs.shareableLinkElement.innerText = `${document.location.origin}/browse/?cardID=${card._id}`;
+                if (card.isPublic) {
+                    elementRefs.shareableLinkElement.innerText = `${document.location.origin}/browse/?cardID=${card._id}`;
+                } else {
+                    elementRefs.shareableLinkElement.innerText = "";
+                }
+                
 
                 // Reset the contents of the current_card variable
                 state.currentCardID = card._id;
@@ -306,6 +311,7 @@
                 elementRefs.cardTitleElement.value = "";
                 elementRefs.cardDescriptionElement.innerHTML = "";
                 elementRefs.alreadySetTagsElement.innerHTML = "";
+                elementRefs.shareableLinkElement.innerText = "";
                 elementRefs.cardIsPublicToggleElement.checked = userSettings.cardsAreByDefaultPrivate;
 
                 state.cardIsPublicToggle = userSettings.cardsAreByDefaultPrivate;

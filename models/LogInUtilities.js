@@ -5,6 +5,7 @@ const User = require("./mongoose_models/UserSchema.js");
 const MetadataDB = require("./MetadataMongoDB.js");
 const Metadata = require("./mongoose_models/MetadataCardSchema");
 const Card = require("./mongoose_models/CardSchema");
+const CardsDB = require("./CardsMongoDB.js");
 const Token = require("./mongoose_models/Token.js");
 const Email = require("./EmailClient.js");
 const config = require("../config.js");
@@ -309,16 +310,27 @@ exports.registerUserAndPassword = function(payload) {
                 })
                 .then((metadataConfirmation) => {
                     if (!metadataConfirmation.success) {
-                        resolve(metadataConfirmation); return Promise.reject("DUMMY")
+                        resolve(metadataConfirmation); return Promise.reject("DUMMY");
                     } else {
                         return sendAccountValidationURLToEmail(prevResults.savedUser);
                     }
                 })
                 .then((emailConfirmation) => {
                     if (emailConfirmation.success) {
-                        emailConfirmation.message = `Welcome to ${config.APP_NAME}! We've also sent a validation URL to ${email}. Validate your account within 30 days.`;
+                        emailConfirmation.message = `Welcome to ${config.APP_NAME}! We've also sent a validation URL to ${email}. Please validate your account within 30 days.`;
+                        prevResults.emailConfirmation = emailConfirmation;
+                        return CardsDB.create({
+                            title: "This is the Card Title", tags: "sample_card",
+                            description: "# Hash Tags Create Headers\n\n> Click on the edit button to see how to edit your cards using Markdown.\n\n| Tables | are | fair | game! |\n| --- | --- | --- | --- |\n| 1 | *two* | ~~three~~ | **four** |\n| I | hope | they're | useful |\n\n* When linking to an image, you can optionally specify the width and height (image credit: XKCD)\n\n![xkcd: Alpha Centauri](https://imgs.xkcd.com/comics/alpha_centauri.png =25%x10%)\n\n[spoiler]\n\n* Anything below the first '[spoiler]' will be covered by a gray box. \n* Hovering over / clicking on the gray box will reveal the content underneath.\n\n* Feel free to inline LaTeX \\(e = mc^2\\) or code: `int n = 10;`\n\n* Standalone LaTeX also works:\n$$ e = mc^2 $$\n\n* When writing code blocks, specify the language so that it's highlighted accordingly\n```python\nimport sys\nprint(sys.version)\n```\n\nPS. Cards are not usually this long. Try to limit them to one screen so that you can review them without scrolling. (Alternatively, adjust your browser's zoom level)",
+                            createdById: prevResults.savedUser.userIDInApp,
+                            urgency: 10, parent: "", isPublic: false
+                        });
+                    } else {
+                        resolve(emailConfirmation); return Promise.reject("DUMMY");
                     }
-                    resolve(emailConfirmation);
+                })
+                .then((_) => {
+                    resolve(prevResults.emailConfirmation);
                 })
                 .catch((err) => { 
                     if (err !== "DUMMY") reject(err); 
