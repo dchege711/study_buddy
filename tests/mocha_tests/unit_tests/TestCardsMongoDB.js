@@ -6,6 +6,7 @@ const Card = require("../../../models/mongoose_models/CardSchema.js");
 const SampleCards = require("../../SampleCards.js");
 const dummyAccount = require("../../DummyAccountUtils.js");
 const LogInUtilities = require("../../../models/LogInUtilities.js");
+const config = require("../../../config.js");
 
 var dummyUser;
 
@@ -15,7 +16,7 @@ describe("Test CardsMongoDB\n", function() {
     before(function(done) {
 
         LogInUtilities
-            .deleteAllAccounts([])
+            .deleteAllAccounts([config.PUBLIC_USER_USERNAME])
             .then(function (_) { return dummyAccount.getDummyAccount(); })
             .then(function(accountInfo) { dummyUser = accountInfo; done(); })
             .catch(function(err) { done(err); });
@@ -23,7 +24,7 @@ describe("Test CardsMongoDB\n", function() {
     });
 
     after(function() {
-        return LogInUtilities.deleteAllAccounts([]);
+        return LogInUtilities.deleteAllAccounts([config.PUBLIC_USER_USERNAME]);
     });
 
     describe("Method sanity tests...", function() {

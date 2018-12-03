@@ -3,13 +3,14 @@
 const TestAuthActions = require("./TestAuthActions.js");
 const LoginUtils = require("../../models/LogInUtilities.js");
 const dbConnection = require("../../models/MongooseClient.js");
+const config = require("../../config.js");
 
 let headless = process.argv[2] === "headless";
 
 async function runTestSuite(headless=true) {
 
     let passedAllTests = true;
-    let numDeleted = await LoginUtils.deleteAllAccounts();
+    let numDeleted = await LoginUtils.deleteAllAccounts([config.PUBLIC_USER_USERNAME]);
     console.log(`\n${numDeleted} account(s) were deleted\n`);
 
 

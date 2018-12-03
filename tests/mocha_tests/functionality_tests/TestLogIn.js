@@ -7,11 +7,11 @@ const config = require("../../../config.js");
 describe("Test LoginUtilities\n", function() {
 
     before(function() {
-        return LogInUtilities.deleteAllAccounts([]);
+        return LogInUtilities.deleteAllAccounts([config.PUBLIC_USER_USERNAME]);
     });
 
     after(function() {
-        return LogInUtilities.deleteAllAccounts([]);        
+        return LogInUtilities.deleteAllAccounts([config.PUBLIC_USER_USERNAME]);        
     });
 
     describe("#registerUserAndPassword()", function() {

@@ -5,7 +5,6 @@ const config = require("../../../config.js");
 
 describe("Test EmailClient\n", function() {
 
-
     describe("Sending an email...", function() {
 
         it("should send an email successfully", function() {
