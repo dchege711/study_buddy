@@ -1,67 +1,50 @@
-require('./MongooseClient');
+"use strict";
 
-var CardsDB = require('./CardsMongoDB');
-var MetadataDB = require('./MetadataMongoDB');
+require("./MongooseClient");
 
-/**
- * @description Add metadata for the specified user
- */
-var addAndPopulateMetadata = function(userIDInApp) {
-    MetadataDB.create(
-        {
-            "userIDInApp": userIDInApp,
-            "metadataIndex": 0
-        }, (response) => {
-        console.log(response.message);
-        populateMetadata(1);
-    });
-};
-
-var testMetadataUpdate = function(callBack) {
-    var randomUrgency = Math.floor(Math.random() * 200);
-    var cardID = "5a7d20921aef274630536c1a";
-    CardsDB.update({
-        _id: cardID, urgency: randomUrgency
-    }, function(response) {
-        MetadataDB.read({ "userIDInApp": 1 }, (results) => {
-            console.log("Testing updates to metadata...");
-            console.log(results[0].stats[0][cardID].urgency + " should equal " + randomUrgency);
-            callBack();
-        });
-    });
-};
+const User = require("./mongoose_models/UserSchema.js");
+const Card = require("./mongoose_models/CardSchema.js");
+const MetadataDB = require("./MetadataMongoDB");
+const LogInUtils = require("./LogInUtilities.js");
 
 /**
- * @description Delete metadata for the specified user
+ * @description Add a dummy user in order to make managing the browse page for 
+ * public cards easier
  */
-var deleteMetadata = function (userIDInApp, callBack) {
-    MetadataDB.delete(
-        {
-            "userIDInApp": userIDInApp
-        }, (response) => {
-            console.log(response.message);
-            callBack(userIDInApp);
-        });
-};
-
-/**
- * Add the metadataIndex field to every card that the user owns.
- * 
- * @param {Number} userIDInApp The app ID of the user owning the cards
- */
-var populateMetadata = function(userIDInApp) {
-    CardsDB.read(
-        {
-            "userIDInApp": userIDInApp
-        }, (response) => {
-            cards = response.message;
-            MetadataDB.update(cards, (response) => {
-                console.log(response.message);
+function addPublicUser() {
+    let prevResults = {};
+    User
+        .findOne({username: "c13u", email: "flashcards@c13u.com"}).exec()
+        .then((savedUser) => {
+            if (savedUser) {
+                return LogInUtils.deleteAccount(savedUser.userIDInApp);
+            } else {
+                return Promise.resolve("DUMMY");
+            }
+        })
+        .then((a) => {
+            return LogInUtils.registerUserAndPassword({
+                username: "c13u", email: "flashcards@c13u.com",
+                password: LogInUtils.getRandomString(20) // Never meant to login
             });
-        }
-    );
-};
+        })
+        .then((a) => {
+            return User.findOne({username: "c13u"}).exec();
+        })
+        .then((savedUser) => {
+            prevResults.savedUser = savedUser;
+            return Card.find({isPublic: true}).exec();
+        })
+        .then((publicCards) => {
+            return MetadataDB.updatePublicUserMetadata(publicCards);
+        })
+        .then((confirmation) => {
+            if (confirmation.success) console.log(`Success!`);
+            else return Promise.reject(confirmation.message);
+        })
+        .catch((err) => { console.error(err); });
+}
 
 if (require.main === module) {
-    deleteMetadata(1, addAndPopulateMetadata);
+    addPublicUser();
 }
