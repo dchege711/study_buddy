@@ -5,6 +5,7 @@
         <title><%= APP_NAME %>: Browse/Search</title>
         <script type="text/javascript" src="/dist/CardsManager.bundle.min.js"></script>
         <script type="text/javascript" src="/dist/CardTemplateUtilities.bundle.min.js"></script>
+        <script type="text/javascript" src="/dist/TagsBarUtilities.bundle.min.js"></script>
         <% include ../partials/syntax_highlighting_and_latex.ejs %>
 
         <style>
@@ -85,11 +86,16 @@
 
     <script type="text/javascript">
 
-        let cardsManager = null;
+        let cardsManager = null, state = {currentCardID: null}; 
 
-        let state = {
-            currentCardID: null
-        }
+        AppUtilities
+            .sendHTTPRequest("POST", "/read-public-metadata", {})
+            .then((response) => {
+                response = JSON.parse(response);
+                state.tagsAndIDs = response.message[0].node_information[0];
+                TagsBarUtilities.initializeTagsBar("side_bar_contents", state.tagsAndIDs);
+            })
+            .catch((err) => { console.error(err); });
 
         const USER_INFO = AppUtilities.getAccountInfo();
 
@@ -100,11 +106,29 @@
             cardDescriptionElement: document.getElementById("card_description"),
             cardTagsElement: document.getElementById("card_tags"),
             cardPopularityElement: document.getElementById("card_popularity")
-
         };
     
         function handleSearchInputChange() {
             state.queryString = elementRefs.searchInputElement.value;
+        }
+
+        /**
+        * @description Toggle the selection of a tag.
+        * 
+        * @param {String} tag the tag that has been clicked.
+        */
+        function selectThisTag(tag) {
+            if (state.selectedTags.has(tag)) {
+                state.selectedTags.delete(tag);
+            } else {
+                state.selectedTags.add(tag);
+            }                
+            document.getElementById(tag).classList.toggle("chosen");
+        }
+
+        function filterCards() {
+            let cardIDs = TagsBarUtilities.getIDsOfSelectedTags();
+            document.location = `${document.location.origin}/browse/?cardIDs=${Array.from(cardIDs).join(",")}`;
         }
 
         function displayFullCard(cardID) {
