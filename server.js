@@ -9,10 +9,13 @@ var enforce = require('express-sslify');
 var AccountRoutes = require("./routes/AuthenticationRoutes.js");
 var InAppRoutes = require("./routes/InAppRoutes.js");
 var config = require("./config.js");
-
+const misc = require("./models/Miscellaneous.js");
 
 // Needed to get a Mongoose instance running for this process
 const dbConnection = require("./models/MongooseClient.js");
+
+// Set up the default account for publicly viewable cards
+(async () => { await misc.addPublicUser(); })();
 
 var app = express();
 var port = config.PORT;
