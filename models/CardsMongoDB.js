@@ -19,8 +19,9 @@ const querySanitizer = sanitizer.sanitizeQuery;
 exports.create = function(payload) {
     return new Promise(function(resolve, reject) {
         let returnedValues = {};
+        let sanitizedCard = cardSanitizer(payload);
         Card
-            .create(cardSanitizer(payload))
+            .create(sanitizedCard)
             .then((savedCard) => {
                 returnedValues.savedCard = savedCard;
                 savedCard.previousTags = savedCard.tags;
@@ -30,9 +31,11 @@ exports.create = function(payload) {
                 if (confirmation.success) {
                     confirmation.message = returnedValues.savedCard;
                 }
-                resolve(confirmation);
+                returnedValues.saveConfirmation = confirmation;
+                return MetadataDB.updatePublicUserMetadata([returnedValues.savedCard]);
             })
-            .catch((err) => { reject(err); })
+            .then((_) => { resolve(returnedValues.saveConfirmation); })
+            .catch((err) => { if (err !== "DUMMY") reject(err); })
     });
 };
 
@@ -108,8 +111,12 @@ exports.update = function(cardJSON) {
                     prevResults.savedCard = savedCard;
                     return MetadataDB.update([savedCard]);
                 } else {
-                    resolve({success: true, status: 200, message: savedCard});
+                    prevResults.savedCard = savedCard;
+                    return Promise.resolve("DUMMY");
                 }
+            })
+            .then((_) => {
+                return MetadataDB.updatePublicUserMetadata([prevResults.savedCard]);
             })
             .then((_) => {
                 resolve({success: true, status: 200, message: prevResults.savedCard});
@@ -239,8 +246,11 @@ exports.publicSearch = function(payload) {
     if (payload.userID !== undefined) {
         mandatoryFields.push({createdById: payload.userID});
     }
-    if (payload.cardID !== undefined) {
-        mandatoryFields.push({_id: payload.cardID });
+
+    if (payload.cardIDs) payload.cardIDs = Array.from(payload.cardIDs.split(","));
+    if (payload.cardID) payload.cardIDs = [payload.cardID];
+    if (payload.cardIDs !== undefined) {
+        mandatoryFields.push({ _id: { $in: payload.cardIDs } });
     }
     if (payload.queryString !== undefined) {
         mandatoryFields.push({ $text: { $search: splitTags(payload.queryString) } });
