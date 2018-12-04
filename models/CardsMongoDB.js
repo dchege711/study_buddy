@@ -247,7 +247,9 @@ exports.publicSearch = function(payload) {
         mandatoryFields.push({createdById: payload.userID});
     }
 
-    if (payload.cardIDs) payload.cardIDs = Array.from(payload.cardIDs.split(","));
+    if (payload.cardIDs && typeof payload.cardIDs === "string") {
+        payload.cardIDs = Array.from(payload.cardIDs.split(","));
+    }
     if (payload.cardID) payload.cardIDs = [payload.cardID];
     if (payload.cardIDs !== undefined) {
         mandatoryFields.push({ _id: { $in: payload.cardIDs } });

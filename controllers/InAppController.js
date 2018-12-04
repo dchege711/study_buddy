@@ -42,7 +42,11 @@ exports.readPublicMetadata = function (req, res) {
         .catch((err) => { convertObjectToResponse(err, null, res); });
 }
 
-exports.browsePage = function(req, res) {
+exports.browsePagePost = function(req, res) {
+    sendResponseFromPromise(CardsDB.publicSearch(req.body), res);
+}
+
+exports.browsePageGet = function(req, res) {
     CardsDB
         .publicSearch(req.query)
         .then((abbreviatedCards) => {
@@ -52,7 +56,7 @@ exports.browsePage = function(req, res) {
                     abbreviatedCards: abbreviatedCards.message,
                     APP_NAME: config.APP_NAME
                 }
-            );
+            );  
         })
         .catch((err) => {convertObjectToResponse(err, null, res); });
 };

@@ -12,7 +12,9 @@ router.get("/home", requireLogIn, inAppController.home);
 
 router.get("/wiki", inAppController.wikiPage);
 
-router.get("/browse", inAppController.browsePage);
+router.get("/browse", inAppController.browsePageGet);
+
+router.post("/browse", inAppController.browsePagePost);
 
 router.get("/account", requireLogIn, inAppController.accountGet);
 
