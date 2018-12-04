@@ -58,6 +58,8 @@
 
                     <% include ../partials/sidebar_template.ejs %>
 
+                    <p id="current_tag_selection" class="w3-right"></p>
+
                     <div class="w3-container w3-threequarter w3-right flexbox" id="search_results">
                         <% if (abbreviatedCards.length === 0) { %>
                             <div class="w3-container">
@@ -67,7 +69,7 @@
                             <% for (let i = 0; i < abbreviatedCards.length; i++) { %>
                                 <div class="w3-card-4 w3-padding-small w3-margin search-result" onclick="displayFullCard('<%= abbreviatedCards[i]._id %>')">
                                     <header class="w3-container w3-blue"><h4><%= abbreviatedCards[i].title %></h4></header>
-                                    <div class="w3-container"><p><strong>Tags: </strong><%= abbreviatedCards[i].tags %></p></div>
+                                    <div class="w3-container"><p><strong>Tags: </strong><%= abbreviatedCards[i].tags.split(/\s/).join(", ") %></p></div>
                                 </div>
                             <% } %>
                         <% } %>
@@ -86,7 +88,12 @@
 
     <script type="text/javascript">
 
-        let cardsManager = null, state = {currentCardID: null}; 
+        let cardsManager = null;
+        let state = {
+            currentCardID: null,
+            currentTagSelectionElement: document.getElementById("current_tag_selection"),
+            searchResultsElement: document.getElementById("search_results")
+        }; 
 
         AppUtilities
             .sendHTTPRequest("POST", "/read-public-metadata", {})
@@ -112,23 +119,34 @@
             state.queryString = elementRefs.searchInputElement.value;
         }
 
-        /**
-        * @description Toggle the selection of a tag.
-        * 
-        * @param {String} tag the tag that has been clicked.
-        */
-        function selectThisTag(tag) {
-            if (state.selectedTags.has(tag)) {
-                state.selectedTags.delete(tag);
-            } else {
-                state.selectedTags.add(tag);
-            }                
-            document.getElementById(tag).classList.toggle("chosen");
-        }
-
         function filterCards() {
-            let cardIDs = TagsBarUtilities.getIDsOfSelectedTags();
-            document.location = `${document.location.origin}/browse/?cardIDs=${Array.from(cardIDs).join(",")}`;
+            let selectedTags = TagsBarUtilities.getIDsOfSelectedTags();
+            if (selectedTags === null) return;
+
+            let cardIDs = Array.from(selectedTags);
+            AppUtilities
+                .sendHTTPRequest("POST", "/browse", {cardIDs: cardIDs})
+                .then((response) => {
+                    response = JSON.parse(response);
+                    if (!response.success) {
+                        console.error(response.message); return;
+                    }
+                    state.currentTagSelectionElement.innerHTML = `Current Tags: ${Array.from(TagsBarUtilities.getSelectedTags()).join(", ")}`
+                    abbreviatedCards = response.message;
+                    searchResultsHTML = ``;
+                    for (let i = 0; i < abbreviatedCards.length; i++) {
+                        searchResultsHTML += `
+                            <div class="w3-card-4 w3-padding-small w3-margin search-result" onclick="displayFullCard('${abbreviatedCards[i]._id}')">
+                            <header class="w3-container w3-blue"><h4>${abbreviatedCards[i].title}</h4></header>
+                            <div class="w3-container"><p><strong>Tags: </strong>${abbreviatedCards[i].tags.split(/\s/).join(", ")}</p></div>
+                            </div>
+                        `;
+                    }
+                    state.searchResultsElement.innerHTML = searchResultsHTML;
+ 
+                })
+                .catch((err) => { console.error(err); });
+            // document.location = `${document.location.origin}/browse/?cardIDs=${Array.from(cardIDs).join(",")}`;
         }
 
         function displayFullCard(cardID) {
