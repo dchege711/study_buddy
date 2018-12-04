@@ -13,7 +13,7 @@
                 display: flex;
                 flex-flow: row wrap;
                 align-items: stretch;
-                align-content: space-between;
+                align-content: start;
             }
 
             div#card_container_holder {
@@ -28,6 +28,8 @@
             }
 
             div.search-result {
+                width: 30%;
+                word-break: normal;
                 cursor: pointer;
             }
 
@@ -68,7 +70,7 @@
                         <% } else { %>
                             <% for (let i = 0; i < abbreviatedCards.length; i++) { %>
                                 <div class="w3-card-4 w3-padding-small w3-margin search-result" onclick="displayFullCard('<%= abbreviatedCards[i]._id %>')">
-                                    <header class="w3-container w3-blue"><h4><%= abbreviatedCards[i].title %></h4></header>
+                                    <header class="w3-container w3-pale-green"><h4><%= abbreviatedCards[i].title %></h4></header>
                                     <div class="w3-container"><p><strong>Tags: </strong><%= abbreviatedCards[i].tags.split(/\s/).join(", ") %></p></div>
                                 </div>
                             <% } %>
@@ -137,7 +139,7 @@
                     for (let i = 0; i < abbreviatedCards.length; i++) {
                         searchResultsHTML += `
                             <div class="w3-card-4 w3-padding-small w3-margin search-result" onclick="displayFullCard('${abbreviatedCards[i]._id}')">
-                            <header class="w3-container w3-blue"><h4>${abbreviatedCards[i].title}</h4></header>
+                            <header class="w3-container w3-pale-green"><h4>${abbreviatedCards[i].title}</h4></header>
                             <div class="w3-container"><p><strong>Tags: </strong>${abbreviatedCards[i].tags.split(/\s/).join(", ")}</p></div>
                             </div>
                         `;
@@ -146,7 +148,6 @@
  
                 })
                 .catch((err) => { console.error(err); });
-            // document.location = `${document.location.origin}/browse/?cardIDs=${Array.from(cardIDs).join(",")}`;
         }
 
         function displayFullCard(cardID) {
