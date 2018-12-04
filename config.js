@@ -10,7 +10,7 @@ if (exports.NODE_ENV === "production") {
     exports.MONGO_URI = process.env.STUDY_BUDDY_MLAB_MONGO_URI;
     exports.BASE_URL = "https://cards.c13u.com";
 } else if (exports.NODE_ENV === "development") {
-    exports.MONGO_URI = process.env.STUDY_BUDDY_MLAB_TEST_DB_URI;
+    exports.MONGO_URI = process.env.STUDY_BUDDY_MLAB_MONGO_URI;
     exports.BASE_URL = `http://localhost:${exports.PORT}`;
 } else {
     throw Error("Please set the NODE_ENV environment variable.");

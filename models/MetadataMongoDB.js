@@ -5,6 +5,7 @@ const Metadata = require('./mongoose_models/MetadataCardSchema');
 const Card = require('./mongoose_models/CardSchema.js');
 const fs = require("fs");
 const querySanitizer = require("./SanitizationAndValidation.js").sanitizeQuery;
+const config = require("../config.js");
 
 /**
  * @description Create & save a new metadata document for a user
@@ -150,7 +151,7 @@ exports.updatePublicUserMetadata = function(cards) {
 
     return new Promise(function(resolve, reject) {
         User
-            .findOne({username: "c13u"}).exec()
+            .findOne({username: config.PUBLIC_USER_USERNAME}).exec()
             .then(async (publicUser) => {
                 if (cardsToAdd.length > 0) {
                     let query = {
