@@ -25,7 +25,7 @@
     "build": "webpack --config webpack.config.js",
     "start": "npm run build && node server.js",
     "debug": "node --trace-warnings server.js",
-    "test": "npm run mocha_tests && npm run selenium_tests",
+    "test": "node models/Miscellaneous.js && npm run mocha_tests && npm run selenium_tests",
     "mocha_tests": "nyc mocha --no-warnings --recursive --sort './tests/mocha_tests/*/*.js'",
     "selenium_tests": "cd tests/selenium_tests/ && nyc ./run_selenium_tests.sh firefox headless && cd ../../"
   },

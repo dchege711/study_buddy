@@ -5,6 +5,7 @@
         <title><%= APP_NAME %>: Browse/Search</title>
         <script type="text/javascript" src="/dist/CardsManager.bundle.min.js"></script>
         <script type="text/javascript" src="/dist/CardTemplateUtilities.bundle.min.js"></script>
+        <script type="text/javascript" src="/dist/TagsBarUtilities.bundle.min.js"></script>
         <% include ../partials/syntax_highlighting_and_latex.ejs %>
 
         <style>
@@ -12,7 +13,7 @@
                 display: flex;
                 flex-flow: row wrap;
                 align-items: stretch;
-                align-content: space-between;
+                align-content: start;
             }
 
             div#card_container_holder {
@@ -27,6 +28,8 @@
             }
 
             div.search-result {
+                width: 30%;
+                word-break: normal;
                 cursor: pointer;
             }
 
@@ -57,6 +60,8 @@
 
                     <% include ../partials/sidebar_template.ejs %>
 
+                    <p id="current_tag_selection" class="w3-right"></p>
+
                     <div class="w3-container w3-threequarter w3-right flexbox" id="search_results">
                         <% if (abbreviatedCards.length === 0) { %>
                             <div class="w3-container">
@@ -65,8 +70,8 @@
                         <% } else { %>
                             <% for (let i = 0; i < abbreviatedCards.length; i++) { %>
                                 <div class="w3-card-4 w3-padding-small w3-margin search-result" onclick="displayFullCard('<%= abbreviatedCards[i]._id %>')">
-                                    <header class="w3-container w3-blue"><h4><%= abbreviatedCards[i].title %></h4></header>
-                                    <div class="w3-container"><p><strong>Tags: </strong><%= abbreviatedCards[i].tags %></p></div>
+                                    <header class="w3-container w3-pale-green"><h4><%= abbreviatedCards[i].title %></h4></header>
+                                    <div class="w3-container"><p><strong>Tags: </strong><%= abbreviatedCards[i].tags.split(/\s/).join(", ") %></p></div>
                                 </div>
                             <% } %>
                         <% } %>
@@ -86,10 +91,20 @@
     <script type="text/javascript">
 
         let cardsManager = null;
-
         let state = {
-            currentCardID: null
-        }
+            currentCardID: null,
+            currentTagSelectionElement: document.getElementById("current_tag_selection"),
+            searchResultsElement: document.getElementById("search_results")
+        }; 
+
+        AppUtilities
+            .sendHTTPRequest("POST", "/read-public-metadata", {})
+            .then((response) => {
+                response = JSON.parse(response);
+                state.tagsAndIDs = response.message[0].node_information[0];
+                TagsBarUtilities.initializeTagsBar("side_bar_contents", state.tagsAndIDs);
+            })
+            .catch((err) => { console.error(err); });
 
         const USER_INFO = AppUtilities.getAccountInfo();
 
@@ -100,11 +115,39 @@
             cardDescriptionElement: document.getElementById("card_description"),
             cardTagsElement: document.getElementById("card_tags"),
             cardPopularityElement: document.getElementById("card_popularity")
-
         };
     
         function handleSearchInputChange() {
             state.queryString = elementRefs.searchInputElement.value;
+        }
+
+        function filterCards() {
+            let selectedTags = TagsBarUtilities.getIDsOfSelectedTags();
+            if (selectedTags === null) return;
+
+            let cardIDs = Array.from(selectedTags);
+            AppUtilities
+                .sendHTTPRequest("POST", "/browse", {cardIDs: cardIDs})
+                .then((response) => {
+                    response = JSON.parse(response);
+                    if (!response.success) {
+                        console.error(response.message); return;
+                    }
+                    state.currentTagSelectionElement.innerHTML = `Current Tags: ${Array.from(TagsBarUtilities.getSelectedTags()).join(", ")}`
+                    abbreviatedCards = response.message;
+                    searchResultsHTML = ``;
+                    for (let i = 0; i < abbreviatedCards.length; i++) {
+                        searchResultsHTML += `
+                            <div class="w3-card-4 w3-padding-small w3-margin search-result" onclick="displayFullCard('${abbreviatedCards[i]._id}')">
+                            <header class="w3-container w3-pale-green"><h4>${abbreviatedCards[i].title}</h4></header>
+                            <div class="w3-container"><p><strong>Tags: </strong>${abbreviatedCards[i].tags.split(/\s/).join(", ")}</p></div>
+                            </div>
+                        `;
+                    }
+                    state.searchResultsElement.innerHTML = searchResultsHTML;
+ 
+                })
+                .catch((err) => { console.error(err); });
         }
 
         function displayFullCard(cardID) {

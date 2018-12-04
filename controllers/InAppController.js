@@ -1,6 +1,7 @@
 "use strict";
 
 const CardsDB = require("../models/CardsMongoDB.js");
+const User = require("./../models/mongoose_models/UserSchema.js");
 const MetadataDB = require("../models/MetadataMongoDB.js");
 const controllerUtils = require("./ControllerUtilities.js");
 const loginUtilities = require("../models/LogInUtilities.js");
@@ -30,7 +31,22 @@ exports.readPublicCard = function (req, res) {
     sendResponseFromPromise(CardsDB.readPublicCard(req.body), res);
 };
 
-exports.browsePage = function(req, res) {
+exports.readPublicMetadata = function (req, res) {
+    User
+        .findOne({username: config.PUBLIC_USER_USERNAME})
+        .then((publicUser) => {
+            sendResponseFromPromise(
+                MetadataDB.read({userIDInApp: publicUser.userIDInApp}), res
+            );
+        })
+        .catch((err) => { convertObjectToResponse(err, null, res); });
+}
+
+exports.browsePagePost = function(req, res) {
+    sendResponseFromPromise(CardsDB.publicSearch(req.body), res);
+}
+
+exports.browsePageGet = function(req, res) {
     CardsDB
         .publicSearch(req.query)
         .then((abbreviatedCards) => {
@@ -40,7 +56,7 @@ exports.browsePage = function(req, res) {
                     abbreviatedCards: abbreviatedCards.message,
                     APP_NAME: config.APP_NAME
                 }
-            );
+            );  
         })
         .catch((err) => {convertObjectToResponse(err, null, res); });
 };
@@ -54,10 +70,6 @@ exports.accountGet = function (req, res) {
 
 exports.readMetadata = function (req, res) {
     sendResponseFromPromise(MetadataDB.read(req.body), res);
-};
-
-exports.tags = function (req, res) {
-    sendResponseFromPromise(MetadataDB.readTags(req.body), res);
 };
 
 exports.addCard = function (req, res) {

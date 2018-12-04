@@ -51,10 +51,14 @@ let getHash = async function(password, salt) {
 /**
  * @description Generate a random string from the specified alphabet.
  * @param {Number} stringLength The length of the desired string.
- * @param {String} alphabet The characters that can be included in the string.
+ * @param {String} alphabet The characters that can be included in the string. 
+ * If not specified, defaults to the alphanumeric characters.
  */
 exports.getRandomString = function(stringLength, alphabet) {
-    var random_string = "";
+    if (alphabet === undefined) {
+        alphabet = DIGITS + LOWER_CASE + UPPER_CASE;
+    }
+    let random_string = "";
     for (let i = 0; i < stringLength; i++) {
         // In JavaScript, concatenation is actually faster...
         random_string += alphabet.charAt(Math.floor(Math.random() * alphabet.length));

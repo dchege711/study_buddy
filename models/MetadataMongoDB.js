@@ -67,59 +67,24 @@ exports.read = function (payload) {
 };
 
 /**
- * @description Scan the metadata database, looking for all the tags and their
- * counts. Return this info as a list of JSON objects keyed by `text` and `size`
- * 
- * @param {JSON} payload Filter for the metadata documents
- * @returns {Promise} takes in an array of dicts. Each dict has the keys 
- * `text` and `size`.
- */
-exports.readTags = function(payload) {
-    payload = querySanitizer(payload);
-    let cursor = Metadata.find(payload).cursor();
-    let tags = {};
-    cursor.on("data", (metadataDoc) => {
-        var nodeInfo = metadataDoc.node_information[0];
-        for (const tag in nodeInfo) {
-            Object.keys(nodeInfo[tag]).forEach((card_id) => {
-                if (!tags.hasOwnProperty(tag)) {
-                    tags[tag] = nodeInfo[tag][card_id].urgency;
-                } else {
-                    tags[tag] += nodeInfo[tag][card_id].urgency;
-                }
-            }); 
-        }
-    });
-
-    cursor.on("close", () => {
-        tagsAsList = [];
-        for (const property in tags) {
-            tagsAsList.push({
-                text: property,
-                size: tags[property] 
-            });
-        }
-
-        // The D3 wrapper works better when the input is sorted.
-        // RN there's a pending PR: https://github.com/wvengen/d3-wordcloud/pull/13
-        tagsAsList.sort(function(tag_item_a, tag_item_b) {
-            return tag_item_b.size - tag_item_a.size;
-        });
-
-        tagsAsList = tagsAsList.slice(0, 25);
-        return new Promise.resolve(tagsAsList);
-    });
-};
-
-/**
  * Update the metadata with the new cards' details. This method
  * is usually called by CardsMongoDB.update(). An array is needed to prevent
  * race conditions when updating metadata from more than one card. 
  * 
  * @param {Array} savedCards Array of cards
- * @returns {Promise} takes a JSON with `success`, `status` and `message` as keys.
+ * 
+ * @param {JSON} metadataQuery An identifier for the metadata document. This 
+ * argument was added in order to update the global public user account. If not 
+ * specified, it defaults to the owner of the first card in `savedCards`.
+ * 
+ * @param {String} attributeName A sortable attribute of the card that will be 
+ * used to rank the cards in the metadata. Possible values include `urgency`, 
+ * `numChildren`.
+ * 
+ * @returns {Promise} resolves with a JSON with `success`, `status` and 
+ * `message` as keys. If successful, `message` has a metadata JSON object.
  */
-exports.update = async function (savedCards) {
+exports.update = async function (savedCards, metadataQuery, attributeName) {
     /*
      * How many cards before we need a new metadata JSON?
      * (400 + 150 * num_id_metadata) * 5 bytes/char <= 16MB
@@ -130,20 +95,29 @@ exports.update = async function (savedCards) {
         savedCards[0].metadataIndex = 0;
     }
 
+    if (metadataQuery === undefined) {
+        metadataQuery = {
+            createdById: savedCards[0].createdById,
+            metadataIndex: savedCards[0].metadataIndex
+        }
+    }
+
+    if (attributeName === undefined) attributeName = "urgency";
+
     return new Promise(function(resolve, reject) {
         if (savedCards[0].createdById === undefined) {
             reject(
                 new Error("MetadataMongoDB.update() was called for a card without an owner")
             );
+            return;
         }
         Metadata
-            .findOne({
-                createdById: savedCards[0].createdById,
-                metadataIndex: savedCards[0].metadataIndex
-            }).exec()
+            .findOne(metadataQuery).exec()
             .then((metadataDoc) => {
                 savedCards.forEach(async (savedCard) => {
-                    metadataDoc = await updateMetadataWithCardDetails(savedCard, metadataDoc);
+                    metadataDoc = await updateMetadataWithCardDetails(
+                        savedCard, metadataDoc, attributeName
+                    );
                 });
                 metadataDoc.markModified("stats");
                 metadataDoc.markModified("node_information");
@@ -158,12 +132,80 @@ exports.update = async function (savedCards) {
 };
 
 /**
+ * @description Update the metadata for a public card.
+ * 
+ * @param {Array} cards an array of JSON flashcards
+ * 
+ * @returns {Promise} resolves with a JSON with `success`, `status` and 
+ * `message` as keys. If successful, `message` has a metadata JSON object.
+ * 
+ */
+exports.updatePublicUserMetadata = function(cards) {
+
+    let cardsToAdd = [], cardsToRemove = [];
+    for (let i = 0; i < cards.length; i++) {
+        if (cards[i].isPublic) cardsToAdd.push(cards[i]);
+        else cardsToRemove.push(cards[i]);
+    }
+
+    return new Promise(function(resolve, reject) {
+        User
+            .findOne({username: "c13u"}).exec()
+            .then(async (publicUser) => {
+                if (cardsToAdd.length > 0) {
+                    let query = {
+                        createdById: publicUser.userIDInApp,
+                        metadataIndex: 0 // Because this is the first document
+                    };
+                    return exports.update(cardsToAdd, query, "numChildren");
+                } else {
+                    let metadataDocs = await exports.read({userIDInApp: publicUser.userIDInApp});
+                    return Promise.resolve({
+                        message: metadataDocs.message[0], success: true
+                    });
+                }
+            })
+            .then((updateConfirmation) => {
+                if (!updateConfirmation.success) {
+                    return Promise.reject(updateConfirmation.message);
+                }
+                let metadataDoc = updateConfirmation.message;
+                let metadataStats = metadataDoc.stats[0];
+                let metadataNodeInfo = metadataDoc.node_information[0];
+                for (let j = 0; j < cardsToRemove.length; j++) {
+                    let cardID = cardsToRemove[j]._id;
+                    // Remove the card from the lists that the user previews from
+                    cardsToRemove[j].tags.split(" ").forEach(tagToRemove => {
+                        tagToRemove = tagToRemove.trim();
+                        if (tagToRemove !== "" && metadataNodeInfo[tagToRemove]) {
+                            delete metadataNodeInfo[tagToRemove][cardID];
+                            if (Object.keys(metadataNodeInfo[tagToRemove]).length === 0) {
+                                delete metadataNodeInfo[tagToRemove];
+                            }
+                        }
+                    });
+                    delete metadataStats[cardID];
+                }
+                
+                metadataDoc.markModified("stats");
+                metadataDoc.markModified("node_information");
+                return metadataDoc.save();
+            })
+            .then((savedMetadata) => {
+                resolve({success: true, message: savedMetadata, status: 200});
+            })
+            .catch((err) => { reject(err); });
+    });
+    
+}
+
+/**
  * @description Delete all the metadata associated with the user.
  * @param {JSON} payload Contains `userIDInApp` as a key
  * @returns {Promise} resolves with a JSON object keyed by `success`, `status` 
  * and `message`
  */
-exports.delete = function (payload) {
+exports.deleteAllMetadata = function (payload) {
     payload = querySanitizer(payload);
     return new Promise(function(resolve, reject) {
         Metadata
@@ -410,11 +452,17 @@ exports.writeCardsToJSONFile = function (userIDInApp) {
  * metadata.
  * @param {JSON} metadataDoc A Mongoose Schema object that is used to store the
  * current user's metadata.
+ * @param {String}
  * @returns {Promise} resolved with a reference to the modified metadata doc 
  */
-function updateMetadataWithCardDetails(savedCard, metadataDoc) {
+function updateMetadataWithCardDetails(savedCard, metadataDoc, attributeName) {
 
-    let urgency = savedCard.urgency;
+    let sortableAttribute;
+    if (attributeName === undefined) {
+        sortableAttribute = savedCard.urgency;
+    } else {
+        sortableAttribute = savedCard[attributeName];
+    }
     let cardID = savedCard._id;
 
     if (metadataDoc.stats.length == 0) metadataDoc.stats.push({});
@@ -428,7 +476,7 @@ function updateMetadataWithCardDetails(savedCard, metadataDoc) {
 
     // Save this card in the stats field where it only appears once
     if (metadataStats[cardID] === undefined) metadataStats[cardID] = {};
-    metadataStats[cardID].urgency = urgency;
+    metadataStats[cardID].urgency = sortableAttribute;
     metadataDoc.markModified("stats");
 
     // Keep track of which tags have been changed
@@ -462,7 +510,7 @@ function updateMetadataWithCardDetails(savedCard, metadataDoc) {
                     prevTagStillExists[strippedTag] = true;
                 }
 
-                metadataNodeInfo[strippedTag][cardID].urgency = urgency;
+                metadataNodeInfo[strippedTag][cardID].urgency = sortableAttribute;
             }
         });
     }

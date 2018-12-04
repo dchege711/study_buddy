@@ -20,7 +20,10 @@ exports.EMAIL_ADDRESS = process.env.STUDY_BUDDY_DEFAULT_EMAIL_ADDRESS;
 exports.MAILGUN_LOGIN = process.env.STUDY_BUDDY_MAILGUN_LOGIN;
 exports.MAILGUN_PASSWORD = process.env.STUDY_BUDDY_MAILGUN_PASSWORD;
 
-exports.DEBUG_EMAIL_ADDRESS = process.env.STUDY_BUDDY_DEFAULT_EMAIL_ADDRESS;
+exports.DEBUG_EMAIL_ADDRESS = process.env.STUDY_BUDDY_EMAIL_ADDRESS;
 exports.DEBUG_USERNAME = "test-study-buddy-user";
 exports.DEBUG_PASSWORD = "i_know_how_to_keep_passwords_safe_amirite?";
 exports.DEBUG_OPERATION_TIMEOUT_MS = 3000; 
+
+exports.PUBLIC_USER_USERNAME = "c13u";
+exports.PUBLIC_USER_EMAIL = process.env.STUDY_BUDDY_DEFAULT_EMAIL_ADDRESS;

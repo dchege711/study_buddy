@@ -1,67 +1,63 @@
-require('./MongooseClient');
+"use strict";
 
-var CardsDB = require('./CardsMongoDB');
-var MetadataDB = require('./MetadataMongoDB');
+const User = require("./mongoose_models/UserSchema.js");
+const Card = require("./mongoose_models/CardSchema.js");
+const MetadataDB = require("./MetadataMongoDB");
+const LogInUtils = require("./LogInUtilities.js");
+const config = require("../config.js");
 
 /**
- * @description Add metadata for the specified user
+ * @description Add a dummy user in order to make managing the browse page for 
+ * public cards easier
  */
-var addAndPopulateMetadata = function(userIDInApp) {
-    MetadataDB.create(
-        {
-            "userIDInApp": userIDInApp,
-            "metadataIndex": 0
-        }, (response) => {
-        console.log(response.message);
-        populateMetadata(1);
+exports.addPublicUser = function() {
+    return new Promise(function(resolve, reject) {
+        let prevResults = {};
+        User
+            .findOne({username: config.PUBLIC_USER_USERNAME, email: config.PUBLIC_USER_EMAIL}).exec()
+            .then((savedUser) => {
+                if (savedUser) {
+                    return LogInUtils.deleteAccount(savedUser.userIDInApp);
+                } else {
+                    return Promise.resolve("DUMMY");
+                }
+            })
+            .then((_) => {
+                return LogInUtils.registerUserAndPassword({
+                    username: config.PUBLIC_USER_USERNAME, 
+                    email: config.PUBLIC_USER_EMAIL,
+                    password: LogInUtils.getRandomString(20) // Never meant to login
+                });
+            })
+            .then((_) => {
+                return User.findOne({username: config.PUBLIC_USER_USERNAME}).exec();
+            })
+            .then((savedUser) => {
+                prevResults.savedUser = savedUser;
+                return Card.find({isPublic: true}).exec();
+            })
+            .then((publicCards) => {
+                return MetadataDB.updatePublicUserMetadata(publicCards);
+            })
+            .then((confirmation) => {
+                if (confirmation.success) resolve(`Success!`);
+                else reject(confirmation.message);
+            })
+            .catch((err) => { reject(err); });
     });
-};
 
-var testMetadataUpdate = function(callBack) {
-    var randomUrgency = Math.floor(Math.random() * 200);
-    var cardID = "5a7d20921aef274630536c1a";
-    CardsDB.update({
-        _id: cardID, urgency: randomUrgency
-    }, function(response) {
-        MetadataDB.read({ "userIDInApp": 1 }, (results) => {
-            console.log("Testing updates to metadata...");
-            console.log(results[0].stats[0][cardID].urgency + " should equal " + randomUrgency);
-            callBack();
-        });
-    });
-};
-
-/**
- * @description Delete metadata for the specified user
- */
-var deleteMetadata = function (userIDInApp, callBack) {
-    MetadataDB.delete(
-        {
-            "userIDInApp": userIDInApp
-        }, (response) => {
-            console.log(response.message);
-            callBack(userIDInApp);
-        });
-};
-
-/**
- * Add the metadataIndex field to every card that the user owns.
- * 
- * @param {Number} userIDInApp The app ID of the user owning the cards
- */
-var populateMetadata = function(userIDInApp) {
-    CardsDB.read(
-        {
-            "userIDInApp": userIDInApp
-        }, (response) => {
-            cards = response.message;
-            MetadataDB.update(cards, (response) => {
-                console.log(response.message);
-            });
-        }
-    );
-};
+}
 
 if (require.main === module) {
-    deleteMetadata(1, addAndPopulateMetadata);
+
+    const dbConnection = require("./MongooseClient.js");
+    
+    exports.addPublicUser()
+        .then((_) => { return dbConnection.closeMongooseConnection(); })
+        .then(() => { console.log(`Created the public user...`); process.exit(0); })
+        .catch((err) => { console.error(err); process.exit(1); });
+
+    // ... So many pending promises. I'm not proud of calling `process.exit()`
+    // const whyIsNodeRunning = require("why-is-node-running");
+    // setTimeout(whyIsNodeRunning, 10000);
 }

@@ -12,13 +12,15 @@ router.get("/home", requireLogIn, inAppController.home);
 
 router.get("/wiki", inAppController.wikiPage);
 
-router.get("/browse", inAppController.browsePage);
+router.get("/browse", inAppController.browsePageGet);
+
+router.post("/browse", inAppController.browsePagePost);
 
 router.get("/account", requireLogIn, inAppController.accountGet);
 
 router.post("/read-metadata", requireLogIn, inAppController.readMetadata);
 
-router.post("/tags", inAppController.tags);
+router.post("/read-public-metadata", inAppController.readPublicMetadata);
 
 router.post("/add-card", requireLogIn, inAppController.addCard);
 

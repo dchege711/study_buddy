@@ -19,7 +19,8 @@ module.exports = {
     entry: {
         CardTemplateUtilities: path.resolve(__dirname, "public", "static", "CardTemplateUtilities.js"),
         CardsManager: path.resolve(__dirname, "public", "static", "CardsManager.js"),
-        AppUtilities: path.resolve(__dirname, "public", "static", "AppUtilities.js")
+        AppUtilities: path.resolve(__dirname, "public", "static", "AppUtilities.js"),
+        TagsBarUtilities: path.resolve(__dirname, "public", "static", "TagsBarUtilities.js")
     },
     plugins: [
         new CleanWebpackPlugin(['dist']),
