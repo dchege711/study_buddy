@@ -240,7 +240,7 @@
                 }
             }
             elementRefs.cardTagsElement.innerHTML = tags_html;
-            elementRefs.cardPopularityElement.value = card.urgency;
+            elementRefs.cardPopularityElement.innerText = card.numChildren;
             state.currentCardID = card._id;
         
             PrettifyCards.addSyntaxHighlighting();
