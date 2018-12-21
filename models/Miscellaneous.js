@@ -17,7 +17,7 @@ exports.addPublicUser = function() {
             .findOne({username: config.PUBLIC_USER_USERNAME, email: config.PUBLIC_USER_EMAIL}).exec()
             .then((savedUser) => {
                 if (savedUser) {
-                    return LogInUtils.deleteAccount(savedUser.userIDInApp);
+                    return Promise.reject("DUMMY");
                 } else {
                     return Promise.resolve("DUMMY");
                 }
@@ -43,7 +43,7 @@ exports.addPublicUser = function() {
                 if (confirmation.success) resolve(`Success!`);
                 else reject(confirmation.message);
             })
-            .catch((err) => { reject(err); });
+            .catch((err) => { if (err !== "DUMMY") reject(err); });
     });
 
 }
