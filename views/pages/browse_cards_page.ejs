@@ -71,7 +71,7 @@
                             <% for (let i = 0; i < abbreviatedCards.length; i++) { %>
                                 <div class="w3-card-4 w3-padding-small w3-margin search-result" onclick="displayFullCard('<%= abbreviatedCards[i]._id %>')">
                                     <header class="w3-container w3-pale-green"><h4><%= abbreviatedCards[i].title %></h4></header>
-                                    <div class="w3-container"><p><strong>Tags: </strong><%= abbreviatedCards[i].tags.split(/\s/).join(", ") %></p></div>
+                                    <div class="w3-container"><p><strong>Tags: </strong><span id='tags<%= abbreviatedCards[i]._id %>'><%= abbreviatedCards[i].tags.split(/\s/).join(", ") %></span></p></div>
                                 </div>
                             <% } %>
                         <% } %>
@@ -152,9 +152,15 @@
 
         function displayFullCard(cardID) {
             elementRefs.cardContainerHolderElement.style.visibility = "visible";
-            cardsManager = new CardsManager(null, null, cardSourceURL="/read-public-card");
+            cardsManager = new CardsManager(state.tagsAndIDs, null, cardSourceURL="/read-public-card");
             cardsManager
-                .initializeFromMinicards([{_id: cardID, urgency: 1}])
+                .initializeFromMinicards(
+                    [{
+                        _id: cardID, urgency: Number.POSITIVE_INFINITY,
+                        tags: document.getElementById(`tags${cardID}`).innerText.split(", ")
+                    }], 
+                    includeTagNeighbors=true
+                )
                 .then(() => { return cardsManager.next(); })
                 .then((card) => { renderCard(card); })
                 .catch((err) => { console.error(err); });
