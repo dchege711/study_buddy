@@ -246,7 +246,7 @@
                 }
             }
             elementRefs.cardTagsElement.innerHTML = tags_html;
-            elementRefs.cardPopularityElement.innerText = card.numChildren;
+            elementRefs.cardPopularityElement.innerText = card.idsOfUsersWithCopy.split(", ").length;
             state.currentCardID = card._id;
         
             PrettifyCards.addSyntaxHighlighting();

@@ -80,7 +80,7 @@ exports.update = function(cardJSON) {
     let prevResults = {};
     const EDITABLE_ATTRIBUTES = new Set([
         "title", "description", "descriptionHTML", "tags", "urgency", "isPublic", 
-        "numChildren", "numTimesMarkedAsDuplicate", "numTimesMarkedForReview"
+        "numTimesMarkedAsDuplicate", "numTimesMarkedForReview"
     ]);
 
     let query = querySanitizer({cardID: cardJSON.cardID});
@@ -317,7 +317,9 @@ exports.duplicateCard = function(payload) {
                     });
                     return Promise.reject("DUMMY");
                 } else {
-                    preExistingCard.numChildren = preExistingCard.numChildren + 1;
+                    let idsOfUsersWithCopy = new Set(preExistingCard.idsOfUsersWithCopy.split(", "));
+                    idsOfUsersWithCopy.add(payload.userIDInApp);
+                    preExistingCard.idsOfUsersWithCopy = Array.from(idsOfUsersWithCopy).join(", ");
                     return preExistingCard.save();
                 }           
             })

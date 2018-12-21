@@ -26,6 +26,7 @@ var cardSchema = new mongoose.Schema(
         lastReviewed: { type: Date, default: Date.now },
         parent: { type: String, trim: true, default: "" },
         numChildren: { type: Number, default: 0 },
+        idsOfUsersWithCopy: { type: String, lowercase: true, trim: true, default: "" },
         numTimesMarkedAsDuplicate: { type: Number, default: 0 },
         numTimesMarkedForReview: { type: Number, default: 0 }
     }, 
