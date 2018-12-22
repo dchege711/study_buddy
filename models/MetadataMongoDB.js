@@ -461,6 +461,8 @@ function updateMetadataWithCardDetails(savedCard, metadataDoc, attributeName) {
     let sortableAttribute;
     if (attributeName === undefined) {
         sortableAttribute = savedCard.urgency;
+    } else if (attributeName === "numChildren") {
+        sortableAttribute = savedCard.idsOfUsersWithCopy.split(", ").length;
     } else {
         sortableAttribute = savedCard[attributeName];
     }

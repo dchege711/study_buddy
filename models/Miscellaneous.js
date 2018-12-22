@@ -17,7 +17,7 @@ exports.addPublicUser = function() {
             .findOne({username: config.PUBLIC_USER_USERNAME, email: config.PUBLIC_USER_EMAIL}).exec()
             .then((savedUser) => {
                 if (savedUser) {
-                    return LogInUtils.deleteAccount(savedUser.userIDInApp);
+                    resolve("User already exists");
                 } else {
                     return Promise.resolve("DUMMY");
                 }
@@ -53,8 +53,11 @@ if (require.main === module) {
     const dbConnection = require("./MongooseClient.js");
     
     exports.addPublicUser()
-        .then((_) => { return dbConnection.closeMongooseConnection(); })
-        .then(() => { console.log(`Created the public user...`); process.exit(0); })
+        .then((confirmation) => { 
+            console.log(confirmation);
+            return dbConnection.closeMongooseConnection(); 
+        })
+        .then(() => {  process.exit(0); })
         .catch((err) => { console.error(err); process.exit(1); });
 
     // ... So many pending promises. I'm not proud of calling `process.exit()`

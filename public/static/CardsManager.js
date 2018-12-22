@@ -54,18 +54,42 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card") {
     /**
      * @description Initialize a card manager using an array of abbreviated 
      * cards.
+     * 
      * @param {Array} minicards Array of JSON objects having the keys `_id`, 
      * and `urgency`
-     * @param {Function} callBack Function to call once everything is complete.
+     * 
+     * @param {Boolean} includeTagNeighbors If set to true, enqueue cards that share 
+     * similar tags as well. Note that this expects the minicards to have a `tags` 
+     * attribute in addition to `_id` and `urgency`.
      */
-    cardsManagerObj.initializeFromMinicards = function(minicards) {
+    cardsManagerObj.initializeFromMinicards = function(minicards, includeTagNeighbors=false) {
         return new Promise(function(resolve, reject) {
             pqCardsAlreadyViewed = max_PQ();
             pqCardsToView = max_PQ();
 
+            let alreadySeenIDs = new Set([]);
             minicards.forEach((minicard) => {
+                alreadySeenIDs.add(minicard._id);
                 pqCardsToView.insert([minicard._id, minicard.urgency]);
             });
+
+            if (includeTagNeighbors) {
+                let tagsToUse = new Set([]);
+                minicards.forEach((minicard) => {
+                    minicard.tags.forEach((tag) => { tagsToUse.add(tag); });
+                });
+
+                tagsToUse.forEach(function(tag) {
+                    for (let cardID in tags_and_ids[tag]) {
+                        if (!alreadySeenIDs.has(cardID)) {
+                            pqCardsToView.insert(
+                                [cardID, tags_and_ids[tag][cardID].urgency]
+                            );
+                            alreadySeenIDs.add(cardID);
+                        }
+                    }
+                });
+            }
 
             resolve();
         });
