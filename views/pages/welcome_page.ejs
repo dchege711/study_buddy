@@ -6,20 +6,22 @@
         <script src="/dist/AppUtilities.bundle.min.js"></script>
     </head>
 
+    <style>
+        #welcome_page_content {
+            background-color: white;
+            border-radius: 2%;
+        }
+    </style>
+
     <body onload="AppUtilities.processParams();">
 
         <% include ../partials/navbar.ejs %>
 
-        <div id="main_div">
-
-            <div id="word_cloud_container" 
-                class="w3-container w3-padding-small w3-twothird w3-left">
-                <img src="/images/sample_page.png" width="100%" height="100%">
-            </div>
+        <div id="main_div" class="w3-display-container">
             
-            <div class="w3-container w3-third w3-padding-large w3-right">
+            <div id="welcome_page_content" class="w3-container w3-display-middle w3-third w3-center w3-padding-large">
 
-                <form class="w3-padding-large w3-center tab_content" id="login_form" method="post">
+                <form class="w3-padding-large tab_content" id="login_form" method="post">
                 
                     <label for="username"> Username or Email Address: </label>
                     <input class="w3-input" type="text" name="username_or_email" required/>
@@ -50,7 +52,7 @@
 
                 </form>
 
-                <form class="w3-padding-large w3-center hidden tab_content" id="signup_form" method="post">
+                <form class="w3-padding-large hidden tab_content" id="signup_form" method="post">
 
                     <label for="email">Email Address: </label>
                     <input class="w3-input" type="email" name="email" 
@@ -83,6 +85,8 @@
                         id="display_login_form" onclick="return displayForm('login_form')">
                         ... or go back to LogIn</button>
                 </form>
+
+                <p>...or head over to <a href="/browse/">browse/search</a> to view existing cards.</p>
 
             </div>
 
