@@ -350,7 +350,7 @@ exports.duplicateCard = function(payload) {
  * as its keys. If successful, the message will contain the saved card.
  */
 exports.flagCard = function(payload) {
-    payload = sanitizeQuery(payload);
+    payload = querySanitizer(payload);
     let flagsToUpdate = {};
     if (payload.markedForReview) flagsToUpdate.numTimesMarkedForReview = 1;
     if (payload.markedAsDuplicate) flagsToUpdate.numTimesMarkedAsDuplicate = 1;
@@ -366,6 +366,34 @@ exports.flagCard = function(payload) {
             .catch((err) => {
                 reject(err); 
             });
+    });
+}
+
+/**
+ * @description Fetch the tags contained in the associated users cards. 
+ * 
+ * @param {JSON} payload Must contain `userIDInApp` as one of the keys.
+ * 
+ * @returns {Promise} takes a JSON object with `success`, `status` and `message` 
+ * as its keys. If successful, the message will contain an array of arrays. Each 
+ * inner array will have tags that were found on a same card.
+ */
+exports.getTagGroupings = function(payload) {
+    payload = querySanitizer(payload);
+    return new Promise(function(resolve, reject) {
+        Card
+            .find({createdById: payload.userIDInApp})
+            .select("tags").exec()
+            .then((cards) => {
+                let tagsArray = [];
+                for (let i = 0; i < cards.length; i++) {
+                    tagsArray.push(cards[i].tags.split(" "));
+                }
+                resolve({
+                    success: true, message: tagsArray
+                })
+            })
+            .catch((err) => { reject(err); });
     });
 }
 

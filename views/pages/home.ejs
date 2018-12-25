@@ -317,8 +317,8 @@
                 state.cardIsPublicToggle = userSettings.cardsAreByDefaultPrivate;
                 state.currentCardTagsHaveChanged = false;
 
-                elementRefs.cardUrgencyElement.value = 0;
-                elementRefs.cardUrgencyNumberElement.innerText = "0";
+                elementRefs.cardUrgencyElement.value = 10;
+                elementRefs.cardUrgencyNumberElement.innerText = "10";
                 elementRefs.cardDescriptionElement.setAttribute("contenteditable", "true");
                 elementRefs.sideBarContentsElement.style.height = elementRefs.cardTemplateElement.style.height;
                 window.removeEventListener("keydown", arrowKeysForNavigation);

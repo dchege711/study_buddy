@@ -642,13 +642,11 @@ exports.deleteAccount = function(userIDInApp) {
  * works when `config.NODE_ENV == 'development'`
  * 
  * @param {Array} usernamesToSpare A list of usernames whose accounts shouldn't 
- * be deleted.
+ * be deleted. By default, the global public user is not deleted.
  * 
  * @returns {Promise} resolves with the number of accounts that were deleted. 
  */
-exports.deleteAllAccounts = function(usernamesToSpare) {
-
-    if (usernamesToSpare === undefined) usernamesToSpare = [];
+exports.deleteAllAccounts = function(usernamesToSpare=[config.PUBLIC_USER_USERNAME]) {
 
     if (config.NODE_ENV !== "development") {
         return new Promise.reject(
