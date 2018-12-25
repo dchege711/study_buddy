@@ -45,16 +45,16 @@ function Graph(directed=false) {
     }
 
     /**
-     * @description Find `k` nodes that are near `nodeID`. This is a rough 
-     * estimate which doesn't guarantee global optimality. The search for the 
-     * neighbors proceeds in a BFS manner.
+     * @description Find `k` nodes that are near the input array of node IDs. 
+     * This is a rough estimate which doesn't guarantee global optimality. 
+     * The search for the neighbors proceeds in a BFS manner.
      * 
      * @returns Map whose keys are the `k` nodes near to `nodeID` and their 
      * values are the respective distances
      */
-    this.kNearNeighbors = function(nodeID, k=7) {
+    this.kNearNeighbors = function(nodeIDs, k=7) {
         let kNeighbors = new Map([]);
-        let alreadySeenIDs = new Set([nodeID]);
+        let alreadySeenIDs = new Set(nodeIDs);
         let pq = new MaxPQ();
 
         function __enqueue(node, currentPQ) {
@@ -66,8 +66,10 @@ function Graph(directed=false) {
             });
         }
 
-        __enqueue(nodeID, pq);
-
+        for (let i = 0; i < nodeIDs.length; i++) {
+            __enqueue(nodeIDs[i], pq);
+        }
+        
         let nodeAndNegatedDistance, nextPQ;
         while (kNeighbors.size < k && !pq.is_empty()) {
             nextPQ = new MaxPQ();
