@@ -16,7 +16,7 @@ exports.getDummyAccount = function() {
     }
 
     return new Promise(function(resolve, reject) {
-        LoginUtilities.deleteAllAccounts()
+        LoginUtilities.deleteAllAccounts([])
             .then((_) => {
                 return Misc.addPublicUser();
             })
