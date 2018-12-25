@@ -261,14 +261,14 @@ blockquote {
 
 #card_search_results {
     text-overflow: ellipsis;
-    font-size: smaller;
+    width: 49%;
     position: absolute;
     background: white;
     z-index: 10;
 }
 
 #card_search_results ul {
-    border-bottom: 2px solid lightgray;
+    border-bottom: 1px solid lightgray;
     padding: 0;
 }
 
