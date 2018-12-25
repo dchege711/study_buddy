@@ -66,9 +66,7 @@ function Graph(directed=false) {
             });
         }
 
-        for (let i = 0; i < nodeIDs.length; i++) {
-            __enqueue(nodeIDs[i], pq);
-        }
+        nodeIDs.forEach((nodeID) => { __enqueue(nodeID, pq); });
         
         let nodeAndNegatedDistance, nextPQ;
         while (kNeighbors.size < k && !pq.is_empty()) {

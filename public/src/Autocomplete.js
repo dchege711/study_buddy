@@ -49,8 +49,8 @@ function AutoComplete() {
         AutoComplete.graph.addEdge(wordA, wordB, 1 / (1/weight + edgeWeight));
     }
 
-    this.kNeighbors = function(nodeIDs, k=10) {
-        return AutoComplete.graph.kNearNeighbors(randomTagGroup, k);
+    this.kNeighbors = function(words, k=10) {
+        return AutoComplete.graph.kNearNeighbors(words, k);
     }
 
 }
