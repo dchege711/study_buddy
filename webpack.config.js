@@ -17,10 +17,10 @@ const CircularDependencyPlugin = require('circular-dependency-plugin');
 module.exports = {
     mode: "production",
     entry: {
-        CardTemplateUtilities: path.resolve(__dirname, "public", "static", "CardTemplateUtilities.js"),
-        CardsManager: path.resolve(__dirname, "public", "static", "CardsManager.js"),
-        AppUtilities: path.resolve(__dirname, "public", "static", "AppUtilities.js"),
-        TagsBarUtilities: path.resolve(__dirname, "public", "static", "TagsBarUtilities.js")
+        CardTemplateUtilities: path.resolve(__dirname, "public", "src", "CardTemplateUtilities.js"),
+        CardsManager: path.resolve(__dirname, "public", "src", "CardsManager.js"),
+        AppUtilities: path.resolve(__dirname, "public", "src", "AppUtilities.js"),
+        TagsBarUtilities: path.resolve(__dirname, "public", "src", "TagsBarUtilities.js")
     },
     plugins: [
         new CleanWebpackPlugin(['dist']),
