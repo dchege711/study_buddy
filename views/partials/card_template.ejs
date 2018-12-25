@@ -50,7 +50,7 @@
             <div id="already_set_card_tags"></div>
             <div class="dropdown">
                 <input type="text" id="card_tag_input" placeholder="Add a new tag..." 
-                onkeyup="handleTagsInputChange(event);"
+                onkeyup="handleTagsInputChange(event);" onfocus="suggestNewTags(this);" onblur="removeTagSuggestions();"
                 class="w3-input dropbtn" />
                 <div class="dropdown-content" id="tags_autocomplete_results"></div>
             </div>

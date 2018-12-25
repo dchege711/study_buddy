@@ -1,7 +1,7 @@
 "use strict";
 
 const dbConnection = require("../../../models/MongooseClient.js");
-const Graph = require("../../../public/static/Graph.js");
+const Graph = require("../../../public/src/Graph.js");
 const CardsDB = require("../../../models/CardsMongoDB.js");
 const DummyAccountUtils = require("../../DummyAccountUtils.js");
 const LogInUtilities = require("../../../models/LogInUtilities.js");
@@ -44,13 +44,12 @@ describe("Test Graph.js\n", function() {
     });
 
     it("should return reasonable neighbors", function(done) {
-        let randomTagGroup, randomTag, N = userTagGroups.length, neighbors, k;
+        let randomTagGroup, N = userTagGroups.length, neighbors, k;
         for (let i = 0; i < 3; i++) {
             randomTagGroup = userTagGroups[Math.floor(Math.random() * (N))];
-            randomTag = randomTagGroup[Math.floor(Math.random() * (randomTagGroup.length))];
             k = 1 + Math.floor(Math.random() * 8);
-            neighbors = myGraph.kNearNeighbors(randomTag, k);
-            console.log(`${k} neighbors of ${randomTag}: ${neighbors.join(", ")}`);
+            neighbors = myGraph.kNearNeighbors(randomTagGroup, k);
+            console.log(`${k} neighbors of ${randomTagGroup.join(", ")}: ${neighbors.join(", ")}`);
         }
         done();
     });
