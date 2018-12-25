@@ -20,7 +20,8 @@ module.exports = {
         CardTemplateUtilities: path.resolve(__dirname, "public", "src", "CardTemplateUtilities.js"),
         CardsManager: path.resolve(__dirname, "public", "src", "CardsManager.js"),
         AppUtilities: path.resolve(__dirname, "public", "src", "AppUtilities.js"),
-        TagsBarUtilities: path.resolve(__dirname, "public", "src", "TagsBarUtilities.js")
+        TagsBarUtilities: path.resolve(__dirname, "public", "src", "TagsBarUtilities.js"),
+        AutoComplete: path.resolve(__dirname, "public", "src", "AutoComplete.js")
     },
     plugins: [
         new CleanWebpackPlugin(['dist']),
