@@ -8,7 +8,7 @@
         <script type="text/javascript" src="/dist/CardsManager.bundle.min.js"></script>
         <script type="text/javascript" src="/dist/CardTemplateUtilities.bundle.min.js"></script>
         <script type="text/javascript" src="/dist/TagsBarUtilities.bundle.min.js"></script>
-        <script src="/src/TernarySearchTrie.js"></script>
+        <script type="text/javascript" src="/dist/AutoComplete.bundle.min.js"></script>
         <script type="text/javascript">
 
             /**
@@ -97,7 +97,7 @@
             /* If a user is logged in, there'll be some metadata about them in 
              * Local Storage. 
              */
-            let metadata, state, tagsTrie, cardsManager;
+            let metadata, state, autocomplete, cardsManager;
             const userSettings = AppUtilities.getAccountInfo();
 
             function initializeHomepage() {
@@ -119,7 +119,8 @@
                         }
                         if (!state.tagsAndIDs) state.tagsAndIDs = {};
 
-                        tagsTrie = ternary_search_trie(Object.keys(state.tagsAndIDs));
+                        autocomplete = new AutoComplete();
+                        autocomplete.initializePrefixTree(Object.keys(state.tagsAndIDs));
                         cardsManager = new CardsManager(state.tagsAndIDs, state.currentUserID);
 
                         TagsBarUtilities.initializeTagsBar("side_bar_contents", state.tagsAndIDs);
@@ -305,7 +306,7 @@
                 } else {
                     // Provide autocomplete results
                     let autocompleteHTML = ""
-                    let matches = tagsTrie.keys_with_prefix(tagBeingEntered);
+                    let matches = autocomplete.keysWithPrefix(tagBeingEntered);
                     let numResultsToShow = 5;
                     if (matches.length < 5) numResultsToShow = matches.length;
                     for (let i = 0; i < matches.length; i++) {
@@ -369,7 +370,7 @@
                 payload.createdById = state.currentUserID;
                 if (state.currentCardTagsHaveChanged) {
                     payload.tags = Array.from(state.currentCardTags).join(" ");
-                    state.currentCardTags.forEach((tag) => { tagsTrie.put(tag); });
+                    state.currentCardTags.forEach((tag) => { autocomplete.updatePrefixTree(tag); });
                 }
                 payload.isPublic = state.card_is_public_toggle;
                 
