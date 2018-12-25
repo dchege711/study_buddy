@@ -7,6 +7,7 @@
         <% include ../partials/syntax_highlighting_and_latex.ejs %>
         <script type="text/javascript" src="/dist/CardsManager.bundle.min.js"></script>
         <script type="text/javascript" src="/dist/CardTemplateUtilities.bundle.min.js"></script>
+        <script type="text/javascript" src="/dist/TagsBarUtilities.bundle.min.js"></script>
         <script src="/src/TernarySearchTrie.js"></script>
         <script type="text/javascript">
 
@@ -96,7 +97,7 @@
             /* If a user is logged in, there'll be some metadata about them in 
              * Local Storage. 
              */
-            let metadata, state, tags_trie, cardsManager;
+            let metadata, state, tagsTrie, cardsManager;
             const userSettings = AppUtilities.getAccountInfo();
 
             function initializeHomepage() {
@@ -118,10 +119,10 @@
                         }
                         if (!state.tagsAndIDs) state.tagsAndIDs = {};
 
-                        tags_trie = ternary_search_trie(Object.keys(state.tagsAndIDs));
+                        tagsTrie = ternary_search_trie(Object.keys(state.tagsAndIDs));
                         cardsManager = new CardsManager(state.tagsAndIDs, state.currentUserID);
 
-                        initializeSideBar(); 
+                        TagsBarUtilities.initializeTagsBar("side_bar_contents", state.tagsAndIDs);
                         initializeCards();
                     })
                     .catch((err) => { console.error(err); });
@@ -148,35 +149,6 @@
                 tagsAutocompleteResultsElement: document.getElementById("tags_autocomplete_results"),
                 shareableLinkElement: document.getElementById("shareable_link")
             };
-
-            function initializeSideBar() {
-                var tagsInDecreasingOrder = Object.keys(state.tagsAndIDs);
-                tagsInDecreasingOrder.sort(function (tagA, tagB) {
-                    var importanceTagA = 0;
-                    var importanceTagB = 0;
-
-                    Object.keys(state.tagsAndIDs[tagB]).forEach((cardID) => {
-                        importanceTagB += state.tagsAndIDs[tagB][cardID]["urgency"]
-                    });
-
-                    Object.keys(state.tagsAndIDs[tagA]).forEach((cardID) => {
-                        importanceTagA += state.tagsAndIDs[tagA][cardID]["urgency"]
-                    });
-                    return importanceTagB - importanceTagA;
-                });
-
-                let tagsHTML = "";
-                tagsInDecreasingOrder.forEach((tag) => {
-                    let tag_prefix = "#";
-                    if (tag.charAt(0) == "#") tag_prefix = "";
-                    tagsHTML += "<ul id='" + tag +
-                        "' class='link' onclick='selectThisTag(`" + tag +
-                        "`);'> " + tag_prefix + tag + " (" + Object.keys(state.tagsAndIDs[tag]).length +
-                        ")</ul>";
-                });
-                
-                elementRefs.sideBarContentsElement.innerHTML = tagsHTML;
-            }
 
             function initializeCards() {
                 cardsManager
@@ -206,29 +178,16 @@
                 document.getElementById(element_id).style.visibility = "hidden";
             }
 
-            function selectThisTag(tag) {
-                if (state.selectedTags.has(tag)) {
-                    state.selectedTags.delete(tag);
-                } else {
-                    state.selectedTags.add(tag);
-                }                
-                document.getElementById(tag).classList.toggle("chosen");
-            }
-
             function filterCards() {
                 
                 // I apologize for this embarassing line. :-(
-                let tagsToUse;
+                let tagsToUse = TagsBarUtilities.getSelectedTags();
 
                 // Communicate which cards are being displayed...
-                if (state.selectedTags.size == 0) {
-                    tagsToUse = null;
+                if (tagsToUse === null) {
                     elementRefs.filterListElement.innerHTML = "Now showing: all";
                 } else {
-                    tagsToUse = state.selectedTags;
-                    let statusMessage = "Now showing: ";
-                    statusMessage += Array.from(state.selectedTags).join(", ");
-                    elementRefs.filterListElement.innerHTML = statusMessage;
+                    elementRefs.filterListElement.innerHTML = `Now showing: ${Array.from(tagsToUse).join(", ")}`;;
                 }
 
                 // Update the cards being displayed
@@ -346,7 +305,7 @@
                 } else {
                     // Provide autocomplete results
                     let autocompleteHTML = ""
-                    let matches = tags_trie.keys_with_prefix(tagBeingEntered);
+                    let matches = tagsTrie.keys_with_prefix(tagBeingEntered);
                     let numResultsToShow = 5;
                     if (matches.length < 5) numResultsToShow = matches.length;
                     for (let i = 0; i < matches.length; i++) {
@@ -410,7 +369,7 @@
                 payload.createdById = state.currentUserID;
                 if (state.currentCardTagsHaveChanged) {
                     payload.tags = Array.from(state.currentCardTags).join(" ");
-                    state.currentCardTags.forEach((tag) => { tags_trie.put(tag); });
+                    state.currentCardTags.forEach((tag) => { tagsTrie.put(tag); });
                 }
                 payload.isPublic = state.card_is_public_toggle;
                 
