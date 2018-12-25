@@ -72,6 +72,10 @@ exports.readMetadata = function (req, res) {
     sendResponseFromPromise(MetadataDB.read(req.body), res);
 };
 
+exports.readTagGroups = function(req, res) {
+    sendResponseFromPromise(CardsDB.getTagGroupings(req.body), res);
+}
+
 exports.addCard = function (req, res) {
     sendResponseFromPromise(CardsDB.create(req.body), res);
 };
