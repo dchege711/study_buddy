@@ -125,6 +125,13 @@
 
                         TagsBarUtilities.initializeTagsBar("side_bar_contents", state.tagsAndIDs);
                         initializeCards();
+                        return AppUtilities.sendHTTPRequest("POST", "/read-tag-groups", {userIDInApp: state.currentUserID});
+                    })
+                    .then((tagGroupsResponse) => {
+                        tagGroupsResponse = JSON.parse(tagGroupsResponse);
+                        if (tagGroupsResponse.success) {
+                            autocomplete.initializeGraphFromGroups(tagGroupsResponse.message);
+                        }
                     })
                     .catch((err) => { console.error(err); });
             }
@@ -305,7 +312,7 @@
                     updateTagsButtons(tagBeingEntered.trim());
                 } else {
                     // Provide autocomplete results
-                    let autocompleteHTML = ""
+                    let autocompleteHTML = "";
                     let matches = autocomplete.keysWithPrefix(tagBeingEntered);
                     let numResultsToShow = 5;
                     if (matches.length < 5) numResultsToShow = matches.length;
@@ -317,8 +324,23 @@
                 
             }
 
+            function suggestNewTags(tagInputElement) {
+                if (tagInputElement.value === "" && state.currentCardTags.size > 0) {
+                    let suggestedTags = autocomplete.kNeighbors(state.currentCardTags, 5);
+                    let autocompleteHTML = "";
+                    for (let i = 0; i < suggestedTags.length; i++) {
+                        autocompleteHTML += `<button class="autocomplete_suggestion_button" onclick="updateTagsButtons('${suggestedTags[i]}');">${suggestedTags[i]}</button>`;
+                    }
+                    elementRefs.tagsAutocompleteResultsElement.innerHTML = autocompleteHTML;
+                }
+            }
+
+            function removeTagSuggestions() {
+                elementRefs.tagsAutocompleteResultsElement.innerHTML = "";
+            }
+
             function updateTagsButtons(new_tag) {
-                if (!state.currentCardTags.has(new_tag)) {
+                if (new_tag.trim() !== "" && !state.currentCardTags.has(new_tag)) {
                     state.currentCardTags.add(new_tag);
                     elementRefs.tagsAutocompleteResultsElement.innerHTML = "";
                     elementRefs.alreadySetTagsElement.insertAdjacentHTML(
