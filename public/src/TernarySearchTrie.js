@@ -13,11 +13,11 @@
  * autocomplete purposes. No values are stored at the nodes of the TST.
  * @param {String[]} words Words to initialize the trie with.
  */
-function ternary_search_trie(words) {
+function TernarySearchTrie(words) {
     var TST = {};
     var root = null;
 
-    for (let i = 0; i < words.length; i++) root = insert_key(root, words[i], 0);
+    for (let i = 0; i < words.length; i++) root = insertKey(root, words[i], 0);
 
     /**
      * @description Check whether `key` exists in the trie
@@ -26,7 +26,7 @@ function ternary_search_trie(words) {
      */
     TST.contains = function(key) {
         if (!key || key.length === 0) return false;
-        var tst_node = get_key(root, key, 0);
+        var tst_node = getKey(root, key, 0);
         if (tst_node === null) return null;
         return tst_node.val !== null;
     };
@@ -39,7 +39,7 @@ function ternary_search_trie(words) {
      */
     TST.put = function (key) {
         if (!key || key.length === 0) return;
-        root = insert_key(root, key, 0);
+        root = insertKey(root, key, 0);
     };
 
     /**
@@ -47,9 +47,9 @@ function ternary_search_trie(words) {
      * @param {String} prefix The prefix to be matched
      * @returns {String[]} An array of all keys that have the provided prefix
      */
-    TST.keys_with_prefix = function (prefix) {
+    TST.keysWithPrefix = function (prefix) {
         var matching_keys = [];
-        var tst_node = get_key(root, prefix, 0);
+        var tst_node = getKey(root, prefix, 0);
         if (!tst_node) return matching_keys;
         if (tst_node.val) matching_keys.push(prefix);
         collect(tst_node.mid, prefix, matching_keys);
@@ -63,12 +63,12 @@ function ternary_search_trie(words) {
      * @param {Number} i The character to be considered in the string
      * @returns {Object} A node in the TST. Might be null.
      */
-    function get_key(x, key, i) {
+    function getKey(x, key, i) {
         if (x === null) return null;
         var c = key.charAt(i);
-        if (c < x.c) return get_key(x.left, key, i);
-        else if (c > x.c) return get_key(x.right, key, i);
-        else if (i < key.length - 1) return get_key(x.mid, key, i+1);
+        if (c < x.c) return getKey(x.left, key, i);
+        else if (c > x.c) return getKey(x.right, key, i);
+        else if (i < key.length - 1) return getKey(x.mid, key, i+1);
         else return x;
     }
 
@@ -95,22 +95,24 @@ function ternary_search_trie(words) {
      * @param {Number} i The character to be considered in the string
      * @returns {Object} A node in the TST. Might be null.
      */
-    function insert_key(x, key, i) {
+    function insertKey(x, key, i) {
         var current_char = key.charAt(i);
         if (x === null) {
             x = { 
                 c: current_char, left: null, right: null, mid: null, val:null
             };
         }
-        if (current_char < x.c) x.left = insert_key(x.left, key, i);
-        else if (current_char > x.c) x.right = insert_key(x.right, key, i);
-        else if (i < key.length - 1) x.mid = insert_key(x.mid, key, i+1);
+        if (current_char < x.c) x.left = insertKey(x.left, key, i);
+        else if (current_char > x.c) x.right = insertKey(x.right, key, i);
+        else if (i < key.length - 1) x.mid = insertKey(x.mid, key, i+1);
         else x.val = true;
         return x;
     }
 
     return TST;
 }
+
+module.exports = TernarySearchTrie;
 
 /**
  * Sanity check...
@@ -136,17 +138,17 @@ if (typeof require !== "undefined" && require.main === module) {
         "rhetoric", "binary_search", "c13u_diaries"
     ];
 
-    var testTST = ternary_search_trie(words_one);
+    var testTST = new TernarySearchTrie(words_one);
 
     console.log("Printing keys with prefix 'pr'...");
-    console.log(testTST.keys_with_prefix("pr"));
+    console.log(testTST.keysWithPrefix("pr"));
 
     for (let i = 0; i < words_two.length; i++) testTST.put(words_two[i]);
 
     console.log("Printing keys with prefix 's'...");
-    console.log(testTST.keys_with_prefix("s"));
+    console.log(testTST.keysWithPrefix("s"));
 
     console.log("Printing all keys with prefix 'sdcdvfv'...");
-    console.log(testTST.keys_with_prefix("sdcdvfv"));
+    console.log(testTST.keysWithPrefix("sdcdvfv"));
 
 }
