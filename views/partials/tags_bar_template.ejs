@@ -14,7 +14,7 @@
 
 <div class="w3-container w3-left w3-quarter w3-padding">
 
-    <div>
+    <div class="w3-container w3-padding-small">
         <button class="w3-button w3-blue w3-round-xxlarge w3-left" onclick="filterCards();">
             <b><i class="fa fa-refresh fa-fw" aria-hidden="true"></i> Filter By Tags</b>
         </button>
@@ -23,8 +23,37 @@
             <b>Clear Selection</b>
         </button>
     </div>
+
+    <div class="dropdown" class="w3-container">
+        <input type="text" placeholder="Search for tag..." 
+        onkeyup="searchTags(this.value);" onblur="window.setTimeout(removeTagSearchResults, 200);"
+        class="w3-input dropbtn" />
+        <div class="dropdown-content" id="tags_search_results"></div>
+    </div>
     
-    <div id="side_bar">
+    <div id="side_bar" class="w3-container">
         <div id="side_bar_contents"></div> 
     </div>
 </div>
+
+<script type="text/javascript">
+
+    const tagsBarTemplateState = {
+        tagSearchResultsElement: document.getElementById("tags_search_results")
+    }
+
+    function searchTags(prefix) {
+        let autocompleteHTML = "";
+        let matches = autocomplete.keysWithPrefix(prefix);
+        let numResultsToShow = 5;
+        if (matches.length < 5) numResultsToShow = matches.length;
+        for (let i = 0; i < matches.length; i++) {
+            autocompleteHTML += `<button class="autocomplete_suggestion_button" onclick="TagsBarUtilities.selectThisTag('${matches[i]}');">${matches[i]}</button>`;
+        }
+        tagsBarTemplateState.tagSearchResultsElement.innerHTML = autocompleteHTML;
+    }
+
+    function removeTagSearchResults() {
+        tagsBarTemplateState.tagSearchResultsElement.innerHTML = "";
+    }
+</script>
