@@ -132,16 +132,6 @@ footer {
 
 /************************ In-app Sidebar **************************************/
 
-#side_bar {
-    overflow: scroll;
-    min-height: 100vh;
-}
-
-#side_bar_contents {
-    overflow: scroll;
-    height: 90vh;
-}
-
 .hidden {
     display: none;
 }
