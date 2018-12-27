@@ -71,8 +71,11 @@ exports.initializeTagsBar = function(tagBarElementID, tagsAndIDs) {
 
 /**
  * @returns {Set} all the currently selected tags
+ * @returns {null} if there are no selected tags
  */
 exports.getSelectedTags = function() {
+    if (tagsState.selectedTags.size == 0) return null;
+    
     return tagsState.selectedTags;
 }
 
