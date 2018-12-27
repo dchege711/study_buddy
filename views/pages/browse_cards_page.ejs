@@ -6,6 +6,7 @@
         <script type="text/javascript" src="/dist/CardsManager.bundle.min.js"></script>
         <script type="text/javascript" src="/dist/CardTemplateUtilities.bundle.min.js"></script>
         <script type="text/javascript" src="/dist/TagsBarUtilities.bundle.min.js"></script>
+        <script type="text/javascript" src="/dist/AutoComplete.bundle.min.js"></script>
         <% include ../partials/syntax_highlighting_and_latex.ejs %>
 
         <style>
@@ -91,6 +92,8 @@
     <script type="text/javascript">
 
         let cardsManager = null;
+        let autocomplete;
+
         let state = {
             currentCardID: null,
             currentTagSelectionElement: document.getElementById("current_tag_selection"),
@@ -103,6 +106,8 @@
                 response = JSON.parse(response);
                 state.tagsAndIDs = response.message[0].node_information[0];
                 TagsBarUtilities.initializeTagsBar("side_bar_contents", state.tagsAndIDs);
+                autocomplete = new AutoComplete();
+                autocomplete.initializePrefixTree(Object.keys(state.tagsAndIDs));
             })
             .catch((err) => { console.error(err); });
 
@@ -122,18 +127,24 @@
         }
 
         function filterCards() {
-            let selectedTags = TagsBarUtilities.getIDsOfSelectedTags();
-            if (selectedTags === null) return;
+            let selectedIDs = TagsBarUtilities.getIDsOfSelectedTags();
+            let payload, currentTagsString;
+            if (selectedIDs === null) {
+                currentTagsString = "all";
+                payload = {};
+            } else {
+                currentTagsString = Array.from(TagsBarUtilities.getSelectedTags()).join(", ");
+                payload = {cardIDs: Array.from(selectedIDs)};
+            }  
 
-            let cardIDs = Array.from(selectedTags);
             AppUtilities
-                .sendHTTPRequest("POST", "/browse", {cardIDs: cardIDs})
+                .sendHTTPRequest("POST", "/browse", payload)
                 .then((response) => {
                     response = JSON.parse(response);
                     if (!response.success) {
                         console.error(response.message); return;
                     }
-                    state.currentTagSelectionElement.innerHTML = `Current Tags: ${Array.from(TagsBarUtilities.getSelectedTags()).join(", ")}`
+                    state.currentTagSelectionElement.innerHTML = `Current Tags: ${currentTagsString}`;
                     abbreviatedCards = response.message;
                     searchResultsHTML = ``;
                     for (let i = 0; i < abbreviatedCards.length; i++) {
