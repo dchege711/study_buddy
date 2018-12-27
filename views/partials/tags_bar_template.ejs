@@ -15,11 +15,11 @@
 <div class="w3-container w3-left w3-quarter w3-padding">
 
     <div>
-        <button class="w3-button w3-blue w3-round-xxlarge w3-left" onclick="filterCards()">
+        <button class="w3-button w3-blue w3-round-xxlarge w3-left" onclick="filterCards();">
             <b><i class="fa fa-refresh fa-fw" aria-hidden="true"></i> Filter By Tags</b>
         </button>
     
-        <button class="w3-button w3-blue w3-round-xxlarge w3-right" onclick="TagsBarUtilities.resetTagSelection()">
+        <button class="w3-button w3-blue w3-round-xxlarge w3-right" onclick="TagsBarUtilities.resetTagSelection(); filterCards();">
             <b>Clear Selection</b>
         </button>
     </div>

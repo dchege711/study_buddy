@@ -195,13 +195,7 @@
                 cardsManager
                     .initializeFromTags(tagsToUse)
                     .then(() => { return cardsManager.next(); })
-                    .then((card) => { 
-                        renderCard(card);
-                        state.selectedTags.forEach((tag) => {
-                            document.getElementById(tag).classList.toggle("chosen");
-                        })
-                        state.selectedTags.clear();
-                    })
+                    .then((card) => { renderCard(card); })
                     .catch((err) => { console.error(err); });
             }
 
@@ -411,7 +405,7 @@
                                     state.tagsAndIDs[tag][savedCard._id] = {urgency: savedCard.urgency};
                                 }
                             });
-                            initializeSideBar();
+                            TagsBarUtilities.initializeTagsBar("side_bar_contents", state.tagsAndIDs);
                         }
                     })
                     .catch((err) => { console.error(err); });
