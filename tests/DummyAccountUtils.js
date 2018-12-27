@@ -66,7 +66,7 @@ if (require.main === module) {
     let numCards = 60;
     exports.populateDummyAccount(numCards)
         .then((user) => { 
-            console.log(`Created user ${user.userIDInApp} and gave them ${numCards} cards`);
+            console.log(`Created user ${user.username} and gave them ${numCards} cards`);
             return dbConnection.closeMongooseConnection(); 
         })
         .catch((err) => { console.error(err); });

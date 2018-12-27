@@ -20,6 +20,15 @@ exports.selectThisTag = function(tag) {
 }
 
 /**
+ * @description Unselect all currently selected tags
+ */
+exports.resetTagSelection = function() {
+    tagsState.selectedTags.forEach((tag) => {
+        exports.selectThisTag(tag);
+    });
+}
+
+/**
  * @description Populate the tags HTMLElement with a list of clickable tags in 
  * descending order.
  * 
@@ -62,8 +71,11 @@ exports.initializeTagsBar = function(tagBarElementID, tagsAndIDs) {
 
 /**
  * @returns {Set} all the currently selected tags
+ * @returns {null} if there are no selected tags
  */
 exports.getSelectedTags = function() {
+    if (tagsState.selectedTags.size == 0) return null;
+    
     return tagsState.selectedTags;
 }
 

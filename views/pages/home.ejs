@@ -72,14 +72,7 @@
 
             <div class="w3-container">
 
-                <div class="w3-container w3-left w3-quarter">
-                    <button class="w3-button w3-blue w3-round-xxlarge" onclick="filterCards()">
-                        <b><i class="fa fa-refresh fa-fw" aria-hidden="true"></i> Display Cards with Selected Tags </b>
-                    </button>
-                    <div id="side_bar">
-                        <div id="side_bar_contents"></div> 
-                    </div>
-                </div>
+                <% include ../partials/tags_bar_template.ejs %>
                 
                 <div class="w3-container w3-right w3-threequarter" id="card_template">
                     <% include ../partials/card_template.ejs %>
@@ -202,13 +195,7 @@
                 cardsManager
                     .initializeFromTags(tagsToUse)
                     .then(() => { return cardsManager.next(); })
-                    .then((card) => { 
-                        renderCard(card);
-                        state.selectedTags.forEach((tag) => {
-                            document.getElementById(tag).classList.toggle("chosen");
-                        })
-                        state.selectedTags.clear();
-                    })
+                    .then((card) => { renderCard(card); })
                     .catch((err) => { console.error(err); });
             }
 
@@ -418,7 +405,7 @@
                                     state.tagsAndIDs[tag][savedCard._id] = {urgency: savedCard.urgency};
                                 }
                             });
-                            initializeSideBar();
+                            TagsBarUtilities.initializeTagsBar("side_bar_contents", state.tagsAndIDs);
                         }
                     })
                     .catch((err) => { console.error(err); });
