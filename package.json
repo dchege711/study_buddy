@@ -23,6 +23,7 @@
   },
   "scripts": {
     "build": "webpack --config webpack.config.js",
+    "jsdoc": "jsdoc -r models",
     "start": "npm run build && node server.js",
     "debug": "node --trace-warnings server.js",
     "single_test": "mocha  --no-warnings --timeout 20000 ./tests/mocha_tests/unit_tests/TestGraph.js",
@@ -67,6 +68,7 @@
     "circular-dependency-plugin": "^5.0.2",
     "clean-webpack-plugin": "^0.1.19",
     "highlightjs": "^9.12.0",
+    "jsdoc": "^3.5.5",
     "mathjax": "^2.7.5",
     "mocha": "^5.2.0",
     "nyc": "^13.1.0",
