@@ -6,7 +6,7 @@
 <div id="card_container" class="w3-card w3-padding-large card_borders">
 
     <div>
-        <button class="w3-right w3-btn" onclick="makeInvisible('card_container_holder');">
+        <button class="w3-right w3-btn" onclick="document.getElementById('card_modal').style.display='none';">
             <i class="fa fa-fw fa-window-close" aria-hidden="true"></i>
         </button>
     </div>
@@ -22,8 +22,8 @@
         <br />
 
         <div>
-            <strong>Tags</strong><br>
-            <div id="card_tags"></div>
+            <strong>Tags:</strong>
+            <span id="card_tags"></span>
         </div>
 
         <br />
@@ -59,7 +59,7 @@
 
         <button class="w3-btn w3-round-xlarge w3-third w3-left w3-red" onClick="flagCard('markedForReview')">
             <b>
-                <i class="fa fa-exclamation-circle fa-fw" aria-hidden="true"></i> Flag Card for Review
+                <i class="fa fa-exclamation-circle fa-fw" aria-hidden="true"></i> Flag Card as Inappropriate
             </b>
         </button>
 
