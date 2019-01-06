@@ -246,14 +246,7 @@
             elementRefs.cardTitleElement.innerHTML = card.title;
             elementRefs.cardDescriptionElement.innerHTML = card.descriptionHTML;
         
-            let tags_html = "";
-            let tags_array = card.tags.trim().split(" ");
-            for (let i = 0; i < tags_array.length; i++) {
-                if (tags_array[i].length > 0) {
-                    tags_html += `<button id="card_tag_text_${tags_array[i]}" class="card_tag_button_text">${tags_array[i]}</button>`;
-                }
-            }
-            elementRefs.cardTagsElement.innerHTML = tags_html;
+            elementRefs.cardTagsElement.innerText = card.tags.trim().replace(/\s/g, ", ");
             elementRefs.cardPopularityElement.innerText = card.idsOfUsersWithCopy.split(", ").length;
             state.currentCardID = card._id;
         
