@@ -102,6 +102,7 @@
             .then((response) => {
                 response = JSON.parse(response);
                 state.tagsAndIDs = response.message[0].node_information[0];
+                cardsManager = new CardsManager(state.tagsAndIDs, null, cardSourceURL="/read-public-card");
                 TagsBarUtilities.initializeTagsBar("side_bar_contents", state.tagsAndIDs);
                 autocomplete = new AutoComplete();
                 autocomplete.initializePrefixTree(Object.keys(state.tagsAndIDs));
@@ -148,7 +149,7 @@
                         searchResultsHTML += `
                             <div class="w3-card-4 w3-padding-small w3-margin search-result" onclick="displayFullCard('${abbreviatedCards[i]._id}')">
                             <header class="w3-container w3-pale-green"><h4>${abbreviatedCards[i].title}</h4></header>
-                            <div class="w3-container"><p><strong>Tags: </strong>${abbreviatedCards[i].tags.split(/\s/).join(", ")}</p></div>
+                            <div class="w3-container"><p><strong>Tags: </strong><span id="tags${abbreviatedCards[i]._id}">${abbreviatedCards[i].tags.split(/\s/).join(", ")}</span></p></div>
                             </div>
                         `;
                     }
@@ -159,8 +160,6 @@
         }
 
         function displayFullCard(cardID) {
-            elementRefs.cardContainerHolderElement.style.display = "block";
-            cardsManager = new CardsManager(state.tagsAndIDs, null, cardSourceURL="/read-public-card");
             cardsManager
                 .initializeFromMinicards(
                     [{
@@ -170,7 +169,10 @@
                     includeTagNeighbors=true
                 )
                 .then(() => { return cardsManager.next(); })
-                .then((card) => { renderCard(card); })
+                .then((card) => { 
+                    renderCard(card); 
+                    elementRefs.cardContainerHolderElement.style.display = "block";
+                })
                 .catch((err) => { console.error(err); });
         }
 
@@ -237,7 +239,7 @@
         }
 
         function renderCard(card) {
-            
+
             if (!card) {
                 CardTemplateUtilities.displayPopUp("Out of cards!", 1500);
                 return;
