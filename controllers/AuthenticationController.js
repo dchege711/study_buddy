@@ -8,7 +8,7 @@ const convertObjectToResponse = controllerUtils.convertObjectToResponse;
 const sendResponseFromPromise = controllerUtils.sendResponseFromPromise;
 
 const defaultTemplateObject = {
-    APP_NAME: config.APP_NAME
+    APP_NAME: config.APP_NAME, LOGGED_IN: false
 };
 
 /**

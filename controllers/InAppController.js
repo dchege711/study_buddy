@@ -12,7 +12,7 @@ const deleteTempFile = controllerUtils.deleteTempFile;
 const sendResponseFromPromise = controllerUtils.sendResponseFromPromise;
 
 const defaultTemplateObject = {
-    APP_NAME: config.APP_NAME, BASE_URL: config.BASE_URL
+    APP_NAME: config.APP_NAME, BASE_URL: config.BASE_URL, LOGGED_IN: true
 };
 
 exports.readCard = function (req, res) {
@@ -24,7 +24,9 @@ exports.home = function (req, res) {
 };
 
 exports.wikiPage = function (req, res) {
-    res.render("pages/wiki_page.ejs", defaultTemplateObject);
+    let templateObject = Object.assign({}, defaultTemplateObject)
+    templateObject.LOGGED_IN = req.session.user !== undefined;
+    res.render("pages/wiki_page.ejs", templateObject);
 };
 
 exports.readPublicCard = function (req, res) {
@@ -54,7 +56,8 @@ exports.browsePageGet = function(req, res) {
                 "pages/browse_cards_page.ejs", 
                 {
                     abbreviatedCards: abbreviatedCards.message,
-                    APP_NAME: config.APP_NAME
+                    APP_NAME: config.APP_NAME,
+                    LOGGED_IN: req.session.user !== undefined
                 }
             );  
         })
@@ -63,8 +66,11 @@ exports.browsePageGet = function(req, res) {
 
 exports.accountGet = function (req, res) {
     res.render(
-        "pages/account_page.ejs", 
-        {account_info: req.session.user, APP_NAME: config.APP_NAME}
+        "pages/account_page.ejs", {
+            account_info: req.session.user, 
+            APP_NAME: config.APP_NAME, 
+            LOGGED_IN: req.session.user !== undefined
+        }
     );
 };
 

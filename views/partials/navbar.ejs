@@ -1,3 +1,5 @@
+<script type="text/javascript" src="/dist/AppUtilities.bundle.min.js"></script>
+
 <div>
 
     <ul class="topnav" id="topnavitems">
@@ -17,6 +19,35 @@
             <a href="/wiki" class="link_button">Wiki</a>
         </li>
 
+        <% if (LOGGED_IN) { %>
+            
+            <li class="right">
+                <a href="#" class="link_button" onClick="logOut();">Log Out</a>
+            </li>
+    
+            <li class="right">
+                <a id="account_button" href="/account" class="link_button">
+                    Your Account
+                </a>
+            </li>
+
+        <% } %>
+
     </ul>
 
 </div>
+
+<script type="text/javascript">
+    /**
+     * @description Log out the currently logged in user.
+     */
+    function logOut() {
+        AppUtilities.sendHTTPRequest("POST", "/logout", {})
+            .then((response) => {
+                localStorage.clear();
+                window.location = "/";
+            })
+            .catch((err) => { console.error(err); });
+    }
+
+</script>
