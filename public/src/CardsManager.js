@@ -50,6 +50,7 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card") {
             if (tagsToUse === null) tagsToUse = Object.keys(tags_and_ids);
 
             bst = new AVLTree(reverseComparator, true);
+            cardsManagerObj.bst = bst;
             let already_seen_ids = new Set([]);
             tagsToUse.forEach(function(tag) {
                 for (let cardID in tags_and_ids[tag]) {
@@ -77,6 +78,7 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card") {
     cardsManagerObj.initializeFromMinicards = function(minicards, includeTagNeighbors=false) {
         return new Promise(function(resolve, reject) {
             bst = new AVLTree(reverseComparator, true);
+            cardsManagerObj.bst = bst;
             let alreadySeenIDs = new Set([]);
             minicards.forEach((minicard) => {
                 alreadySeenIDs.add(minicard._id);
@@ -114,6 +116,7 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card") {
     cardsManagerObj.initializeFromTrash = function (trashed_card_ids) {
         return new Promise(function(resolve, reject) {
             bst = new AVLTree(reverseComparator, true);
+            cardsManagerObj.bst = bst;
             let card_ids = Object.keys(trashed_card_ids); // Synchronous
             for (let i = 0; i < card_ids.length; i++) {
                 cardsManagerObj.insertCard(card_ids[i], trashed_card_ids[card_ids[i]]);
@@ -235,6 +238,30 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card") {
         cardsManagerObj.removeCard(card._id);
         cardsManagerObj.insertCard(card._id, card.urgency);
     };
+
+    /**
+     * @description Return the 1st, 2nd, 3rd and 4th quartiles of the urgencies 
+     * of the cards on the current `CardsManager` object.
+     * @returns {Array} A 4 element array denoting the 1st, 2nd, 3rd and 4th 
+     * quartiles of the urgences.
+     */
+    cardsManagerObj.quartiles = function() {
+        let N = bst._size;
+        if (N == 0) {
+            return [0, 0, 0, 0];
+        }
+        else if (N <= 4) {
+            let maxUrgency = bst.max().urgency;
+            return [maxUrgency, maxUrgency, maxUrgency, maxUrgency];
+        } else {
+            return [
+                bst.at(Math.floor(3 * N / 4)).key.urgency,
+                bst.at(Math.floor(N / 2)).key.urgency,
+                bst.at(Math.floor(N / 4)).key.urgency,
+                bst.min().urgency
+            ];
+        }
+    }
 
     /**
      * @description Search for the card with the given ID. First search in the

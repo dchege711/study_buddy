@@ -154,7 +154,10 @@
             function initializeCards() {
                 cardsManager
                     .initializeFromTags(null)
-                    .then(() => { return cardsManager.next(); })
+                    .then(() => { 
+                        colorUrgencyQuartiles(cardsManager.quartiles());
+                        return cardsManager.next(); 
+                    })
                     .then((card) => { renderCard(card); })
                     .catch((err) => { console.error(err); });
             }
@@ -194,13 +197,44 @@
                 // Update the cards being displayed
                 cardsManager
                     .initializeFromTags(tagsToUse)
-                    .then(() => { return cardsManager.next(); })
+                    .then(() => { 
+                        colorUrgencyQuartiles(cardsManager.quartiles());
+                        return cardsManager.next(); 
+                    })
                     .then((card) => { renderCard(card); })
                     .catch((err) => { console.error(err); });
             }
 
             function clearSearchResults() {
                 elementRefs.cardSearchResultsElement.innerHTML = '';
+            }
+
+            /**
+             * Color the quartile marker with the quartile range for the 
+             * current selection of cards. The quartile marker is located right 
+             * below the urgency slider.
+             * 
+             * @param {Array} quartiles The values of the 1st, 2nd, 3rd and 4th 
+             * quartiles. Assumes the maximum urgency is 10.
+             */ 
+            function colorUrgencyQuartiles(quartiles) {
+                if (quartiles.length == 4) {
+                    let bar_width_ids = [
+                        "first_quartile_marker", "second_quartile_marker", 
+                        "third_quartile_marker", "fourth_quartile_marker"
+                    ];
+                    let bar_width_percentages = [
+                        Math.floor(quartiles[0] * 10), 0, 0, 0
+                    ];
+                    for (let i = 1; i < quartiles.length; i++) {
+                        bar_width_percentages[i] = Math.floor((quartiles[i] - quartiles[i-1]) * 10);
+                    }
+                    
+                    for (let i = 0; i < bar_width_ids.length; i++) {
+                        document.getElementById(bar_width_ids[i]).style.width = `${bar_width_percentages[i]}%`;
+                    }
+                }
+                 
             }
 
             function renderCard(card) {
