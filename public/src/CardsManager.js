@@ -51,6 +51,8 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card") {
 
             bst = new AVLTree(reverseComparator, true);
             cardsManagerObj.bst = bst;
+            currentNode = null;
+
             let already_seen_ids = new Set([]);
             tagsToUse.forEach(function(tag) {
                 for (let cardID in tags_and_ids[tag]) {
@@ -79,6 +81,8 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card") {
         return new Promise(function(resolve, reject) {
             bst = new AVLTree(reverseComparator, true);
             cardsManagerObj.bst = bst;
+            currentNode = null;
+
             let alreadySeenIDs = new Set([]);
             minicards.forEach((minicard) => {
                 alreadySeenIDs.add(minicard._id);
@@ -117,6 +121,8 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card") {
         return new Promise(function(resolve, reject) {
             bst = new AVLTree(reverseComparator, true);
             cardsManagerObj.bst = bst;
+            currentNode = null;
+            
             let card_ids = Object.keys(trashed_card_ids); // Synchronous
             for (let i = 0; i < card_ids.length; i++) {
                 cardsManagerObj.insertCard(card_ids[i], trashed_card_ids[card_ids[i]]);
