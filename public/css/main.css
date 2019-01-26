@@ -432,3 +432,22 @@ input:checked + .slider:before {
 .quartile_bar ul li {
     height: 10px;
 }
+
+.flexbox {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: stretch;
+    align-content: start;
+}
+
+div.minicard_search_result {
+    width: 30%;
+    word-break: normal;
+    cursor: pointer;
+}
+
+#minicards_search_results {
+    overflow: scroll;
+    height: 100vh;
+    padding-bottom: 2% !important;
+}

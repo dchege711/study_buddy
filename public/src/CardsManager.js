@@ -98,7 +98,7 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card") {
                 tagsToUse.forEach(function(tag) {
                     for (let cardID in tags_and_ids[tag]) {
                         if (!alreadySeenIDs.has(cardID)) {
-                            cardsManagerObj.insertCard(minicard._id, minicard.urgency);
+                            cardsManagerObj.insertCard(cardID, tags_and_ids[tag][cardID].urgency);
                             alreadySeenIDs.add(cardID);
                         }
                     }
