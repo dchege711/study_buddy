@@ -417,9 +417,9 @@
                 var removed_card_id = cardsManager.removeCard(state.currentCardID);
                 if (removed_card_id === state.currentCardID) {
                     // Move on to the next card in the PQ
-                    if (cardsManager.numNext() > 0) {
+                    if (cardsManager.hasNext()) {
                         fetchNextCard();
-                    } else if (cardsManager.numPrev() > 0) {
+                    } else if (cardsManager.hasPrev()) {
                         fetchPreviousCard();
                     } else {
                         displayNewCard();

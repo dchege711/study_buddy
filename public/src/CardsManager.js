@@ -1,6 +1,6 @@
 "use strict";
 
-var max_PQ = require("./MaxPriorityQueue.js");
+const AVLTree = require("./AVLTree.js");
 var sendHTTPRequest = require("./AppUtilities.js").sendHTTPRequest;
 
 function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card") {
@@ -8,11 +8,31 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card") {
     /* Holds the attributes and methods of the CardsManager module */
     var cardsManagerObj = {};
 
-    /* Hold the IDs of the cards that are yet to be viewed */
-    var pqCardsToView = max_PQ();
+    /* Holds the IDs of the cards that are currently being viewed */
+    var bst = new AVLTree();
 
-    /* Hold the IDs of the cards that have already been viewed. */
-    var pqCardsAlreadyViewed = max_PQ();
+    /* A reference to the current node on the BST */
+    var currentNode = null;
+
+    /* A mapping of card IDs to keys in the BST */
+    var idsToBSTKeys = {};
+
+    /**
+     * A function for comparing the keys for the BST
+     * 
+     * @param {Object} a Expected attributes: `urgency`, `_id`
+     * @param {Object} b Expected attributes: `urgency`, `id`
+     * 
+     * @returns {Number} `0` if the keys are equal, `1` if `a < b` and `-1` if 
+     * `a > b`
+     */
+    function reverseComparator(a, b) {
+        if (a.urgency < b.urgency) return 1;
+        if (a.urgency > b.urgency) return -1;
+        if (a._id < b._id) return 1;
+        if (a._id > b._id) return -1;
+        return 0;
+    }
 
     /* Empty Card Template */
     cardsManagerObj.empty_card = {
@@ -22,32 +42,24 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card") {
 
     /**
      * @description Initialize Card Manager by preparing a queue of cards.
-     * @param {Array} tags_to_use The tags that should appear in the PQ.
+     * @param {Array} tagsToUse The tags that should appear in the PQ.
      */
-    cardsManagerObj.initializeFromTags = function(tags_to_use) {
+    cardsManagerObj.initializeFromTags = function(tagsToUse) {
         return new Promise(function(resolve, reject) {
 
-            if (tags_to_use === null) tags_to_use = Object.keys(tags_and_ids);
+            if (tagsToUse === null) tagsToUse = Object.keys(tags_and_ids);
 
-            // Reset the PQ (God forgive me for all my garbage :-/ )
-            pqCardsAlreadyViewed = max_PQ();
-            pqCardsToView = max_PQ();
-
-            // A card may have many tags, so don't repeatedly add it to the PQ
+            bst = new AVLTree(reverseComparator, true);
             let already_seen_ids = new Set([]);
-            tags_to_use.forEach(function(tag) {
+            tagsToUse.forEach(function(tag) {
                 for (let cardID in tags_and_ids[tag]) {
                     if (already_seen_ids.has(cardID) === false) {
-                        pqCardsToView.insert(
-                            [cardID, tags_and_ids[tag][cardID].urgency]
-                        );
+                        cardsManagerObj.insertCard(cardID, tags_and_ids[tag][cardID].urgency);
                         already_seen_ids.add(cardID);
                     }
                 }
             });
-
             resolve();
-
         });
     };
 
@@ -64,13 +76,11 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card") {
      */
     cardsManagerObj.initializeFromMinicards = function(minicards, includeTagNeighbors=false) {
         return new Promise(function(resolve, reject) {
-            pqCardsAlreadyViewed = max_PQ();
-            pqCardsToView = max_PQ();
-
+            bst = new AVLTree(reverseComparator, true);
             let alreadySeenIDs = new Set([]);
             minicards.forEach((minicard) => {
                 alreadySeenIDs.add(minicard._id);
-                pqCardsToView.insert([minicard._id, minicard.urgency]);
+                cardsManagerObj.insertCard(minicard._id, minicard.urgency);
             });
 
             if (includeTagNeighbors) {
@@ -82,9 +92,7 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card") {
                 tagsToUse.forEach(function(tag) {
                     for (let cardID in tags_and_ids[tag]) {
                         if (!alreadySeenIDs.has(cardID)) {
-                            pqCardsToView.insert(
-                                [cardID, tags_and_ids[tag][cardID].urgency]
-                            );
+                            cardsManagerObj.insertCard(minicard._id, minicard.urgency);
                             alreadySeenIDs.add(cardID);
                         }
                     }
@@ -105,12 +113,10 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card") {
      */
     cardsManagerObj.initializeFromTrash = function (trashed_card_ids) {
         return new Promise(function(resolve, reject) {
-            pqCardsAlreadyViewed = max_PQ();
-            pqCardsToView = max_PQ();
-
+            bst = new AVLTree(reverseComparator, true);
             let card_ids = Object.keys(trashed_card_ids); // Synchronous
             for (let i = 0; i < card_ids.length; i++) {
-                pqCardsToView.insert([card_ids[i], trashed_card_ids[card_ids[i]]]);
+                cardsManagerObj.insertCard(card_ids[i], trashed_card_ids[card_ids[i]]);
             }
 
             resolve();
@@ -124,32 +130,38 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card") {
      */
     cardsManagerObj.next = function() {
         return new Promise(function(resolve, reject) {
-            if (pqCardsToView.is_empty()) {
-                resolve(null);
-            } else {
-                let next_card_id_urgency = transferItem(
-                    pqCardsToView, pqCardsAlreadyViewed
-                );
-    
-                findCard(next_card_id_urgency[0])
+            if (cardsManagerObj.hasNext()) {
+                if (currentNode === null) {
+                    currentNode = bst.find(bst.min());
+                } else {
+                    currentNode = bst.next(currentNode);
+                }
+                findCard(currentNode.key._id)
                     .then((card) => { resolve(card); })
                     .catch((err) => { reject(err); });
-            }            
+            } else {
+                resolve(null);
+            }           
         });
     };
 
     /**
-     * @description Return the number of cards that are yet to be viewed.
+     * @return {Boolean} `true` if calling `next()` will produce a card. `false` 
+     * otherwise
      */
-    cardsManagerObj.numNext = function () {
-        return pqCardsToView.size();
+    cardsManagerObj.hasNext = function () {
+        if (bst.size === 0) return false;
+        if (currentNode === null) return true;
+        return bst.next(currentNode) !== null;
     };
 
     /**
-     * @description Return the number of cards that have already been viewed.
+     * @return {Boolean} `true` if calling `prev()` will produce a card. `false` 
+     * otherwise
      */
-    cardsManagerObj.numPrev = function () {
-        return pqCardsAlreadyViewed.size();
+    cardsManagerObj.hasPrev = function () {
+        if (bst.size === 0) return false;
+        return bst.prev(currentNode) !== null;
     };
 
     /**
@@ -159,15 +171,14 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card") {
      */
     cardsManagerObj.previous = function() {
         return new Promise(function(resolve, reject) {
-            if (pqCardsAlreadyViewed.is_empty()) {
-                resolve(null);
+            if (cardsManagerObj.hasPrev()) {
+                currentNode = bst.prev(currentNode);
+                findCard(currentNode.key._id)
+                    .then((card) => { resolve(card); })
+                    .catch((err) => { reject(err); });
             } else {
-                let prev_card_id_urgency = transferItem(pqCardsAlreadyViewed, pqCardsToView);
-                findCard(prev_card_id_urgency[0])
-                    .then((card) => {resolve(card); })
-                    .catch((err) => {reject(err); });
-            }
-            
+                resolve(null);
+            } 
         });
     };
 
@@ -175,59 +186,55 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card") {
      * @description Remove the specified card from the cards that are displayed 
      * to the user.
      * 
-     * @param {String} card_to_remove_id The ID of the card to be removed from 
+     * @param {String} idOfCardToRemove The ID of the card to be removed from 
      * the queue of cards.
      */
-    cardsManagerObj.removeCard = function(card_to_remove_id) {
-
-        // The card to be removed will be at the top of either PQ
-        let card_to_remove = pqCardsAlreadyViewed.peek();
-        if (card_to_remove && card_to_remove[0] == card_to_remove_id) {
-            return pqCardsAlreadyViewed.del_max()[0];
-        } else {
-            card_to_remove = pqCardsToView.peek();
-            if (card_to_remove && card_to_remove[0] == card_to_remove_id) {
-                return pqCardsToView.del_max()[0];
+    cardsManagerObj.removeCard = function(idOfCardToRemove) {
+        if (currentNode.key._id === idOfCardToRemove) {
+            let keyToRemove = currentNode.key;
+            if (cardsManagerObj.hasNext()) {
+                currentNode = bst.next(currentNode);
+            } else if (cardsManagerObj.hasPrev()) {
+                currentNode = bst.prev(currentNode);
+            } else {
+                currentNode = null;
             }
+            delete idsToBSTKeys[idOfCardToRemove];
+            bst.remove(keyToRemove);
+        } else {
+            console.error(`${currentNode.key._id} !== ${idOfCardToRemove}`);
         }
-        
-        return null;
     };
 
     /**
-     * @description Insert a card into the queue. By convention, the card will 
-     * be inserted into the queue of already viewed cards. If you wish to view
-     * it, run `CardsManager.previous`
-     * @param {String} card_to_insert_id The ID of the card to insert into the queue
-     * @param {Number} card_to_insert_urgency The urgency of the card to be inserted. 
+     * @description Insert a card into the set of cards that can be discovered 
+     * by the `next()` and `prev()` iterators. The card will be insrted into 
+     * its natural position in the iteration order. As such, it may not be 
+     * the card returned by the immediate call of either `prev()` or `next()`
+     * 
+     * @param {String} newCardID The ID of the card to insert into the queue
+     * @param {Number} newCardUrgency The urgency of the card to be inserted. 
      * Used as a sorting key.
      */
-    cardsManagerObj.insertCard = function(card_to_insert_id, card_to_insert_urgency) {
-        pqCardsAlreadyViewed.insert(
-            [card_to_insert_id, card_to_insert_urgency]
-        );
-    };
-
-    cardsManagerObj.update_card = function(card) {
-        localStorage.removeItem(card._id);
-        localStorage.setItem(card._id, JSON.stringify(card));
-        this.removeCard(card._id);
-        pqCardsAlreadyViewed.insert([card._id, card.urgency * -1]);
+    cardsManagerObj.insertCard = function(newCardID, newCardUrgency) {
+        let newKey = { _id: newCardID, urgency: newCardUrgency }
+        idsToBSTKeys[newCardID] = newKey;
+        bst.insert(newKey);
     };
 
     /**
-     * @description Move the top item of the source PQ to the destination PQ.
-     * Return the item that has been moved.
+     * @description Sync the changes made to the card with the card manager. We 
+     * don't check whether the urgency changed. The old key is removed from the 
+     * BST and a new (possibly updated) key is added to the BST.
      * 
-     * @param {max_PQ} source_pq The source PQ
-     * @param {max_PQ} destination_pq The destination PQ
+     * @param {Object} card the new version of the card
      */
-    function transferItem(source_pq, destination_pq, negate=true) {
-        var id_and_urgency = source_pq.del_max();
-        id_and_urgency[1] = id_and_urgency[1] * -1;
-        destination_pq.insert(id_and_urgency);
-        return id_and_urgency;
-    }
+    cardsManagerObj.updateCard = function(card) {
+        localStorage.removeItem(card._id);
+        localStorage.setItem(card._id, JSON.stringify(card));
+        cardsManagerObj.removeCard(card._id);
+        cardsManagerObj.insertCard(card._id, card.urgency);
+    };
 
     /**
      * @description Search for the card with the given ID. First search in the
@@ -262,7 +269,7 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card") {
                 .then((results) => {
                     results = JSON.parse(results);
                     if (results.success) {
-                        cardsManagerObj.update_card(results.message);
+                        cardsManagerObj.updateCard(results.message);
                         resolve(results.message);
                     } else {
                         reject(results.message);
