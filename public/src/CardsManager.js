@@ -201,15 +201,16 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card") {
     cardsManagerObj.removeCard = function(idOfCardToRemove) {
         if (currentNode.key._id === idOfCardToRemove) {
             let keyToRemove = currentNode.key;
-            if (cardsManagerObj.hasNext()) {
-                currentNode = bst.next(currentNode);
-            } else if (cardsManagerObj.hasPrev()) {
+            if (cardsManagerObj.hasPrev()) {
                 currentNode = bst.prev(currentNode);
+            } else if (cardsManagerObj.hasNext()) {
+                currentNode = bst.next(currentNode);
             } else {
                 currentNode = null;
             }
             delete idsToBSTKeys[idOfCardToRemove];
             bst.remove(keyToRemove);
+            return keyToRemove._id;
         } else {
             console.error(`${currentNode.key._id} !== ${idOfCardToRemove}`);
         }
@@ -257,7 +258,7 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card") {
             return [0, 0, 0, 0];
         }
         else if (N <= 4) {
-            let maxUrgency = bst.max().urgency;
+            let maxUrgency = bst.min().urgency;
             return [maxUrgency, maxUrgency, maxUrgency, maxUrgency];
         } else {
             return [
