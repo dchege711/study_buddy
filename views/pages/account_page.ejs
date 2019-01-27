@@ -34,7 +34,7 @@
 
     <body onload="initializeAccountPage();">
 
-        <% include ../partials/logged_in_navbar.ejs %>
+        <% include ../partials/navbar.ejs %>
 
         <div id="main_div">
 
@@ -164,7 +164,7 @@
 
         function initializeAccountPage() {
             AppUtilities.refreshMetadata()
-                .then((metadataDoc) => {
+                .then(([metadataDoc, _]) => {
                     state = {
                         metadata: metadataDoc,
                         card_container: document.getElementById("card_container"),

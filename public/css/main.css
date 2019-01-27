@@ -386,6 +386,12 @@ input:checked + .slider:before {
     right: 100%;
 }
 
+#urgency_bar_help_tooltip {
+    width: 120%;
+    top: -50px;
+    right: 0%;
+}
+
 /* Show the tooltip text when you mouse over the tooltip container */
 .tooltip:hover .tooltiptext {
     visibility: visible;
@@ -407,4 +413,45 @@ input:checked + .slider:before {
     text-align: center;
     color: white;
     padding: 10% 0 0 0;
+}
+
+.quartile_bar {
+    height: 12px;
+    border-bottom: 1px solid black;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+}
+
+.quartile_bar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+
+.quartile_bar ul li {
+    height: 10px;
+}
+
+.flexbox {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: stretch;
+    align-content: start;
+}
+
+div.minicard_search_result {
+    width: 30%;
+    word-break: normal;
+    cursor: pointer;
+}
+
+#minicards_search_results {
+    overflow: scroll;
+    height: 100vh;
+    padding-bottom: 2% !important;
+}
+
+.w3-modal-content {
+    width: 80% !important;
 }

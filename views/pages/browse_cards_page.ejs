@@ -8,28 +8,6 @@
         <script type="text/javascript" src="/dist/TagsBarUtilities.bundle.min.js"></script>
         <script type="text/javascript" src="/dist/AutoComplete.bundle.min.js"></script>
         <% include ../partials/syntax_highlighting_and_latex.ejs %>
-
-        <style>
-            .flexbox {
-                display: flex;
-                flex-flow: row wrap;
-                align-items: stretch;
-                align-content: start;
-            }
-
-            div.search-result {
-                width: 30%;
-                word-break: normal;
-                cursor: pointer;
-            }
-
-            #search_results {
-                overflow: scroll;
-                height: 100vh;
-                padding-bottom: 2% !important;
-            }
-
-        </style>
     </head>
 
     <body>
@@ -58,14 +36,14 @@
 
                     <p id="current_tag_selection" class="w3-right"></p>
 
-                    <div class="w3-threequarter w3-right flexbox" id="search_results">
+                    <div class="w3-threequarter w3-right flexbox" id="minicards_search_results">
                         <% if (abbreviatedCards.length === 0) { %>
                             <div class="w3-container">
                                 <p>No cards found.</p>
                             </div>
                         <% } else { %>
                             <% for (let i = 0; i < abbreviatedCards.length; i++) { %>
-                                <div class="w3-card-4 w3-padding-small w3-margin search-result" onclick="displayFullCard('<%= abbreviatedCards[i]._id %>')">
+                                <div class="w3-card-4 w3-padding-small w3-margin minicard_search_result" onclick="displayFullCard('<%= abbreviatedCards[i]._id %>')">
                                     <header class="w3-container w3-pale-green"><h4><%= abbreviatedCards[i].title %></h4></header>
                                     <div class="w3-container"><p><strong>Tags: </strong><span id='tags<%= abbreviatedCards[i]._id %>'><%= abbreviatedCards[i].tags.split(/\s/).join(", ") %></span></p></div>
                                 </div>
@@ -102,6 +80,7 @@
             .then((response) => {
                 response = JSON.parse(response);
                 state.tagsAndIDs = response.message[0].node_information[0];
+                cardsManager = new CardsManager(state.tagsAndIDs, null, cardSourceURL="/read-public-card");
                 TagsBarUtilities.initializeTagsBar("side_bar_contents", state.tagsAndIDs);
                 autocomplete = new AutoComplete();
                 autocomplete.initializePrefixTree(Object.keys(state.tagsAndIDs));
@@ -148,7 +127,7 @@
                         searchResultsHTML += `
                             <div class="w3-card-4 w3-padding-small w3-margin search-result" onclick="displayFullCard('${abbreviatedCards[i]._id}')">
                             <header class="w3-container w3-pale-green"><h4>${abbreviatedCards[i].title}</h4></header>
-                            <div class="w3-container"><p><strong>Tags: </strong>${abbreviatedCards[i].tags.split(/\s/).join(", ")}</p></div>
+                            <div class="w3-container"><p><strong>Tags: </strong><span id="tags${abbreviatedCards[i]._id}">${abbreviatedCards[i].tags.split(/\s/).join(", ")}</span></p></div>
                             </div>
                         `;
                     }
@@ -159,8 +138,6 @@
         }
 
         function displayFullCard(cardID) {
-            elementRefs.cardContainerHolderElement.style.display = "block";
-            cardsManager = new CardsManager(state.tagsAndIDs, null, cardSourceURL="/read-public-card");
             cardsManager
                 .initializeFromMinicards(
                     [{
@@ -170,7 +147,10 @@
                     includeTagNeighbors=true
                 )
                 .then(() => { return cardsManager.next(); })
-                .then((card) => { renderCard(card); })
+                .then((card) => { 
+                    renderCard(card); 
+                    elementRefs.cardContainerHolderElement.style.display = "block";
+                })
                 .catch((err) => { console.error(err); });
         }
 
@@ -237,7 +217,7 @@
         }
 
         function renderCard(card) {
-            
+
             if (!card) {
                 CardTemplateUtilities.displayPopUp("Out of cards!", 1500);
                 return;

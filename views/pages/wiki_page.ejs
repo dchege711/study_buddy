@@ -64,6 +64,7 @@
                         <ol>
                             <li><a href="#formatting">Formatting Cards</a></li>
                             <li><a href="#tagging_system">The Tagging and Urgency System</a></li>
+                            <li><a href="#urgency_bars">The Urgency Bars</a></li>
                             <li><a href="#review_mode">Review Mode</a></li>
                             <li><a href="#public_cards">Public vs. Private Cards</a></li>
                         </ol>
@@ -201,6 +202,69 @@
                         The 2 means that you have 2 cards that have 'b' as one of their tags. 
                         The hashtag is prepended because it's the conventional way of writing a tag.
                         <br>
+                    </p>
+
+                </div>
+
+                <div class="details_section">
+
+                    <h3 class="details_header" id="urgency_bars">
+                        Urgency Bars
+                        <sup><sup>
+                            <a href="#help_contents">back to the top</a>
+                        </sup></sup>
+                    </h3>
+
+                    <p>
+                        The 4 urgency bars give you an idea of where the urgencies 
+                        of the selected cards lie. Suppose you've chosen to review 
+                        cards that have the tags #medium_programming_challenges 
+                        and/or #dynamic_programming.
+                        <br><br>
+
+                        Suppose there are 12 such cards and their urgencies are 
+                        [3, 3, 3, 4, 6, 6, 7, 8, 8, 8, 8, 9]. The urgencies of the 
+                        3rd, 6th, 9th and 12th cards are 3, 6, 8 and 9 respectively. 
+                        The urgency bars will therefore be:
+
+                        <div class="quartile_bar">
+                            <ul>
+                                <li style="background-color: green; width: 30%"></li>
+                                <li style="background-color: orange; width: 30%"></li>
+                                <li style="background-color: blue; width: 20%"></li>
+                                <li style="background-color: red; width: 10%"></li>
+                            </ul>
+                        </div>
+
+                        <br>
+                        The bars also show you how you're using the provided 
+                        range. For instance, if the urgency bars are like this...
+                        <br><br>
+
+                        <div class="quartile_bar">
+                            <ul>
+                                <li style="background-color: green; width: 20%"></li>
+                                <li style="background-color: orange; width: 5%"></li>
+                                <li style="background-color: blue; width: 2%"></li>
+                                <li style="background-color: red; width: 2%"></li>
+                            </ul>
+                        </div>
+
+                        <br>
+                        ... a few conclusions can be made:
+                        <ul>
+                            <li>The most urgent card in this set has an urgency 
+                                value of about 4.0
+                            </li>
+                            <li>There's not much separation in the urgency 
+                                values of the upper half of the cards</li>
+                        </ul>
+
+                        <br>
+                        The urgency bars should guide you when setting the 
+                        urgency of any given card. If the bars are cramped 
+                        together, you might want to space out the urgency values 
+                        of those cards.
                     </p>
 
                 </div>

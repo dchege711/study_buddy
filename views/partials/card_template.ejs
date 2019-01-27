@@ -1,36 +1,29 @@
-<div id="card_container" class="w3-card w3-padding-large card_borders">
+<div id="card_container" class="w3-card card_borders">
 
     <div class="w3-container">
         <p id="shareable_link" class="w3-left"></p>
-    </div>
-
-    <div class="w3-container">
-        
-        <button class="w3-btn w3-hover-white w3-right" onclick="displayNewCard()">
-            <b>
-                <i class="fa fa-plus-square-o fa-fw" aria-hidden="true"></i> Add New Card
-            </b>
+        <button class="w3-right w3-btn w3-hover-red" onclick="document.getElementById('card_modal').style.display='none';">
+            <strong>&#10006; Close</strong>
         </button>
-        
     </div>
 
     <div class="card-header w3-center w3-container">
-        <label class="input-area-padded padding-small">
+        <label class="input-area-padded padding-small w3-twothird w3-left">
             <input type="text" id="card_title" name="title" 
                 class="w3-input" style="font-weight:bolder"
                 onkeydown="handleInputChange('card_title')"/>
         </label>
+
+        <button class="w3-btn w3-hover-white w3-right" onclick="displayNewCard()">
+            <b><i class="fa fa-plus-square-o fa-fw" aria-hidden="true"></i> Add New Card</b>
+        </button>
+
+        <button class="w3-btn w3-hover-white w3-right" onClick="displayRawCardDescription()">
+            <b><i class="w3-right fa fa-pencil fa-fw" aria-hidden="true"></i> Edit Card</b>
+        </button>
     </div>
 
     <div class="w3-container">
-
-        <div class="w3-container">
-            <button class="w3-btn w3-hover-white w3-right" onClick="displayRawCardDescription()">
-                <b>
-                    <i class="w3-right fa fa-pencil fa-fw" aria-hidden="true"></i>
-                </b>
-            </button>
-        </div>
 
         <div class="w3-container" id="card_description" 
             onkeydown="insertTabsIfNecessary(event); handleInputChange('card_description')">
@@ -46,8 +39,8 @@
         <br />
 
         <div>
-            <strong>Tags</strong><br>
-            <div id="already_set_card_tags"></div>
+            <strong>Tags: </strong>
+            <span id="already_set_card_tags"></span>
             <div class="dropdown">
                 <input type="text" id="card_tag_input" placeholder="Add a new tag..." 
                 onkeyup="handleTagsInputChange(event);" onfocus="suggestNewTags(this);" onblur="window.setTimeout(removeTagSuggestions, 300);"
@@ -81,15 +74,38 @@
                 
             </div>
 
+            <div class="w3-threequarter w3-left quartile_bar">
+                <ul>
+                    <li id="first_quartile_marker" style="background-color: green"></li>
+                    <li id="second_quartile_marker" style="background-color: orange"></li>
+                    <li id="third_quartile_marker" style="background-color: blue"></li>
+                    <li id="fourth_quartile_marker" style="background-color: red"></li>
+                </ul>
+                
+            </div>
+
+            <div class="w3-quarter w3-right tooltip">
+                <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> Help
+                <span class="tooltiptext" id="urgency_bar_help_tooltip">
+                    The green bar indicates where the urgency values of the first 
+                    25% of the cards lie. The orange bar does the same for the 
+                    next 25% of the cards, and so forth.
+                    <a href="/wiki/#urgency_bars" target="_blank">Read more.</a>
+                </span>
+            </div>
+
         </div>
     </div>
 
-    <div class="w3-bar w3-padding-16">
-        <button class="w3-left w3-third w3-btn w3-round-xxlarge" 
-            onClick="fetchPreviousCard()">
-            <b>
-                <i class="fa fa-chevron-left"></i> Previous</b>
-        </button>
+    <div class="w3-bar" style="padding:2%;">
+        <div class="w3-third w3-left">
+            <button class="w3-btn w3-round-xxlarge w3-left w3-red" onClick="moveCardToTrash()">
+                <b><i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> Delete Card</b>
+            </button>
+            <button class="w3-right w3-btn w3-round-xxlarge w3-blue" onClick="fetchPreviousCard()">
+                <b><i class="fa fa-chevron-left"></i> Previous</b>
+            </button>
+        </div>
 
         <div class="w3-center w3-third">
             <div class="popup">
@@ -98,24 +114,15 @@
             </div>
         </div>
 
-        <button class="w3-right w3-btn w3-third w3-round-xxlarge" onClick="fetchNextCard()">
-            <b>
-                <i class="fa fa-chevron-right"></i> Next</b>
-        </button>
+        <div class="w3-right w3-third">
+            <button class="w3-left w3-btn w3-round-xxlarge w3-blue" onClick="fetchNextCard()">
+                <b><i class="fa fa-chevron-right"></i> Next</b>
+            </button>
 
-    </div>
-
-    <div class="w3-container w3-center w3-bar w3-padding-16">
-
-        <button class="w3-btn w3-round-xxlarge w3-left w3-red" onClick="moveCardToTrash()">
-            <b>
-                <i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> Delete Card
-            </b>
-        </button>
-
-        <button class="w3-btn w3-round-xxlarge w3-right w3-green" onClick="saveCard()">
-            <b><i class="fa fa-floppy-o fa-fw" aria-hidden="true"></i> Save Card</b>
-        </button>
+            <button class="w3-btn w3-round-xxlarge w3-right w3-green" onClick="saveCard()">
+                <b><i class="fa fa-floppy-o fa-fw" aria-hidden="true"></i> Save Card</b>
+            </button>
+        </div>
 
     </div>
 
