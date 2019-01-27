@@ -108,9 +108,19 @@ exports.refreshMetadata = function() {
         exports
             .sendHTTPRequest("POST", "/read-metadata", {userIDInApp: accountInfo.userIDInApp})
             .then((metadataResponse) => {
-                let metadataDoc = JSON.parse(metadataResponse).message;
-                localStorage.setItem("metadata", JSON.stringify(metadataDoc));
-                resolve(metadataDoc[0]);
+                let metadata = JSON.parse(metadataResponse).message;
+                let metadataDocs = metadata.metadataDocs;
+
+                let minicards = {}
+                for (let minicard of metadata.minicards) {
+                    minicards[minicard._id] = { 
+                        _id: minicard._id, title: minicard.title, 
+                        tags: minicard.tags.trim().replace(/\s/g, ", ") 
+                    };
+                }
+                localStorage.setItem("metadata", JSON.stringify(metadataDocs));
+                localStorage.setItem("minicards", JSON.stringify(minicards));
+                resolve([metadataDocs[0], minicards]);
             })
             .catch((err) => { reject(err); });
     });

@@ -451,3 +451,7 @@ div.minicard_search_result {
     height: 100vh;
     padding-bottom: 2% !important;
 }
+
+.w3-modal-content {
+    width: 80% !important;
+}

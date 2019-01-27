@@ -164,7 +164,7 @@
 
         function initializeAccountPage() {
             AppUtilities.refreshMetadata()
-                .then((metadataDoc) => {
+                .then(([metadataDoc, _]) => {
                     state = {
                         metadata: metadataDoc,
                         card_container: document.getElementById("card_container"),

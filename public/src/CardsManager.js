@@ -3,7 +3,7 @@
 const AVLTree = require("./AVLTree.js");
 var sendHTTPRequest = require("./AppUtilities.js").sendHTTPRequest;
 
-function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card") {
+function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicards={}) {
 
     /* Holds the attributes and methods of the CardsManager module */
     var cardsManagerObj = {};
@@ -133,6 +133,36 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card") {
     };
 
     /**
+     * @description An iterator over all cards that are discoverable through 
+     * the `prev()` and `next()` methods of the `CardsManager`
+     */
+    cardsManagerObj.cardKeys = function* () {
+        let currentNode = bst.minNode();
+        while (currentNode) {
+            yield currentNode.key;
+            currentNode = bst.next(currentNode);
+        }
+        return "done";
+    }
+
+    /**
+     * @description Set the cursor of the `CardsManager` object to the card 
+     * with the provided ID
+     */
+    cardsManagerObj.fetchCard = function (cardID) {
+        return new Promise(function(resolve, reject) {
+            currentNode = bst.find(idsToBSTKeys[cardID]);
+            if (currentNode) {
+                findCard(currentNode.key._id)
+                    .then((card) => { resolve(card); })
+                    .catch((err) => { reject(err); });
+            } else {
+                resolve(null);
+            }
+        });
+    };
+
+    /**
      * @description Return the next card on the queue.
      * @param {Function} callback The function to call that accepts a card
      * as a parameter.
@@ -244,6 +274,10 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card") {
         localStorage.setItem(card._id, JSON.stringify(card));
         cardsManagerObj.removeCard(card._id);
         cardsManagerObj.insertCard(card._id, card.urgency);
+        minicards[card._id] = { 
+            _id: card._id, title: card.title, 
+            tags: card.tags.trim().replace(/\s/g, ", ") 
+        }; 
     };
 
     /**

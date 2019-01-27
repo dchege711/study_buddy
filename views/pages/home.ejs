@@ -73,13 +73,18 @@
             <div class="w3-container">
 
                 <% include ../partials/tags_bar_template.ejs %>
-                
-                <div class="w3-container w3-right w3-threequarter" id="card_template">
-                    <% include ../partials/card_template.ejs %>
+
+                <div class="w3-threequarter w3-right flexbox" id="minicards_search_results">
                 </div>
 
             </div>
             
+        </div>
+
+        <div id="card_modal" class="w3-modal">
+            <div id="card_container_holder" class="w3-modal-content">
+                <% include ../partials/card_template.ejs %>
+            </div>
         </div>
 
         <% include ../partials/footer.ejs %>
@@ -93,11 +98,35 @@
             let metadata, state, autocomplete, cardsManager;
             const userSettings = AppUtilities.getAccountInfo();
 
+            // Maintain references to elements that get searched for often
+            const elementRefs = {
+                cardContainerHolderElement: document.getElementById("card_modal"),
+                alreadySetTagsElement: document.getElementById("already_set_card_tags"),
+                cardDescriptionElement: document.getElementById("card_description"),
+                cardIsPublicToggleElement: document.getElementById("card_is_public_toggle"),
+                cardPopupElement: document.getElementById("card_popup_element"),
+                cardSearchInputElement: document.getElementById("card_search_input"),
+                cardSearchResultsElement: document.getElementById("card_search_results"),
+                abbreviatedCardsElement: document.getElementById("minicards_search_results"),
+                cardTagInputElement: document.getElementById("card_tag_input"),
+                cardTitleElement: document.getElementById("card_title"),
+                cardUrgencyElement: document.getElementById("card_urgency"),
+                cardUrgencyNumberElement: document.getElementById("card_urgency_number"),
+                filterListElement: document.getElementById("filter_list"),
+                sideBarContentsElement: document.getElementById("side_bar_contents"),
+                spoilerElement: document.getElementById("spoiler"),
+                spoilerBoxElement: document.getElementById("spoiler_box"),
+                spoilerEndElement: document.getElementById("spoiler_end"),
+                tagsAutocompleteResultsElement: document.getElementById("tags_autocomplete_results"),
+                shareableLinkElement: document.getElementById("shareable_link")
+            };
+
             function initializeHomepage() {
                 AppUtilities.refreshMetadata()
-                    .then((metadataDoc) => {
+                    .then(([metadataDoc, minicards]) => {
                         metadata = metadataDoc;
                         state = {
+                            minicards: minicards,
                             changedItems: new Set([]),
                             currentCardID: null,
                             currentUserID: metadata.createdById,
@@ -114,7 +143,7 @@
 
                         autocomplete = new AutoComplete();
                         autocomplete.initializePrefixTree(Object.keys(state.tagsAndIDs));
-                        cardsManager = new CardsManager(state.tagsAndIDs, state.currentUserID);
+                        cardsManager = new CardsManager(state.tagsAndIDs, state.currentUserID, "/read-card", minicards);
 
                         TagsBarUtilities.initializeTagsBar("side_bar_contents", state.tagsAndIDs);
                         initializeCards();
@@ -129,36 +158,32 @@
                     .catch((err) => { console.error(err); });
             }
 
-            // Maintain references to elements that get searched for often
-            const elementRefs = {
-                alreadySetTagsElement: document.getElementById("already_set_card_tags"),
-                cardDescriptionElement: document.getElementById("card_description"),
-                cardIsPublicToggleElement: document.getElementById("card_is_public_toggle"),
-                cardPopupElement: document.getElementById("card_popup_element"),
-                cardSearchInputElement: document.getElementById("card_search_input"),
-                cardSearchResultsElement: document.getElementById("card_search_results"),
-                cardTagInputElement: document.getElementById("card_tag_input"),
-                cardTemplateElement: document.getElementById("card_template"),
-                cardTitleElement: document.getElementById("card_title"),
-                cardUrgencyElement: document.getElementById("card_urgency"),
-                cardUrgencyNumberElement: document.getElementById("card_urgency_number"),
-                filterListElement: document.getElementById("filter_list"),
-                sideBarContentsElement: document.getElementById("side_bar_contents"),
-                spoilerElement: document.getElementById("spoiler"),
-                spoilerBoxElement: document.getElementById("spoiler_box"),
-                spoilerEndElement: document.getElementById("spoiler_end"),
-                tagsAutocompleteResultsElement: document.getElementById("tags_autocomplete_results"),
-                shareableLinkElement: document.getElementById("shareable_link")
-            };
+            function refreshMinicards() {
+                let minicardsHTML = ``;
+                for (let cardKey of cardsManager.cardKeys()) {
+                    minicardsHTML += `
+                    <div class="w3-card-4 w3-padding-small w3-margin minicard_search_result" onclick="displayFullCard('${cardKey._id}')">
+                        <header class="w3-container w3-pale-green"><h4>${state.minicards[cardKey._id].title}</h4></header>
+                        <div class="w3-container"><p><strong>Tags: </strong>${state.minicards[cardKey._id].tags}</p></div>
+                    </div>`;
+                }
+                elementRefs.abbreviatedCardsElement.innerHTML = minicardsHTML;
+            }
+
+            function displayFullCard(cardID) {
+                cardsManager
+                    .fetchCard(cardID)
+                    .then((card) => { renderCard(card); })
+                    .catch((err) => { console.error(err); });
+            }
 
             function initializeCards() {
                 cardsManager
                     .initializeFromTags(null)
                     .then(() => { 
+                        refreshMinicards(); 
                         colorUrgencyQuartiles(cardsManager.quartiles());
-                        return cardsManager.next(); 
                     })
-                    .then((card) => { renderCard(card); })
                     .catch((err) => { console.error(err); });
             }
 
@@ -198,10 +223,9 @@
                 cardsManager
                     .initializeFromTags(tagsToUse)
                     .then(() => { 
-                        colorUrgencyQuartiles(cardsManager.quartiles());
-                        return cardsManager.next(); 
+                        refreshMinicards();
+                        colorUrgencyQuartiles(cardsManager.quartiles()); 
                     })
-                    .then((card) => { renderCard(card); })
                     .catch((err) => { console.error(err); });
             }
 
@@ -241,6 +265,7 @@
 
                 if (!card) {
                     CardTemplateUtilities.displayPopUp("Out of cards!", 1500);
+                    elementRefs.cardContainerHolderElement.style.display = "block";
                     return;
                 }
 
@@ -270,9 +295,7 @@
                 elementRefs.alreadySetTagsElement.innerHTML = tagsHTML;
                 elementRefs.cardUrgencyElement.value = card.urgency;
                 elementRefs.cardUrgencyNumberElement.innerText = card.urgency;
-                elementRefs.cardDescriptionElement.removeAttribute("contenteditable");
-                elementRefs.sideBarContentsElement.style.height = elementRefs.cardTemplateElement.style.height;
-                
+                elementRefs.cardDescriptionElement.removeAttribute("contenteditable");                
                 elementRefs.cardIsPublicToggleElement.checked = card.isPublic;
                 state.cardIsPublicToggle = card.isPublic;
                 if (card.isPublic) {
@@ -281,7 +304,6 @@
                     elementRefs.shareableLinkElement.innerText = "";
                 }
                 
-
                 // Reset the contents of the current_card variable
                 state.currentCardID = card._id;
                 state.cardPostURL = "/update-card";
@@ -291,6 +313,8 @@
                 PrettifyCards.renderLatex(["card_description"]);
 
                 CardTemplateUtilities.syncSpoilerBox();
+
+                elementRefs.cardContainerHolderElement.style.display = "block";
             }
 
             function displayRawCardDescription() {
@@ -312,7 +336,6 @@
                 elementRefs.cardUrgencyElement.value = 10;
                 elementRefs.cardUrgencyNumberElement.innerText = "10";
                 elementRefs.cardDescriptionElement.setAttribute("contenteditable", "true");
-                elementRefs.sideBarContentsElement.style.height = elementRefs.cardTemplateElement.style.height;
                 window.removeEventListener("keydown", arrowKeysForNavigation);
 
                 // Reset the contents of the current_card variable
@@ -321,6 +344,8 @@
                 state.currentCardID = null;
                 state.rawDescription = "";
                 state.cardPostURL = "/add-card";
+
+                elementRefs.cardContainerHolderElement.style.display = "block";
             }
 
             function handleInputChange(element_id) {
