@@ -45,17 +45,20 @@ exports.create = function(payload) {
  * @param {JSON} payload Must contain `userIDInApp` as one of the keys.
  * If `_id` is not one of the keys, fetch all the user's cards.
  * 
+ * @param {String} projection The fields to return. Defaults to 
+ * `title description descriptionHTML tags urgency createdById isPublic`
+ * 
  * @returns {Promise} resolves with a JSON doc with `success`, `status` and  
  * `message` as keys. If successful, `message` will be an array of all matching 
  * cards.
  */
-exports.read = function(payload) {
+exports.read = function(payload, projection="title description descriptionHTML tags urgency createdById isPublic") {
     payload = querySanitizer(payload);
     let query = {createdById: payload.userIDInApp};
     if (payload.cardID !== undefined) query._id = payload.cardID;
     return new Promise(function(resolve, reject) {
         Card
-            .find(query).exec()
+            .find(query).select(projection).exec()
             .then((cards) => {
                 resolve({
                     success: true, status: 200, message: cards

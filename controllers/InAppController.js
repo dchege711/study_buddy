@@ -75,7 +75,21 @@ exports.accountGet = function (req, res) {
 };
 
 exports.readMetadata = function (req, res) {
-    sendResponseFromPromise(MetadataDB.read(req.body), res);
+    let dataObject = {success: true, message: {}};
+    MetadataDB.read(req.body)
+        .then((metadataResponse) => {
+            dataObject.message.metadataDocs = metadataResponse.message;
+            return CardsDB.read(
+                { userIDInApp: req.body.userIDInApp }, "title tags urgency"
+            );
+        })
+        .then((minicardsResponse) => {
+            dataObject.message.minicards = minicardsResponse.message;
+            res.json(dataObject);
+        })
+        .catch((err) => {
+            convertObjectToResponse(err, null, res);
+        });
 };
 
 exports.readTagGroups = function(req, res) {
