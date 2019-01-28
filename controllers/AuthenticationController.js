@@ -16,9 +16,15 @@ const defaultTemplateObject = {
  * using certain URLs
  */
 exports.requireLogIn = function (req, res, next) {
-    if (!req.session.user) res.redirect("/login");
-    else if (req.session.user) next();
-    else if (req.cookies.session_token) {
+    if (!req.session.user) {
+        res.redirect("/login");
+    } else if (req.session.user) {
+        if (req.body && req.body.userIDInApp) {
+            // I expect these to be the same, but just in case...
+            req.body.userIDInApp = req.session.user.userIDInApp;
+        }
+        next();
+    } else if (req.cookies.session_token) {
         exports.logInBySessionToken(req.cookies.session_token, res, next);
     }
 };
