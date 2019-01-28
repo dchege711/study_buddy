@@ -141,7 +141,6 @@
             };
 
             function updateStreakBar(streakObj) {
-                console.log(streakObj);
                 let streakBarElement = document.getElementById("streak_bar");
                 let streakWidth = Math.min(100, streakObj.cardIDs.length * 100.0 / streakObj.dailyTarget)
                 streakBarElement.style.width = `${streakWidth}%`;
