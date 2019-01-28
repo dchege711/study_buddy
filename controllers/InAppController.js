@@ -153,7 +153,13 @@ exports.deleteAccount = function(req, res) {
 };
 
 exports.updateUserSettings = function(req, res) {
-    sendResponseFromPromise(MetadataDB.updateUserSettings(req.body), res);
+    MetadataDB
+        .updateUserSettings(req.body)
+        .then((confirmation) => {
+            if (confirmation.success) req.session.user = confirmation.user;
+            convertObjectToResponse(null, confirmation, res);
+        })
+        .catch((err) => { convertObjectToResponse(err, null, res); });
 };
 
 exports.duplicateCard = function(req, res) {

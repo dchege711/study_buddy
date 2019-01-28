@@ -541,7 +541,7 @@ function updateMetadataWithCardDetails(savedCard, metadataDoc, attributeName) {
 exports.updateUserSettings = function(newUserSettings) {
     newUserSettings = querySanitizer(newUserSettings);
 
-    let supportedChanges = new Set(["cardsAreByDefaultPrivate"]);
+    let supportedChanges = new Set(["cardsAreByDefaultPrivate", "dailyTarget"]);
     let validChanges = [];
     Object.keys(newUserSettings).forEach((setting) => {
         if (supportedChanges.has(setting)) validChanges.push(setting);
@@ -553,6 +553,8 @@ exports.updateUserSettings = function(newUserSettings) {
                 success: false, status: 200, message: "No changes were made."
             });
         }
+        let updatedUser;
+
         User
             .findOne({userIDInApp: newUserSettings.userIDInApp}).exec()
             .then((existingUser) => {
@@ -567,9 +569,20 @@ exports.updateUserSettings = function(newUserSettings) {
                 }
                 return existingUser.save();
             })
+            .then((saveResults) => {
+                updatedUser = saveResults;
+                if (newUserSettings.dailyTarget) {
+                    return Metadata.updateOne(
+                        {createdById: newUserSettings.userIDInApp, metadataIndex: 0},
+                        {$set: { "streak.dailyTarget": newUserSettings.dailyTarget}}
+                    );
+                }
+                return Promise.resolve(null);
+            })
             .then((_) => {
                 resolve({
-                    message: "User settings updated!", success: true, status: 200
+                    message: "User settings updated!", success: true, 
+                    status: 200, user: updatedUser
                 });
             })
             .catch((err) => { reject(err); });
