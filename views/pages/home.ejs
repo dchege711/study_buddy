@@ -27,6 +27,13 @@
             window.addEventListener("keydown", arrowKeysForNavigation);
 
         </script>
+
+        <style>
+            #streak_bar {
+                background-color: #bf033b;
+                background-image: linear-gradient(45deg, #ffc719 100%, #bf033b 0%);
+            }
+        </style>
         
     </head>
 
@@ -46,15 +53,27 @@
                     </div>
                 </div>
 
-                <label class="w3-right switch tooltip">
-                    <input type="checkbox" id="reviewModeToggle" onchange="toggleOption('reviewModeToggle');">
-                    <span class="slider round" id="review_mode_label"></span>
-                    <span class="tooltiptext" id="review_mode_tooltip">
-                        After the urgency of a card has been modified, automatically 
-                        save the current card and load the next card. 
-                        <a href="/wiki#review_mode" target="_blank">Read more</a>
-                    </span>
-                </label>
+                <div class="w3-half">
+                    <div class="w3-threequarter w3-row">
+                        <span class="w3-light-grey w3-left w3-col w3-round-xlarge" style="width:100%">
+                            <div id="streak_bar" class="w3-container w3-center w3-round-xlarge w3-padding" style="width:0%"></div>
+                            <span class='w3-right' id="streak_text"></span>
+                        </span>
+                    </div>
+                        
+                    <div class="w3-quarter">
+                        <label class="w3-right switch tooltip">
+                            <input type="checkbox" id="reviewModeToggle" onchange="toggleOption('reviewModeToggle');">
+                            <span class="slider round" id="review_mode_label"></span>
+                            <span class="tooltiptext" id="review_mode_tooltip">
+                                After the urgency of a card has been modified, automatically 
+                                save the current card and load the next card. 
+                                <a href="/wiki#review_mode" target="_blank">Read more</a>
+                            </span>
+                        </label>
+                    </div>
+
+                </div>
                 
             </div>
 
@@ -121,6 +140,15 @@
                 shareableLinkElement: document.getElementById("shareable_link")
             };
 
+            function updateStreakBar(streakObj) {
+                console.log(streakObj);
+                let streakBarElement = document.getElementById("streak_bar");
+                let streakWidth = Math.min(100, streakObj.cardIDs.length * 100.0 / streakObj.dailyTarget)
+                streakBarElement.style.width = `${streakWidth}%`;
+                streakBarElement.style.backgroundImage = `linear-gradient(45deg, #ffc719 20% ${100 - streakWidth}%, #bf033b 100%)`;
+                document.getElementById("streak_text").innerText = `Daily Target: ${streakObj.cardIDs.length} / ${streakObj.dailyTarget} (Streak ${streakObj.length})`;
+            }
+
             function initializeHomepage() {
                 AppUtilities.refreshMetadata()
                     .then(([metadataDoc, minicards]) => {
@@ -140,13 +168,15 @@
                             card_is_public_toggle: userSettings.cardsAreByDefaultPrivate
                         }
                         if (!state.tagsAndIDs) state.tagsAndIDs = {};
-
+                        
                         autocomplete = new AutoComplete();
                         autocomplete.initializePrefixTree(Object.keys(state.tagsAndIDs));
                         cardsManager = new CardsManager(state.tagsAndIDs, state.currentUserID, "/read-card", minicards);
 
                         TagsBarUtilities.initializeTagsBar("side_bar_contents", state.tagsAndIDs);
                         initializeCards();
+                        updateStreakBar(metadata.streak);
+
                         return AppUtilities.sendHTTPRequest("POST", "/read-tag-groups", {userIDInApp: state.currentUserID});
                     })
                     .then((tagGroupsResponse) => {
@@ -187,16 +217,32 @@
                     .catch((err) => { console.error(err); });
             }
 
-            function fetchPreviousCard() {
-                cardsManager.previous()
-                    .then((card) => { renderCard(card); })
+            function fetchCard(cardCaller) {
+                let payload = {
+                    userIDInApp: state.currentUserID, cardIDs: []
+                }
+                if (state.currentCardID) payload.cardIDs = [state.currentCardID];
+
+                cardCaller()
+                    .then((card) => { 
+                        renderCard(card);
+                        return AppUtilities.sendHTTPRequest(
+                            "POST", "/update-streak", payload
+                        ) 
+                    })
+                    .then((streakConfirmation) => {
+                        streakConfirmation = JSON.parse(streakConfirmation);
+                        updateStreakBar(streakConfirmation.message);
+                    })
                     .catch((err) => { console.error(err); });
+            }
+
+            function fetchPreviousCard() {
+                fetchCard(cardsManager.previous);
             }
     
             function fetchNextCard() {
-                cardsManager.next()
-                    .then((card) => { renderCard(card); })
-                    .catch((err) => { console.error(err); });
+                fetchCard(cardsManager.next);
             }
 
             function toggleOption(element_id) {
