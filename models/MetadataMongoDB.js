@@ -572,12 +572,22 @@ exports.updateUserSettings = function(newUserSettings) {
             .then((saveResults) => {
                 updatedUser = saveResults;
                 if (newUserSettings.dailyTarget) {
-                    return Metadata.updateOne(
-                        {createdById: newUserSettings.userIDInApp, metadataIndex: 0},
-                        {$set: { "streak.dailyTarget": newUserSettings.dailyTarget}}
-                    );
+                    return Metadata.findOne({
+                        createdById: newUserSettings.userIDInApp, metadataIndex: 0
+                    }).exec();
+                } else {
+                    resolve({
+                        message: "User settings updated!", success: true, 
+                        status: 200, user: updatedUser
+                    });
                 }
-                return Promise.resolve(null);
+            })
+            .then((metadataDoc) => {
+                if (newUserSettings.dailyTarget) {
+                    metadataDoc.streak.set("dailyTarget", newUserSettings.dailyTarget);
+                    metadataDoc.markModified("streak");
+                }
+                return metadataDoc.save();
             })
             .then((_) => {
                 resolve({
