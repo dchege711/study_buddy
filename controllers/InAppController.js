@@ -110,6 +110,10 @@ exports.updateCard = function (req, res) {
     sendResponseFromPromise(CardsDB.update(req.body), res);
 };
 
+exports.updateStreak = function (req, res) {
+    sendResponseFromPromise(MetadataDB.updateStreak(req.body), res);
+}
+
 exports.deleteCard = function (req, res) {
     sendResponseFromPromise(MetadataDB.deleteCardFromTrash(req.body), res);
 };
@@ -149,7 +153,13 @@ exports.deleteAccount = function(req, res) {
 };
 
 exports.updateUserSettings = function(req, res) {
-    sendResponseFromPromise(MetadataDB.updateUserSettings(req.body), res);
+    MetadataDB
+        .updateUserSettings(req.body)
+        .then((confirmation) => {
+            if (confirmation.success) req.session.user = confirmation.user;
+            convertObjectToResponse(null, confirmation, res);
+        })
+        .catch((err) => { convertObjectToResponse(err, null, res); });
 };
 
 exports.duplicateCard = function(req, res) {

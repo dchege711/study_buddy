@@ -14,11 +14,17 @@ var metadataSchema = new mongoose.Schema(
         node_information: Array,
         trashed_cards: Array,
         stats: Array,
-        cardsAreByDefaultPrivate: {type: Boolean, default: true }
+        streak: {
+            type: Map, 
+            default: {
+                cardIDs: [], length: 0, dailyTarget: 25, timeStamp: Date.now
+            }
+        },
+        cardsAreByDefaultPrivate: {type: Boolean, default: true}
     },
     {
         timestamps: true,
-        autoIndex: false,
+        autoIndex: true,
         collection: "c13u_study_buddy_metadata",
         strict: true
     }

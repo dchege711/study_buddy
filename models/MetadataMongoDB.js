@@ -541,7 +541,7 @@ function updateMetadataWithCardDetails(savedCard, metadataDoc, attributeName) {
 exports.updateUserSettings = function(newUserSettings) {
     newUserSettings = querySanitizer(newUserSettings);
 
-    let supportedChanges = new Set(["cardsAreByDefaultPrivate"]);
+    let supportedChanges = new Set(["cardsAreByDefaultPrivate", "dailyTarget"]);
     let validChanges = [];
     Object.keys(newUserSettings).forEach((setting) => {
         if (supportedChanges.has(setting)) validChanges.push(setting);
@@ -553,6 +553,8 @@ exports.updateUserSettings = function(newUserSettings) {
                 success: false, status: 200, message: "No changes were made."
             });
         }
+        let updatedUser;
+
         User
             .findOne({userIDInApp: newUserSettings.userIDInApp}).exec()
             .then((existingUser) => {
@@ -567,11 +569,54 @@ exports.updateUserSettings = function(newUserSettings) {
                 }
                 return existingUser.save();
             })
+            .then((saveResults) => {
+                updatedUser = saveResults;
+                if (newUserSettings.dailyTarget) {
+                    return Metadata.updateOne(
+                        {createdById: newUserSettings.userIDInApp, metadataIndex: 0},
+                        {$set: { "streak.dailyTarget": newUserSettings.dailyTarget}}
+                    );
+                }
+                return Promise.resolve(null);
+            })
             .then((_) => {
                 resolve({
-                    message: "User settings updated!", success: true, status: 200
+                    message: "User settings updated!", success: true, 
+                    status: 200, user: updatedUser
                 });
             })
             .catch((err) => { reject(err); });
     });
-}
+};
+
+/**
+ * @description Update the streak object for the current user. Assumes that the 
+ * streak object is up to date.
+ * 
+ * @param {JSON} streakUpdateObj Expected properties: `userIDInApp`, `cardIDs`
+ * 
+ * @returns {Object} the saved metadata object with the updated streak
+ */
+exports.updateStreak = function(streakUpdateObj) {
+    streakUpdateObj = querySanitizer(streakUpdateObj);
+    return new Promise(function(resolve, reject) {
+        Metadata
+            .findOne({createdById: streakUpdateObj.userIDInApp, metadataIndex: 0}).exec()
+            .then((metadataDoc) => {
+                let idsReviewedCards = new Set(metadataDoc.streak.get("cardIDs"));
+                for (let cardID of streakUpdateObj.cardIDs) {
+                    idsReviewedCards.add(cardID);
+                }
+                metadataDoc.streak.set('cardIDs', Array.from(idsReviewedCards));
+                metadataDoc.markModified("streak");
+                return metadataDoc.save(); 
+            })
+            .then((savedMetadataDoc) => { 
+                resolve({
+                    message: savedMetadataDoc.streak, success: true, status: 200
+                });
+            })
+            .catch((err) => { reject(err); });
+    });
+    
+};

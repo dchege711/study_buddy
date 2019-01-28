@@ -61,6 +61,11 @@
                         <% } %>
 
                         <label class="w3-label" for="cardsAreByDefaultPrivate">If checked, your cards will be private (except the ones that you explicitly set as public)</label>
+                        
+                        <br /><br />
+                        <label class="w3-label" for="dailyTarget">Minimum number of cards to review per day</label>
+                        <input type="number" name="dailyTarget" value="<%= account_info.dailyTarget %>">
+
 
                         <input type="text" style="display:none" name="userIDInApp" value="<%= account_info.userIDInApp %>">
                         
