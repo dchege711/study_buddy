@@ -20,7 +20,7 @@ exports.convertObjectToResponse = function (err, result_JSON, res) {
         res.status(500);
         res.render(
             "pages/5xx_error_page.ejs", 
-            { response_JSON: generic_500_msg, APP_NAME: APP_NAME }
+            { response_JSON: generic_500_msg, APP_NAME: APP_NAME, LOGGED_IN: false }
         );
     } else {
         let status = result_JSON.status || 200;

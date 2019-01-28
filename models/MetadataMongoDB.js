@@ -574,4 +574,36 @@ exports.updateUserSettings = function(newUserSettings) {
             })
             .catch((err) => { reject(err); });
     });
-}
+};
+
+/**
+ * @description Update the streak object for the current user. Assumes that the 
+ * streak object is up to date.
+ * 
+ * @param {JSON} streakUpdateObj Expected properties: `userIDInApp`, `cardIDs`
+ * 
+ * @returns {Object} the saved metadata object with the updated streak
+ */
+exports.updateStreak = function(streakUpdateObj) {
+    streakUpdateObj = querySanitizer(streakUpdateObj);
+    return new Promise(function(resolve, reject) {
+        Metadata
+            .findOne({createdById: streakUpdateObj.userIDInApp, metadataIndex: 0}).exec()
+            .then((metadataDoc) => {
+                let idsReviewedCards = new Set(metadataDoc.streak.get("cardIDs"));
+                for (let cardID of streakUpdateObj.cardIDs) {
+                    idsReviewedCards.add(cardID);
+                }
+                metadataDoc.streak.set('cardIDs', Array.from(idsReviewedCards));
+                metadataDoc.markModified("streak");
+                return metadataDoc.save(); 
+            })
+            .then((savedMetadataDoc) => { 
+                resolve({
+                    message: savedMetadataDoc.streak, success: true, status: 200
+                });
+            })
+            .catch((err) => { reject(err); });
+    });
+    
+};

@@ -30,6 +30,8 @@ router.post("/search-cards", requireLogIn, inAppController.searchCards);
 
 router.post("/update-card", requireLogIn, inAppController.updateCard);
 
+router.post("/update-streak", requireLogIn, inAppController.updateStreak);
+
 router.post("/delete-card", requireLogIn, inAppController.deleteCard);
 
 router.post("/trash-card", requireLogIn, inAppController.trashCard);

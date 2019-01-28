@@ -110,6 +110,10 @@ exports.updateCard = function (req, res) {
     sendResponseFromPromise(CardsDB.update(req.body), res);
 };
 
+exports.updateStreak = function (req, res) {
+    sendResponseFromPromise(MetadataDB.updateStreak(req.body), res);
+}
+
 exports.deleteCard = function (req, res) {
     sendResponseFromPromise(MetadataDB.deleteCardFromTrash(req.body), res);
 };
