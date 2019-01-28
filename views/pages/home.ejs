@@ -189,7 +189,10 @@
             }
 
             function refreshMinicards() {
-                let minicardsHTML = ``;
+                let minicardsHTML = `
+                    <div class="w3-card-4 w3-padding-small w3-margin minicard_search_result" onclick="displayNewCard()">
+                        <header class="w3-container w3-pale-blue"><h4><i class="fa fa-plus-square-o fa-fw" aria-hidden="true"></i> Create a New Card</h4></header>
+                    </div>`;
                 for (let cardKey of cardsManager.cardKeys()) {
                     minicardsHTML += `
                     <div class="w3-card-4 w3-padding-small w3-margin minicard_search_result" onclick="displayFullCard('${cardKey._id}')">
@@ -611,8 +614,10 @@
             function reInitializeCards(abbreviated_cards) {
                 elementRefs.cardSearchResultsElement.innerHTML = "";
                 cardsManager.initializeFromMinicards(abbreviated_cards)
-                    .then(() => { return cardsManager.next(); })
-                    .then((card) => { renderCard(card); })
+                    .then(() => { 
+                        refreshMinicards();
+                        colorUrgencyQuartiles(cardsManager.quartiles()); 
+                    })
                     .catch((err) => { console.error(err); });
             }
 
