@@ -521,8 +521,8 @@
             
             function moveCardToTrash() {
                 // Remove the card from the ones that get displayed
-                var removed_card_id = cardsManager.removeCard(state.currentCardID);
-                if (removed_card_id === state.currentCardID) {
+                let removedCardID = cardsManager.removeCard(state.currentCardID);
+                if (removedCardID === state.currentCardID) {
                     // Move on to the next card in the PQ
                     if (cardsManager.hasNext()) {
                         fetchNextCard();
@@ -535,7 +535,7 @@
                     // Request the server to trash the card
                     AppUtilities.sendHTTPRequest("POST", "/trash-card", 
                         {
-                            cardID: removed_card_id, createdById: state.currentUserID
+                            cardID: removedCardID, createdById: state.currentUserID
                         })
                         .then((trash_confirmation) => {
                             trash_confirmation = JSON.parse(trash_confirmation);
