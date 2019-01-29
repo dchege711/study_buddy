@@ -719,12 +719,22 @@ exports.sampleCards = [
 const N = exports.sampleCards.length;
 
 /**
- * @returns {Array} contains `numCards` chosen at random with replacement.
+ * @returns {Array} contains at most `numCards` chosen at random without replacement.
  */
 exports.getRandomCards = function(numCards) {
-    let cards = [];
-    for (let i = 0; i < numCards; i++) {
-        cards.push(exports.sampleCards[Math.floor(Math.random() * (N))]);
+    let cardIndexes = new Array(Math.min(numCards, exports.sampleCards.length));
+    for (let i = 0; i < cardIndexes.length; i++) cardIndexes[i] = i;
+    let randomIdx, temp;
+    for (let i = 0; i < cardIndexes.length; i++) {
+        randomIdx = Math.floor(Math.random() * (cardIndexes.length - i)) + i;
+        temp = cardIndexes[randomIdx];
+        cardIndexes[randomIdx] = cardIndexes[i];
+        cardIndexes[i] = temp;
+    }
+
+    let cards = new Array(cardIndexes.length);
+    for (let i = 0; i < cardIndexes.length; i++) {
+        cards[i] = exports.sampleCards[cardIndexes[i]];
     }
     return cards;
 }
