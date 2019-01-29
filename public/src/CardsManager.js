@@ -229,8 +229,10 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicard
      * the queue of cards.
      */
     cardsManagerObj.removeCard = function(idOfCardToRemove) {
+
+        // If we're removing the current card, adjust such that `next()` 
+        // resolves to the card that followed the card that we'll remove
         if (currentNode.key._id === idOfCardToRemove) {
-            let keyToRemove = currentNode.key;
             if (cardsManagerObj.hasPrev()) {
                 currentNode = bst.prev(currentNode);
             } else if (cardsManagerObj.hasNext()) {
@@ -238,13 +240,46 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicard
             } else {
                 currentNode = null;
             }
-            delete idsToBSTKeys[idOfCardToRemove];
-            bst.remove(keyToRemove);
-            return keyToRemove._id;
-        } else {
-            console.error(`${currentNode.key._id} !== ${idOfCardToRemove}`);
         }
+        let keyToRemove = idsToBSTKeys[idOfCardToRemove];
+        delete idsToBSTKeys[idOfCardToRemove];
+        bst.remove(keyToRemove);
+        return keyToRemove._id;
     };
+
+    cardsManagerObj.status = function() {
+        if (currentNode) {
+            let node = bst.prev(currentNode);
+            if (node) {
+                findCard(node.key._id)
+                    .then((card) => {
+                        console.log(`Previous: (${card.urgency}) ${card.title}`);
+                    })
+                    .catch((err) => { console.error(err); });
+            } else {
+                console.log(`Previous: null`);
+            }
+            
+            findCard(currentNode.key._id)
+                .then((card) => {
+                    console.log(`Current: (${card.urgency}) ${card.title}`);
+                })
+                .catch((err) => { console.error(err); });
+
+            node = bst.next(currentNode);
+            if (node) {
+                findCard(node.key._id)
+                    .then((card) => {
+                        console.log(`Next: (${card.urgency}) ${card.title}`);
+                    })
+                    .catch((err) => { console.error(err); });
+            } else {
+                console.log(`Next: null`);
+            }      
+        } else {
+            console.log(`Current: null`);
+        }
+    }
 
     /**
      * @description Insert a card into the set of cards that can be discovered 
@@ -277,7 +312,7 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicard
         minicards[card._id] = { 
             _id: card._id, title: card.title, 
             tags: card.tags.trim().replace(/\s/g, ", ") 
-        }; 
+        };
     };
 
     /**
