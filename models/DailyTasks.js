@@ -30,8 +30,7 @@ function resetStreaks() {
                     };
                     let timeStampDate = (new Date(streakObj.timeStamp)).toDateString();
                     if (todaysDate !== timeStampDate) {
-                        console.log(`Is ${streakObj.cardIDs.size} >= ${streakObj.dailyTarget}?`);
-                        if (streakObj.cardIDs.size >= streakObj.dailyTarget) {
+                        if (streakObj.cardIDs.length >= streakObj.dailyTarget) {
                             streakObj.length += 1;
                         } else {
                             streakObj.length = 0;
