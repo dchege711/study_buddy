@@ -243,8 +243,8 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicard
         }
         let keyToRemove = idsToBSTKeys[idOfCardToRemove];
         delete idsToBSTKeys[idOfCardToRemove];
-        bst.remove(keyToRemove);
-        return keyToRemove._id;
+        if (keyToRemove) bst.remove(keyToRemove);
+        return idOfCardToRemove;
     };
 
     cardsManagerObj.status = function() {
@@ -307,12 +307,17 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicard
     cardsManagerObj.updateCard = function(card) {
         localStorage.removeItem(card._id);
         localStorage.setItem(card._id, JSON.stringify(card));
-        cardsManagerObj.removeCard(card._id);
-        cardsManagerObj.insertCard(card._id, card.urgency);
         minicards[card._id] = { 
             _id: card._id, title: card.title, 
             tags: card.tags.trim().replace(/\s/g, ", ") 
         };
+
+        let oldKey = idsToBSTKeys[card._id];
+        if (oldKey) {
+            cardsManagerObj.removeCard(card._id);
+        }
+        cardsManagerObj.insertCard(card._id, card.urgency);
+        
     };
 
     /**
