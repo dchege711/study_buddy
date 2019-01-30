@@ -14,7 +14,8 @@ const Metadata = require("./mongoose_models/MetadataCardSchema.js");
 function resetStreaks() {
 
     let bulkWriteOps = [];
-    let todaysDate = (new Date(Date.now())).toDateString();
+    let currentTimeStamp = Date.now();
+    let todaysDate = (new Date(currentTimeStamp)).toDateString();
 
     return new Promise(function(resolve, reject) {
         Metadata
@@ -29,13 +30,14 @@ function resetStreaks() {
                     };
                     let timeStampDate = (new Date(streakObj.timeStamp)).toDateString();
                     if (todaysDate !== timeStampDate) {
+                        console.log(`Is ${streakObj.cardIDs.size} >= ${streakObj.dailyTarget}?`);
                         if (streakObj.cardIDs.size >= streakObj.dailyTarget) {
                             streakObj.length += 1;
                         } else {
                             streakObj.length = 0;
                         }
                     }
-                    streakObj.timeStamp = Date.now();
+                    streakObj.timeStamp = currentTimeStamp;
                     bulkWriteOps.push({
                         updateOne: {
                             filter: {_id: metadataDoc._id}, 
