@@ -226,17 +226,22 @@
                 if (state.currentCardID) payload.cardIDs = [state.currentCardID];
 
                 cardCaller()
-                    .then((card) => { 
+                    .then((card) => {
+                        let cardIsNew = state.cardPostURL === "/add-card";  
                         renderCard(card);
-                        return AppUtilities.sendHTTPRequest(
-                            "POST", "/update-streak", payload
-                        ) 
+                        if (cardIsNew) {
+                            return Promise.reject(null);
+                        } else {
+                            return AppUtilities.sendHTTPRequest(
+                                "POST", "/update-streak", payload
+                            )
+                        }  
                     })
                     .then((streakConfirmation) => {
                         streakConfirmation = JSON.parse(streakConfirmation);
                         updateStreakBar(streakConfirmation.message);
                     })
-                    .catch((err) => { console.error(err); });
+                    .catch((err) => { if (err) console.error(err); });
             }
 
             function fetchPreviousCard() {
