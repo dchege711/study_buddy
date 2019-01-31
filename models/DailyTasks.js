@@ -34,8 +34,9 @@ function resetStreaks() {
                             streakObj.length += 1;
                         } else {
                             streakObj.length = 0;
-                        }
+                        } 
                     }
+                    streakObj.cardIDs = [];
                     streakObj.timeStamp = currentTimeStamp;
                     bulkWriteOps.push({
                         updateOne: {
