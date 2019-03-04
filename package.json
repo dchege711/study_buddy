@@ -29,7 +29,8 @@
     "single_test": "mocha  --no-warnings --timeout 20000 ./tests/mocha_tests/unit_tests/TestGraph.js",
     "test": "node models/Miscellaneous.js && npm run mocha_tests && npm run selenium_tests",
     "mocha_tests": "nyc mocha --no-warnings --recursive --sort --timeout 20000 './tests/mocha_tests/*/*.js'",
-    "selenium_tests": "cd tests/selenium_tests/ && nyc ./run_selenium_tests.sh firefox headless && cd ../../"
+    "selenium_tests": "cd tests/selenium_tests/ && nyc ./run_selenium_tests.sh firefox headless && cd ../../",
+    "heroku-postbuild": "echo Skip build on Heroku"
   },
   "repository": {
     "type": "git",
@@ -76,5 +77,6 @@
     "webpack": "^4.25.1",
     "webpack-cli": "^3.1.2",
     "why-is-node-running": "2.0.2"
-  }
+  },
+  "heroku-run-build-script": true
 }
