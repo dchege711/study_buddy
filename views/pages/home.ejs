@@ -295,20 +295,21 @@
              * quartiles. Assumes the maximum urgency is 10.
              */ 
             function colorUrgencyQuartiles(quartiles) {
-                if (quartiles.length == 4) {
-                    let bar_width_ids = [
+                if (quartiles.length == 5) {
+                    let barWidthIDs = [
+                        "zeroth_quartile_marker", 
                         "first_quartile_marker", "second_quartile_marker", 
                         "third_quartile_marker", "fourth_quartile_marker"
                     ];
-                    let bar_width_percentages = [
-                        Math.floor(quartiles[0] * 10), 0, 0, 0
+                    let barWidthPercentages = [
+                        Math.floor(quartiles[0] * 10), 0, 0, 0, 0
                     ];
                     for (let i = 1; i < quartiles.length; i++) {
-                        bar_width_percentages[i] = Math.floor((quartiles[i] - quartiles[i-1]) * 10);
+                        barWidthPercentages[i] = Math.floor((quartiles[i] - quartiles[i-1]) * 10);
                     }
                     
-                    for (let i = 0; i < bar_width_ids.length; i++) {
-                        document.getElementById(bar_width_ids[i]).style.width = `${bar_width_percentages[i]}%`;
+                    for (let i = 0; i < barWidthIDs.length; i++) {
+                        document.getElementById(barWidthIDs[i]).style.width = `${barWidthPercentages[i]}%`;
                     }
                 }
                  
