@@ -323,12 +323,39 @@ exports.registerUserAndPassword = function(payload) {
                     if (emailConfirmation.success) {
                         emailConfirmation.message = `Welcome to ${config.APP_NAME}! We've also sent a validation URL to ${email}. Please validate your account within 30 days.`;
                         prevResults.emailConfirmation = emailConfirmation;
-                        return CardsDB.create({
-                            title: "This is the Card Title", tags: "sample_card",
-                            description: "# Hash Tags Create Headers\n\n> Click on the edit button to see how to edit your cards using Markdown.\n\n| Tables | are | fair | game! |\n| --- | --- | --- | --- |\n| 1 | *two* | ~~three~~ | **four** |\n| I | hope | they're | useful |\n\n* When linking to an image, you can optionally specify the width and height (image credit: XKCD)\n\n![xkcd: Alpha Centauri](https://imgs.xkcd.com/comics/alpha_centauri.png =25%x10%)\n\n[spoiler]\n\n* Anything below the first '[spoiler]' will be covered by a gray box. \n* Hovering over / clicking on the gray box will reveal the content underneath.\n\n* Feel free to inline LaTeX \\(e = mc^2\\) or code: `int n = 10;`\n\n* Standalone LaTeX also works:\n$$ e = mc^2 $$\n\n* When writing code blocks, specify the language so that it's highlighted accordingly\n```python\nimport sys\nprint(sys.version)\n```\n\nPS. Cards are not usually this long. Try to limit them to one screen so that you can review them without scrolling. (Alternatively, adjust your browser's zoom level)",
-                            createdById: prevResults.savedUser.userIDInApp,
-                            urgency: 10, parent: "", isPublic: false
-                        });
+                        let starterCards = [
+                            {
+                                title: "Example of a Card Title", tags: "sample_card",
+                                description: "# Hash Tags Create Headers\n\n* You can format your cards using markdown, e.g.\n* Bullet points\n\n1. Numbered lists\n\n *So*, **many**, ~~options~~\n\n> See [the Markdown Cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)",
+                                createdById: prevResults.savedUser.userIDInApp,
+                                urgency: 10, parent: "", isPublic: false
+                            },
+                            {
+                                title: "Sample Card With Image", tags: "sample_card",
+                                description: "When linking to an image, you can optionally specify the width and height (image credit: XKCD)\n\n![xkcd: Alpha Centauri](https://imgs.xkcd.com/comics/alpha_centauri.png =25%x10%)",
+                                createdById: prevResults.savedUser.userIDInApp,
+                                urgency: 9, parent: "", isPublic: false
+                            },
+                            {
+                                title: "Sample Card With Spoiler Tags", tags: "sample_card",
+                                description: "> How do I quiz myself? \n\n[spoiler]\n\n* Anything below the first '[spoiler]' will be covered by a gray box. \n* Hovering over / clicking on the gray box will reveal the content underneath.\n* Also note how the urgency influences the order of the cards. Cards with lower urgency are presented last.",
+                                createdById: prevResults.savedUser.userIDInApp,
+                                urgency: 8, parent: "", isPublic: false
+                            },
+                            {
+                                title: "Code Snippets and LaTeX", tags: "sample_card",
+                                description: "* Feel free to inline LaTeX \\(e = mc^2\\) or code: `int n = 10;`\n\n* Standalone LaTeX also works, e.g.\n$$ e = mc^2 $$\n\n* When writing code blocks, specify the language so that it's highlighted accordingly, e.g.\n```python\nimport sys\nprint(sys.version)\n```",
+                                createdById: prevResults.savedUser.userIDInApp,
+                                urgency: 7, parent: "", isPublic: false
+                            },
+                            {
+                                title: "Putting It All Together", tags: "sample_card",
+                                description: "> Give examples on when these problem solving techniques are appropriate:\n* Defining a recurrence relation.\n* Manipulating the definitions.\n* Analyzing all possible cases.\n\n\n\n[spoiler]\n\n### Define a recurrence and identify base/boundary conditions\n* Useful when knowing a previous state helps you find the next state.\n* Techniques include plug-and-chug and solving for characteristic equation.\n\n### Manipulating the Definitions\n* Useful for proving general statements with little to no specificity.\n\n### Analyzing all possible cases\n* Sometimes there's an invariant that summarizes all possible cases into a few cases, e.g. *Ramsey's 3 mutual friends/enemies for n >= 6*",
+                                createdById: prevResults.savedUser.userIDInApp,
+                                urgency: 6, parent: "", isPublic: false
+                            }
+                        ]
+                        return CardsDB.createMany(starterCards);
                     } else {
                         resolve(emailConfirmation); return Promise.reject("DUMMY");
                     }

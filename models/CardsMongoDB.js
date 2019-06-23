@@ -40,6 +40,32 @@ exports.create = function(payload) {
 };
 
 /**
+ * Create multiple cards at once
+ * 
+ * @param {Array} unsavedCards An array of JSON objects keyed by `title`, 
+ * `description`, `tags`, `createdById`, `urgency`, `isPublic` and `parent`.
+ * 
+ * @returns {Promise} takes a JSON object with `success`, `status` and `message` 
+ * as its keys. If successful, the message will be an array of the saved cards' IDs
+ */
+exports.createMany = function(unsavedCards) {
+    return new Promise(async function(resolve, reject) {
+        let savedCardsIDs = [];
+        let saveConfirmation;
+        for (let i = 0; i < unsavedCards.length; i++) {
+            saveConfirmation = await exports.create(unsavedCards[i]).catch((err) => {
+                reject(err);
+                return;
+            });
+            savedCardsIDs.push(saveConfirmation.message._id);
+        }
+        resolve({
+            success: true, status: 200, message: savedCardsIDs
+        });
+    });
+}
+
+/**
  * Read a card(s) from the database.
  * 
  * @param {JSON} payload Must contain `userIDInApp` as one of the keys.
