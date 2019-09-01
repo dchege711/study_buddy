@@ -321,21 +321,25 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicard
     };
 
     /**
-     * @description Return the 1st, 2nd, 3rd and 4th quartiles of the urgencies 
-     * of the cards on the current `CardsManager` object.
-     * @returns {Array} A 4 element array denoting the 1st, 2nd, 3rd and 4th 
+     * @description Compute and return the 0th, 1st, 2nd, 3rd and 4th quartiles 
+     * of the urgencies of the cards on the current `CardsManager` object.
+     * 
+     * @returns {Array} A 5 element array denoting the 0th, 1st, 2nd, 3rd and 4th 
      * quartiles of the urgences.
      */
     cardsManagerObj.quartiles = function() {
         let N = bst._size;
         if (N == 0) {
-            return [0, 0, 0, 0];
+            return [0, 0, 0, 0, 0];
         }
         else if (N <= 4) {
+            // Recall that the BST is populated using `reverseComparator()`, thus 
+            // the min node on the BST has the highest urgency.
             let maxUrgency = bst.min().urgency;
-            return [maxUrgency, maxUrgency, maxUrgency, maxUrgency];
+            return [maxUrgency, maxUrgency, maxUrgency, maxUrgency, maxUrgency];
         } else {
             return [
+                bst.max().urgency, 
                 bst.at(Math.floor(3 * N / 4)).key.urgency,
                 bst.at(Math.floor(N / 2)).key.urgency,
                 bst.at(Math.floor(N / 4)).key.urgency,

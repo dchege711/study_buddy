@@ -40,6 +40,32 @@ exports.create = function(payload) {
 };
 
 /**
+ * Create multiple cards at once
+ * 
+ * @param {Array} unsavedCards An array of JSON objects keyed by `title`, 
+ * `description`, `tags`, `createdById`, `urgency`, `isPublic` and `parent`.
+ * 
+ * @returns {Promise} takes a JSON object with `success`, `status` and `message` 
+ * as its keys. If successful, the message will be an array of the saved cards' IDs
+ */
+exports.createMany = function(unsavedCards) {
+    return new Promise(async function(resolve, reject) {
+        let savedCardsIDs = [];
+        let saveConfirmation;
+        for (let i = 0; i < unsavedCards.length; i++) {
+            saveConfirmation = await exports.create(unsavedCards[i]).catch((err) => {
+                reject(err);
+                return;
+            });
+            savedCardsIDs.push(saveConfirmation.message._id);
+        }
+        resolve({
+            success: true, status: 200, message: savedCardsIDs
+        });
+    });
+}
+
+/**
  * Read a card(s) from the database.
  * 
  * @param {JSON} payload Must contain `userIDInApp` as one of the keys.
@@ -235,9 +261,13 @@ let collectSearchResults = function(queryObject) {
  * @description Find cards that satisfy the given criteria and are publicly 
  * viewable.
  * 
- * @param {JSON} `payload` Expected keys are `card_id`, `user_id`, `query_string`. 
- * The `user_id` in this case refers to the creator of the cards, 
- * not the ID of the user/guest that makes the request. 
+ * @param {JSON} `payload` Supported keys include:
+ *  - `userID`: The ID of the creator of the cards
+ *  - `cardIDs`: A string of card IDs separated by a `,` without spaces
+ *  - `cardID`: The ID of a single card. The same effect can be achieved with `cardIDs`
+ *  - `queryString`: The keywords to look for. They are interpreted as tags
+ *  - `creationStartDate`: The earliest date by which the cards were created
+ *  - `creationEndDate`: The latest date for which the cards were created
  * 
  * @returns {Promise} resolves with a JSON object. If `success` is set, then 
  * the `message` attribute will be an array of matching cards.
@@ -259,6 +289,12 @@ exports.publicSearch = function(payload) {
     }
     if (payload.queryString !== undefined) {
         mandatoryFields.push({ $text: { $search: splitTags(payload.queryString) } });
+    }
+    if (payload.creationStartDate || payload.creationEndDate) {
+        let dateQuery = {}
+        if (payload.creationStartDate) dateQuery["$gt"] = payload.creationStartDate;
+        if (payload.creationEndDate) dateQuery["$lt"] = payload.creationEndDate;
+        mandatoryFields.push({createdAt: dateQuery});
     }
 
     let queryObject = {

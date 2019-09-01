@@ -12,7 +12,7 @@ describe("Test Graph.js\n", function() {
 
     // Setup the data that will be used for testing
     before(function(done) {
-        DummyAccountUtils.populateDummyAccount(50)
+        DummyAccountUtils.populateDummyAccount(20)
             .then(function(user) {
                 return CardsDB.getTagGroupings({userIDInApp: user.userIDInApp});
             })
