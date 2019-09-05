@@ -148,7 +148,8 @@
                 )
                 .then(() => { return cardsManager.next(); })
                 .then((card) => { 
-                    renderCard(card); 
+                    // 2x so that the spoiler box can have positive dimensions
+                    renderCard(card); renderCard(card);
                     elementRefs.cardContainerHolderElement.style.display = "block";
                 })
                 .catch((err) => { console.error(err); });

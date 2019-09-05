@@ -205,7 +205,10 @@
             function displayFullCard(cardID) {
                 cardsManager
                     .fetchCard(cardID)
-                    .then((card) => { renderCard(card); })
+                    .then((card) => { 
+                        // 2x so that the spoiler box can have positive dimensions
+                        renderCard(card); renderCard(card); 
+                    })
                     .catch((err) => { console.error(err); });
             }
 
