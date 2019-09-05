@@ -226,21 +226,7 @@
                 if (state.currentCardID) payload.cardIDs = [state.currentCardID];
 
                 cardCaller()
-                    .then((card) => {
-                        let cardIsNew = state.cardPostURL === "/add-card";  
-                        renderCard(card);
-                        if (cardIsNew) {
-                            return Promise.reject(null);
-                        } else {
-                            return AppUtilities.sendHTTPRequest(
-                                "POST", "/update-streak", payload
-                            )
-                        }  
-                    })
-                    .then((streakConfirmation) => {
-                        streakConfirmation = JSON.parse(streakConfirmation);
-                        updateStreakBar(streakConfirmation.message);
-                    })
+                    .then((card) => { renderCard(card); })
                     .catch((err) => { if (err) console.error(err); });
             }
 
@@ -369,6 +355,18 @@
                 CardTemplateUtilities.syncSpoilerBox();
 
                 elementRefs.cardContainerHolderElement.style.display = "block";
+
+                // Update the streak counter
+                let payload = {
+                    userIDInApp: state.currentUserID, cardIDs: [state.currentCardID]
+                };
+                AppUtilities
+                    .sendHTTPRequest("POST", "/update-streak", payload)
+                    .then((streakConfirmation) => {
+                        streakConfirmation = JSON.parse(streakConfirmation);
+                        updateStreakBar(streakConfirmation.message);
+                    })
+                    .catch((err) => { if (err) console.error(err); });
             }
 
             function displayRawCardDescription() {
