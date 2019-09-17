@@ -5,10 +5,20 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Attach",
+            "type": "node",
+            "request": "attach",
+            "port": 9229,
+            "protocol": "inspector", 
+            "address": "localhost",
+            "restart": true,
+            "sourceMaps": false,
+        },
+        {
             "type": "node",
             "request": "launch",
-            "name": "node server.js",
+            "name": "Launch",
             "program": "${workspaceFolder}/server.js"
-        }
+        }, 
     ]
 }

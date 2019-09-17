@@ -25,7 +25,7 @@
     "build": "webpack --config webpack.config.js",
     "jsdoc": "jsdoc -r models",
     "start": "npm run build && node server.js",
-    "debug": "node --trace-warnings server.js",
+    "debug": "nodemon --inspect=127.0.0.1:9229 server.js",
     "single_test": "mocha  --no-warnings --timeout 40000 ./tests/mocha_tests/unit_tests/TestGraph.js",
     "test": "node models/Miscellaneous.js && npm run mocha_tests && npm run selenium_tests",
     "mocha_tests": "nyc mocha --no-warnings --recursive --sort --timeout 40000 './tests/mocha_tests/*/*.js'",
