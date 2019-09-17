@@ -53,7 +53,7 @@ exports.populateDummyAccount = function(numCards=50) {
                     if (i % 3 == 0) card.isPublic = false;
                     else card.isPublic = true;
                     await CardsDB.create(card);
-                    console.log(`${i}/${cards.length}: ${card.title}`);
+                    console.log(`${i + 1}/${cards.length}: ${card.title}`);
                 }
                 resolve(loggedInUser)
             })
