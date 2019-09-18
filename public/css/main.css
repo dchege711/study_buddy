@@ -157,7 +157,8 @@ table {
     border-spacing:0;
     width:100%;
     display:table;
-    border:1px solid #ccc
+    border:1px solid #ccc;
+    text-align: center;
 }
 
 tr {
@@ -179,7 +180,6 @@ table td:first-child{
 th {
     padding:8px 8px;
     display:table-cell;
-    text-align:left;
     vertical-align:top
 }
 
