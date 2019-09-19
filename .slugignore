@@ -1,9 +1,0 @@
-# Folders and files to be ignored by Heroku
-# https://devcenter.heroku.com/articles/slug-compiler#ignoring-files-with-slugignore
-
-.vscode/
-backup/
-docs/
-misc_resources/
-public/src/
-tests/
