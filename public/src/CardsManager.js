@@ -229,10 +229,9 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicard
      * the queue of cards.
      */
     cardsManagerObj.removeCard = function(idOfCardToRemove) {
-
         // If we're removing the current card, adjust such that `next()` 
         // resolves to the card that followed the card that we'll remove
-        if (currentNode.key._id === idOfCardToRemove) {
+        if (currentNode && currentNode.key._id === idOfCardToRemove) {
             if (cardsManagerObj.hasPrev()) {
                 currentNode = bst.prev(currentNode);
             } else if (cardsManagerObj.hasNext()) {
