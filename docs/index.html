@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Home | Cards by c13u Docs</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Home</h1>
+
+    
+
+
+
+    
+
+
+    <h3> </h3>
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+    <section>
+        <article><h1>Flashcards by c13u</h1>
+<p><a href="https://travis-ci.com/dchege711/study_buddy"><img src="https://travis-ci.com/dchege711/study_buddy.svg?branch=master" alt="Build Status"></a></p>
+<p>The web app is live at <a href="https://cards.c13u.com/">https://cards.c13u.com/</a></p>
+<h2><a href="#tasks">Tasks</a></h2>
+<p>:white_check_mark: <a href="#add-an-accounts-page">Add an Accounts Page</a></p>
+<p>:white_check_mark: <a href="#implement-a-card-review-system">Implement a Card Review System</a></p>
+<p>:white_check_mark: <a href="#enhance-the-tagging-system">Enhance the Tagging System</a></p>
+<p>:white_check_mark: <a href="#support-text-search-for-cards">Support Text Search for Cards</a></p>
+<p>:white_check_mark: <a href="#persistent-session-management">Persistent Session Management</a></p>
+<p>:white_check_mark: <a href="#login-signup-and-account-recovery">Login, SignUp and Account Recovery</a></p>
+<p>:white_check_mark: <a href="#make-card-navigation-more-user-friendly">Make card navigation through the GUI more user-friendly</a></p>
+<p>:white_check_mark: <a href="#make-editing-of-cards-more-user-friendly">Make editing of cards more user-friendly</a></p>
+<p>:white_check_mark: <a href="#support-deleting-a-card-moving-a-card-to-the-trash-and-undoing-the-move">Support moving a card to the trash and undoing the move</a></p>
+<p>:white_check_mark: <a href="#organize-how-data-will-be-represented-in-the-database">Organize how data will be represented in the database</a></p>
+<p>:white_check_mark: <a href="#render-card-content-appropriately">Render card content appropriately</a></p>
+<p>:white_check_mark: <a href="#add-a-sidebar-that-supports-filters-based-on-tags">Add a sidebar that supports filters based on tags</a></p>
+<h3>To-do Items</h3>
+<p>:soon: Evaluate whether adding <a href="https://introjs.com/">https://introjs.com/</a> is a good idea for first time users.</p>
+<p>:soon: Submit the web app to various forums. :sweat_smile:</p>
+<p>:soon: Learn how to handle subscriptions using Stripe.</p>
+<p>:soon: Implement logic for recovering cards from the trash.</p>
+<p>:soon: Implement a method that cleans all the cards in the trash and unvalidated accounts that are more than 30 days old.</p>
+<p>:soon: Change the underlying DS for the cards manager from two max-oriented priority queues to a balanced binary search tree. That way, you can visit a any card on the tree much faster on average.</p>
+<p>:soon: Read into layout/reflow. Avoid inefficient operations where possible. Starting resources <a href="https://gist.github.com/paulirish/5d52fb081b3570c81e3a">here</a>, <a href="https://developers.google.com/speed/docs/insights/browser-reflow">here</a>, <a href="https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers">here</a> and <a href="https://3perf.com/talks/web-perf-101/">here</a>.</p>
+<p>:soon: Avail newly added tags in the autocomplete suggestions.</p>
+<p>:soon: Make the title contenteditable so that LaTEX can render on it. Also update the MathJax configuration to track the title and description on startup.</p>
+<p>:soon: Hide the search results once someone clicks away.</p>
+<p>:soon: In the sidebar, display the median urgency so that the user can know how to adjust the cards to influence order.</p>
+<p>:soon: Add utility in accounts to quickly modify the tags.</p>
+<p>:soon: Read about <a href="https://blog.inkdrop.info/how-ive-attracted-the-first-500-paid-users-for-my-saas-that-costs-5-mo-7a5b94b8e820">building a user base</a></p>
+<h3>Support Public and Sharable Cards</h3>
+<p>Sub-objectives include:</p>
+<ul>
+<li>
+<p>Allow users to toggle a card as public</p>
+<ul>
+<li>(Done) Provide the option within the home page</li>
+<li>(Done) Allow them to set their default settings public/private</li>
+<li>(Done) Add the relevant fields in the database</li>
+<li>Deleted cards should be taken off the public collection</li>
+</ul>
+</li>
+<li>
+<p>Allow users to share links to cards/collections</p>
+<ul>
+<li>(Done) Support Ctrl-C for a specific card's link</li>
+<li>Support Ctrl-C for cards bearing given tags (and a convenient method for doing so)</li>
+</ul>
+</li>
+<li>
+<p>Add functionality to the browse page</p>
+<ul>
+<li>(Done) Provide an endpoint that allows unauthenticated searches for public cards</li>
+</ul>
+</li>
+<li>
+<p>(Done) Update the Wiki Page on what public/private means</p>
+</li>
+</ul>
+<h3>Add a Test Suite for Continuous Testing</h3>
+<p><sub><sup><a href="#tasks">:arrow_up: Back to top</a></sup></sub></p>
+<p>Objective: write tests using MochaJS. Prevent commits that fail the tests from being merged into master.</p>
+<p>I first needed to separate the production database from the test database. If I'm to present this to users, I can't risk wiping their data based on a test that went wrong!</p>
+<p>More info in the <a href="tests/readme.md">testing subfolder</a></p>
+<h3>Setup a Mail Server</h3>
+<p><sub><sup><a href="#tasks">:arrow_up: Back to top</a></sup></sub></p>
+<p>Using Gmail is great for testing, but Gmail restricts me from autheticating from suspicious devices (e.g. Heroku's servers). I have chosen to setup <a href="https://documentation.mailgun.com/en/latest/quickstart-sending.html#send-with-smtp-or-api">MailGun</a> which provides 10,000 free emails per month.</p>
+<h3>Add an Accounts Page</h3>
+<p><sub><sup><a href="#tasks">:arrow_up: Back to top</a></sup></sub></p>
+<p>I think the barebones for the Flashcards by c13u Account page are:</p>
+<ul>
+<li>Being able to download one's data. (Implemented)</li>
+<li>Being able to delete one's account. (Implemented)</li>
+<li>Recovering cards from the trash. (Implemented)</li>
+</ul>
+<p>Anything else (e.g. avatars, themes) will be considered after observing usage patterns and deciding what feature is worth adding. Of the top of my head, stuff that would be worth looking into are:</p>
+<ul>
+<li>Importing cards from a JSON file.</li>
+<li>Creating a PDF cheatsheet from a selection of tags.</li>
+</ul>
+<h3>Implement a Card Review System</h3>
+<p><sub><sup><a href="#tasks">:arrow_up: Back to top</a></sup></sub></p>
+<p><a href="https://en.wikipedia.org/wiki/Spaced_repetition">Spaced Repitition</a> is commonly practised when a user has to retain a large amount of information indefinitely. It exploits the <a href="https://en.wikipedia.org/wiki/Spacing_effect">Spacing Effect</a>, the phenomenon whereby learning is greater when studying is spread out over time, as opposed to studying the same amount of content in a single session.</p>
+<p>Flash card software usually adjusts the spacing time based on whether the user provided the right answer. Unlike vocabulary-based flash cards, most of my cards don't have an answer that can be checked trivially. I'll thus depend on the user updating the urgency attribute in lieu of providing an answer to the flash card. Since the cards are shown in decreasing order of urgency, cards that are ranked lower will appear much later in subsequent review sessions.</p>
+<p>Two immediate concerns come to mind:</p>
+<ol>
+<li>
+<p>Support a <code>Review Mode</code> setting that automatically saves the card whenever the urgency attribute is changed, and advances to the next card in the queue. This saves the user from having to click the <code>Save</code> and the <code>Next Card</code> buttons. (Implemented)</p>
+</li>
+<li>
+<p>Over time, the urgencies on the cards might drift towards zero. I don't really know what to do about this. There's a chance that the user will be adding new cards over time (and these new cards are likely to have mid/high urgencies) or that the user will find a card that they wish to see more often (and thus raise the urgency). Depending on which of the two scenarios pan out, I'll decide whether additional code is needed to mitigate this. (Pending)</p>
+</li>
+</ol>
+<h3>Enhance the Tagging System</h3>
+<p><sub><sup><a href="#tasks">:arrow_up: Back to top</a></sup></sub></p>
+<p>I need a tags convention. I chose white-space delimited tags. For instance, multiple card tags would be entered as follows: <code>string_processing algorithms dynamic_programming</code>.</p>
+<p>I currently have 100 cards and 63 unique tags. Ideally, I want to have as many cards as I want and the fewest tags possible while making sure that the tags are descriptive. I can't afford to have near tags such as <code>searching</code> and <code>search</code> at the same time. Who knows if 3 weeks from now I'll start tagging cards using <code>information_retrieval</code> instead of <code>search</code>. There are three levels at which I can approach this. Level 1 is the least sophisticated while Level 3 is the most sophisticated. I'll start by implementing Level 1. If Level 1 isn't satisfactory (based on how I use Flashcards by c13u), I'll implement Level 2, and maybe even Level 3.</p>
+<h4>Level 1 (Implemented)</h4>
+<p>If the user starts typing <code>pr</code>, I should provide <code>probability</code>, and <code>primes</code> as autocomplete options. I trust the user will choose an existing option when applicable. This approach will reduce spelling variations, e.g. <code>searching</code> vs <code>search</code>. The autocomplete options come from the tags that a user has already used. The major shortcoming is that the user needs to type a similar tag which starts with the same spelling, e.g. <code>chance</code> will never cause <code>probability</code> to come up in the autocomplete result set. A trie is sufficient for this purpose.</p>
+<h4>Level 2</h4>
+<p>I can also provide some naive suggestions based on how similar/related tags are. There are two ways of determining this.</p>
+<p>I can infer similarity based on how tags have been used in the past, e.g. if the user types <code>trees</code>, and there's already a card that has <code>trees, data_structures, search</code> as tags, I should recommend <code>data_structures</code> and <code>search</code> as well. This looks like a graph problem.</p>
+<p>It's also possible to build a graph of words based on an external dataset. Such a graph would have nodes like <code>markov_chain</code> and <code>probability</code> connected by an edge with a greater weight than say <code>markov_chain</code>--&gt;<code>poisson</code>. This approach can suggest tags that have not been used before. However, this 'knowledge graph' isn't readily available. I might have to make it myself.</p>
+<h4>Level 3</h4>
+<p>The Level 1 &amp; 2 approaches are agnostic of the content contained inside the card and suffer from cold starts. Level 3 involves building a content-based recommendation system. Song et. al's <a href="misc_resources/automatic_tag_recommendation_algos_for_social_recommender_systems.pdf">Automatic Tag Recommendation Algorithms for Social Recommender Systems</a> discusses different recommendation systems ranging from 25% precision up to 40% accuracy. If Level 1 and 2 fall below 15% I'll consider implementing one of the systems in Song's paper. For now, let's keep things simple until we can't.</p>
+<h3>Support Text Search for Cards</h3>
+<p><sub><sup><a href="#tasks">:arrow_up: Back to top</a></sup></sub></p>
+<p>Plan: Have a search bar for taking in queries. Provide at most 7 results. Update the search results whenever the user hits SPACE or ENTER (reduces # queries to the database).</p>
+<p>Challenges: Provide relevant search results (rank them before returning them). Don't transfer more data than necessary (return only snippets, maybe title plus first line).</p>
+<p>Search should be relevant and fast, erring on the side of relevance. Connecting to the database is slow. Luckily, <code>mongoose</code> allows me to maintain a persistent connection to the database. Studying the docs helps one make efficient queries and capture some low-hanging fruit. For instance, using <code>where(some_js_expression)</code> in MongoDB is expensive because <code>some_js_expression</code> will be evaluated for every document in the collection. <s>Using regex inside the query itself is more efficient.</s> MongoDB supports <a href="https://docs.mongodb.com/v3.2/text-search/">text search</a> and a 'sort by relevance' function. Yay!</p>
+<p>I want to strike a balance between making frequent hits to the database and providing search feedback as the user types. Whenever a user hits SPACE after at least one word, I query the database for 7 results and display their titles in the dropdown menu on the search bar. If the user clicks on any of the 7 results, I display the entire card and terminate the search. If the user hits ENTER, then I query the database for all cards that match the query. These cards are then fed into the cards manager, and the user can browse them at their own pace.</p>
+<p>To minimize the amount of data being transferred between the client and the database as the user types a query, the server returns partial cards to a search query. These partial cards contain the <code>_id, urgency, title</code> fields and nothing else. I display the titles in the dropdown menu that gets updated as the user continues searching. Once the user has decided on which card(s) to view, I use the already built functions to load the card, i.e. first check if the card is in the cache, otherwise, fetch the full card from the database.</p>
+<h3>Persistent Session Management</h3>
+<p><sub><sup><a href="#tasks">:arrow_up: Back to top</a></sup></sub></p>
+<p>I am using <a href="https://github.com/expressjs/session">express-session</a> and some custom middleware to support persistent logins. In case I'll need to support Facebook/Twitter/Google logins in the future, I'll use <a href="http://www.passportjs.org/docs/configure/">passport</a>. For now, Passport is an overkill.</p>
+<p>When a user successfully logs in, I set a token that will be sent on all subsequent requests. Once I receive any request that needs a logged in user, I automatically log in a user if the token provided is valid. If the cookie is invalid (e.g. after a password reset or after 30 days), I redirect them to the login page.</p>
+<p>When a user logs out, I delete the token that I issued upon their initial login and redirect them to the welcome/login page. In case a user resets their password, I also invalidate all previously issued tokens.</p>
+<h3>LogIn, SignUp and Account Recovery</h3>
+<p><sub><sup><a href="#tasks">:arrow_up: Back to top</a></sup></sub></p>
+<p>I found CrackStation's piece on <a href="https://crackstation.net/hashing-security.htm">salted password hashing</a> informative. I store a hash and a salt on the database, and every time a user logs in, I validate the submitted password using the salt and the hash. The <a href="http://bitwiseshiftleft.github.io/sjcl/doc/">Stanford Crypto Library</a> provided good tools for handling the encryption methods.</p>
+<p>When someone tries registering for a new account with a used email address, I ask them to check the email address for a confirmation email. However, the email that I sent tells the email address owner that someone tried registering for an account using their email, and suggests a password reset since if the person who tried to register is legitimate, then they'd benefit from setting a new password. If a new user submits a username that's already in use, I let them know that the username is already in use - something had to give. With sufficient patience, it's possible to enumerate valid usernames, but at least usernames don't have to be obviously linked to a specific person. If need be, I could set up a CAPTCHA before revealing that a username is already taken to slow down enumeration of usernames.</p>
+<p>Once an account is registered, the user needs to click on a validation link sent to the submitted email. <s>The user cannot log into Flashcards by c13u before the email address is verified. I'll be (hopefully) short on space, so any unvalidated accounts older than 30 days will get deleted from the database.</s> I observed a high bounce rate AND few signups. I'll allow accounts with unvalidated email addresses to sign in for at most 30 days.</p>
+<p>Logging in should be as painless as possible. Since the usernames only contain <code>[_\-A-Za-z0-9]+</code>, I can infer whether the submitted string was an email address or a username, and authenticate accordingly. If the username/email/password is incorrect, I send a generic <code>Invalid username/email or password</code> message without disclosing which is incorrect. Again, it's possible to enumerate usernames, so this is not entirely foolproof. If the credentials provided were correct <s>but the email account has not been verified, I resend a validation URL to their email, and request them to first validate their account. Otherwise,</s> I log them in to Flashcards by c13u.</p>
+<p>Users can reset their passwords in case they forget them. First, the user submits the email address associated with their Flashcards by c13u account. If the account exists, I send an email containing a password reset link that is valid for 2 hours, or until it's used, whichever comes earlier.</p>
+<h3>Make card navigation more user-friendly</h3>
+<p><sub><sup><a href="#tasks">:arrow_up: Back to top</a></sup></sub></p>
+<p>I chose to display the tags appearing on the sidebar in decreasing order of importance. As opposed to tag frequency, I weighted each tag by summing up the urgencies of all the cards that the tag is included in. This better captures the relative importance of the tags.</p>
+<p>In addition to sorting cards in the underlying priority queue by urgency, I added an additional integer that denotes the insertion order. This enables the PQ to be stable. For instance, if the user views the cards A then B then C, pressing the previous button will visit the cards in reverse order, even when A, B and C have the same priority.</p>
+<p>I overrode the default action of the left and right arrow keys when the user is viewing a set of cards. The left arrow key shows the previous card, while the right arrow key shows the next card. However, when the user is editing the cards, the left and right arrow keys default back to their usual behavior.</p>
+<h3>Make editing of cards more user-friendly</h3>
+<p><sub><sup><a href="#tasks">:arrow_up: Back to top</a></sup></sub></p>
+<p>About supporting tabs in the card description, I chose to insert <code>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;</code> if the user pressed the tab key. The downside to this is that deleting a 'tab' requires 4 backspaces. I tried inserting a tab character instead but for it to render, I needed to add <code>white-space: pre-wrap;</code> as a style attribute. This however inserts to much whitespace when between separate lines of texts. Since flash cards are more frequently read than written, I prioritized having the flash cards as compact as possible in order to avoid the need to scroll down when reading them.</p>
+<p>Previously, users had to escape the LaTEX delimiter themselves and also escape underscores within inline LaTEX. This meant lines like <code>\(p_i = 2\)</code> had to be written as <code>\\(p\_i = 2\\)</code>. <s>With some regular expressions, I was able to support the former approach. I traded computational efficiency <em>(more code to automatically escape backslashes and replace automatically inserted <code>&lt;em&gt;, &lt;/em&gt;</code> tags)</em> for convenience <em>(users entering normal LaTEX)</em>. I choose to make this correction on the client side since I can't afford that much storage capacity on the server side.</s> I configured <code>showdown.converter</code> to escape underscores and asterisks when converting markdown to HTML. Although I had activated these options before, <code>showdown.converter</code> wasn't applying them. The bug was fixed on Github. I thus downloaded the version of <code>showdown.min.js</code> available during commit <code>039dd66256e771716c20a807a2941974ac7c5873</code>. Since that version works fine, I choose to use my downloaded copy instead of using the version hosted on the CDN since that might change over time. Later versions of the file insert extra whitespace in my code blocks, so I prefer maintaining the version from the above commit.</p>
+<p>I changed the urgency input from a number input type to a range input type. To set an urgency, using the range input type is faster since the user doesn't really care about the actual value, but its percentage, e.g. <em>card X is half as important as the most important cards in my deck</em>. Furthermore, using a range requires one click, while using a number type requires a click and a type.</p>
+<h3>Support <s>deleting a card</s> moving a card to the trash and undoing the move</h3>
+<p><sub><sup><a href="#tasks">:arrow_up: Back to top</a></sup></sub></p>
+<p>I learned that I should <a href="http://alistapart.com/article/neveruseawarning">never use a warning when I meant undo</a>. Seems like a good design decision. Users who really want to delete a card might be unsatisifed, but I'll soon implement a clean up script that automatically deletes cards that are in the trash and are more than 30 days old. Amazing how much fiddling goes in the backend, just to allow a user to delete and then save themselves 3 seconds later by hitting <code>Undo</code>.</p>
+<h3>Organize how data will be represented in the database</h3>
+<p><sub><sup><a href="#tasks">:arrow_up: Back to top</a></sup></sub></p>
+<p>I choose MongoDB mainly because it's schemaless - I didn't yet have a crystal-clear vision of how the data end of the web app would turn out. I also found <a href="http://mongoosejs.com/">Mongoose</a> convenient for a quick start in using MongoDB in Node. <a href="https://www.mlab.com/">mLab</a> provides a nice free tier (512 MB). In case this project ever blows up, I might need to get a more robust service with backups and all, but right now, problems of scale are quite imaginary. It's better to get everything working for cheap than to bleed cash on the off-chance that this project is a goldmine.</p>
+<p>As of now, the user's profile is in one document. The user's profile contains links to metadata documents. Each metadata document has a list of the cards owned by the user who owns the metadata document, and some high level stats like how many cards have a given tag. Each card is a separate document, but it also has information on who owns it. <code>User, Card, MetadataDoc</code> have all been writen as Mongoose schemas.</p>
+<h3>Render card content appropriately</h3>
+<p><sub><sup><a href="#tasks">:arrow_up: Back to top</a></sup></sub></p>
+<p>I found the <a href="https://highlightjs.org/">highlight.js</a> library useful for syntax highlighting. It even allows me to specify what languages I want supported. I downloaded a package from them instead of using a CDN. Although I refrain from adding more dependencies, writing my own syntax highlighter would have been unwise.</p>
+<p><a href="https://www.mathjax.org/">MathJAX</a> renders my LaTEX. At first I had problems getting LaTEX to render properly, but I realized that by default, MathJAX expects LaTEX to be already on the DOM. I dug through its documentation and I found out that MathJAX allows manual reloads. I therefore added a function that requests MathJAX to re-render the contents of the card template every time I load a different card.</p>
+<p>Since I'm targeting users that store somewhat detailed flashcards, I felt that Markdown (in addition to LaTEX and syntax highlighting) will prove more useful. Manually converting markdown to HTML is a project by itself. Since it's not the main purpose of Flashcards by c13u, I was happy to import <a href="https://github.com/showdownjs/showdown">Showdown</a>. The library looks mature and the documentation is sound.</p>
+<p>I've also added support for one spoiler per card. The format is:</p>
+<pre class="prettyprint source lang-markdown"><code>What's the general approach for solving problems on probability?
+
+[spoiler]
+
+* Find the sample space \(S\). Draw a tree if \(S\) is not too large.
+
+* From the leaves, define the events of interest. Don't be fooled by their frequency!
+
+* Determine the probabilities along the edges using the assumptions made in the problem. The probability of an outcome is the product of all edge probabilities along the path from the root to the outcome. This is mechanical.
+
+* Compute event probabilities by adding up probabilities for all favorable outcomes.
+
+</code></pre>
+<p>Any content found under the first <code>[spoiler]</code> is assumed to be part of the spoiler.</p>
+<h3>Add a sidebar that supports filters based on tags</h3>
+<p><sub><sup><a href="#tasks">:arrow_up: Back to top</a></sup></sub></p>
+<p>The sidebar shows which tags are available as clickable buttons. Once the user clicks on a tag(s), they can then click the filter button to only show cards that have that filter. I am using two priority queues to control the card flow, one for the cards that are yet to be seen, and the other for the cards that have already been seen. I used notes from COS 226 on PQs to re-write the Java implementation of a PQ into JavaScript, then absracted away the underlying PQ into a cards manager that could be queried for <code>next_card(), previous_card()</code>, etc. Although PQ packages exist on NPM, implementing a barebones version is good enough for me.</p></article>
+    </section>
+
+
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Tutorials</h3><ul><li><a href="tutorial-public_cards.html">Public Cards</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addPublicUser">addPublicUser</a></li><li><a href="global.html#authenticateByToken">authenticateByToken</a></li><li><a href="global.html#authenticateUser">authenticateUser</a></li><li><a href="global.html#cardSchema">cardSchema</a></li><li><a href="global.html#close">close</a></li><li><a href="global.html#closeMongooseConnection">closeMongooseConnection</a></li><li><a href="global.html#collectSearchResults">collectSearchResults</a></li><li><a href="global.html#create">create</a></li><li><a href="global.html#createMany">createMany</a></li><li><a href="global.html#dbConnection">dbConnection</a></li><li><a href="global.html#delete">delete</a></li><li><a href="global.html#deleteAccount">deleteAccount</a></li><li><a href="global.html#deleteAllAccounts">deleteAllAccounts</a></li><li><a href="global.html#deleteAllMetadata">deleteAllMetadata</a></li><li><a href="global.html#deleteCardFromTrash">deleteCardFromTrash</a></li><li><a href="global.html#deleteSessionToken">deleteSessionToken</a></li><li><a href="global.html#duplicateCard">duplicateCard</a></li><li><a href="global.html#flagCard">flagCard</a></li><li><a href="global.html#getAccountDetails">getAccountDetails</a></li><li><a href="global.html#getHash">getHash</a></li><li><a href="global.html#getIdInAppAndValidationURI">getIdInAppAndValidationURI</a></li><li><a href="global.html#getRandomString">getRandomString</a></li><li><a href="global.html#getSaltAndHash">getSaltAndHash</a></li><li><a href="global.html#getTagGroupings">getTagGroupings</a></li><li><a href="global.html#insertDescriptionHTML">insertDescriptionHTML</a></li><li><a href="global.html#mongoose">mongoose</a></li><li><a href="global.html#provideSessionToken">provideSessionToken</a></li><li><a href="global.html#publicSearch">publicSearch</a></li><li><a href="global.html#read">read</a></li><li><a href="global.html#readPublicCard">readPublicCard</a></li><li><a href="global.html#registerUserAndPassword">registerUserAndPassword</a></li><li><a href="global.html#removeCardFromMetadataTrash">removeCardFromMetadataTrash</a></li><li><a href="global.html#resetPassword">resetPassword</a></li><li><a href="global.html#resetStreaks">resetStreaks</a></li><li><a href="global.html#restoreCardFromTrash">restoreCardFromTrash</a></li><li><a href="global.html#sanitizeCard">sanitizeCard</a></li><li><a href="global.html#sanitizeQuery">sanitizeQuery</a></li><li><a href="global.html#search">search</a></li><li><a href="global.html#sendAccountValidationLink">sendAccountValidationLink</a></li><li><a href="global.html#sendAccountValidationURLToEmail">sendAccountValidationURLToEmail</a></li><li><a href="global.html#sendCardToTrash">sendCardToTrash</a></li><li><a href="global.html#sendEmail">sendEmail</a></li><li><a href="global.html#sendResetLink">sendResetLink</a></li><li><a href="global.html#splitTags">splitTags</a></li><li><a href="global.html#standardizeTagDelimiters">standardizeTagDelimiters</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#updateMetadataWithCardDetails">updateMetadataWithCardDetails</a></li><li><a href="global.html#updatePublicUserMetadata">updatePublicUserMetadata</a></li><li><a href="global.html#updateStreak">updateStreak</a></li><li><a href="global.html#updateUserSettings">updateUserSettings</a></li><li><a href="global.html#validateAccount">validateAccount</a></li><li><a href="global.html#validatePasswordResetLink">validatePasswordResetLink</a></li><li><a href="global.html#writeCardsToJSONFile">writeCardsToJSONFile</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Fri Sep 20 2019 19:22:06 GMT-0700 (PDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
