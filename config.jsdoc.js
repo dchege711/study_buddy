@@ -42,6 +42,7 @@ module.exports = {
 
         // Step 4: For each file from step #3, ignore it if its path is here
         exclude: [
+            "public/src/AVLTree.js"
         ],
         
     }, 
