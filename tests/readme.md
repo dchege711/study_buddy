@@ -1,5 +1,11 @@
 # Testing
 
+## Test Suite for Continuous Testing
+
+Objective: write tests using MochaJS. Prevent commits that fail the tests from being merged into master.
+
+I first needed to separate the production database from the test database. If I'm to present this to users, I can't risk wiping their data based on a test that went wrong!
+
 ## Tests to automate
 
 | Task | UI Sanity Test | API Test |

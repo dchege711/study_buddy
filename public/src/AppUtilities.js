@@ -1,3 +1,12 @@
+"use strict";
+
+/**
+ * A collection of functions that tend to be used in different pages on the 
+ * website.
+ * 
+ * @module
+ */
+
 /**
  * @description Prepare a JSON document from the form's inputs.
  * 

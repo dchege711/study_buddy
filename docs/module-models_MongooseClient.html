@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Module: models/MongooseClient | Cards by c13u Docs</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Module: models/MongooseClient</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        
+            
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><p>Set up the connection that will be used across the app.
+There's a nice tutorial by
+<a href="https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/mongoose">MDN</a>.
+We choose MongoDB mainly because it's schemaless - we didn't yet have a
+crystal-clear vision of how the data end of the web app would turn out. We
+also found <a href="http://mongoosejs.com/">Mongoose</a> convenient for a quick start
+in using MongoDB in Node. <a href="https://www.mlab.com/">mLab</a> provides a nice free
+tier (512 MB). In case this project ever blows up, we might need to get a
+more robust service with backups and all, but right now, problems of scale
+are quite imaginary. It's better to get everything working for cheap than to
+bleed cash on the off-chance that this project is a goldmine.</p></div>
+        
+
+        
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="models_MongooseClient.js.html">models/MongooseClient.js</a>, <a href="models_MongooseClient.js.html#line1">line 1</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".closeMongooseConnection"><span class="type-signature">(static) </span>closeMongooseConnection<span class="signature">(callback)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Close the MongoDB connection before closing the application.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The first parameter will be set in case of any
+error</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="models_MongooseClient.js.html">models/MongooseClient.js</a>, <a href="models_MongooseClient.js.html#line50">line 50</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Wiki</h3><ul><li><a href="tutorial-main._readme.html">The Main Page</a></li><li><a href="tutorial-meta._readme.html">Miscellaneous</a></li><li><a href="tutorial-user._readme.html">The User Account</a></li></ul><h3>Modules</h3><ul><li><a href="module-models_CardsMongoDB.html">models/CardsMongoDB</a></li><li><a href="module-models_DailyTasks.html">models/DailyTasks</a></li><li><a href="module-models_EmailClient.html">models/EmailClient</a></li><li><a href="module-models_LogInUtilities.html">models/LogInUtilities</a></li><li><a href="module-models_MetadataMongoDB.html">models/MetadataMongoDB</a></li><li><a href="module-models_Miscellaneous.html">models/Miscellaneous</a></li><li><a href="module-models_mongoose_models_CardSchema.html">models/mongoose_models/CardSchema</a></li><li><a href="module-models_mongoose_models_MetadataCardSchema.html">models/mongoose_models/MetadataCardSchema</a></li><li><a href="module-models_mongoose_models_Token.html">models/mongoose_models/Token</a></li><li><a href="module-models_mongoose_models_UserSchema.html">models/mongoose_models/UserSchema</a></li><li><a href="module-models_MongooseClient.html">models/MongooseClient</a></li><li><a href="module-models_SanitizationAndValidation.html">models/SanitizationAndValidation</a></li><li><a href="module-public_src_AppUtilities.html">public/src/AppUtilities</a></li><li><a href="module-public_src_CardTemplateUtilities.html">public/src/CardTemplateUtilities</a></li><li><a href="module-public_src_TagsBarUtilities.html">public/src/TagsBarUtilities</a></li></ul><h3>Classes</h3><ul><li><a href="AutoComplete.html">AutoComplete</a></li><li><a href="CardsManager.html">CardsManager</a></li><li><a href="Graph.html">Graph</a></li><li><a href="max_PQ.html">max_PQ</a></li><li><a href="TernarySearchTrie.html">TernarySearchTrie</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Sat Sep 21 2019 11:35:25 GMT-0700 (PDT)
+    <br />
+    If you find any errors in the docs or have suggestions, either 
+    <a href="https://github.com/dchege711/study_buddy/issues">open an issue on Github</a> 
+    or <a href="mailto:d.chege711+flashcards@gmail.com">email me.</a>
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

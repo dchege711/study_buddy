@@ -1,7 +1,17 @@
 /**
- * @description Set up the connection that will be used across the app. 
- * There's a nice tutorial at: 
- * https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/mongoose
+ * Set up the connection that will be used across the app. 
+ * There's a nice tutorial by 
+ * [MDN](https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/mongoose). 
+ * We choose MongoDB mainly because it's schemaless - we didn't yet have a 
+ * crystal-clear vision of how the data end of the web app would turn out. We 
+ * also found [Mongoose](http://mongoosejs.com/) convenient for a quick start 
+ * in using MongoDB in Node. [mLab](https://www.mlab.com/) provides a nice free 
+ * tier (512 MB). In case this project ever blows up, we might need to get a 
+ * more robust service with backups and all, but right now, problems of scale 
+ * are quite imaginary. It's better to get everything working for cheap than to 
+ * bleed cash on the off-chance that this project is a goldmine.
+ * 
+ * @module
  */
 
 var mongoose = require("mongoose");

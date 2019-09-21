@@ -1,5 +1,11 @@
 "use strict";
 
+/**
+ * A collection of utility functions for managing the tags sidebar.
+ * 
+ * @module
+ */
+
 let tagsState = {
     selectedTags: new Set([]),
     tagsAndIDs: null
@@ -30,7 +36,9 @@ exports.resetTagSelection = function() {
 
 /**
  * @description Populate the tags HTMLElement with a list of clickable tags in 
- * descending order.
+ * descending order of importance. As opposed to tag frequency, we weight each 
+ * tag by summing up the urgencies of all the cards that the tag is included in. 
+ * This better captures the relative importance of the tags.
  * 
  * @param {String} tagBarElementID the ID of the HTML Element that will bear the 
  * tags

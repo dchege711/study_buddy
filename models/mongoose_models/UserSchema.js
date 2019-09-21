@@ -1,6 +1,7 @@
 /**
- * @description Prepare a model for representing users in the database.
+ * @description A model for representing users in the database.
  * 
+ * @module
  */
 
 var mongoose = require('mongoose');

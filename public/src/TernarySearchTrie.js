@@ -1,17 +1,14 @@
-/**
- * @author Chege Gitau
- * @description A minimal version of the ternary search trie as implemented by
- * Robert Sedgewick and Kevin Wayne. The original implementation was in Java and
- * was licensed under GNU GPLv3, and can be found here:
- * 
- * https://algs4.cs.princeton.edu/code/edu/princeton/cs/algs4/TST.java
- * 
- */
+"use strict";
 
 /**
- * Minimal implementation of a ternary search trie. Intended to be used for
- * autocomplete purposes. No values are stored at the nodes of the TST.
+ * @description A minimal version of the ternary search trie as implemented by
+ * Robert Sedgewick and Kevin Wayne. The original implementation was in Java and
+ * was licensed under GNU GPLv3, and 
+ * [can be found here](https://algs4.cs.princeton.edu/code/edu/princeton/cs/algs4/TST.java)
+ * 
  * @param {String[]} words Words to initialize the trie with.
+ * 
+ * @class
  */
 function TernarySearchTrie(words) {
     var TST = {};

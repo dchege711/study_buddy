@@ -1,18 +1,12 @@
 /**
- * @description Prepare a model for representing cards in the database.
+ * @description A model for representing cards in the database.
+ * 
+ * @module
  */
 
 var mongoose = require('mongoose');
 
-/**
- * Tips from MDN:
- * 
- * Each model maps to a collection of documents in the MongoDB database. 
- * The documents will contain the fields/schema types defined in the model 
- * Schema.
- * 
- */
-
+/** The schema for cards in the database */
 var cardSchema = new mongoose.Schema(
     {
         title: { type: String, default: "", trim: true },
@@ -39,9 +33,8 @@ var cardSchema = new mongoose.Schema(
 );
 
 /**
- * Creating a text index enables case-insensitive search across the specified 
- * fields. 
- * https://docs.mongodb.com/manual/tutorial/control-results-of-text-search/
+ * Create a text index to enable case-insensitive search across the specified 
+ * fields. [docs](https://docs.mongodb.com/manual/tutorial/control-results-of-text-search/)
  */
 cardSchema.index(
     {

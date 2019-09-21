@@ -1,0 +1,31 @@
+{
+    "main._readme": {
+        "title": "The Main Page", 
+        "children": {
+            "main.editing_cards": {
+                "title": "Editing Cards"
+            }, 
+            "main.public_cards": {
+                "title": "Public vs. Private Cards"
+            }
+        }
+    }, 
+
+    "user._readme": {
+        "title": "The User Account", 
+        "children": {
+            "user.account_management": {
+                "title": "Account Management"
+            }
+        }
+    },
+
+    "meta._readme": {
+        "title": "Miscellaneous", 
+        "children": {
+            "meta.content_management": {
+                "title": "Content Management"
+            }
+        }
+    }
+}

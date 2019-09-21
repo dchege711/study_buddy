@@ -2,6 +2,8 @@
  * Implements a max priority queue with a binary heap.
  * Allows us to maintain a sorted deck of N items in log N time.
  * Adapted from https://algs4.cs.princeton.edu/code/edu/princeton/cs/algs4/MaxPQ.java.html
+ * 
+ * @class
  */
 function max_PQ() {
     

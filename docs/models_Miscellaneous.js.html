@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Source: models/Miscellaneous.js | Cards by c13u Docs</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: models/Miscellaneous.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>"use strict";
+
+/**
+ * A collection of utilities that don't fit neatly in any given file.
+ * 
+ * @module
+ */
+
+const User = require("./mongoose_models/UserSchema.js");
+const Card = require("./mongoose_models/CardSchema.js");
+const MetadataDB = require("./MetadataMongoDB");
+const LogInUtils = require("./LogInUtilities.js");
+const config = require("../config.js");
+
+/**
+ * @description Add a dummy user in order to make managing the browse page for 
+ * public cards easier
+ */
+exports.addPublicUser = function() {
+    return new Promise(function(resolve, reject) {
+        let prevResults = {};
+        User
+            .findOne({username: config.PUBLIC_USER_USERNAME, email: config.PUBLIC_USER_EMAIL}).exec()
+            .then((savedUser) => {
+                if (savedUser) {
+                    resolve("User already exists");
+                } else {
+                    return Promise.resolve("DUMMY");
+                }
+            })
+            .then((_) => {
+                return LogInUtils.registerUserAndPassword({
+                    username: config.PUBLIC_USER_USERNAME, 
+                    email: config.PUBLIC_USER_EMAIL,
+                    password: LogInUtils.getRandomString(20) // Never meant to login
+                });
+            })
+            .then((_) => {
+                return User.findOne({username: config.PUBLIC_USER_USERNAME}).exec();
+            })
+            .then((savedUser) => {
+                prevResults.savedUser = savedUser;
+                return Card.find({isPublic: true}).exec();
+            })
+            .then((publicCards) => {
+                return MetadataDB.updatePublicUserMetadata(publicCards);
+            })
+            .then((confirmation) => {
+                if (confirmation.success) resolve(`Success!`);
+                else reject(confirmation.message);
+            })
+            .catch((err) => { reject(err); });
+    });
+
+}
+
+if (require.main === module) {
+
+    const dbConnection = require("./MongooseClient.js");
+    
+    exports.addPublicUser()
+        .then((confirmation) => { 
+            console.log(confirmation);
+            return dbConnection.closeMongooseConnection(); 
+        })
+        .then(() => {  process.exit(0); })
+        .catch((err) => { console.error(err); process.exit(1); });
+
+    // ... So many pending promises. I'm not proud of calling `process.exit()`
+    // const whyIsNodeRunning = require("why-is-node-running");
+    // setTimeout(whyIsNodeRunning, 10000);
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Wiki</h3><ul><li><a href="tutorial-main._readme.html">The Main Page</a></li><li><a href="tutorial-meta._readme.html">Miscellaneous</a></li><li><a href="tutorial-user._readme.html">The User Account</a></li></ul><h3>Modules</h3><ul><li><a href="module-models_CardsMongoDB.html">models/CardsMongoDB</a></li><li><a href="module-models_DailyTasks.html">models/DailyTasks</a></li><li><a href="module-models_EmailClient.html">models/EmailClient</a></li><li><a href="module-models_LogInUtilities.html">models/LogInUtilities</a></li><li><a href="module-models_MetadataMongoDB.html">models/MetadataMongoDB</a></li><li><a href="module-models_Miscellaneous.html">models/Miscellaneous</a></li><li><a href="module-models_mongoose_models_CardSchema.html">models/mongoose_models/CardSchema</a></li><li><a href="module-models_mongoose_models_MetadataCardSchema.html">models/mongoose_models/MetadataCardSchema</a></li><li><a href="module-models_mongoose_models_Token.html">models/mongoose_models/Token</a></li><li><a href="module-models_mongoose_models_UserSchema.html">models/mongoose_models/UserSchema</a></li><li><a href="module-models_MongooseClient.html">models/MongooseClient</a></li><li><a href="module-models_SanitizationAndValidation.html">models/SanitizationAndValidation</a></li><li><a href="module-public_src_AppUtilities.html">public/src/AppUtilities</a></li><li><a href="module-public_src_CardTemplateUtilities.html">public/src/CardTemplateUtilities</a></li><li><a href="module-public_src_TagsBarUtilities.html">public/src/TagsBarUtilities</a></li></ul><h3>Classes</h3><ul><li><a href="AutoComplete.html">AutoComplete</a></li><li><a href="CardsManager.html">CardsManager</a></li><li><a href="Graph.html">Graph</a></li><li><a href="max_PQ.html">max_PQ</a></li><li><a href="TernarySearchTrie.html">TernarySearchTrie</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Sat Sep 21 2019 11:35:25 GMT-0700 (PDT)
+    <br />
+    If you find any errors in the docs or have suggestions, either 
+    <a href="https://github.com/dchege711/study_buddy/issues">open an issue on Github</a> 
+    or <a href="mailto:d.chege711+flashcards@gmail.com">email me.</a>
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

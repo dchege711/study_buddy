@@ -1,5 +1,11 @@
 "use strict";
 
+/**
+ * Handle actions related to the metadata of the cards in the database.
+ * 
+ * @module
+ */
+
 const User = require("./mongoose_models/UserSchema.js");
 const Metadata = require('./mongoose_models/MetadataCardSchema');
 const Card = require('./mongoose_models/CardSchema.js');

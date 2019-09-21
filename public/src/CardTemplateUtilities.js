@@ -4,6 +4,7 @@
  * @description A collection of common operations that are carried out on the 
  * card templates across different situations.
  * 
+ * @module
  */
 
 /**

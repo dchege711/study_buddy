@@ -1,12 +1,12 @@
 "uses strict";
 
-/**
- * @author Chege Gitau
- * @description A minimal graph data type
- */
-
 const MaxPQ = require("./MaxPriorityQueue.js");
 
+/**
+ * @description A minimal graph data type
+ * 
+ * @class
+ */
 function Graph(directed=false) {
 
     Graph.__adj = {};
