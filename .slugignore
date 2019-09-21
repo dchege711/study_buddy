@@ -1,0 +1,6 @@
+# Files that Heroku should exclude from the slug
+
+/backup
+/docs
+/tests
+/wiki
