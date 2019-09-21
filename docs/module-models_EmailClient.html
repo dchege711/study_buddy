@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Source: mongoose_models/MetadataCardSchema.js | Cards by c13u Docs</title>
+    <title>Module: models/EmailClient | Cards by c13u Docs</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,50 +17,385 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: mongoose_models/MetadataCardSchema.js</h1>
+    <h1 class="page-title">Module: models/EmailClient</h1>
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/**
- * @description Prepare a model for representing metadata in the database.
- */
+        
+            
+        
+    
+</header>
 
-var mongoose = require('mongoose');
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><p>A client for sending emails. Using Gmail is great for testing, but it
+prevents authenticating from suspicious devices (e.g. Heroku's servers). We
+chose <a href="https://documentation.mailgun.com/en/latest/quickstart-sending.html#send-with-smtp-or-api">MailGun</a>
+which provides 10,000 free email sends per month.</p></div>
+        
 
-// Using SchemaTypes.Mixed produces unreliable write results
-// It's better to include the dictionary in an array.
+        
+            
 
-var metadataSchema = new mongoose.Schema(
-    {
-        createdById: Number,
-        metadataIndex: Number,
-        node_information: Array,
-        trashed_cards: Array,
-        stats: Array,
-        streak: {
-            type: Map, 
-            default: {
-                cardIDs: [], length: 0, dailyTarget: 25, timeStamp: Date.now
-            }
-        },
-        cardsAreByDefaultPrivate: {type: Boolean, default: true}
-    },
-    {
-        timestamps: true,
-        autoIndex: true,
-        collection: "c13u_study_buddy_metadata",
-        strict: true
-    }
-);
 
-module.exports = mongoose.model('Metadata', metadataSchema);</code></pre>
-        </article>
-    </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="EmailClient.js.html">EmailClient.js</a>, <a href="EmailClient.js.html#line2">line 2</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".close"><span class="type-signature">(static) </span>close<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Clean up the resources before exiting this module.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="EmailClient.js.html">EmailClient.js</a>, <a href="EmailClient.js.html#line48">line 48</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".sendEmail"><span class="type-signature">(static) </span>sendEmail<span class="signature">(mailOptions)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>mailOptions</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">JSON</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Values are comma separated strings whose keys include:
+<code>to</code>, <code>cc</code>, <code>bcc</code>, <code>subject</code>, <code>text</code>, <code>html</code>, except for <code>attachment</code>
+which is an object with the keys <code>filename</code>, <code>content</code>, <code>path</code>, <code>href</code>,
+<code>contentType</code>, <code>contentDisposition</code>, <code>cid</code>, <code>encoding</code>, <code>headers</code>, <code>raw</code>.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="EmailClient.js.html">EmailClient.js</a>, <a href="EmailClient.js.html#line34">line 34</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>takes a JSON with <code>success</code> and <code>message</code> as the keys</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

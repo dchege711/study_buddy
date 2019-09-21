@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Source: mongoose_models/MetadataCardSchema.js | Cards by c13u Docs</title>
+    <title>Wiki: The Main Page | Cards by c13u Docs</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,53 +17,28 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: mongoose_models/MetadataCardSchema.js</h1>
+    <h1 class="page-title">Wiki: The Main Page</h1>
 
-    
-
-
-
-    
     <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/**
- * @description Prepare a model for representing metadata in the database.
- */
 
-var mongoose = require('mongoose');
+<header>
+    
+    <ul>
+        <li><a href="tutorial-main.editing_cards.html">Editing Cards</a></li>
+    
+        <li><a href="tutorial-main.public_cards.html">Public vs. Private Cards</a></li>
+    </ul>
+    
 
-// Using SchemaTypes.Mixed produces unreliable write results
-// It's better to include the dictionary in an array.
+    <!-- Removed the <h2>The Main Page</h2> because it's redundant. -->
+    
+</header>
 
-var metadataSchema = new mongoose.Schema(
-    {
-        createdById: Number,
-        metadataIndex: Number,
-        node_information: Array,
-        trashed_cards: Array,
-        stats: Array,
-        streak: {
-            type: Map, 
-            default: {
-                cardIDs: [], length: 0, dailyTarget: 25, timeStamp: Date.now
-            }
-        },
-        cardsAreByDefaultPrivate: {type: Boolean, default: true}
-    },
-    {
-        timestamps: true,
-        autoIndex: true,
-        collection: "c13u_study_buddy_metadata",
-        strict: true
-    }
-);
+<article>
+    
+</article>
 
-module.exports = mongoose.model('Metadata', metadataSchema);</code></pre>
-        </article>
-    </section>
-
-
-
+</section>
 
 </div>
 

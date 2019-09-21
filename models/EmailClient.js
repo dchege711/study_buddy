@@ -1,3 +1,13 @@
+"use strict";
+/**
+ * A client for sending emails. Using Gmail is great for testing, but it 
+ * prevents authenticating from suspicious devices (e.g. Heroku's servers). We 
+ * chose [MailGun]{@link https://documentation.mailgun.com/en/latest/quickstart-sending.html#send-with-smtp-or-api}
+ * which provides 10,000 free email sends per month.
+ * 
+ * @module 
+ */
+
 const nodemailer = require("nodemailer");
 var config = require("../config.js");
 

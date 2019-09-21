@@ -14,7 +14,7 @@ module.exports = {
         encoding: "utf8", 
         destination: "./docs/", 
         recurse: true, 
-        tutorials: "blog_posts/", 
+        tutorials: "wiki/", 
     },
 
     // Plugins tend to need more configuration. See the plugin site for more info

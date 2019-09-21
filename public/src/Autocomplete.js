@@ -1,10 +1,17 @@
 "use strict";
 
 /**
- * @author Chege Gitau
+ * Providing autocomplete functionality for the card tags. The suggestions are
+ * generated in one of 2 ways:
  * 
- * @description A helper data type for providing autocomplete suggestions
+ * - If a partial tag is being entered, other tags that share the prefix are 
+ *   provided, e.g. `pr` might generate `probability` and `primes` if the user 
+ *   has used these tags on other cards that they own.
  * 
+ * - Near neighbors of the already completed tags. The graph has tags as nodes, 
+ *   with links between tags that appear on the same card.
+ * 
+ * @module
  */
 
 const Graph = require("./Graph.js");
