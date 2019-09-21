@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Source: models/mongoose_models/CardSchema.js | Cards by c13u Docs</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: models/mongoose_models/CardSchema.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @description A model for representing cards in the database.
+ * 
+ * @module
+ */
+
+var mongoose = require('mongoose');
+
+/** The schema for cards in the database */
+var cardSchema = new mongoose.Schema(
+    {
+        title: { type: String, default: "", trim: true },
+        description: { type: String, trim: true, default: "" },
+        descriptionHTML: { type: String, trim: true, default: "" },
+        tags: { type: String, lowercase: true, trim: true, default: "" },
+        urgency: { type: Number, default: 10 },
+        metadataIndex: { type: Number, default: 0 },
+        createdById: { type: Number, required: true}, 
+        isPublic: { type: Boolean, default: false },
+        lastReviewed: { type: Date, default: Date.now },
+        parent: { type: String, trim: true, default: "" },
+        numChildren: { type: Number, default: 0 },
+        idsOfUsersWithCopy: { type: String, lowercase: true, trim: true, default: "" },
+        numTimesMarkedAsDuplicate: { type: Number, default: 0 },
+        numTimesMarkedForReview: { type: Number, default: 0 }
+    }, 
+    {
+        timestamps: true,
+        autoIndex: true,
+        collection: "c13u_study_buddy",
+        strict: true
+    }
+);
+
+/**
+ * Create a text index to enable case-insensitive search across the specified 
+ * fields. [docs](https://docs.mongodb.com/manual/tutorial/control-results-of-text-search/)
+ */
+cardSchema.index(
+    {
+        title: "text", description: "text", tags: "text"
+    },
+    {
+        weights: {title: 1, description: 1, tags: 2},
+        name: "TextIndex"
+    }
+);
+
+/*
+ * The schema has now been compiled into a mongoose model. I can now use it
+ * find, create, update and delete objects of the Card type.
+ * 
+ * Also, Every model has an associated connection (this will be the default 
+ * connection when you use mongoose.model()). 
+ * You create a new connection and call .model() on it to create the 
+ * documents on a different database.
+ * 
+ */ 
+let CardModel = mongoose.model('Card', cardSchema);
+module.exports = CardModel;
+
+if (require.main === module) {
+    // Run this script as main if you change the indexes
+    // http://thecodebarbarian.com/whats-new-in-mongoose-5-2-syncindexes
+    CardModel
+        .syncIndexes()
+        .then((msg) => { console.log(msg); })
+        .catch((err) => { console.error(err); });
+
+    CardModel
+        .listIndexes()
+        .then((indexes) => { console.log(indexes); })
+        .catch((err) => { console.error(err); });
+
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Wiki</h3><ul><li><a href="tutorial-main._readme.html">The Main Page</a></li><li><a href="tutorial-meta._readme.html">Miscellaneous</a></li><li><a href="tutorial-user._readme.html">The User Account</a></li></ul><h3>Modules</h3><ul><li><a href="module-models_CardsMongoDB.html">models/CardsMongoDB</a></li><li><a href="module-models_DailyTasks.html">models/DailyTasks</a></li><li><a href="module-models_EmailClient.html">models/EmailClient</a></li><li><a href="module-models_LogInUtilities.html">models/LogInUtilities</a></li><li><a href="module-models_MetadataMongoDB.html">models/MetadataMongoDB</a></li><li><a href="module-models_Miscellaneous.html">models/Miscellaneous</a></li><li><a href="module-models_mongoose_models_CardSchema.html">models/mongoose_models/CardSchema</a></li><li><a href="module-models_mongoose_models_MetadataCardSchema.html">models/mongoose_models/MetadataCardSchema</a></li><li><a href="module-models_mongoose_models_Token.html">models/mongoose_models/Token</a></li><li><a href="module-models_mongoose_models_UserSchema.html">models/mongoose_models/UserSchema</a></li><li><a href="module-models_MongooseClient.html">models/MongooseClient</a></li><li><a href="module-models_SanitizationAndValidation.html">models/SanitizationAndValidation</a></li><li><a href="module-public_src_AppUtilities.html">public/src/AppUtilities</a></li><li><a href="module-public_src_CardTemplateUtilities.html">public/src/CardTemplateUtilities</a></li><li><a href="module-public_src_TagsBarUtilities.html">public/src/TagsBarUtilities</a></li></ul><h3>Classes</h3><ul><li><a href="AutoComplete.html">AutoComplete</a></li><li><a href="CardsManager.html">CardsManager</a></li><li><a href="Graph.html">Graph</a></li><li><a href="max_PQ.html">max_PQ</a></li><li><a href="TernarySearchTrie.html">TernarySearchTrie</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Sat Sep 21 2019 11:24:18 GMT-0700 (PDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -2,7 +2,8 @@
 
 /**
  * @description A collection of tasks that should be ran on a daily basis. 
- * Remember to set up a cron job to run this script.
+ * 
+ * @module
  */
 
 const dbConnection = require("./MongooseClient.js");

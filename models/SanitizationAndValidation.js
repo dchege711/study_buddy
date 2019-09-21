@@ -1,5 +1,11 @@
 "use strict";
 
+/**
+ * Provide functionality for sanitizing and validating user input on the server.
+ * 
+ * @module
+ */
+
 const showdown = require("showdown");
 const xss = require("xss");
 

@@ -1,5 +1,11 @@
 "use strict";
 
+/**
+ * A collection of utilities that don't fit neatly in any given file.
+ * 
+ * @module
+ */
+
 const User = require("./mongoose_models/UserSchema.js");
 const Card = require("./mongoose_models/CardSchema.js");
 const MetadataDB = require("./MetadataMongoDB");

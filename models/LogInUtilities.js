@@ -1,5 +1,12 @@
 "use strict";
 
+/**
+ * A collection of functions that are useful for managing user state within the 
+ * app.
+ * 
+ * @module
+ */
+
 const stanfordCrypto = require('sjcl');
 const User = require("./mongoose_models/UserSchema.js");
 const MetadataDB = require("./MetadataMongoDB.js");

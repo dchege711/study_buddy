@@ -1,7 +1,10 @@
 "use strict";
 
+const Graph = require("./Graph.js");
+const TST = require("./TernarySearchTrie.js");
+
 /**
- * Providing autocomplete functionality for the card tags. The suggestions are
+ * Provide autocomplete functionality for the card tags. The suggestions are
  * generated in one of 2 ways:
  * 
  * - If a partial tag is being entered, other tags that share the prefix are 
@@ -11,12 +14,8 @@
  * - Near neighbors of the already completed tags. The graph has tags as nodes, 
  *   with links between tags that appear on the same card.
  * 
- * @module
+ * @class
  */
-
-const Graph = require("./Graph.js");
-const TST = require("./TernarySearchTrie.js");
-
 function AutoComplete() {
 
     AutoComplete.prefixTree = null;

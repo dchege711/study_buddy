@@ -1,5 +1,11 @@
 "use strict";
 
+/**
+ * A collection of utility functions for managing the tags sidebar.
+ * 
+ * @module
+ */
+
 let tagsState = {
     selectedTags: new Set([]),
     tagsAndIDs: null

@@ -3,6 +3,11 @@
 const AVLTree = require("./AVLTree.js");
 var sendHTTPRequest = require("./AppUtilities.js").sendHTTPRequest;
 
+/**
+ * Manage the set of cards being displayed to the user.
+ * 
+ * @class
+ */
 function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicards={}) {
 
     /* Holds the attributes and methods of the CardsManager module */

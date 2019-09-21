@@ -4,7 +4,7 @@
  *
  * @author Alexander Milevski <info@w8r.name>
  * @license MIT
- * @preserve
+ * @preserve true
  */
 
 (function (global, factory) {
@@ -32,8 +32,8 @@
      * @param  {Node}                        root
      * @param  {String}                      prefix
      * @param  {Boolean}                     isTail
-     * @param  {Function(in:string):void}    out
-     * @param  {Function(node:Node):String}  printNode
+     * @param  {Function}                    out
+     * @param  {Function}                    printNode
      */
     function row (root, prefix, isTail, out, printNode) {
       if (root) {

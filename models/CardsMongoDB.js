@@ -1,5 +1,11 @@
 "use strict";
 
+/**
+ * Handle card-related activities, e.g. CRUD operations.
+ * 
+ * @module
+ */
+
 const Card = require('./mongoose_models/CardSchema.js');
 const MetadataDB = require('./MetadataMongoDB.js');
 const sanitizer = require("./SanitizationAndValidation.js");

@@ -1,5 +1,7 @@
 /**
- * @description Prepare a model for representing metadata in the database.
+ * @description A model for representing metadata in the database.
+ * 
+ * @module
  */
 
 var mongoose = require('mongoose');

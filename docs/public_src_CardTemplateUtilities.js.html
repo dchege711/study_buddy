@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Source: public/src/CardTemplateUtilities.js | Cards by c13u Docs</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: public/src/CardTemplateUtilities.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>"use strict";
+
+/**
+ * @description A collection of common operations that are carried out on the 
+ * card templates across different situations.
+ * 
+ * @module
+ */
+
+/**
+ * @description Make the DOM element invisible.
+ */
+exports.makeInvisible = function(elementID) {
+    document.getElementById(elementID).style.visibility = "hidden";
+};
+
+/**
+ * @description Display a popup text for the specified number of milliseconds. 
+ * Useful popups include `Saved Card!`, `Out of Cards!`
+ * 
+ * @param {String} text 
+ * @param {Number} timeoutMS 
+ */
+exports.displayPopUp = function(text, timeoutMS) {
+    let popup = document.getElementById("card_popup_element");
+    popup.innerHTML = text;
+    popup.style.visibility = "visible";
+    window.setTimeout(() => {
+        this.makeInvisible("card_popup_element")
+    }, timeoutMS);
+};
+
+/**
+ * @description Set the dimensions of the spoiler cover so that it
+ * hides the intended content.
+ */ 
+exports.syncSpoilerBox = function() {
+    // These two elements exist whenever there is a spoiler. 
+    // We use them to determine the height of the obscuring cover.
+    let spoiler = document.getElementById("spoiler");
+    let spoiler_end = document.getElementById("spoiler_end");
+
+    if (spoiler &amp;&amp; spoiler_end) {
+        let spoiler_bbox = spoiler.getBoundingClientRect();
+        let spoiler_end_bbox = spoiler_end.getBoundingClientRect();
+        // Only the difference matters. No biggie that the coordinates are not absolute.
+        // Reduce the width because the card_description HTMLElement is padded
+        let spoiler_box_html = `
+            &lt;div id="spoiler_box" 
+            style="height:${spoiler_end_bbox.bottom - spoiler_bbox.top}px; 
+            width:${document.getElementById("card_description").getBoundingClientRect().width - 30}px" 
+            onclick="makeInvisible('spoiler_box')">&lt;/div>
+        `;
+        let existing_spoiler_cover = document.getElementById("spoiler_box");
+        if (existing_spoiler_cover) {
+            existing_spoiler_cover.innerHTML = spoiler_box_html;
+        } else {
+            spoiler.insertAdjacentHTML("beforebegin", spoiler_box_html);
+        }
+    }
+};
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Wiki</h3><ul><li><a href="tutorial-main._readme.html">The Main Page</a></li><li><a href="tutorial-meta._readme.html">Miscellaneous</a></li><li><a href="tutorial-user._readme.html">The User Account</a></li></ul><h3>Modules</h3><ul><li><a href="module-models_CardsMongoDB.html">models/CardsMongoDB</a></li><li><a href="module-models_DailyTasks.html">models/DailyTasks</a></li><li><a href="module-models_EmailClient.html">models/EmailClient</a></li><li><a href="module-models_LogInUtilities.html">models/LogInUtilities</a></li><li><a href="module-models_MetadataMongoDB.html">models/MetadataMongoDB</a></li><li><a href="module-models_Miscellaneous.html">models/Miscellaneous</a></li><li><a href="module-models_mongoose_models_CardSchema.html">models/mongoose_models/CardSchema</a></li><li><a href="module-models_mongoose_models_MetadataCardSchema.html">models/mongoose_models/MetadataCardSchema</a></li><li><a href="module-models_mongoose_models_Token.html">models/mongoose_models/Token</a></li><li><a href="module-models_mongoose_models_UserSchema.html">models/mongoose_models/UserSchema</a></li><li><a href="module-models_MongooseClient.html">models/MongooseClient</a></li><li><a href="module-models_SanitizationAndValidation.html">models/SanitizationAndValidation</a></li><li><a href="module-public_src_AppUtilities.html">public/src/AppUtilities</a></li><li><a href="module-public_src_CardTemplateUtilities.html">public/src/CardTemplateUtilities</a></li><li><a href="module-public_src_TagsBarUtilities.html">public/src/TagsBarUtilities</a></li></ul><h3>Classes</h3><ul><li><a href="AutoComplete.html">AutoComplete</a></li><li><a href="CardsManager.html">CardsManager</a></li><li><a href="Graph.html">Graph</a></li><li><a href="max_PQ.html">max_PQ</a></li><li><a href="TernarySearchTrie.html">TernarySearchTrie</a></li></ul><h3><a href="global.html">Global</a></h3>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Sat Sep 21 2019 11:24:18 GMT-0700 (PDT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

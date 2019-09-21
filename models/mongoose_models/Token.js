@@ -1,6 +1,7 @@
 /**
- * @description Prepare a model for representing tokens.
+ * @description A model for representing tokens.
  * 
+ * @module
  */
 
 var mongoose = require('mongoose');

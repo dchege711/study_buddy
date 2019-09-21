@@ -29,7 +29,7 @@ module.exports = {
     source: {
         // Step 1: Search for files in these paths
         include: [
-            "models/", "routes/", "views/"
+            "models/", "public/src/"
         ],
 
         // Step 2: For each file found in step #1 only consider it if it ends in 
