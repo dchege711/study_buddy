@@ -46,13 +46,7 @@
             <div class="w3-container" id="status_bar">
 
                 <div id="card_search_container" class="w3-half">
-                    <div class="dropdown">
-                        <input type="text" id="card_search_input" 
-                            placeholder="Search card descriptions and titles. Press [Enter] to view all results" 
-                            onkeydown="searchCards(event)" class="dropbtn" 
-                            onblur="window.setTimeout(clearSearchResults, 300);" />
-                        <div class="dropdown-content" id="card_search_results"></div>
-                    </div>
+                    <% include ../partials/search_bar_dropdown.ejs %>
                 </div>
 
                 <div class="w3-half">
@@ -271,10 +265,6 @@
                         colorUrgencyQuartiles(cardsManager.quartiles()); 
                     })
                     .catch((err) => { console.error(err); });
-            }
-
-            function clearSearchResults() {
-                elementRefs.cardSearchResultsElement.innerHTML = '';
             }
 
             /**
@@ -571,47 +561,6 @@
                         }
                     })
                     .catch((err) => { console.error(err); });
-            }
-            
-            /*
-             * @description Provide search results for queries typed in the 
-             * search bar. If the space bar is pressed, only ask for 7 results,
-             * otherwise ask for all matching documents.
-             */
-            function searchCards(event) {
-                window.removeEventListener("keydown", arrowKeysForNavigation);
-                var keyPress = event.key;
-                if (keyPress === " " || keyPress === "Enter") {
-                    var queryString = elementRefs.cardSearchInputElement.value.trim();
-                    if (keyPress === " ") limit = 7;
-                    else limit = Infinity;
-                    if (queryString !== "") {
-                        AppUtilities
-                            .sendHTTPRequest(
-                                "POST", "/search-cards",
-                                { queryString: queryString, limit: limit}
-                            )
-                            .then((response) => {
-                                response = JSON.parse(response);
-                                if (response.success) {
-                                    var search_results = response.message;
-                                    if (keyPress === " ") {
-                                        var search_results_html = "";
-                                        for (let i = 0; i < search_results.length; i++) {
-                                            search_results_html += `
-                                                <ul onclick='reInitializeCards([${JSON.stringify(search_results[i])}]);'>
-                                                ${search_results[i].title}</ul>`;
-                                        }
-                                        elementRefs.cardSearchResultsElement.innerHTML = search_results_html;
-                                    } else {
-                                        elementRefs.cardSearchResultsElement.innerHTML = "";
-                                        reInitializeCards(search_results);
-                                    }    
-                                }
-                            })
-                            .catch((err) => { console.error(err); });
-                    }
-                }
             }
             
             /*
