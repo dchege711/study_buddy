@@ -240,34 +240,6 @@ blockquote {
     border-radius: 5px;
 }
 
-#card_search_input {
-    border: none;
-    border-bottom: 0.2px solid black;
-    width: 100%;
-    min-height: 40px;
-    padding: 0;
-    margin-right: 10%;
-}
-
-#card_search_results {
-    text-overflow: ellipsis;
-    width: 49%;
-    position: absolute;
-    background: white;
-    z-index: 10;
-}
-
-#card_search_results ul {
-    border-bottom: 1px solid lightgray;
-    padding: 0;
-}
-
-#card_search_results ul:hover {
-    color: white;
-    background: black;
-    cursor: pointer;
-}
-
 .card_borders {
     border-left: 5px solid #2196F3;
     border-bottom: thin solid #2196F3;
