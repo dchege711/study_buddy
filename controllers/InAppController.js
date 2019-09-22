@@ -11,22 +11,31 @@ const convertObjectToResponse = controllerUtils.convertObjectToResponse;
 const deleteTempFile = controllerUtils.deleteTempFile;
 const sendResponseFromPromise = controllerUtils.sendResponseFromPromise;
 
-const defaultTemplateObject = {
-    APP_NAME: config.APP_NAME, BASE_URL: config.BASE_URL, LOGGED_IN: true
-};
+/**
+ * @param {Object} req The incoming HTTP request
+ * 
+ * @return {JSON} The key-value pairs that should be provided to templates by 
+ * default. 
+ */
+function getDefaultTemplateVars(req = undefined) {
+    return {
+        APP_NAME: config.APP_NAME, BASE_URL: config.BASE_URL, 
+        LOGGED_IN: req.session.user !== undefined
+    };
+}
 
 exports.readCard = function (req, res) {
     sendResponseFromPromise(CardsDB.read(req.body), res);
 };
 
 exports.home = function (req, res) {
-    res.render("pages/home.ejs", defaultTemplateObject);
+    let templateVars = getDefaultTemplateVars(req);
+    templateVars.SEARCH_ENDPOINT_URL = "/search-cards";
+    res.render("pages/home.ejs", templateVars);
 };
 
 exports.wikiPage = function (req, res) {
-    let templateObject = Object.assign({}, defaultTemplateObject)
-    templateObject.LOGGED_IN = req.session.user !== undefined;
-    res.render("pages/wiki_page.ejs", templateObject);
+    res.render("pages/wiki_page.ejs", getDefaultTemplateVars(req));
 };
 
 exports.readPublicCard = function (req, res) {
@@ -49,17 +58,13 @@ exports.browsePagePost = function(req, res) {
 }
 
 exports.browsePageGet = function(req, res) {
+    let templateVars = getDefaultTemplateVars(req);
+    templateVars.SEARCH_ENDPOINT_URL = "/browse";
     CardsDB
         .publicSearch(req.query)
         .then((abbreviatedCards) => {
-            res.render(
-                "pages/browse_cards_page.ejs", 
-                {
-                    abbreviatedCards: abbreviatedCards.message,
-                    APP_NAME: config.APP_NAME,
-                    LOGGED_IN: req.session.user !== undefined
-                }
-            );  
+            templateVars.abbreviatedCards = abbreviatedCards.message;
+            res.render("pages/browse_cards_page.ejs", templateVars);
         })
         .catch((err) => {convertObjectToResponse(err, null, res); });
 };
