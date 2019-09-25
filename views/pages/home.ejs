@@ -9,24 +9,6 @@
         <script type="text/javascript" src="/dist/CardTemplateUtilities.bundle.min.js"></script>
         <script type="text/javascript" src="/dist/TagsBarUtilities.bundle.min.js"></script>
         <script type="text/javascript" src="/dist/AutoComplete.bundle.min.js"></script>
-        <script type="text/javascript">
-
-            /**
-             * @description Make LEFT/RIGHT arrow keys show PREVIOUS/NEXT card.
-             */ 
-            function arrowKeysForNavigation(event) {
-                if (event.key === "ArrowLeft") {
-                    fetchPreviousCard();
-                    event.preventDefault();
-                } else if (event.key === "ArrowRight") {
-                    fetchNextCard();
-                    event.preventDefault();
-                }
-            }
-
-            window.addEventListener("keydown", arrowKeysForNavigation);
-
-        </script>
 
         <style>
             #streak_bar {
@@ -314,7 +296,6 @@
                 if (!card.title) card.title = "";
                 if (!card.urgency) card.urgency = 0;
 
-                window.addEventListener("keydown", arrowKeysForNavigation);
                 elementRefs.cardTitleElement.value = card.title;
                 
                 elementRefs.cardDescriptionElement.innerHTML = card.descriptionHTML;
@@ -367,7 +348,6 @@
             function displayRawCardDescription() {
                 elementRefs.cardDescriptionElement.innerText = state.rawDescription;
                 elementRefs.cardDescriptionElement.setAttribute("contenteditable", "true");
-                window.removeEventListener("keydown", arrowKeysForNavigation);
             }
 
             function displayNewCard() {
@@ -383,7 +363,6 @@
                 elementRefs.cardUrgencyElement.value = 10;
                 elementRefs.cardUrgencyNumberElement.innerText = "10";
                 elementRefs.cardDescriptionElement.setAttribute("contenteditable", "true");
-                window.removeEventListener("keydown", arrowKeysForNavigation);
 
                 // Reset the contents of the current_card variable
                 state.changedItems.clear();
@@ -396,12 +375,10 @@
             }
 
             function handleInputChange(element_id) {
-                window.removeEventListener("keydown", arrowKeysForNavigation);
                 state.changedItems.add(element_id);
             }
 
             function handleTagsInputChange(event) {
-                window.removeEventListener("keydown", arrowKeysForNavigation);
                 let tagBeingEntered = elementRefs.cardTagInputElement.value;
                 let keyPress = event.key;
                 // If whitespace was added, create the new tag if need be.

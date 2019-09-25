@@ -57,17 +57,11 @@
     const CARD_SEARCH_RESULTS_ELEMENT = document.getElementById("card_search_results");
 
     /**
-     * @description Make LEFT/RIGHT arrow keys show PREVIOUS/NEXT card.
-     */ 
-    function arrowKeysForNavigation(event) {}
-
-    /**
      * @description Provide search results for queries typed in the search bar. 
      * If the user pressed the space bar, ask the server for the top 7 results. 
      * If the user pressed 'Enter', ask the server for all results.
      */
     function searchCards(event) {
-        window.removeEventListener("keydown", arrowKeysForNavigation);
         let keyPress = event.key;
         // Only query the server if the user has entered a complete word or is 
         // done typing.
