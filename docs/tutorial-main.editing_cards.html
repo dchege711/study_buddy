@@ -29,28 +29,20 @@
 </header>
 
 <article>
-    <h2>Markdown</h2>
+    <p>We will use this card to illustrate most of the editing features.</p>
+<p><img src="raw_card.png" alt="Raw version of sample card"></p>
+<p>On saving the card, it will be displayed like this:</p>
+<p><img src="with_spoiler.png" alt="How the sample card is rendered with a spoiler box"></p>
+<p>The gray box was created by including a <code>[spoiler]</code> line anywhere in the card. The gray box will cover anything below the first <code>[spoiler]</code> line. To show what's underneath, the gray box, hover over it or click on it:</p>
+<p><img src="pretty_card.png" alt="The sample card without the spoiler box"></p>
+<h2>Markdown</h2>
 <p>Since we're targeting users that store somewhat detailed flashcards, we felt that Markdown (in addition to LaTEX and syntax highlighting) will prove useful. Manually converting markdown to HTML is a project by itself. Since it's not the main purpose of Flashcards by c13u, we were happy to import <a href="https://github.com/showdownjs/showdown">Showdown</a>. The library looks mature and the documentation is sound.</p>
-<h2>Spoilers</h2>
-<p>Being able to cover some of the content is crucial to any flashcards application. We added support for one spoiler per card. The format is:</p>
-<pre class="prettyprint source lang-markdown"><code>What's the general approach for solving problems on probability?
-
-[spoiler]
-
-* Find the sample space \(S\). Draw a tree if \(S\) is not too large.
-
-* From the leaves, define the events of interest. Don't be fooled by their frequency!
-
-* Determine the probabilities along the edges using the assumptions made in the problem. The probability of an outcome is the product of all edge probabilities along the path from the root to the outcome. This is mechanical.
-
-* Compute event probabilities by adding up probabilities for all favorable outcomes.
-
-</code></pre>
-<p>Any content found under the first <code>[spoiler]</code> is assumed to be part of the spoiler.</p>
+<p>If you're new to Markdown, <a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">here's a handy cheatsheet</a>.</p>
 <h2>Tabbing Inside Card Description</h2>
 <p>We chose to insert <code>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;</code> if the user pressed the tab key. The downside to this is that deleting a 'tab' requires 4 backspaces. We tried inserting a tab character instead but for it to render, we needed to add <code>white-space: pre-wrap;</code> as a style attribute. This however inserts to much whitespace between separate lines of texts. Since flash cards are more frequently read than written, we prioritized having the flash cards as compact as possible in order to avoid the need to scroll down when reading them.</p>
 <h2>LaTEX</h2>
 <p><a href="https://www.mathjax.org/">MathJAX</a> renders LaTEX on the app. At first we had problems getting LaTEX to render properly, but we realized that by default, MathJAX expects LaTEX to be already on the DOM. We dug through its documentation and found out that MathJAX allows manual reloads. We therefore added a function that requests MathJAX to re-render the contents of the card template every time the user loads a card.</p>
+<p>If you're new to LaTeX, the <a href="https://en.wikibooks.org/wiki/LaTeX">LaTeX Wikibook</a> and <a href="https://www.overleaf.com/learn/latex/Learn_LaTeX_in_30_minutes">ShareLaTeX docs</a> are good tutorials.</p>
 <h2>LaTEX Delimiters</h2>
 <p>Previously, users had to escape the LaTEX delimiter themselves and also escape underscores within inline LaTEX. This meant lines like <code>\(p_i = 2\)</code> had to be written as <code>\\(p\_i = 2\\)</code>. <s>With some regular expressions, we was able to support the former approach. We traded computational efficiency <em>(more code to automatically escape backslashes and replace automatically inserted <code>&lt;em&gt;, &lt;/em&gt;</code> tags)</em> for convenience <em>(users entering normal LaTEX)</em>. We choose to make this correction on the client side since we can't afford that much storage capacity on the server side.</s></p>
 <p>We configured <code>showdown.converter</code> to escape underscores and asterisks when converting markdown to HTML. Although we had activated these options before, <code>showdown.converter</code> wasn't applying them. The bug was fixed on Github. We downloaded the version of <code>showdown.min.js</code> available during commit <code>039dd66256e771716c20a807a2941974ac7c5873</code>. Since that version works fine, we use my downloaded copy instead of using the version hosted on the CDN since that might change over time. Later versions of the file insert extra whitespace in my code blocks, so we prefer maintaining the version from the above commit.</p>
@@ -73,13 +65,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Wiki</h3><ul><li><a href="tutorial-main._readme.html">The Main Page</a></li><li><a href="tutorial-meta._readme.html">Miscellaneous</a></li><li><a href="tutorial-user._readme.html">The User Account</a></li></ul><h3>Modules</h3><ul><li><a href="module-models_CardsMongoDB.html">models/CardsMongoDB</a></li><li><a href="module-models_DailyTasks.html">models/DailyTasks</a></li><li><a href="module-models_EmailClient.html">models/EmailClient</a></li><li><a href="module-models_LogInUtilities.html">models/LogInUtilities</a></li><li><a href="module-models_MetadataMongoDB.html">models/MetadataMongoDB</a></li><li><a href="module-models_Miscellaneous.html">models/Miscellaneous</a></li><li><a href="module-models_mongoose_models_CardSchema.html">models/mongoose_models/CardSchema</a></li><li><a href="module-models_mongoose_models_MetadataCardSchema.html">models/mongoose_models/MetadataCardSchema</a></li><li><a href="module-models_mongoose_models_Token.html">models/mongoose_models/Token</a></li><li><a href="module-models_mongoose_models_UserSchema.html">models/mongoose_models/UserSchema</a></li><li><a href="module-models_MongooseClient.html">models/MongooseClient</a></li><li><a href="module-models_SanitizationAndValidation.html">models/SanitizationAndValidation</a></li><li><a href="module-public_src_AppUtilities.html">public/src/AppUtilities</a></li><li><a href="module-public_src_CardTemplateUtilities.html">public/src/CardTemplateUtilities</a></li><li><a href="module-public_src_TagsBarUtilities.html">public/src/TagsBarUtilities</a></li></ul><h3>Classes</h3><ul><li><a href="AutoComplete.html">AutoComplete</a></li><li><a href="CardsManager.html">CardsManager</a></li><li><a href="Graph.html">Graph</a></li><li><a href="max_PQ.html">max_PQ</a></li><li><a href="TernarySearchTrie.html">TernarySearchTrie</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Wiki</h3><ul><li><a href="tutorial-main._readme.html">The Main Page</a></li><li><a href="tutorial-meta._readme.html">Miscellaneous</a></li><li><a href="tutorial-user._readme.html">The User Account</a></li><li><a href="tutorial-user_guide._readme.html">About Flashcards by c13u</a></li></ul><h3>Modules</h3><ul><li><a href="module-models_CardsMongoDB.html">models/CardsMongoDB</a></li><li><a href="module-models_DailyTasks.html">models/DailyTasks</a></li><li><a href="module-models_EmailClient.html">models/EmailClient</a></li><li><a href="module-models_LogInUtilities.html">models/LogInUtilities</a></li><li><a href="module-models_MetadataMongoDB.html">models/MetadataMongoDB</a></li><li><a href="module-models_Miscellaneous.html">models/Miscellaneous</a></li><li><a href="module-models_mongoose_models_CardSchema.html">models/mongoose_models/CardSchema</a></li><li><a href="module-models_mongoose_models_MetadataCardSchema.html">models/mongoose_models/MetadataCardSchema</a></li><li><a href="module-models_mongoose_models_Token.html">models/mongoose_models/Token</a></li><li><a href="module-models_mongoose_models_UserSchema.html">models/mongoose_models/UserSchema</a></li><li><a href="module-models_MongooseClient.html">models/MongooseClient</a></li><li><a href="module-models_SanitizationAndValidation.html">models/SanitizationAndValidation</a></li><li><a href="module-public_src_AppUtilities.html">public/src/AppUtilities</a></li><li><a href="module-public_src_CardTemplateUtilities.html">public/src/CardTemplateUtilities</a></li><li><a href="module-public_src_TagsBarUtilities.html">public/src/TagsBarUtilities</a></li></ul><h3>Classes</h3><ul><li><a href="AutoComplete.html">AutoComplete</a></li><li><a href="CardsManager.html">CardsManager</a></li><li><a href="Graph.html">Graph</a></li><li><a href="max_PQ.html">max_PQ</a></li><li><a href="TernarySearchTrie.html">TernarySearchTrie</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Sat Sep 21 2019 11:51:21 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Fri Sep 27 2019 18:12:30 GMT-0700 (PDT)
     <br />
     If you find any errors in the docs or have suggestions, either 
     <a href="https://github.com/dchege711/study_buddy/issues">open an issue on Github</a> 

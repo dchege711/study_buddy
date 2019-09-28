@@ -1,27 +1,20 @@
+We will use this card to illustrate most of the editing features.
+
+![Raw version of sample card](raw_card.png)
+
+On saving the card, it will be displayed like this:
+
+![How the sample card is rendered with a spoiler box](with_spoiler.png)
+
+The gray box was created by including a `[spoiler]` line anywhere in the card. The gray box will cover anything below the first `[spoiler]` line. To show what's underneath, the gray box, hover over it or click on it:
+
+![The sample card without the spoiler box](pretty_card.png)
+
 ## Markdown
 
 Since we're targeting users that store somewhat detailed flashcards, we felt that Markdown (in addition to LaTEX and syntax highlighting) will prove useful. Manually converting markdown to HTML is a project by itself. Since it's not the main purpose of Flashcards by c13u, we were happy to import [Showdown](https://github.com/showdownjs/showdown). The library looks mature and the documentation is sound.
 
-## Spoilers
-
-Being able to cover some of the content is crucial to any flashcards application. We added support for one spoiler per card. The format is:
-
-```markdown
-What's the general approach for solving problems on probability?
-
-[spoiler]
-
-* Find the sample space \(S\). Draw a tree if \(S\) is not too large.
-
-* From the leaves, define the events of interest. Don't be fooled by their frequency!
-
-* Determine the probabilities along the edges using the assumptions made in the problem. The probability of an outcome is the product of all edge probabilities along the path from the root to the outcome. This is mechanical.
-
-* Compute event probabilities by adding up probabilities for all favorable outcomes.
-
-```
-
-Any content found under the first `[spoiler]` is assumed to be part of the spoiler.
+If you're new to Markdown, [here's a handy cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet).
 
 ## Tabbing Inside Card Description
 
@@ -30,6 +23,8 @@ We chose to insert `&nbsp;&nbsp;&nbsp;&nbsp;` if the user pressed the tab key. T
 ## LaTEX
 
 [MathJAX](https://www.mathjax.org/) renders LaTEX on the app. At first we had problems getting LaTEX to render properly, but we realized that by default, MathJAX expects LaTEX to be already on the DOM. We dug through its documentation and found out that MathJAX allows manual reloads. We therefore added a function that requests MathJAX to re-render the contents of the card template every time the user loads a card.
+
+If you're new to LaTeX, the [LaTeX Wikibook](https://en.wikibooks.org/wiki/LaTeX) and [ShareLaTeX docs](https://www.overleaf.com/learn/latex/Learn_LaTeX_in_30_minutes) are good tutorials.
 
 ## LaTEX Delimiters
 

@@ -71,7 +71,11 @@ module.exports = {
         // monospaceLinks: false, 
 
         default: {
-            // layoutFile: "views/jsdoc.layout.tmpl"
+            // layoutFile: "views/jsdoc.layout.tmpl", 
+
+            staticFiles: {
+                include: ["wiki/_img"]
+            }
         }
     }
 };  
