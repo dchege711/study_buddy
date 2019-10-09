@@ -184,7 +184,7 @@ is processed for EACH document in the collection. Yikes!</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line200">line 200</a>
+        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line208">line 208</a>
     </li></ul></dd>
     
 
@@ -542,7 +542,14 @@ as its keys. If successful, the message will be an array of the saved cards' IDs
 
 
 <div class="description">
-    <p>Remove this card from the database.</p>
+    <p>Remove this card from the database. We learned that we should
+<a href="http://alistapart.com/article/neveruseawarning">never use a warning when we meant undo</a>.
+Seems like a good design decision. Users who really want to delete a card
+might be unsatisifed, but I bet they're in the minority(?). Furthermore,
+they can permanently delete a card from the accounts page. Amazing how much
+fiddling goes in the backend, just to allow a user to delete and then save
+themselves 3 seconds later by hitting <code>Undo</code>.</p>
+<p><a href="tutorial-main.editing_cards.html">Editing Cards</a></p>
 </div>
 
 
@@ -635,7 +642,7 @@ as its keys. If successful, the message will be an array of the saved cards' IDs
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line170">line 170</a>
+        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line178">line 178</a>
     </li></ul></dd>
     
 
@@ -797,7 +804,7 @@ collection</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line352">line 352</a>
+        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line360">line 360</a>
     </li></ul></dd>
     
 
@@ -960,7 +967,7 @@ moderators to deal with the most flagged cards first.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line397">line 397</a>
+        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line405">line 405</a>
     </li></ul></dd>
     
 
@@ -1120,7 +1127,7 @@ as its keys. If successful, the message will contain the saved card.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line426">line 426</a>
+        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line434">line 434</a>
     </li></ul></dd>
     
 
@@ -1290,7 +1297,7 @@ viewable.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line281">line 281</a>
+        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line289">line 289</a>
     </li></ul></dd>
     
 
@@ -1636,7 +1643,7 @@ cards.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line322">line 322</a>
+        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line330">line 330</a>
     </li></ul></dd>
     
 
@@ -1797,7 +1804,7 @@ matching card if any.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line193">line 193</a>
+        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line201">line 201</a>
     </li></ul></dd>
     
 
@@ -2072,7 +2079,7 @@ Return the results to the callback function that was passed in.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line251">line 251</a>
+        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line259">line 259</a>
     </li></ul></dd>
     
 
@@ -2235,7 +2242,7 @@ object. Needed so that it can be closed at the end of the script.</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line479">line 479</a>
+        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line487">line 487</a>
     </li></ul></dd>
     
 
@@ -2376,7 +2383,7 @@ queries. A person searching for <code>dynamic_programming</code> should be inter
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line234">line 234</a>
+        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line242">line 242</a>
     </li></ul></dd>
     
 
@@ -2491,7 +2498,7 @@ running this script as main.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line454">line 454</a>
+        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line462">line 462</a>
     </li></ul></dd>
     
 
@@ -2543,7 +2550,7 @@ running this script as main.</p>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Fri Sep 27 2019 18:12:30 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Wed Oct 09 2019 01:01:12 GMT-0700 (PDT)
     <br />
     If you find any errors in the docs or have suggestions, either 
     <a href="https://github.com/dchege711/study_buddy/issues">open an issue on Github</a> 
