@@ -4,8 +4,9 @@ const Graph = require("./Graph.js");
 const TST = require("./TernarySearchTrie.js");
 
 /**
- * Provide autocomplete functionality for the card tags. The suggestions are
- * generated in one of 2 ways:
+ * @description Provide autocomplete functionality for the card tags. This 
+ * helps the user use the fewest tags possible while still being descriptive.
+ * The suggestions are generated in one of 2 ways:
  * 
  * - If a partial tag is being entered, other tags that share the prefix are 
  *   provided, e.g. `pr` might generate `probability` and `primes` if the user 
@@ -13,6 +14,8 @@ const TST = require("./TernarySearchTrie.js");
  * 
  * - Near neighbors of the already completed tags. The graph has tags as nodes, 
  *   with links between tags that appear on the same card.
+ * 
+ * {@tutorial main.editing_cards}
  * 
  * @class
  */

@@ -6,6 +6,13 @@
 
     let PrettifyCards = {
         
+        /**
+         * @description We found the [highlight.js]{@link https://highlightjs.org/} 
+         * library useful for syntax highlighting. It even allows us to specify 
+         * what languages we want supported. We downloaded a package from them 
+         * instead of using a CDN. Although we refrain from adding more 
+         * dependencies, writing our own syntax highlighter would have been unwise.
+         */
         addSyntaxHighlighting: function () {
             let code_elements = document.querySelectorAll('pre code');
             for (let i = 0; i < code_elements.length; i++) {
@@ -14,6 +21,15 @@
         },
 
         /**
+         * @description At first we had problems getting LaTEX to render 
+         * properly, but we realized that by default, MathJAX expects LaTEX to 
+         * be already on the DOM. We dug through its documentation and found 
+         * out that MathJAX allows manual reloads. We therefore added a 
+         * function that requests MathJAX to re-render the contents of the card 
+         * template every time the user loads a card.
+         *
+         * {@tutorial main.editing_cards}
+         *
          * @param {Array} elementIDs
          * @returns {Void} Modifies the DOM in place
          */

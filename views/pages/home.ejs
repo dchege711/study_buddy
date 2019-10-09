@@ -433,6 +433,19 @@
                 state.currentCardTagsHaveChanged = true;
             }
 
+            /**
+             * @description Insert `&nbsp;&nbsp;&nbsp;&nbsp;` if the user 
+             * pressed the `tab` key. The downside to this is that deleting a 
+             * 'tab' requires 4 backspaces. We tried inserting a tab character 
+             * instead but for it to render, we needed to add 
+             * `white-space: pre-wrap;` as a style attribute. This however 
+             * inserts to much whitespace between separate lines of texts. 
+             * Since flash cards are more frequently read than written, we 
+             * prioritized having the flash cards as compact as possible in 
+             * order to avoid the need to scroll down when reading them.
+             * 
+             * {@tutorial main.editing_cards}
+             */
             function insertTabsIfNecessary(event) {
                 if (event.key == "Tab") {
                     document.execCommand("insertHTML", false, "&nbsp;&nbsp;&nbsp;&nbsp;");
