@@ -34,7 +34,27 @@
 
 var mongoose = require('mongoose');
 
-/** The schema for cards in the database */
+/**
+ * The schema for cards in the database 
+ * 
+ * @param {Number} urgency
+ * [Spaced Repetition]{@link https://en.wikipedia.org/wiki/Spaced_repetition} 
+ * is commonly practised when a user has to retain a large amount of 
+ * information indefinitely. It exploits the 
+ * [Spacing Effect]{@link https://en.wikipedia.org/wiki/Spacing_effect}, the 
+ * phenomenon whereby learning is greater when studying is spread out over time, 
+ * as opposed to studying the same amount of content in a single session.
+ * Flashcard software usually adjusts the spacing time based on whether the 
+ * user provided the right answer. Answers may at times be too complex to 
+ * define in code. We therefore depend on the user updating the `card.urgency` 
+ * attribute in lieu of providing an answer to the flash card. Since the cards 
+ * are shown in decreasing order of urgency, cards that are ranked lower will 
+ * appear much later in subsequent review sessions.
+ * 
+ * @param {Boolean} isPublic 
+ *  If `false`, then the card is private. A private flashcard is only visible 
+ *  to its owner. It will not appear in the search results at the `/browse` page. In contrast, a public card will appear in the search results as a read-only card. Any user that adds the card to their own collection will get a separate copy of the card.
+ */
 var cardSchema = new mongoose.Schema(
     {
         title: { type: String, default: "", trim: true },
@@ -111,13 +131,13 @@ if (require.main === module) {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Wiki</h3><ul><li><a href="tutorial-main._readme.html">The Main Page</a></li><li><a href="tutorial-meta._readme.html">Miscellaneous</a></li><li><a href="tutorial-user._readme.html">The User Account</a></li><li><a href="tutorial-user_guide._readme.html">About Flashcards by c13u</a></li></ul><h3>Modules</h3><ul><li><a href="module-models_CardsMongoDB.html">models/CardsMongoDB</a></li><li><a href="module-models_DailyTasks.html">models/DailyTasks</a></li><li><a href="module-models_EmailClient.html">models/EmailClient</a></li><li><a href="module-models_LogInUtilities.html">models/LogInUtilities</a></li><li><a href="module-models_MetadataMongoDB.html">models/MetadataMongoDB</a></li><li><a href="module-models_Miscellaneous.html">models/Miscellaneous</a></li><li><a href="module-models_mongoose_models_CardSchema.html">models/mongoose_models/CardSchema</a></li><li><a href="module-models_mongoose_models_MetadataCardSchema.html">models/mongoose_models/MetadataCardSchema</a></li><li><a href="module-models_mongoose_models_Token.html">models/mongoose_models/Token</a></li><li><a href="module-models_mongoose_models_UserSchema.html">models/mongoose_models/UserSchema</a></li><li><a href="module-models_MongooseClient.html">models/MongooseClient</a></li><li><a href="module-models_SanitizationAndValidation.html">models/SanitizationAndValidation</a></li><li><a href="module-public_src_AppUtilities.html">public/src/AppUtilities</a></li><li><a href="module-public_src_CardTemplateUtilities.html">public/src/CardTemplateUtilities</a></li><li><a href="module-public_src_TagsBarUtilities.html">public/src/TagsBarUtilities</a></li></ul><h3>Classes</h3><ul><li><a href="AutoComplete.html">AutoComplete</a></li><li><a href="CardsManager.html">CardsManager</a></li><li><a href="Graph.html">Graph</a></li><li><a href="max_PQ.html">max_PQ</a></li><li><a href="TernarySearchTrie.html">TernarySearchTrie</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Wiki</h3><ul><li><a href="tutorial--_readme.html">About Flashcards by c13u</a></li><li><a href="tutorial-main._readme.html">User Guide</a></li></ul><h3>Modules</h3><ul><li><a href="module-models_CardsMongoDB.html">models/CardsMongoDB</a></li><li><a href="module-models_DailyTasks.html">models/DailyTasks</a></li><li><a href="module-models_EmailClient.html">models/EmailClient</a></li><li><a href="module-models_LogInUtilities.html">models/LogInUtilities</a></li><li><a href="module-models_MetadataMongoDB.html">models/MetadataMongoDB</a></li><li><a href="module-models_Miscellaneous.html">models/Miscellaneous</a></li><li><a href="module-models_mongoose_models_CardSchema.html">models/mongoose_models/CardSchema</a></li><li><a href="module-models_mongoose_models_MetadataCardSchema.html">models/mongoose_models/MetadataCardSchema</a></li><li><a href="module-models_mongoose_models_Token.html">models/mongoose_models/Token</a></li><li><a href="module-models_mongoose_models_UserSchema.html">models/mongoose_models/UserSchema</a></li><li><a href="module-models_MongooseClient.html">models/MongooseClient</a></li><li><a href="module-models_SanitizationAndValidation.html">models/SanitizationAndValidation</a></li><li><a href="module-public_src_AppUtilities.html">public/src/AppUtilities</a></li><li><a href="module-public_src_CardTemplateUtilities.html">public/src/CardTemplateUtilities</a></li><li><a href="module-public_src_TagsBarUtilities.html">public/src/TagsBarUtilities</a></li></ul><h3>Classes</h3><ul><li><a href="AutoComplete.html">AutoComplete</a></li><li><a href="CardsManager.html">CardsManager</a></li><li><a href="Graph.html">Graph</a></li><li><a href="max_PQ.html">max_PQ</a></li><li><a href="TernarySearchTrie.html">TernarySearchTrie</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Wed Oct 09 2019 01:01:12 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Wed Oct 09 2019 20:29:23 GMT-0700 (PDT)
     <br />
     If you find any errors in the docs or have suggestions, either 
     <a href="https://github.com/dchege711/study_buddy/issues">open an issue on Github</a> 

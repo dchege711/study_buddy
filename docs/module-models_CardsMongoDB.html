@@ -184,7 +184,7 @@ is processed for EACH document in the collection. Yikes!</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line208">line 208</a>
+        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line215">line 215</a>
     </li></ul></dd>
     
 
@@ -804,7 +804,7 @@ collection</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line360">line 360</a>
+        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line367">line 367</a>
     </li></ul></dd>
     
 
@@ -872,7 +872,11 @@ response is the same as that of <code>CardsMongoDB.create(payload)</code>.</p>
 
 
 <div class="description">
-    <p>Increase the counter of the specified file. This allows
+    <p>With public cards, it's possible that some malicious users may
+upload objectionable cards. While we don't delete users' cards against their
+will, we don't have an obligation to help them share such cards. When a card
+gets flagged as inappropriate, it is excluded from search results in the
+<code>/browse</code> page. We increase the counter of the specified file. This allows
 moderators to deal with the most flagged cards first.</p>
 </div>
 
@@ -967,7 +971,7 @@ moderators to deal with the most flagged cards first.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line405">line 405</a>
+        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line416">line 416</a>
     </li></ul></dd>
     
 
@@ -1127,7 +1131,7 @@ as its keys. If successful, the message will contain the saved card.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line434">line 434</a>
+        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line445">line 445</a>
     </li></ul></dd>
     
 
@@ -1297,7 +1301,7 @@ viewable.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line289">line 289</a>
+        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line296">line 296</a>
     </li></ul></dd>
     
 
@@ -1643,7 +1647,7 @@ cards.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line330">line 330</a>
+        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line337">line 337</a>
     </li></ul></dd>
     
 
@@ -1711,7 +1715,14 @@ matching card if any.</p>
 
 
 <div class="description">
-    <p>Search for cards with associated key words</p>
+    <p>Search for cards with associated key words. Search should be
+relevant and fast, erring on the side of relevance. Studying the docs helps
+one make efficient queries and capture some low-hanging fruit. For instance,
+using <code>where(some_js_expression)</code> in MongoDB is expensive because
+<code>some_js_expression</code> will be evaluated for every document in the collection.
+<s>Using regex inside the query itself is more efficient.</s> MongoDB supports
+<a href="https://docs.mongodb.com/v3.2/text-search/">text search</a> and a 'sort
+by relevance' function.</p>
 </div>
 
 
@@ -1804,7 +1815,7 @@ matching card if any.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line201">line 201</a>
+        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line208">line 208</a>
     </li></ul></dd>
     
 
@@ -2079,7 +2090,7 @@ Return the results to the callback function that was passed in.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line259">line 259</a>
+        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line266">line 266</a>
     </li></ul></dd>
     
 
@@ -2242,7 +2253,7 @@ object. Needed so that it can be closed at the end of the script.</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line487">line 487</a>
+        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line498">line 498</a>
     </li></ul></dd>
     
 
@@ -2383,7 +2394,7 @@ queries. A person searching for <code>dynamic_programming</code> should be inter
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line242">line 242</a>
+        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line249">line 249</a>
     </li></ul></dd>
     
 
@@ -2498,7 +2509,7 @@ running this script as main.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line462">line 462</a>
+        <a href="models_CardsMongoDB.js.html">models/CardsMongoDB.js</a>, <a href="models_CardsMongoDB.js.html#line473">line 473</a>
     </li></ul></dd>
     
 
@@ -2544,13 +2555,13 @@ running this script as main.</p>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Wiki</h3><ul><li><a href="tutorial-main._readme.html">The Main Page</a></li><li><a href="tutorial-meta._readme.html">Miscellaneous</a></li><li><a href="tutorial-user._readme.html">The User Account</a></li><li><a href="tutorial-user_guide._readme.html">About Flashcards by c13u</a></li></ul><h3>Modules</h3><ul><li><a href="module-models_CardsMongoDB.html">models/CardsMongoDB</a></li><li><a href="module-models_DailyTasks.html">models/DailyTasks</a></li><li><a href="module-models_EmailClient.html">models/EmailClient</a></li><li><a href="module-models_LogInUtilities.html">models/LogInUtilities</a></li><li><a href="module-models_MetadataMongoDB.html">models/MetadataMongoDB</a></li><li><a href="module-models_Miscellaneous.html">models/Miscellaneous</a></li><li><a href="module-models_mongoose_models_CardSchema.html">models/mongoose_models/CardSchema</a></li><li><a href="module-models_mongoose_models_MetadataCardSchema.html">models/mongoose_models/MetadataCardSchema</a></li><li><a href="module-models_mongoose_models_Token.html">models/mongoose_models/Token</a></li><li><a href="module-models_mongoose_models_UserSchema.html">models/mongoose_models/UserSchema</a></li><li><a href="module-models_MongooseClient.html">models/MongooseClient</a></li><li><a href="module-models_SanitizationAndValidation.html">models/SanitizationAndValidation</a></li><li><a href="module-public_src_AppUtilities.html">public/src/AppUtilities</a></li><li><a href="module-public_src_CardTemplateUtilities.html">public/src/CardTemplateUtilities</a></li><li><a href="module-public_src_TagsBarUtilities.html">public/src/TagsBarUtilities</a></li></ul><h3>Classes</h3><ul><li><a href="AutoComplete.html">AutoComplete</a></li><li><a href="CardsManager.html">CardsManager</a></li><li><a href="Graph.html">Graph</a></li><li><a href="max_PQ.html">max_PQ</a></li><li><a href="TernarySearchTrie.html">TernarySearchTrie</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Wiki</h3><ul><li><a href="tutorial--_readme.html">About Flashcards by c13u</a></li><li><a href="tutorial-main._readme.html">User Guide</a></li></ul><h3>Modules</h3><ul><li><a href="module-models_CardsMongoDB.html">models/CardsMongoDB</a></li><li><a href="module-models_DailyTasks.html">models/DailyTasks</a></li><li><a href="module-models_EmailClient.html">models/EmailClient</a></li><li><a href="module-models_LogInUtilities.html">models/LogInUtilities</a></li><li><a href="module-models_MetadataMongoDB.html">models/MetadataMongoDB</a></li><li><a href="module-models_Miscellaneous.html">models/Miscellaneous</a></li><li><a href="module-models_mongoose_models_CardSchema.html">models/mongoose_models/CardSchema</a></li><li><a href="module-models_mongoose_models_MetadataCardSchema.html">models/mongoose_models/MetadataCardSchema</a></li><li><a href="module-models_mongoose_models_Token.html">models/mongoose_models/Token</a></li><li><a href="module-models_mongoose_models_UserSchema.html">models/mongoose_models/UserSchema</a></li><li><a href="module-models_MongooseClient.html">models/MongooseClient</a></li><li><a href="module-models_SanitizationAndValidation.html">models/SanitizationAndValidation</a></li><li><a href="module-public_src_AppUtilities.html">public/src/AppUtilities</a></li><li><a href="module-public_src_CardTemplateUtilities.html">public/src/CardTemplateUtilities</a></li><li><a href="module-public_src_TagsBarUtilities.html">public/src/TagsBarUtilities</a></li></ul><h3>Classes</h3><ul><li><a href="AutoComplete.html">AutoComplete</a></li><li><a href="CardsManager.html">CardsManager</a></li><li><a href="Graph.html">Graph</a></li><li><a href="max_PQ.html">max_PQ</a></li><li><a href="TernarySearchTrie.html">TernarySearchTrie</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Wed Oct 09 2019 01:01:12 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Wed Oct 09 2019 20:29:23 GMT-0700 (PDT)
     <br />
     If you find any errors in the docs or have suggestions, either 
     <a href="https://github.com/dchege711/study_buddy/issues">open an issue on Github</a> 

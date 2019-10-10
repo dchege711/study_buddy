@@ -247,7 +247,7 @@ been provided. Useful for maintaining persistent logins.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line450">line 450</a>
+        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line468">line 468</a>
     </li></ul></dd>
     
 
@@ -314,7 +314,15 @@ and <code>message</code> as keys</p>
 
 
 <div class="description">
-    <p>Authenticate a user that is trying to log in.</p>
+    <p>Authenticate a user that is trying to log in. When a user
+successfully logs in, we set a token that will be sent on all subsequent
+requests. Logging in should be as painless as possible. Since the usernames
+only contain <code>[_\-A-Za-z0-9]+</code>, we can infer whether the submitted string
+was an email address or a username, and authenticate accordingly. If the
+username/email/password is incorrect, we send a generic
+<code>Invalid username/email or password</code> message without disclosing which is
+incorrect. It's possible to enumerate usernames, so this is not entirely
+foolproof.</p>
 </div>
 
 
@@ -407,7 +415,7 @@ and <code>message</code> as keys</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line390">line 390</a>
+        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line407">line 407</a>
     </li></ul></dd>
     
 
@@ -657,7 +665,7 @@ and <code>message</code>. The message field contains the following keys: <code>t
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line650">line 650</a>
+        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line672">line 672</a>
     </li></ul></dd>
     
 
@@ -819,7 +827,7 @@ be deleted. By default, the global public user is not deleted.</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line683">line 683</a>
+        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line705">line 705</a>
     </li></ul></dd>
     
 
@@ -979,7 +987,7 @@ has the specified ID.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line472">line 472</a>
+        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line490">line 490</a>
     </li></ul></dd>
     
 
@@ -1090,7 +1098,7 @@ and <code>message</code> as keys.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line630">line 630</a>
+        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line652">line 652</a>
     </li></ul></dd>
     
 
@@ -1275,7 +1283,7 @@ If not specified, defaults to the alphanumeric characters.</p></td>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line64">line 64</a>
+        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line67">line 67</a>
     </li></ul></dd>
     
 
@@ -1321,7 +1329,7 @@ If not specified, defaults to the alphanumeric characters.</p></td>
 <div class="description">
     <p>Register a new user using the provided password, username and email.</p>
 <ul>
-<li>Respond with status <code>200</code> if the username is taken.</li>
+<li>If the username is taken, we let the user know that.</li>
 <li>If the email address is already taken, send an email to that address
 notifying them of the signup.</li>
 <li>If the input is invalid, e.g. a non alphanumeric username, raise an error
@@ -1420,7 +1428,7 @@ since it should have been caught on the client side.</li>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line270">line 270</a>
+        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line279">line 279</a>
     </li></ul></dd>
     
 
@@ -1485,6 +1493,12 @@ since it should have been caught on the client side.</li>
     
 
 
+
+<div class="description">
+    <p>Reset the user's password. We also invalidate all previously
+issued session tokens so that the user has to provide their new password
+before logging into any session.</p>
+</div>
 
 
 
@@ -1577,7 +1591,7 @@ since it should have been caught on the client side.</li>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line575">line 575</a>
+        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line597">line 597</a>
     </li></ul></dd>
     
 
@@ -1733,7 +1747,7 @@ and <code>message</code>.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line191">line 191</a>
+        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line194">line 194</a>
     </li></ul></dd>
     
 
@@ -1889,7 +1903,7 @@ and <code>message</code></p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line488">line 488</a>
+        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line506">line 506</a>
     </li></ul></dd>
     
 
@@ -1954,6 +1968,14 @@ and <code>message</code> as keys.</p>
     
 
 
+
+<div class="description">
+    <p>Once an account is registered, the user needs to click on a
+validation link sent to the submitted email. <s>The user cannot log into
+the app before the email address is verified.</s> We observed a high bounce
+rate AND few signups, so we'll allow accounts with unvalidated email
+addresses to sign in for at most 30 days.</p>
+</div>
 
 
 
@@ -2045,7 +2067,7 @@ and <code>message</code> as keys.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line230">line 230</a>
+        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line239">line 239</a>
     </li></ul></dd>
     
 
@@ -2201,7 +2223,7 @@ and <code>message</code></p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line545">line 545</a>
+        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line563">line 563</a>
     </li></ul></dd>
     
 
@@ -2308,7 +2330,7 @@ as its keys. Fails only if something goes wrong with the database.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line53">line 53</a>
+        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line56">line 56</a>
     </li></ul></dd>
     
 
@@ -2421,7 +2443,7 @@ or validation URL.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line84">line 84</a>
+        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line87">line 87</a>
     </li></ul></dd>
     
 
@@ -2488,7 +2510,9 @@ validation string.</p>
 
 
 <div class="description">
-    <p>Generate a salt and a hash for the provided password.</p>
+    <p>Generate a salt and a hash for the provided password. We found
+CrackStation's piece on <a href="https://crackstation.net/hashing-security.htm">salted password hashing</a>
+informative.</p>
 </div>
 
 
@@ -2532,7 +2556,7 @@ validation string.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line39">line 39</a>
+        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line42">line 42</a>
     </li></ul></dd>
     
 
@@ -2694,7 +2718,7 @@ the salt and the second element is the hash.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line120">line 120</a>
+        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line123">line 123</a>
     </li></ul></dd>
     
 
@@ -2882,7 +2906,7 @@ does not generate new validation URLs.</p>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line154">line 154</a>
+        <a href="models_LogInUtilities.js.html">models/LogInUtilities.js</a>, <a href="models_LogInUtilities.js.html#line157">line 157</a>
     </li></ul></dd>
     
 
@@ -2928,13 +2952,13 @@ does not generate new validation URLs.</p>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Wiki</h3><ul><li><a href="tutorial-main._readme.html">The Main Page</a></li><li><a href="tutorial-meta._readme.html">Miscellaneous</a></li><li><a href="tutorial-user._readme.html">The User Account</a></li><li><a href="tutorial-user_guide._readme.html">About Flashcards by c13u</a></li></ul><h3>Modules</h3><ul><li><a href="module-models_CardsMongoDB.html">models/CardsMongoDB</a></li><li><a href="module-models_DailyTasks.html">models/DailyTasks</a></li><li><a href="module-models_EmailClient.html">models/EmailClient</a></li><li><a href="module-models_LogInUtilities.html">models/LogInUtilities</a></li><li><a href="module-models_MetadataMongoDB.html">models/MetadataMongoDB</a></li><li><a href="module-models_Miscellaneous.html">models/Miscellaneous</a></li><li><a href="module-models_mongoose_models_CardSchema.html">models/mongoose_models/CardSchema</a></li><li><a href="module-models_mongoose_models_MetadataCardSchema.html">models/mongoose_models/MetadataCardSchema</a></li><li><a href="module-models_mongoose_models_Token.html">models/mongoose_models/Token</a></li><li><a href="module-models_mongoose_models_UserSchema.html">models/mongoose_models/UserSchema</a></li><li><a href="module-models_MongooseClient.html">models/MongooseClient</a></li><li><a href="module-models_SanitizationAndValidation.html">models/SanitizationAndValidation</a></li><li><a href="module-public_src_AppUtilities.html">public/src/AppUtilities</a></li><li><a href="module-public_src_CardTemplateUtilities.html">public/src/CardTemplateUtilities</a></li><li><a href="module-public_src_TagsBarUtilities.html">public/src/TagsBarUtilities</a></li></ul><h3>Classes</h3><ul><li><a href="AutoComplete.html">AutoComplete</a></li><li><a href="CardsManager.html">CardsManager</a></li><li><a href="Graph.html">Graph</a></li><li><a href="max_PQ.html">max_PQ</a></li><li><a href="TernarySearchTrie.html">TernarySearchTrie</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Wiki</h3><ul><li><a href="tutorial--_readme.html">About Flashcards by c13u</a></li><li><a href="tutorial-main._readme.html">User Guide</a></li></ul><h3>Modules</h3><ul><li><a href="module-models_CardsMongoDB.html">models/CardsMongoDB</a></li><li><a href="module-models_DailyTasks.html">models/DailyTasks</a></li><li><a href="module-models_EmailClient.html">models/EmailClient</a></li><li><a href="module-models_LogInUtilities.html">models/LogInUtilities</a></li><li><a href="module-models_MetadataMongoDB.html">models/MetadataMongoDB</a></li><li><a href="module-models_Miscellaneous.html">models/Miscellaneous</a></li><li><a href="module-models_mongoose_models_CardSchema.html">models/mongoose_models/CardSchema</a></li><li><a href="module-models_mongoose_models_MetadataCardSchema.html">models/mongoose_models/MetadataCardSchema</a></li><li><a href="module-models_mongoose_models_Token.html">models/mongoose_models/Token</a></li><li><a href="module-models_mongoose_models_UserSchema.html">models/mongoose_models/UserSchema</a></li><li><a href="module-models_MongooseClient.html">models/MongooseClient</a></li><li><a href="module-models_SanitizationAndValidation.html">models/SanitizationAndValidation</a></li><li><a href="module-public_src_AppUtilities.html">public/src/AppUtilities</a></li><li><a href="module-public_src_CardTemplateUtilities.html">public/src/CardTemplateUtilities</a></li><li><a href="module-public_src_TagsBarUtilities.html">public/src/TagsBarUtilities</a></li></ul><h3>Classes</h3><ul><li><a href="AutoComplete.html">AutoComplete</a></li><li><a href="CardsManager.html">CardsManager</a></li><li><a href="Graph.html">Graph</a></li><li><a href="max_PQ.html">max_PQ</a></li><li><a href="TernarySearchTrie.html">TernarySearchTrie</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Wed Oct 09 2019 01:01:12 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Wed Oct 09 2019 20:29:23 GMT-0700 (PDT)
     <br />
     If you find any errors in the docs or have suggestions, either 
     <a href="https://github.com/dchege711/study_buddy/issues">open an issue on Github</a> 
