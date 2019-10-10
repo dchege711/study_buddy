@@ -393,7 +393,11 @@ exports.duplicateCard = function(payload) {
 };
 
 /**
- * @description Increase the counter of the specified file. This allows 
+ * @description With public cards, it's possible that some malicious users may 
+ * upload objectionable cards. While we don't delete users' cards against their 
+ * will, we don't have an obligation to help them share such cards. When a card 
+ * gets flagged as inappropriate, it is excluded from search results in the 
+ * `/browse` page. We increase the counter of the specified file. This allows 
  * moderators to deal with the most flagged cards first. 
  * 
  * @param {JSON} payload The `cardID` must be set. `markedForReview` and 

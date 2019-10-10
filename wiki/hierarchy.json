@@ -8,9 +8,6 @@
         "children": {
             "main.editing_cards": {
                 "title": "Editing Cards"
-            }, 
-            "main.public_cards": {
-                "title": "Public vs. Private Cards"
             }
         }
     }, 

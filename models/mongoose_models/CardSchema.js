@@ -6,7 +6,13 @@
 
 var mongoose = require('mongoose');
 
-/** The schema for cards in the database */
+/**
+ * The schema for cards in the database 
+ * 
+ * @param {Boolean} isPublic 
+ *  If `false`, then the card is private. A private flashcard is only visible 
+ *  to its owner. It will not appear in the search results at the `/browse` page. In contrast, a public card will appear in the search results as a read-only card. Any user that adds the card to their own collection will get a separate copy of the card.
+ */
 var cardSchema = new mongoose.Schema(
     {
         title: { type: String, default: "", trim: true },
