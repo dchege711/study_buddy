@@ -1,3 +1,11 @@
+/**
+ * We use [express-session]{@link https://github.com/expressjs/session} and 
+ * some custom middleware to support persistent logins. In case we'll need to 
+ * support Facebook/Twitter/Google logins in the future, we'll use 
+ * [passport]{@link http://www.passportjs.org/docs/configure/}. For now, 
+ * Passport is an overkill.
+ */
+
 var express = require("express");
 var session = require("express-session");
 var MongoStore = require('connect-mongo')(session);

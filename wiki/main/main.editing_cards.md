@@ -12,6 +12,8 @@ The gray box was created by including a `[spoiler]` line anywhere in the card. T
 
 ## Features of the Card Editor
 
+### The Card Body
+
 * The card's body supports Markdown.
   * If you're new to Markdown, [here's a handy cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet). 
   * models/SanitizationAndValidation.js
@@ -20,10 +22,28 @@ The gray box was created by including a `[spoiler]` line anywhere in the card. T
   * views/partials/syntax_highlighting_and_latex.ejs
 * When editing the card's body, pressing `Tab` adds 4 spaces.
   * views/pages/home.ejs
+
+### Reviewing Cards
+
+* Each card has an associated urgency. Cards with higher urgencies appear first on the deck.
+  * At the bottom of the card, there are 4 urgency bars give you an idea of where the urgencies of the selected cards lie.
+
+    ![Screenshot of urgency bars](2019-09-24-urgency-bars.png)
+
+    *For instance, the card above has an urgency of `9`. Of the cards that we can access using the previous and next buttons, this card lies in the top 25% of the urgencies (red bar).*
+
+### Managing Cards
+
 * Deleted a card by mistake? No worries, we provide an opportunity for you to undo that deletion!
   * models/CardsMongoDB.js
+
+### Tagging Cards
+
 * When adding tags, we suggest (possibly) relevant tags.
   * public/src/Autocomplete.js
+
+### Sharing Cards
+
 * To make the card public/private, toggle the switch.
   * Private cards are only visible to their owner
   * Public cards are discoverable through the `/browse` page.

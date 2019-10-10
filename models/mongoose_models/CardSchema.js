@@ -9,6 +9,20 @@ var mongoose = require('mongoose');
 /**
  * The schema for cards in the database 
  * 
+ * @param {Number} urgency
+ * [Spaced Repetition]{@link https://en.wikipedia.org/wiki/Spaced_repetition} 
+ * is commonly practised when a user has to retain a large amount of 
+ * information indefinitely. It exploits the 
+ * [Spacing Effect]{@link https://en.wikipedia.org/wiki/Spacing_effect}, the 
+ * phenomenon whereby learning is greater when studying is spread out over time, 
+ * as opposed to studying the same amount of content in a single session.
+ * Flashcard software usually adjusts the spacing time based on whether the 
+ * user provided the right answer. Answers may at times be too complex to 
+ * define in code. We therefore depend on the user updating the `card.urgency` 
+ * attribute in lieu of providing an answer to the flash card. Since the cards 
+ * are shown in decreasing order of urgency, cards that are ranked lower will 
+ * appear much later in subsequent review sessions.
+ * 
  * @param {Boolean} isPublic 
  *  If `false`, then the card is private. A private flashcard is only visible 
  *  to its owner. It will not appear in the search results at the `/browse` page. In contrast, a public card will appear in the search results as a read-only card. Any user that adds the card to their own collection will get a separate copy of the card.

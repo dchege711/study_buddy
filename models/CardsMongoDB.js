@@ -191,7 +191,14 @@ exports.delete = function(payload) {
 };
 
 /**
- * @description Search for cards with associated key words
+ * @description Search for cards with associated key words. Search should be 
+ * relevant and fast, erring on the side of relevance. Studying the docs helps 
+ * one make efficient queries and capture some low-hanging fruit. For instance, 
+ * using `where(some_js_expression)` in MongoDB is expensive because 
+ * `some_js_expression` will be evaluated for every document in the collection. 
+ * ~~Using regex inside the query itself is more efficient.~~ MongoDB supports 
+ * [text search]{@link https://docs.mongodb.com/v3.2/text-search/} and a 'sort 
+ * by relevance' function.
  * 
  * @param {JSON} payload Expected keys: `key_words`, `createdById`
  * @returns {Promise} resolves with a JSON with `success`, `status` and `message` 

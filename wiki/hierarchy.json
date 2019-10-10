@@ -1,31 +1,13 @@
 {
-    "user_guide._readme": {
+    "_readme": {
         "title": "About Flashcards by c13u"
     },
 
     "main._readme": {
-        "title": "The Main Page", 
+        "title": "User Guide", 
         "children": {
             "main.editing_cards": {
                 "title": "Editing Cards"
-            }
-        }
-    }, 
-
-    "user._readme": {
-        "title": "The User Account", 
-        "children": {
-            "user.account_management": {
-                "title": "Account Management"
-            }
-        }
-    },
-
-    "meta._readme": {
-        "title": "Miscellaneous", 
-        "children": {
-            "meta.content_management": {
-                "title": "Content Management"
             }
         }
     }

@@ -32,7 +32,10 @@ exports.close = function() {
 };
 
 /**
- * @description Generate a salt and a hash for the provided password.
+ * @description Generate a salt and a hash for the provided password. We found 
+ * CrackStation's piece on [salted password hashing]{@link https://crackstation.net/hashing-security.htm} 
+ * informative.
+ * 
  * @returns {Promise} the resolved value is an array where the first element is 
  * the salt and the second element is the hash.
  */
@@ -223,6 +226,12 @@ exports.sendAccountValidationLink = function(payload) {
 };
 
 /**
+ * @description Once an account is registered, the user needs to click on a 
+ * validation link sent to the submitted email. ~~The user cannot log into 
+ * the app before the email address is verified.~~ We observed a high bounce 
+ * rate AND few signups, so we'll allow accounts with unvalidated email 
+ * addresses to sign in for at most 30 days.
+ * 
  * @param {String} validationURI The validation URL of the associated account
  * @returns {Promise} resolves with a JSON object keyed by `success`, `status` 
  * and `message`
@@ -256,12 +265,12 @@ exports.validateAccount = function(validationURI) {
 
 /**
  * @description Register a new user using the provided password, username and email.
- * * Respond with status `200` if the username is taken.
- * * If the email address is already taken, send an email to that address 
+ * - If the username is taken, we let the user know that.
+ * - If the email address is already taken, send an email to that address 
  * notifying them of the signup.
- * * If the input is invalid, e.g. a non alphanumeric username, raise an error 
+ * - If the input is invalid, e.g. a non alphanumeric username, raise an error 
  * since it should have been caught on the client side.
- * * Otherwise, register the user and send them a validation link.
+ * - Otherwise, register the user and send them a validation link.
  * 
  * @param {JSON} payload Expected keys: `username`, `password`, `email`
  * @returns {Promise} resolves with a JSON object containing the keys `success`, 
@@ -379,7 +388,15 @@ exports.registerUserAndPassword = function(payload) {
 };
 
 /**
- * @description Authenticate a user that is trying to log in.
+ * @description Authenticate a user that is trying to log in. When a user 
+ * successfully logs in, we set a token that will be sent on all subsequent 
+ * requests. Logging in should be as painless as possible. Since the usernames 
+ * only contain `[_\-A-Za-z0-9]+`, we can infer whether the submitted string 
+ * was an email address or a username, and authenticate accordingly. If the 
+ * username/email/password is incorrect, we send a generic 
+ * `Invalid username/email or password` message without disclosing which is 
+ * incorrect. It's possible to enumerate usernames, so this is not entirely 
+ * foolproof.
  * 
  * @param {JSON} payload Expected keys: `username_or_email`, `password`
  * @returns {Promise} resolves with a JSON object keyed by `success`, `status` 
@@ -443,6 +460,7 @@ exports.authenticateUser = function(payload) {
 /**
  * @description Provide an authentication endpoint where a session token has 
  * been provided. Useful for maintaining persistent logins.
+ * 
  * @param {String} tokenID The token ID that can be used for logging in.
  * @returns {Promise} resolves with a JSON doc w/ `success`, `status`
  *  and `message` as keys
@@ -567,6 +585,10 @@ exports.validatePasswordResetLink = function(resetPasswordURI) {
 };
 
 /**
+ * @description Reset the user's password. We also invalidate all previously 
+ * issued session tokens so that the user has to provide their new password 
+ * before logging into any session.
+ * 
  * @param {payload} payload Expected keys: `reset_password_uri`, `password`,
  * `reset_info`.
  * @returns {Promise} resolves with a JSON object that has the keys `success` 
