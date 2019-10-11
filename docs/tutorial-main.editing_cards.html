@@ -29,42 +29,81 @@
 </header>
 
 <article>
-    <h2>Markdown</h2>
-<p>Since we're targeting users that store somewhat detailed flashcards, we felt that Markdown (in addition to LaTEX and syntax highlighting) will prove useful. Manually converting markdown to HTML is a project by itself. Since it's not the main purpose of Flashcards by c13u, we were happy to import <a href="https://github.com/showdownjs/showdown">Showdown</a>. The library looks mature and the documentation is sound.</p>
-<h2>Spoilers</h2>
-<p>Being able to cover some of the content is crucial to any flashcards application. We added support for one spoiler per card. The format is:</p>
-<pre class="prettyprint source lang-markdown"><code>What's the general approach for solving problems on probability?
-
-[spoiler]
-
-* Find the sample space \(S\). Draw a tree if \(S\) is not too large.
-
-* From the leaves, define the events of interest. Don't be fooled by their frequency!
-
-* Determine the probabilities along the edges using the assumptions made in the problem. The probability of an outcome is the product of all edge probabilities along the path from the root to the outcome. This is mechanical.
-
-* Compute event probabilities by adding up probabilities for all favorable outcomes.
-
-</code></pre>
-<p>Any content found under the first <code>[spoiler]</code> is assumed to be part of the spoiler.</p>
-<h2>Tabbing Inside Card Description</h2>
-<p>We chose to insert <code>&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;</code> if the user pressed the tab key. The downside to this is that deleting a 'tab' requires 4 backspaces. We tried inserting a tab character instead but for it to render, we needed to add <code>white-space: pre-wrap;</code> as a style attribute. This however inserts to much whitespace between separate lines of texts. Since flash cards are more frequently read than written, we prioritized having the flash cards as compact as possible in order to avoid the need to scroll down when reading them.</p>
-<h2>LaTEX</h2>
-<p><a href="https://www.mathjax.org/">MathJAX</a> renders LaTEX on the app. At first we had problems getting LaTEX to render properly, but we realized that by default, MathJAX expects LaTEX to be already on the DOM. We dug through its documentation and found out that MathJAX allows manual reloads. We therefore added a function that requests MathJAX to re-render the contents of the card template every time the user loads a card.</p>
-<h2>LaTEX Delimiters</h2>
-<p>Previously, users had to escape the LaTEX delimiter themselves and also escape underscores within inline LaTEX. This meant lines like <code>\(p_i = 2\)</code> had to be written as <code>\\(p\_i = 2\\)</code>. <s>With some regular expressions, we was able to support the former approach. We traded computational efficiency <em>(more code to automatically escape backslashes and replace automatically inserted <code>&lt;em&gt;, &lt;/em&gt;</code> tags)</em> for convenience <em>(users entering normal LaTEX)</em>. We choose to make this correction on the client side since we can't afford that much storage capacity on the server side.</s></p>
-<p>We configured <code>showdown.converter</code> to escape underscores and asterisks when converting markdown to HTML. Although we had activated these options before, <code>showdown.converter</code> wasn't applying them. The bug was fixed on Github. We downloaded the version of <code>showdown.min.js</code> available during commit <code>039dd66256e771716c20a807a2941974ac7c5873</code>. Since that version works fine, we use my downloaded copy instead of using the version hosted on the CDN since that might change over time. Later versions of the file insert extra whitespace in my code blocks, so we prefer maintaining the version from the above commit.</p>
-<h2>Card Urgency</h2>
-<p>We changed the urgency input from a number input type to a range input type. To set an urgency, using the range input type is faster since the user doesn't really care about the actual value, but its percentage, e.g. <em>card X is half as important as the most important cards in my deck</em>. Furthermore, using a range requires one click, while using a number type requires a click and a type.</p>
-<h2>Undoing a Card Deletion</h2>
-<p>We learned that we should <a href="http://alistapart.com/article/neveruseawarning">never use a warning when we meant undo</a>. Seems like a good design decision. Users who really want to delete a card might be unsatisifed, but I bet they're in the minority(?). Furthermore, they can permanently delete a card from the accounts page. Amazing how much fiddling goes in the backend, just to allow a user to delete and then save themselves 3 seconds later by hitting <code>Undo</code>.</p>
-<h2>Syntax Highlighting</h2>
-<p>We found the <a href="https://highlightjs.org/">highlight.js</a> library useful for syntax highlighting. It even allows us to specify what languages we want supported. We downloaded a package from them instead of using a CDN. Although we refrain from adding more dependencies, writing our own syntax highlighter would have been unwise.</p>
-<h2>Tag Auto-Completion</h2>
-<p>The app should help the user use the fewest tags possible while still being descriptive. We address this problem in the following ways:</p>
+    <p><img src="with_spoiler.png" alt="How the sample card is rendered with a spoiler box"></p>
+<h3>The Card Body</h3>
 <ul>
-<li>Providing autocompletion for tags based on the prefix.</li>
-<li>Suggesting related tags based on previous usage patterns.</li>
+<li>The card's body supports Markdown.
+<ul>
+<li>If you're new to Markdown, <a href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">here's a handy cheatsheet</a>.</li>
+<li>models/SanitizationAndValidation.js</li>
+</ul>
+</li>
+<li>The card's body supports LaTeX.
+<ul>
+<li>If you're new to LaTeX, the <a href="https://en.wikibooks.org/wiki/LaTeX">LaTeX Wikibook</a> and <a href="https://www.overleaf.com/learn/latex/Learn_LaTeX_in_30_minutes">ShareLaTeX docs</a> are good tutorials.</li>
+<li>views/partials/syntax_highlighting_and_latex.ejs</li>
+</ul>
+</li>
+<li>When editing the card's body, pressing <code>Tab</code> adds 4 spaces.
+<ul>
+<li>views/pages/home.ejs</li>
+</ul>
+</li>
+<li>To cover up part of the body, write <code>[spoiler]</code> on one line. Anything below that line will be covered by a gray box.</li>
+</ul>
+<h3>Reviewing Cards</h3>
+<ul>
+<li>Each card has an associated urgency. Cards with higher urgencies appear first on the deck.
+<ul>
+<li>
+<p>At the bottom of the card, there are 4 urgency bars give you an idea of where the urgencies of the selected cards lie.</p>
+<p><img src="2019-09-24-urgency-bars.png" alt="Screenshot of urgency bars"></p>
+<p><em>For instance, the card above has an urgency of <code>9</code>. Of the cards that we can access using the previous and next buttons, this card lies in the top 25% of the urgencies (red bar).</em></p>
+</li>
+</ul>
+</li>
+</ul>
+<h3>Managing Cards</h3>
+<ul>
+<li>Deleted a card by mistake? No worries, we provide an opportunity for you to undo that deletion!
+<ul>
+<li>models/CardsMongoDB.js</li>
+</ul>
+</li>
+</ul>
+<h3>Tagging Cards</h3>
+<ul>
+<li>When adding tags, we suggest (possibly) relevant tags, e.g.
+<img src="tags_autocomplete.png" alt="Tag AutoCompletion">
+<ul>
+<li>public/src/Autocomplete.js</li>
+</ul>
+</li>
+</ul>
+<h3>Sharing Cards</h3>
+<ul>
+<li>
+<p>To make the card public/private, toggle the switch.
+<img src="2019-09-24-urgency-bars.png" alt="Screenshot of urgency bars"></p>
+<ul>
+<li>Private cards are only visible to their owner</li>
+<li>Public cards are discoverable through the <code>/browse</code> page.</li>
+<li>To set the default privacy setting for new cards:
+<ul>
+<li>Go to the <code>/account</code> page.</li>
+<li>Check/Uncheck the &quot;If checked, your cards will be private (except the ones that you explicitly set as public)&quot; option</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>To share a public card, copy the URL displayed at the top.
+<img src="shareable_url.png" alt="Shareable URL"></p>
+<ul>
+<li>Note that the URL works as long as the card still exists and is public.</li>
+<li>If another user adds your card to your collection, they get a separate copy.</li>
+</ul>
+</li>
 </ul>
 </article>
 
@@ -73,13 +112,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Wiki</h3><ul><li><a href="tutorial-main._readme.html">The Main Page</a></li><li><a href="tutorial-meta._readme.html">Miscellaneous</a></li><li><a href="tutorial-user._readme.html">The User Account</a></li></ul><h3>Modules</h3><ul><li><a href="module-models_CardsMongoDB.html">models/CardsMongoDB</a></li><li><a href="module-models_DailyTasks.html">models/DailyTasks</a></li><li><a href="module-models_EmailClient.html">models/EmailClient</a></li><li><a href="module-models_LogInUtilities.html">models/LogInUtilities</a></li><li><a href="module-models_MetadataMongoDB.html">models/MetadataMongoDB</a></li><li><a href="module-models_Miscellaneous.html">models/Miscellaneous</a></li><li><a href="module-models_mongoose_models_CardSchema.html">models/mongoose_models/CardSchema</a></li><li><a href="module-models_mongoose_models_MetadataCardSchema.html">models/mongoose_models/MetadataCardSchema</a></li><li><a href="module-models_mongoose_models_Token.html">models/mongoose_models/Token</a></li><li><a href="module-models_mongoose_models_UserSchema.html">models/mongoose_models/UserSchema</a></li><li><a href="module-models_MongooseClient.html">models/MongooseClient</a></li><li><a href="module-models_SanitizationAndValidation.html">models/SanitizationAndValidation</a></li><li><a href="module-public_src_AppUtilities.html">public/src/AppUtilities</a></li><li><a href="module-public_src_CardTemplateUtilities.html">public/src/CardTemplateUtilities</a></li><li><a href="module-public_src_TagsBarUtilities.html">public/src/TagsBarUtilities</a></li></ul><h3>Classes</h3><ul><li><a href="AutoComplete.html">AutoComplete</a></li><li><a href="CardsManager.html">CardsManager</a></li><li><a href="Graph.html">Graph</a></li><li><a href="max_PQ.html">max_PQ</a></li><li><a href="TernarySearchTrie.html">TernarySearchTrie</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Wiki</h3><ul><li><a href="tutorial--_readme.html">About Flashcards by c13u</a></li><li><a href="tutorial-main._readme.html">User Guide</a></li></ul><h3>Modules</h3><ul><li><a href="module-models_CardsMongoDB.html">models/CardsMongoDB</a></li><li><a href="module-models_DailyTasks.html">models/DailyTasks</a></li><li><a href="module-models_EmailClient.html">models/EmailClient</a></li><li><a href="module-models_LogInUtilities.html">models/LogInUtilities</a></li><li><a href="module-models_MetadataMongoDB.html">models/MetadataMongoDB</a></li><li><a href="module-models_Miscellaneous.html">models/Miscellaneous</a></li><li><a href="module-models_mongoose_models_CardSchema.html">models/mongoose_models/CardSchema</a></li><li><a href="module-models_mongoose_models_MetadataCardSchema.html">models/mongoose_models/MetadataCardSchema</a></li><li><a href="module-models_mongoose_models_Token.html">models/mongoose_models/Token</a></li><li><a href="module-models_mongoose_models_UserSchema.html">models/mongoose_models/UserSchema</a></li><li><a href="module-models_MongooseClient.html">models/MongooseClient</a></li><li><a href="module-models_SanitizationAndValidation.html">models/SanitizationAndValidation</a></li><li><a href="module-public_src_AppUtilities.html">public/src/AppUtilities</a></li><li><a href="module-public_src_CardTemplateUtilities.html">public/src/CardTemplateUtilities</a></li><li><a href="module-public_src_TagsBarUtilities.html">public/src/TagsBarUtilities</a></li></ul><h3>Classes</h3><ul><li><a href="AutoComplete.html">AutoComplete</a></li><li><a href="CardsManager.html">CardsManager</a></li><li><a href="Graph.html">Graph</a></li><li><a href="max_PQ.html">max_PQ</a></li><li><a href="TernarySearchTrie.html">TernarySearchTrie</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Sat Sep 21 2019 11:51:21 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a>
     <br />
     If you find any errors in the docs or have suggestions, either 
     <a href="https://github.com/dchege711/study_buddy/issues">open an issue on Github</a> 

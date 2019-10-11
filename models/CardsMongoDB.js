@@ -161,7 +161,15 @@ exports.update = function(cardJSON) {
 };
 
 /**
- * Remove this card from the database.
+ * @description Remove this card from the database. We learned that we should 
+ * [never use a warning when we meant undo]{@link http://alistapart.com/article/neveruseawarning}. 
+ * Seems like a good design decision. Users who really want to delete a card 
+ * might be unsatisifed, but I bet they're in the minority(?). Furthermore, 
+ * they can permanently delete a card from the accounts page. Amazing how much 
+ * fiddling goes in the backend, just to allow a user to delete and then save 
+ * themselves 3 seconds later by hitting `Undo`.
+ * 
+ * {@tutorial main.editing_cards}
  * 
  * @param {JSON} payload The card to be removed
  * @return {Promise} resolves with a JSON keyed by `success`, `status` and 
@@ -183,7 +191,14 @@ exports.delete = function(payload) {
 };
 
 /**
- * @description Search for cards with associated key words
+ * @description Search for cards with associated key words. Search should be 
+ * relevant and fast, erring on the side of relevance. Studying the docs helps 
+ * one make efficient queries and capture some low-hanging fruit. For instance, 
+ * using `where(some_js_expression)` in MongoDB is expensive because 
+ * `some_js_expression` will be evaluated for every document in the collection. 
+ * ~~Using regex inside the query itself is more efficient.~~ MongoDB supports 
+ * [text search]{@link https://docs.mongodb.com/v3.2/text-search/} and a 'sort 
+ * by relevance' function.
  * 
  * @param {JSON} payload Expected keys: `key_words`, `createdById`
  * @returns {Promise} resolves with a JSON with `success`, `status` and `message` 
@@ -385,7 +400,11 @@ exports.duplicateCard = function(payload) {
 };
 
 /**
- * @description Increase the counter of the specified file. This allows 
+ * @description With public cards, it's possible that some malicious users may 
+ * upload objectionable cards. While we don't delete users' cards against their 
+ * will, we don't have an obligation to help them share such cards. When a card 
+ * gets flagged as inappropriate, it is excluded from search results in the 
+ * `/browse` page. We increase the counter of the specified file. This allows 
  * moderators to deal with the most flagged cards first. 
  * 
  * @param {JSON} payload The `cardID` must be set. `markedForReview` and 

@@ -71,7 +71,15 @@ module.exports = {
         // monospaceLinks: false, 
 
         default: {
-            // layoutFile: "views/jsdoc.layout.tmpl"
+            // layoutFile: "views/jsdoc.layout.tmpl", 
+
+            staticFiles: {
+                include: ["wiki/_img"]
+            },
+
+            // Exclude the date and time footer to prevent .html files from 
+            // being added to the git index despite their content not changing
+            includeDate: false,
         }
     }
 };  

@@ -31,7 +31,8 @@ exports.requireLogIn = function (req, res, next) {
 
 /**
  * @description Middleware for authenticating browsers that provide a session
- * token.
+ * token. If the token is invalid (e.g. after a password reset or after 30 days), 
+ * we redirect the browser to the login page.
  */
 exports.logInBySessionToken = function (req, res, next) {
     LogInUtilities
@@ -85,6 +86,10 @@ exports.loginUser = function (req, res, next) {
         .catch((err) => { convertObjectToResponse(err, null, res); });
 };
 
+/**
+ * @description When a user logs out, we delete the token that we issued upon 
+ * their initial login and redirect them to the welcome/login page.
+ */
 exports.logoutUser = function (req, res) {
     var session_token = req.session.user.token_id;
     delete req.session.user;
