@@ -29,7 +29,7 @@ module.exports = {
     source: {
         // Step 1: Search for files in these paths
         include: [
-            "models/", "public/src/"
+            "src/models/", "src/public/src/"
         ],
 
         // Step 2: For each file found in step #1 only consider it if it ends in 
@@ -42,7 +42,7 @@ module.exports = {
 
         // Step 4: For each file from step #3, ignore it if its path is here
         exclude: [
-            "public/src/AVLTree.js"
+            "src/public/src/AVLTree.js"
         ],
         
     }, 

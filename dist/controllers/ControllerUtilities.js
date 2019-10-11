@@ -1,0 +1,63 @@
+var fs = require("fs");
+var APP_NAME = require("../config.js").APP_NAME;
+var generic_500_msg = {
+    success: false, status: 500, message: "Internal Server Error"
+};
+/**
+ * @description A function to interpret JSON documents into server responses. It
+ * is meant to be used as the last function in the controller modules.
+ *
+ * @param {Error} err Any error that occurred in the preceding function
+ * @param {JSON} result_JSON Expected keys: `status`, `success`, `message`
+ * @param {Response} res An Express JS res object
+ */
+exports.convertObjectToResponse = function (err, result_JSON, res) {
+    if (err) {
+        console.error(err);
+        res.type(".html");
+        res.status(500);
+        res.render("pages/5xx_error_page.ejs", { response_JSON: generic_500_msg, APP_NAME: APP_NAME, LOGGED_IN: false });
+    }
+    else {
+        var status_1 = result_JSON.status || 200;
+        res.status(status_1);
+        if (status_1 >= 200 && status_1 < 300) {
+            res.type("application/json");
+            res.json(result_JSON);
+        }
+        else if (status_1 >= 300 && status_1 < 400) {
+            res.type('html');
+            res.redirect(status_1, result_JSON.redirect_url + "?msg=" + encodeURIComponent(result_JSON.message));
+        }
+        else if (status_1 >= 400 && status_1 < 500) {
+            res.type('html');
+            res.render("pages/4xx_error_page.ejs", { response_JSON: result_JSON, APP_NAME: APP_NAME });
+        }
+        else {
+            res.type('html');
+            res.render("pages/5xx_error_page.ejs", { response_JSON: result_JSON, APP_NAME: APP_NAME });
+        }
+    }
+};
+exports.deleteTempFile = function (filepath) {
+    fs.unlink(filepath, function (err) {
+        if (err)
+            console.error(err);
+    });
+};
+/**
+ * @description Most of my controller code involves waiting for results from a
+ * promise, and then sending that response via the `res` object. This method
+ * prevents unnecessarily duplicated code.
+ *
+ * @param {Promise} pendingPromise the promise should be such that calling
+ * `then` delivers the message that needs to be sent to the user.
+ *
+ * @param {Response} res a reference to the Express Response object associated
+ * with the pending request
+ */
+exports.sendResponseFromPromise = function (pendingPromise, res) {
+    pendingPromise
+        .then(function (results) { exports.convertObjectToResponse(null, results, res); })
+        .catch(function (err) { exports.convertObjectToResponse(err, null, res); });
+};
