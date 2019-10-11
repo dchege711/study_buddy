@@ -75,7 +75,11 @@ module.exports = {
 
             staticFiles: {
                 include: ["wiki/_img"]
-            }
+            },
+
+            // Exclude the date and time footer to prevent .html files from 
+            // being added to the git index despite their content not changing
+            includeDate: false,
         }
     }
 };  
