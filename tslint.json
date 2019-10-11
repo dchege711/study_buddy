@@ -4,6 +4,12 @@
         "tslint:recommended"
     ],
     "jsRules": {},
+    "linterOptions": {
+        "exclude": [
+            "src/public/dist/highlight.pack.js", 
+            "src/public/src/AVLTree.js"
+        ]
+    },
     "rules": {
         "trailing-comma": [ false ]
     },

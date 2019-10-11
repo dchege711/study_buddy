@@ -64,7 +64,7 @@ exports.populateDummyAccount = function(numCards=50) {
 if (require.main === module) {
 
     const dbConnection = require("../models/MongooseClient.js");
-    let numCards = 60;
+    let numCards = 15;
     exports.populateDummyAccount(numCards)
         .then((user) => { 
             console.log(`Created user ${user.username} and gave them ${numCards} cards`);

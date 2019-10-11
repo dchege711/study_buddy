@@ -23,7 +23,7 @@
     ]
   },
   "scripts": {
-    "prebuild": "tslint -c tslint.json -p tsconfig.json",
+    "prebuild_disabled": "tslint -c tslint.json -p tsconfig.json",
     "copy_assets": "cp -a src/public/css/. dist/public/css/ && cp -a src/public/images/. dist/public/images/ && cp -a src/views/. dist/views/", 
     "build": "webpack --config src/webpack.config.js && tsc",
     "start": "tsc && npm run build && node dist/server.js",

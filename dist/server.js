@@ -94,14 +94,14 @@ app.use(function (err, req, res, next) {
     console.error(err.stack);
     res.status(500).render("pages/5xx_error_page.ejs", {
         response_JSON: { status: 500, message: "Internal Server Error" },
-        APP_NAME: config.APP_NAME
+        APP_NAME: config.APP_NAME, LOGGED_IN: req.session.user !== undefined
     });
 });
 // Handling 404: https://expressjs.com/en/starter/faq.html
 app.use(function (req, res, next) {
     res.status(404).render("pages/4xx_error_page.ejs", {
         response_JSON: { status: 404, message: "Page Not Found" },
-        APP_NAME: config.APP_NAME
+        APP_NAME: config.APP_NAME, LOGGED_IN: req.session.user !== undefined
     });
 });
 app.listen(port, function () {
