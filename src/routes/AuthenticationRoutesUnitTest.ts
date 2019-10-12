@@ -17,7 +17,10 @@ describe("AuthenticationRouter.ExpectedRoutes", function() {
 
         const routeChecker = new RouteChecker(AuthenticationRouter);
         expectedRoutes.forEach((routeAndMethod) => {
-            routeChecker.hasRoute(routeAndMethod[0], routeAndMethod[1]);
+            assert.ok(
+                routeChecker.hasRoute(routeAndMethod[0], routeAndMethod[1]), 
+                `Missing method: ${routeAndMethod[1]}; path: ${routeAndMethod[0]}`
+            );
         });
 
     });
