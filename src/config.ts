@@ -31,7 +31,7 @@ export { MONGO_URI };
  */
 function getAppBaseURL() {
     if (NODE_ENV === "production") return "https://cards.c13u.com";
-    if (NODE_ENV === "development") return `http://localhost:${PORT}`;
+    if (NODE_ENV === "development") return `http://127.0.0.0:${PORT}`;
 }
 
 /** The web URL from which all other app URLs are based of. */

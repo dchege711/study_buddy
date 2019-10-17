@@ -6,7 +6,7 @@ import assert = require("assert");
 
 import * as config from "./config";
 
-describe("config.ExpectedValues", function() {
+describe("Config.ExpectedValues", function() {
     it("should export these config variables with truthy values", function() {
         assert.ok(config.APP_NAME);
         assert.ok(config.PORT);
