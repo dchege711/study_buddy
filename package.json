@@ -2,7 +2,7 @@
   "name": "flashcards_by_c13u",
   "version": "1.0.0",
   "description": "A web application that helps me review content",
-  "main": "dist/server.js",
+  "main": "dist/App.js",
   "nyc": {
     "reporter": [
       "lcov",
@@ -26,9 +26,9 @@
     "prebuild_disabled": "tslint -c tslint.json -p tsconfig.json",
     "copy_assets": "cp -a src/public/css/. dist/public/css/ && cp -a src/public/images/. dist/public/images/ && cp -a src/views/. dist/views/",
     "build": "webpack --config src/webpack.config.js",
-    "start": "tsc && node dist/server.js",
-    "debug": "tsc && nodemon --inspect=127.0.0.1:9229 dist/server.js",
-    "test": "mocha --require ts-node/register --file GlobalTestTeardown.ts --exit --timeout 40000 'src/**/*Test.ts'",
+    "start": "tsc && node dist/App.js",
+    "debug": "tsc && nodemon --inspect=127.0.0.1:9229 dist/App.js",
+    "test": "nyc mocha --require ts-node/register --require source-map-support/register --file src/TestConfig.ts --exit --timeout 40000 'src/**/*Test.ts'",
     "heroku-postbuild": "echo Skip build on Heroku",
     "docs": "jsdoc -c ./config.jsdoc.js"
   },
@@ -48,13 +48,13 @@
   "homepage": "https://github.com/dchege711/study_buddy#readme",
   "dependencies": {
     "body-parser": "1.18.2",
-    "connect-mongo": "^2.0.1",
+    "connect-mongo": "^3.0.0",
     "cookie-parser": "^1.4.3",
     "ejs": "2.6.1",
     "express": "4.16.3",
     "express-session": "1.15.6",
     "express-sslify": "^1.2.0",
-    "mongoose": "^5.3.11",
+    "mongoose": "^5.7.5",
     "nodemailer": "^4.6.8",
     "path": "0.12.7",
     "showdown": "1.9.0",
@@ -64,6 +64,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.1.5",
+    "@istanbuljs/nyc-config-typescript": "^0.1.3",
     "@types/connect-mongo": "0.0.44",
     "@types/cookie-parser": "^1.4.2",
     "@types/express-sslify": "^1.2.1",
@@ -87,6 +88,7 @@
     "nodemon": "^1.19.2",
     "nyc": "^14.1.1",
     "selenium-webdriver": "4.0.0-alpha.1",
+    "source-map-support": "^0.5.13",
     "supertest": "^4.0.2",
     "ts-node": "^8.4.1",
     "tslint": "^5.20.0",
