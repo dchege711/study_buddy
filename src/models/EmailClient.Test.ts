@@ -13,7 +13,6 @@ describe("EmailClientTest", function() {
                 text: "This is a test email"
             })
             .then(function (confirmation) {
-                console.log(confirmation);
                 if (confirmation.success) resolve(confirmation.message);
                 else reject(confirmation.message);
             })
