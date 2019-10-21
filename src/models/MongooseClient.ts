@@ -17,6 +17,9 @@
 import * as mongoose from "mongoose";
 import { MONGO_URI } from "../config";
 
+// https://github.com/mongodb/node-mongodb-native/releases
+mongoose.set('useUnifiedTopology', true)
+
 // Already 5 by default, but I might need to increase it one day...
 mongoose.connect(MONGO_URI, {poolSize: 12, useNewUrlParser: true});
 
@@ -30,10 +33,10 @@ mongoose.set('useCreateIndex', true);
 (<any>mongoose).Promise = global.Promise;
 
 // Get the default connection (this will be registered on mongoose)
-const db = mongoose.connection;
+const dbConnection = mongoose.connection;
 
 // Bind the connection to the error event (to get notifications)
-db.on("error", console.error.bind(console, "Connection Error:"));
+dbConnection.on("error", console.error.bind(console, "Connection Error:"));
 
 /*
  * Tip from MDN:
@@ -62,4 +65,4 @@ process.on("SIGINT", function () {
 });
 
 /** @todo: Is this a bug? */
-export {db as dbConnection };
+export { dbConnection };
