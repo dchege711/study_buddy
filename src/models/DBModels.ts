@@ -26,7 +26,7 @@ import { getRandomString, ALPHANUMERICS } from "./Utils";
 
 export const sequelize = new Sequelize(DATABASE_URI);
 
-class User extends Model {
+export class User extends Model {
     /** An identifier of this user instance. */
     readonly id!: string;
 
@@ -102,7 +102,7 @@ User.init({
  * @description The hash and salt used to check that the submitted password
  * matches the one that was originally submitted by the user.
  */
-class UserAuthenticationData extends Model {
+export class UserAuthenticationData extends Model {
     readonly id!: string;
 
     /** The salt used to check a submitted password. */
@@ -132,7 +132,7 @@ UserAuthenticationData.init({
 User.hasOne(UserAuthenticationData);
 
 /** Configurable user settings. */
-class UserPrefences extends Model {
+export class UserPrefences extends Model {
     readonly id!: string;
 
     /** If set, cards created by users will be set to private by default. */
@@ -181,7 +181,7 @@ export const AUTH_TOKEN_TYPES = [
 ];
 
 /** Token used for authentication functionality in lieu of user password. */
-class UserAuthenticationToken extends Model {
+export class UserAuthenticationToken extends Model {
     readonly id!: string;
 
     /** The type of token. The value is one of `AUTH_TOKEN_TYPES` */
@@ -435,7 +435,7 @@ Tag.init({
 Tag.belongsToMany(FlashCard, { through: "FlashCardTag" });
 FlashCard.belongsToMany(Tag, { through: "FlashCardTag" });
 
-class ReviewStreak extends Model {
+export class ReviewStreak extends Model {
     readonly id!: string;
 
     /** The last time when this review streak was reset to zero. */
