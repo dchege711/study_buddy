@@ -272,3 +272,4 @@ if (typeof require !== "undefined" && require.main === module) {
     }
 }
 module.exports = max_PQ;
+//# sourceMappingURL=MaxPriorityQueue.js.map

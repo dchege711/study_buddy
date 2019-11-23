@@ -51,3 +51,4 @@ exports.syncSpoilerBox = function () {
         }
     }
 };
+//# sourceMappingURL=CardTemplateUtilities.js.map

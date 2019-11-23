@@ -1,8 +1,9 @@
+"use strict";
 /**
  * Set up the connection that will be used across the app.
  * There's a nice tutorial by
  * [MDN](https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/mongoose).
- * We choose MongoDB mainly because it's schemaless - we didn't yet have a
+ * We chose MongoDB mainly because it's schemaless - we didn't yet have a
  * crystal-clear vision of how the data end of the web app would turn out. We
  * also found [Mongoose](http://mongoosejs.com/) convenient for a quick start
  * in using MongoDB in Node. [mLab](https://www.mlab.com/) provides a nice free
@@ -13,14 +14,18 @@
  *
  * @module
  */
+Object.defineProperty(exports, "__esModule", { value: true });
 var mongoose = require("mongoose");
-var config = require('../config');
+var config_1 = require("../config");
 // Already 5 by default, but I might need to increase it one day...
-mongoose.connect(config.MONGO_URI, { poolSize: 12, useNewUrlParser: true });
+mongoose.connect(config_1.MONGO_URI, { poolSize: 12, useNewUrlParser: true });
 // Get Mongoose to use the global promise library.
+// This weird syntax is suggested by TypeScript since I'm overwriting an 
+// attribute from an import
 mongoose.Promise = global.Promise;
 // Get the default connection (this will be registered on mongoose)
 var db = mongoose.connection;
+exports.dbConnection = db;
 // Bind the connection to the error event (to get notifications)
 db.on("error", console.error.bind(console, "Connection Error:"));
 /*
@@ -35,17 +40,17 @@ db.on("error", console.error.bind(console, "Connection Error:"));
  * as connect() and returns a Connection object).
  */
 /**
- * @description Close the MongoDB connection before closing the application.
- *
- * @param {Function} callback The first parameter will be set in case of any
- * error
+ * @description Close the MongoDB connection. This method should be called
+ * before closing the application.
  */
-exports.closeMongooseConnection = function (callback) {
+function closeMongooseConnection() {
     return mongoose.disconnect();
-};
+}
+exports.closeMongooseConnection = closeMongooseConnection;
+;
 process.on("SIGINT", function () {
-    exports.closeMongooseConnection()
+    closeMongooseConnection()
         .then(function () { process.exit(0); })
         .catch(function (err) { console.error(err); process.exit(1); });
 });
-exports.mongooseConnection = db;
+//# sourceMappingURL=MongooseClient.js.map

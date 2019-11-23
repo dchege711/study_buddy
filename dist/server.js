@@ -1,10 +1,4 @@
-/**
- * We use [express-session]{@link https://github.com/expressjs/session} and
- * some custom middleware to support persistent logins. In case we'll need to
- * support Facebook/Twitter/Google logins in the future, we'll use
- * [passport]{@link http://www.passportjs.org/docs/configure/}. For now,
- * Passport is an overkill.
- */
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -41,70 +35,99 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var _this = this;
+Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
 var session = require("express-session");
-var MongoStore = require('connect-mongo')(session);
+var MongoStore = require("connect-mongo");
 var path = require("path");
 var bodyParser = require("body-parser");
 var cookieParser = require("cookie-parser");
-var enforce = require('express-sslify');
-var AccountRoutes = require("./routes/AuthenticationRoutes.js");
-var InAppRoutes = require("./routes/InAppRoutes.js");
-var config = require("./config.js");
-var misc = require("./models/Miscellaneous.js");
+var enforce = require("express-sslify");
+var AuthenticationRoutes_1 = require("./routes/AuthenticationRoutes");
+var InAppRoutes_1 = require("./routes/InAppRoutes");
+var config_1 = require("./config");
+var Miscellaneous_1 = require("./models/Miscellaneous");
 // Needed to get a Mongoose instance running for this process
-var dbConnection = require("./models/MongooseClient.js");
+var MongooseClient_js_1 = require("./models/MongooseClient.js");
+var mongoStore = MongoStore(session);
 // Set up the default account for publicly viewable cards
-(function () { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+(function () { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
     switch (_a.label) {
-        case 0: return [4 /*yield*/, misc.addPublicUser()];
+        case 0: return [4 /*yield*/, Miscellaneous_1.addOrFetchPublicUser()];
         case 1:
             _a.sent();
             return [2 /*return*/];
     }
 }); }); })();
-var app = express();
-var port = config.PORT;
+exports.App = express();
 // In Heroku's honesty we trust. Beware otherwise as headers can be spoofed
 // https://github.com/florianheinemann/express-sslify
 if (process.env.NODE_ENV === "production") {
-    app.use(enforce.HTTPS({ trustProtoHeader: true }));
+    exports.App.use(enforce.HTTPS({ trustProtoHeader: true }));
 }
-app.use(session({
+exports.App.use(session({
     secret: "bad secret",
-    httpOnly: false,
+    // httpOnly: false,
     resave: false,
     name: "c13u-study-buddy",
-    store: new MongoStore({
-        mongooseConnection: dbConnection.mongooseConnection,
+    store: new mongoStore({
+        mongooseConnection: MongooseClient_js_1.dbConnection,
         touchAfter: 24 * 3600
     }),
     saveUninitialized: true
 }));
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, "public")));
-app.use(cookieParser());
-app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "ejs");
-app.use("/", AccountRoutes);
-app.use("/", InAppRoutes);
-app.use(function (err, req, res, next) {
+exports.App.use(bodyParser.urlencoded({ extended: true }));
+exports.App.use(bodyParser.json());
+exports.App.use(express.static(path.join(__dirname, "public")));
+exports.App.use(cookieParser());
+exports.App.set("views", path.join(__dirname, "views"));
+exports.App.set("view engine", "ejs");
+exports.App.use("/", AuthenticationRoutes_1.AuthenticationRouter);
+exports.App.use("/", InAppRoutes_1.InAppRouter);
+/**
+ * These values persist throughout the App's lifetime and are available to all
+ * templates. {@link http://expressjs.com/en/api.html#App.locals}
+ */
+exports.App.locals = {
+    APP_NAME: config_1.APP_NAME, BASE_URL: config_1.BASE_URL, LOGGED_IN: false
+};
+/**
+ * Define Application middleware
+ * {@link https://expressjs.com/en/guide/using-middleware.html}
+ */
+/**
+ * This middleware function with no mount path. It is executed every time the
+ * App receives a request.
+ */
+exports.App.use(function (req, res, next) {
+    // res.locals is scoped to each request
+    res.locals.LOGGED_IN = req.session && req.session.user;
+    next();
+});
+/**
+ * Error handling middle ware is a curious case. See docs:
+ * {@link https://expressjs.com/en/guide/using-middleware.html},
+ * {@link https://expressjs.com/en/guide/error-handling.html}
+ *
+ * "Error-handling middleware always takes four arguments. You must provide four
+ * arguments to identify it as an error-handling middleware function. Even if
+ * you don’t need to use the next object, you must specify it to maintain the
+ * signature. Otherwise, the next object will be interpreted as regular
+ * middleware and will fail to handle errors."
+ */
+exports.App.use(function (err, req, res, next) {
     console.error(err.stack);
     res.status(500).render("pages/5xx_error_page.ejs", {
         response_JSON: { status: 500, message: "Internal Server Error" },
-        APP_NAME: config.APP_NAME, LOGGED_IN: req.session.user !== undefined
+        APP_NAME: config_1.APP_NAME, LOGGED_IN: req.session.user !== undefined
     });
 });
 // Handling 404: https://expressjs.com/en/starter/faq.html
-app.use(function (req, res, next) {
+exports.App.use(function (req, res, next) {
     res.status(404).render("pages/4xx_error_page.ejs", {
         response_JSON: { status: 404, message: "Page Not Found" },
-        APP_NAME: config.APP_NAME, LOGGED_IN: req.session.user !== undefined
+        APP_NAME: config_1.APP_NAME, LOGGED_IN: req.session.user !== undefined
     });
 });
-app.listen(port, function () {
-    console.log(path.join(__dirname, "views"));
-    console.log("App is running on port " + port);
-});
+exports.App.listen(config_1.PORT, function () { console.log("Listening on port " + config_1.PORT); });
+//# sourceMappingURL=server.js.map

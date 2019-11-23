@@ -1,16 +1,26 @@
-var express = require("express");
-var auth_controller = require("../controllers/AuthenticationController.js");
-var router = express.Router();
-router.get("/", auth_controller.handleLogIn);
-router.get("/login", auth_controller.handleLogIn);
-router.post("/register-user", auth_controller.registerUser);
-router.post("/login", auth_controller.loginUser);
-router.post("/logout", auth_controller.logoutUser);
-router.get("/send-validation-email", auth_controller.sendValidationEmailGet);
-router.post("/send-validation-email", auth_controller.sendValidationEmailPost);
-router.get("/verify-account/*", auth_controller.verifyAccount);
-router.get("/reset-password", auth_controller.resetPasswordGet);
-router.post("/reset-password", auth_controller.resetPasswordPost);
-router.get("/reset-password-link/*", auth_controller.resetPasswordLinkGet);
-router.post("/reset-password-link/*", auth_controller.resetPasswordLinkPost);
-module.exports = router;
+"use strict";
+/**
+ * @description Provide routes related to authenticating users.
+ */
+Object.defineProperty(exports, "__esModule", { value: true });
+var express_1 = require("express");
+var AuthenticationController_1 = require("../controllers/AuthenticationController");
+/**
+ * A AuthenticationRouter with routes for registering users, logging in users, processing
+ * account validation emails and processing password resets.
+ */
+var AuthenticationRouter = express_1.Router();
+exports.AuthenticationRouter = AuthenticationRouter;
+AuthenticationRouter.get("/", AuthenticationController_1.handleLogIn);
+AuthenticationRouter.get("/login", AuthenticationController_1.handleLogIn);
+AuthenticationRouter.post("/register-user", AuthenticationController_1.registerUser);
+AuthenticationRouter.post("/login", AuthenticationController_1.loginUser);
+AuthenticationRouter.post("/logout", AuthenticationController_1.logoutUser);
+AuthenticationRouter.get("/send-validation-email", AuthenticationController_1.sendValidationEmailGet);
+AuthenticationRouter.post("/send-validation-email", AuthenticationController_1.sendValidationEmailPost);
+AuthenticationRouter.get("/verify-account/*", AuthenticationController_1.verifyAccount);
+AuthenticationRouter.get("/reset-password", AuthenticationController_1.resetPasswordGet);
+AuthenticationRouter.post("/reset-password", AuthenticationController_1.resetPasswordPost);
+AuthenticationRouter.get("/reset-password-link/*", AuthenticationController_1.resetPasswordLinkGet);
+AuthenticationRouter.post("/reset-password-link/*", AuthenticationController_1.resetPasswordLinkPost);
+//# sourceMappingURL=AuthenticationRoutes.js.map

@@ -1,16 +1,17 @@
 "use strict";
-var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {
-    if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
-    return cooked;
-};
 /**
  * Provide functionality for sanitizing and validating user input on the server.
  *
  * @module
  */
+var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cooked, raw) {
+    if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
+    return cooked;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 var showdown = require("showdown");
 var xss = require("xss");
-/*
+/**
  * The converter is used to turn the markdown in the cards into html.
  *
  * Since we're targeting users that store somewhat detailed flashcards,
@@ -50,25 +51,22 @@ var converter = new showdown.Converter({
     disableForced4SpacesIndentedSublists: true
 });
 /**
- * @description Sanitize the card to prevent malicious input, e.g XSS attack
- *
- * @param {JSON} card A card object that is about to be saved into the
- * database.
- *
- * @returns {JSON} sanitized card
+ * @description Return `card` after it has been sanitized. Sanitization helps
+ * prevent malicious actions, e.g an XSS attack. Sanitization is done in place.
  */
-exports.sanitizeCard = function (card) {
+function sanitizeCard(card) {
     if (card.title !== undefined) {
         card.title = xss(card.title);
     }
     if (card.description !== undefined) {
-        var outputHTML = converter.makeHtml(String.raw(__makeTemplateObject(["", ""], ["", ""]), card.description.replace(/\\/g, "\\\\")));
+        var outputHTML = converter.makeHtml(String.raw(templateObject_1 || (templateObject_1 = __makeTemplateObject(["", ""], ["", ""])), card.description.replace(/\\/g, "\\\\")));
         // Otherwise, the HTML renders with '&nbsp;' literals instead of spaces
         outputHTML = xss(outputHTML).replace(/&amp;nbsp;/g, "&nbsp;");
         if (outputHTML.match(/\[spoiler\]/i)) {
             outputHTML = outputHTML.replace(/\[spoiler\]/i, "<span id='spoiler'>[spoiler]</span>");
             outputHTML += "<span id=\"spoiler_end\"></span>";
         }
+        // @ts-ignore
         card.descriptionHTML = outputHTML;
     }
     if (card.urgency !== undefined) {
@@ -87,20 +85,20 @@ exports.sanitizeCard = function (card) {
         card.parent = xss(card.parent);
     }
     return card;
-};
+}
+exports.sanitizeCard = sanitizeCard;
 /**
- * @description Prevent a NoSQL Injection in the search parameters. This is
- * achieved by deleting all query values that begin with `$`.
- *
- * @param {Object} query A mapping of query values, e.g. {username: "dchege711"}
- *
- * @returns {Object} A sanitized version of the input.
+ * @description Sanitize `query` and return it.
  */
-exports.sanitizeQuery = function (query) {
+function sanitizeQuery(query) {
     var keys = Object.keys(query);
     for (var i = 0; i < keys.length; i++) {
-        if (/^\$/.test(query[keys[i]]))
+        // Delete all values that begin with `$` to prevent NoSQL injection.
+        if (/^\$/.test(query[keys[i]].toString()))
             delete query[keys[i]];
     }
     return query;
-};
+}
+exports.sanitizeQuery = sanitizeQuery;
+var templateObject_1;
+//# sourceMappingURL=SanitizationAndValidation.js.map

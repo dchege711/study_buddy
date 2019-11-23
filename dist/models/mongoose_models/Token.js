@@ -1,11 +1,23 @@
+"use strict";
 /**
- * @description A model for representing tokens.
+ * @description A model for representing tokens. Tokens are my way of logging
+ * in returning users without them providing their login details.
+ *
+ * @todo How used is this model? Can I switch it of and use the `sessions`
+ * collection created by `express-session` in `server.js`. Furthermore, how
+ * does one invalidate `express-session` sessions when the user changes their
+ * password, or decides to log out of the application?
  *
  * @module
  */
-var mongoose = require('mongoose');
-var isEmail = require("validator").isEmail;
-var tokenSchema = new mongoose.Schema({
+Object.defineProperty(exports, "__esModule", { value: true });
+var mongoose = require("mongoose");
+var validator_1 = require("validator");
+;
+/**
+ * The schema used to represent tokens in the database.
+ */
+exports.TokenSchema = new mongoose.Schema({
     token_id: {
         type: String,
         required: true,
@@ -17,7 +29,7 @@ var tokenSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        validate: [isEmail, 'Please provide a valid email address']
+        validate: [validator_1.isEmail, 'Please provide a valid email address']
     },
     user_reg_date: String
 }, {
@@ -25,4 +37,7 @@ var tokenSchema = new mongoose.Schema({
     collection: "study_buddy_tokens",
     strict: true
 });
-module.exports = mongoose.model('Token', tokenSchema);
+/** A database model of the token used to re-login users automatically. */
+var Token = mongoose.model('Token', exports.TokenSchema);
+exports.Token = Token;
+//# sourceMappingURL=Token.js.map

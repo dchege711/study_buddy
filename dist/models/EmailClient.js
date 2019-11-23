@@ -7,29 +7,22 @@
  *
  * @module
  */
+Object.defineProperty(exports, "__esModule", { value: true });
 var nodemailer = require("nodemailer");
-var config = require("../config.js");
+var config_1 = require("../config");
 var transporter = nodemailer.createTransport({
     pool: true,
     host: "smtp.mailgun.org",
     port: 587,
     secure: false,
-    auth: {
-        user: config.MAILGUN_LOGIN,
-        pass: config.MAILGUN_PASSWORD
-    }
+    auth: { user: config_1.MAILGUN_LOGIN, pass: config_1.MAILGUN_PASSWORD }
 });
 /**
- *
- * @param {JSON} mailOptions Values are comma separated strings whose keys include:
- * `to`, `cc`, `bcc`, `subject`, `text`, `html`, except for `attachment`
- * which is an object with the keys `filename`, `content`, `path`, `href`,
- * `contentType`, `contentDisposition`, `cid`, `encoding`, `headers`, `raw`.
- *
- * @returns {Promise} takes a JSON with `success` and `message` as the keys
+ * @description Send an email as directed by `mailOptions`. If successful, the
+ * `message` property holds the object returned by `nodemailer`
  */
-exports.sendEmail = function (mailOptions) {
-    mailOptions.from = config.APP_NAME + " <" + config.EMAIL_ADDRESS + ">";
+function sendEmail(mailOptions) {
+    mailOptions.from = config_1.APP_NAME + " <" + config_1.EMAIL_ADDRESS + ">";
     return new Promise(function (resolve, reject) {
         transporter.sendMail(mailOptions)
             .then(function (info) {
@@ -37,14 +30,19 @@ exports.sendEmail = function (mailOptions) {
         })
             .catch(function (err) { reject(err); });
     });
-};
+}
+exports.sendEmail = sendEmail;
+;
 /**
  * @description Clean up the resources before exiting this module.
  */
-exports.close = function () {
-    transporter.close();
-};
+function close() {
+    transporter.close(); // Typescript only exports local objects
+}
+exports.close = close;
+;
 // Close the SMTP pool before closing the application.
 process.on("SIGINT", function () {
-    exports.close();
+    close();
 });
+//# sourceMappingURL=EmailClient.js.map

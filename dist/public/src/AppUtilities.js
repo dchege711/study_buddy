@@ -134,3 +134,4 @@ exports.refreshMetadata = function () {
             .catch(function (err) { reject(err); });
     });
 };
+//# sourceMappingURL=AppUtilities.js.map

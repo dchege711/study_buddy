@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * Handle card-related activities, e.g. CRUD operations.
+ *
+ * @module
+ */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,58 +40,48 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+Object.defineProperty(exports, "__esModule", { value: true });
+var CardSchema_1 = require("./mongoose_models/CardSchema");
+var MetadataDB = require("./MetadataMongoDB");
+var SanitizationAndValidation_1 = require("./SanitizationAndValidation");
 /**
- * Handle card-related activities, e.g. CRUD operations.
- *
- * @module
+ * @description Create a new card and add it to the user's current cards. If
+ * successful, the `message` property holds the newly saved card.
  */
-var Card = require('./mongoose_models/CardSchema.js');
-var MetadataDB = require('./MetadataMongoDB.js');
-var sanitizer = require("./SanitizationAndValidation.js");
-var cardSanitizer = sanitizer.sanitizeCard;
-var querySanitizer = sanitizer.sanitizeQuery;
-/**
- * Create a new card and add it to the user's current cards.
- *
- * @param {JSON} payload Expected keys: `title`, `description`, `tags`,
- * `createdById`, `urgency`, `isPublic` and `parent`.
- *
- * @returns {Promise} takes a JSON object with `success`, `status` and `message`
- * as its keys. If successful, the message will contain the saved card.
- */
-exports.create = function (payload) {
+function create(newCard) {
     return new Promise(function (resolve, reject) {
-        var returnedValues = {};
-        var sanitizedCard = cardSanitizer(payload);
-        Card
-            .create(sanitizedCard)
-            .then(function (savedCard) {
-            returnedValues.savedCard = savedCard;
-            savedCard.previousTags = savedCard.tags;
-            return MetadataDB.update([savedCard]);
+        var savedCard;
+        newCard = SanitizationAndValidation_1.sanitizeCard(newCard);
+        CardSchema_1.Card
+            .create(newCard)
+            .then(function (card) {
+            card.previousTags = card.tags;
+            savedCard = card;
+            return MetadataDB.update([savedCard], { createdById: card.createdById, metadataIndex: 0 });
         })
             .then(function (confirmation) {
             if (confirmation.success) {
-                confirmation.message = returnedValues.savedCard;
+                return MetadataDB.updatePublicUserMetadata([savedCard]);
             }
-            returnedValues.saveConfirmation = confirmation;
-            return MetadataDB.updatePublicUserMetadata([returnedValues.savedCard]);
+            else {
+                return Promise.resolve(null);
+            }
         })
-            .then(function (_) { resolve(returnedValues.saveConfirmation); })
+            .then(function (_) {
+            resolve({ success: true, status: 200, message: savedCard });
+        })
+            /** @todo: Get rid of this workaround */
             .catch(function (err) { if (err !== "DUMMY")
             reject(err); });
     });
-};
+}
+exports.create = create;
+;
 /**
- * Create multiple cards at once
- *
- * @param {Array} unsavedCards An array of JSON objects keyed by `title`,
- * `description`, `tags`, `createdById`, `urgency`, `isPublic` and `parent`.
- *
- * @returns {Promise} takes a JSON object with `success`, `status` and `message`
- * as its keys. If successful, the message will be an array of the saved cards' IDs
+ * Create multiple cards at once. If successful, the `message` attribute will
+ * be an array of the IDs of the saved cards.
  */
-exports.createMany = function (unsavedCards) {
+function createMany(newCards) {
     return new Promise(function (resolve, reject) {
         return __awaiter(this, void 0, void 0, function () {
             var savedCardsIDs, saveConfirmation, i;
@@ -97,12 +92,12 @@ exports.createMany = function (unsavedCards) {
                         i = 0;
                         _a.label = 1;
                     case 1:
-                        if (!(i < unsavedCards.length)) return [3 /*break*/, 4];
-                        return [4 /*yield*/, exports.create(unsavedCards[i]).catch(function (err) {
-                                reject(err);
-                                return;
-                            })];
+                        if (!(i < newCards.length)) return [3 /*break*/, 4];
+                        return [4 /*yield*/, create(newCards[i])
+                                .catch(function (err) { reject(err); })];
                     case 2:
+                        /** @todo How could this go wrong? */
+                        // @ts-ignore
                         saveConfirmation = _a.sent();
                         savedCardsIDs.push(saveConfirmation.message._id);
                         _a.label = 3;
@@ -118,28 +113,21 @@ exports.createMany = function (unsavedCards) {
             });
         });
     });
-};
+}
+exports.createMany = createMany;
 /**
- * Read a card(s) from the database.
- *
- * @param {JSON} payload Must contain `userIDInApp` as one of the keys.
- * If `_id` is not one of the keys, fetch all the user's cards.
- *
- * @param {String} projection The fields to return. Defaults to
- * `title description descriptionHTML tags urgency createdById isPublic`
- *
- * @returns {Promise} resolves with a JSON doc with `success`, `status` and
- * `message` as keys. If successful, `message` will be an array of all matching
- * cards.
+ * Read a card(s) from the database. If `searchQuery.cardID` is not defined,
+ * all the cards belonging to the user will be fetched. If successful, `message`
+ * will be an array of all matching cards.
  */
-exports.read = function (payload, projection) {
+function read(searchQuery, projection) {
     if (projection === void 0) { projection = "title description descriptionHTML tags urgency createdById isPublic"; }
-    payload = querySanitizer(payload);
-    var query = { createdById: payload.userIDInApp };
-    if (payload.cardID !== undefined)
-        query._id = payload.cardID;
+    searchQuery = SanitizationAndValidation_1.sanitizeQuery(searchQuery);
+    var query = { createdById: searchQuery.userIDInApp };
+    if (searchQuery.cardID !== undefined)
+        query._id = searchQuery.cardID;
     return new Promise(function (resolve, reject) {
-        Card
+        CardSchema_1.Card
             .find(query).select(projection).exec()
             .then(function (cards) {
             resolve({
@@ -148,29 +136,30 @@ exports.read = function (payload, projection) {
         })
             .catch(function (err) { reject(err); });
     });
-};
+}
+exports.read = read;
+;
 /**
- * Update an existing card. Some fields of the card are treated as constants,
- * e.g. `createdById` and `createdAt`
+ * @description Save the changes `cardJSON` to the database.
  *
- * @param {JSON} cardJSON The parts of the card that have been updated. Must
- * include `cardID` as an attribute, otherwise no changes will be made.
+ * @param cardJSON The parts of the card that have been updated. Must
+ * include `cardID` as an attribute, otherwise no changes will be made. Some
+ * fields of the card are treated as constants, e.g. `createdById` and `createdAt`.
  *
- * @returns {Promise} resolves with a JSON doc with `success`, `status` and
- * `message` as keys. If successful, `message` will be the updated card.
+ * @returns {Promise} If successful, `message` will be the updated card.
  */
-exports.update = function (cardJSON) {
+function update(cardJSON) {
     var prevResults = {};
     var EDITABLE_ATTRIBUTES = new Set([
         "title", "description", "descriptionHTML", "tags", "urgency", "isPublic",
         "numTimesMarkedAsDuplicate", "numTimesMarkedForReview"
     ]);
-    var query = querySanitizer({ cardID: cardJSON.cardID });
-    cardJSON = cardSanitizer(cardJSON);
+    var query = SanitizationAndValidation_1.sanitizeQuery({ cardID: cardJSON.cardID });
+    cardJSON = SanitizationAndValidation_1.sanitizeCard(cardJSON);
     // findByIdAndUpdate will give me the old, not the updated, document.
     // I need to find the card, save it, and then call MetadataDB.update if need be
     return new Promise(function (resolve, reject) {
-        Card
+        CardSchema_1.Card
             .findById(query.cardID).exec()
             .then(function (existingCard) {
             if (existingCard === null) {
@@ -180,6 +169,7 @@ exports.update = function (cardJSON) {
                 prevResults.previousTags = existingCard.tags;
                 Object.keys(cardJSON).forEach(function (cardKey) {
                     if (EDITABLE_ATTRIBUTES.has(cardKey)) {
+                        // @ts-ignore EDITABLE_ATTRIBUTES is a safe list
                         existingCard[cardKey] = cardJSON[cardKey];
                     }
                 });
@@ -190,11 +180,11 @@ exports.update = function (cardJSON) {
             if (cardJSON.hasOwnProperty("tags") || cardJSON.hasOwnProperty("urgency")) {
                 savedCard.previousTags = prevResults.previousTags;
                 prevResults.savedCard = savedCard;
-                return MetadataDB.update([savedCard]);
+                return MetadataDB.update([savedCard], { createdById: savedCard.createdById, metadataIndex: 0 });
             }
             else {
                 prevResults.savedCard = savedCard;
-                return Promise.resolve("DUMMY");
+                return Promise.resolve({});
             }
         })
             .then(function (_) {
@@ -205,58 +195,18 @@ exports.update = function (cardJSON) {
         })
             .catch(function (err) { reject(err); });
     });
-};
-/**
- * @description Remove this card from the database. We learned that we should
- * [never use a warning when we meant undo]{@link http://alistapart.com/article/neveruseawarning}.
- * Seems like a good design decision. Users who really want to delete a card
- * might be unsatisifed, but I bet they're in the minority(?). Furthermore,
- * they can permanently delete a card from the accounts page. Amazing how much
- * fiddling goes in the backend, just to allow a user to delete and then save
- * themselves 3 seconds later by hitting `Undo`.
- *
- * {@tutorial main.editing_cards}
- *
- * @param {JSON} payload The card to be removed
- * @return {Promise} resolves with a JSON keyed by `success`, `status` and
- * `message` as keys.
- */
-exports.delete = function (payload) {
-    payload = querySanitizer(payload);
-    return new Promise(function (resolve, reject) {
-        Card
-            .findByIdAndRemove(payload.cardID).exec()
-            .then(function (removedCard) {
-            return MetadataDB.remove(removedCard);
-        })
-            .then(function (confirmation) {
-            resolve(confirmation);
-        })
-            .catch(function (err) { reject(err); });
-    });
-};
+}
+exports.update = update;
+;
 /**
  * @description Search for cards with associated key words. Search should be
- * relevant and fast, erring on the side of relevance. Studying the docs helps
- * one make efficient queries and capture some low-hanging fruit. For instance,
- * using `where(some_js_expression)` in MongoDB is expensive because
- * `some_js_expression` will be evaluated for every document in the collection.
- * ~~Using regex inside the query itself is more efficient.~~ MongoDB supports
- * [text search]{@link https://docs.mongodb.com/v3.2/text-search/} and a 'sort
- * by relevance' function.
+ * relevant and fast, erring on the side of relevance.
  *
- * @param {JSON} payload Expected keys: `key_words`, `createdById`
- * @returns {Promise} resolves with a JSON with `success`, `status` and `message`
- * as keys. If successful `message` will contain abbreviated cards that only
- * the `id`, `urgency` and `title` fields.
+ * @returns If successful the `message` attribute holds a list of partial cards,
+ * i.e. each card object only has `id`, `urgency` and `title` attributes.
  */
-exports.search = function (payload) {
-    /**
-     * $expr is faster than $where because it does not execute JavaScript
-     * and should be preferred where possible. Note that the JS expression
-     * is processed for EACH document in the collection. Yikes!
-     */
-    payload = querySanitizer(payload);
+function search(payload) {
+    payload = SanitizationAndValidation_1.sanitizeQuery(payload);
     if (payload.queryString !== undefined) {
         payload.queryString = splitTags(payload.queryString);
     }
@@ -274,19 +224,21 @@ exports.search = function (payload) {
         limit: payload.limit,
         sortCriteria: { score: { $meta: "textScore" } }
     };
-    return collectSearchResults(queryObject);
-};
+    return collectMatchingCards(queryObject);
+}
+exports.search = search;
+;
 /**
- * @description Append a copy of the hyphenated/underscored words in the incoming
- * string without the hyphens/underscores. Useful for pre-processing search
- * queries. A person searching for `dynamic_programming` should be interested in
- * `dynamic programming` as well.
- *
- * @param {String} s a string that may contain hyphenated/underscored words, e.g
- * `arrays dynamic_programming iterative-algorithms`.
- *
- * @returns {String} a string with extra space delimited words, e.g.
+ * @description Append a copy of the hyphenated/underscored words in `s`
+ * without the hyphens/underscores. Useful for pre-processing search queries.
+ * For instance, the input: `arrays dynamic_programming iterative-algorithms`
+ * would lead to:
  * `arrays dynamic_programming iterative-algorithms dynamic programming iterative algorithms`
+ *
+ * @todo Not entirely true. Interest in `dynamic_programming` doesn't mean a
+ * user is interested in `dynamic` and `programming` as separate terms. A better
+ * approach would be filtering out stop words and asking the user to enquote
+ * phrases that should be matched exactly.
  */
 var splitTags = function (s) {
     var possibleTags = s.match(/[\w|\d]+(\_|-){1}[\w|\d]+/g);
@@ -301,12 +253,21 @@ var splitTags = function (s) {
  * @description Search the database for cards matching the specified schema.
  * Return the results to the callback function that was passed in.
  *
- * @returns {Promise} resolves with a JSON object. If `success` is set, then
- * the `message` attribute will be an array of matching cards.
+ * @returns {Promise} If `success` is set, then the `message` attribute will be
+ * an array of matching cards.
  */
-var collectSearchResults = function (queryObject) {
+var collectMatchingCards = function (queryObject) {
+    /**
+     * $expr is faster than $where because it does not execute JavaScript
+     * and should be preferred where possible. Note that the JS expression
+     * is processed for EACH document in the collection. Yikes!
+     * ~~Using regex inside the query itself is more efficient.~~
+     * MongoDB supports
+     * [text search]{@link https://docs.mongodb.com/v3.2/text-search/} and
+     * a 'sort by relevance' function.
+     */
     return new Promise(function (resolve, reject) {
-        Card
+        CardSchema_1.Card
             .find(queryObject.filter, queryObject.sortCriteria)
             .sort(queryObject.sortCriteria)
             .select(queryObject.projection)
@@ -322,7 +283,7 @@ var collectSearchResults = function (queryObject) {
  * @description Find cards that satisfy the given criteria and are publicly
  * viewable.
  *
- * @param {JSON} `payload` Supported keys include:
+ * @param payload Supported keys include:
  *  - `userID`: The ID of the creator of the cards
  *  - `cardIDs`: A string of card IDs separated by a `,` without spaces
  *  - `cardID`: The ID of a single card. The same effect can be achieved with `cardIDs`
@@ -330,17 +291,14 @@ var collectSearchResults = function (queryObject) {
  *  - `creationStartDate`: The earliest date by which the cards were created
  *  - `creationEndDate`: The latest date for which the cards were created
  *
- * @returns {Promise} resolves with a JSON object. If `success` is set, then
- * the `message` attribute will be an array of matching cards.
+ * @returns {Promise} If `success` is set, then the `message` attribute will
+ * be an array of matching cards.
  */
-exports.publicSearch = function (payload) {
-    payload = querySanitizer(payload);
+function publicSearch(payload) {
+    payload = SanitizationAndValidation_1.sanitizeQuery(payload);
     var mandatoryFields = [{ isPublic: true }];
     if (payload.userID !== undefined) {
         mandatoryFields.push({ createdById: payload.userID });
-    }
-    if (payload.cardIDs && typeof payload.cardIDs === "string") {
-        payload.cardIDs = Array.from(payload.cardIDs.split(","));
     }
     if (payload.cardID)
         payload.cardIDs = [payload.cardID];
@@ -356,6 +314,7 @@ exports.publicSearch = function (payload) {
             dateQuery["$gt"] = payload.creationStartDate;
         if (payload.creationEndDate)
             dateQuery["$lt"] = payload.creationEndDate;
+        // @ts-ignore Doesn't match the date type on ICard, but this is fine
         mandatoryFields.push({ createdAt: dateQuery });
     }
     var queryObject = {
@@ -364,23 +323,26 @@ exports.publicSearch = function (payload) {
         limit: payload.limit,
         sortCriteria: { score: { $meta: "textScore" } }
     };
-    return collectSearchResults(queryObject);
-};
+    return collectMatchingCards(queryObject);
+}
+exports.publicSearch = publicSearch;
 /**
- * @description Read a card that has been set to 'public'
- * @param {JSON} payload The `card_id` property should be set to a valid ID
- * @returns {Promise} resolves with a JSON object. If `success` is set, then
- * the `message` attribute will contain a single-element array containing the
- * matching card if any.
+ * @description Read a card as a `public` user, e.g. from the `browse` page
+ *
+ * @returns {Promise} If `success` is set, then the `message` attribute will
+ * contain a single-element array containing the matching card if any.
  */
-exports.readPublicCard = function (payload) {
-    payload = querySanitizer(payload);
+function readPublicCard(payload) {
+    payload = SanitizationAndValidation_1.sanitizeQuery(payload);
     return new Promise(function (resolve, reject) {
         if (payload.cardID === undefined) {
-            resolve([{}]);
+            resolve({
+                success: false, status: 200,
+                message: "Couldn't parse the card ID from the request."
+            });
         }
         else {
-            Card
+            CardSchema_1.Card
                 .findOne({ isPublic: true, _id: payload.cardID }).exec()
                 .then(function (matchingCard) {
                 resolve({
@@ -390,53 +352,51 @@ exports.readPublicCard = function (payload) {
                 .catch(function (err) { reject(err); });
         }
     });
-};
+}
+exports.readPublicCard = readPublicCard;
 /**
  * @description Create a copy of the referenced card and add it to the user's
- * collection
+ * collection.
  *
- * @param {JSON} payload The `cardID` and `userIDInApp` and
- * `cardsAreByDefaultPrivate` attributes should be set appropriately.
- *
- * @returns {Promise} takes a JSON object with `success`, `status` and `message`
- * as its keys. If successful, the message will contain the saved card. This
- * response is the same as that of `CardsMongoDB.create(payload)`.
+ * @returns {Promise} If successful, `message` will contain the saved card.
  */
-exports.duplicateCard = function (payload) {
-    // Fetch the card to be duplicated
+function duplicateCard(payload) {
     return new Promise(function (resolve, reject) {
-        var queryObject = querySanitizer({ _id: payload.cardID, isPublic: true });
-        Card
+        var queryObject = SanitizationAndValidation_1.sanitizeQuery({ _id: payload.cardID, isPublic: true });
+        CardSchema_1.Card
             .findOne(queryObject).exec()
             .then(function (preExistingCard) {
             if (preExistingCard === null) {
                 resolve({
-                    success: false, status: 200, message: "Card not found!"
+                    success: false, status: 200,
+                    message: "The card to be copied was not found on the server."
                 });
-                return Promise.reject("DUMMY");
+                return;
             }
             else {
                 var idsOfUsersWithCopy = new Set(preExistingCard.idsOfUsersWithCopy.split(", "));
-                idsOfUsersWithCopy.add(payload.userIDInApp);
+                idsOfUsersWithCopy.add("" + payload.userIDInApp);
                 preExistingCard.idsOfUsersWithCopy = Array.from(idsOfUsersWithCopy).join(", ");
                 return preExistingCard.save();
             }
         })
             .then(function (savedPreExistingCard) {
-            return exports.create({
+            return create({
                 title: savedPreExistingCard.title,
                 description: savedPreExistingCard.description,
                 tags: savedPreExistingCard.tags,
                 parent: savedPreExistingCard._id,
                 createdById: payload.userIDInApp,
-                isPublic: payload.cardsAreByDefaultPrivate
+                isPublic: payload.isPublic,
+                urgency: CardSchema_1.CardSchema.obj.urgency.max
             });
         })
             .then(function (confirmation) { resolve(confirmation); })
-            .catch(function (err) { if (err !== "DUMMY")
-            reject(err); });
+            .catch(function (err) { reject(err); });
     });
-};
+}
+exports.duplicateCard = duplicateCard;
+;
 /**
  * @description With public cards, it's possible that some malicious users may
  * upload objectionable cards. While we don't delete users' cards against their
@@ -445,21 +405,20 @@ exports.duplicateCard = function (payload) {
  * `/browse` page. We increase the counter of the specified file. This allows
  * moderators to deal with the most flagged cards first.
  *
- * @param {JSON} payload The `cardID` must be set. `markedForReview` and
+ * @param payload The `cardID` must be set. `markedForReview` and
  * `markedAsDuplicate` are optional. If set, they should be booleans.
  *
- * @returns {Promise} takes a JSON object with `success`, `status` and `message`
- * as its keys. If successful, the message will contain the saved card.
+ * @returns {Promise} If successful, `message` will be a confirmation string.
  */
-exports.flagCard = function (payload) {
-    payload = querySanitizer(payload);
+function flagCard(payload) {
+    payload = SanitizationAndValidation_1.sanitizeQuery(payload);
     var flagsToUpdate = {};
     if (payload.markedForReview)
         flagsToUpdate.numTimesMarkedForReview = 1;
     if (payload.markedAsDuplicate)
         flagsToUpdate.numTimesMarkedAsDuplicate = 1;
     return new Promise(function (resolve, reject) {
-        Card
+        CardSchema_1.Card
             .findOneAndUpdate({ _id: payload.cardID }, { $inc: flagsToUpdate })
             .exec()
             .then(function (_) {
@@ -467,24 +426,20 @@ exports.flagCard = function (payload) {
                 status: 200, success: true, message: "Card flagged successfully!"
             });
         })
-            .catch(function (err) {
-            reject(err);
-        });
+            .catch(function (err) { reject(err); });
     });
-};
+}
+exports.flagCard = flagCard;
 /**
  * @description Fetch the tags contained in the associated users cards.
  *
- * @param {JSON} payload Must contain `userIDInApp` as one of the keys.
- *
- * @returns {Promise} takes a JSON object with `success`, `status` and `message`
- * as its keys. If successful, the message will contain an array of arrays. Each
- * inner array will have tags that were found on a same card.
+ * @returns {Promise} If successful, `message` will contain an array of arrays.
+ * Each inner array will have tags that were found on a same card.
  */
-exports.getTagGroupings = function (payload) {
-    payload = querySanitizer(payload);
+function getTagGroupings(payload) {
+    payload = SanitizationAndValidation_1.sanitizeQuery(payload);
     return new Promise(function (resolve, reject) {
-        Card
+        CardSchema_1.Card
             .find({ createdById: payload.userIDInApp })
             .select("tags").exec()
             .then(function (cards) {
@@ -493,12 +448,13 @@ exports.getTagGroupings = function (payload) {
                 tagsArray.push(cards[i].tags.split(" "));
             }
             resolve({
-                success: true, message: tagsArray
+                success: true, message: tagsArray, status: 200
             });
         })
             .catch(function (err) { reject(err); });
     });
-};
+}
+exports.getTagGroupings = getTagGroupings;
 /**
  * @description For uniformity, tags should be delimited by white-space. If a
  * tag has multiple words, then an underscore or hyphen can be used to delimit
@@ -506,10 +462,9 @@ exports.getTagGroupings = function (payload) {
  *
  * Remember to add `require('./MongooseClient');` at the top of this file when
  * running this script as main.
- *
  */
 var standardizeTagDelimiters = function () {
-    var cursor = Card.find({}).cursor();
+    var cursor = CardSchema_1.Card.find({}).cursor();
     cursor.on("data", function (card) {
         var currentCard = card; // In case of any race conditions...
         currentCard.tags = currentCard.tags.replace(/#/g, "");
@@ -533,10 +488,10 @@ var standardizeTagDelimiters = function () {
  * object. Needed so that it can be closed at the end of the script.
  */
 var insertDescriptionHTML = function (connection) {
-    var cursor = Card.find({}).cursor();
+    var cursor = CardSchema_1.Card.find({}).cursor();
     cursor.on("data", function (card) {
         var currentCard = card;
-        currentCard = cardSanitizer(currentCard);
+        currentCard = SanitizationAndValidation_1.sanitizeCard(currentCard);
         currentCard.save(function (err, savedCard) {
             if (err)
                 console.log(err);
@@ -546,11 +501,13 @@ var insertDescriptionHTML = function (connection) {
     });
     cursor.on("close", function () {
         console.log("Finished the operation");
-        connection.closeMongooseConnection();
+        connection.close();
     });
 };
 if (require.main === module) {
-    var dbConnection = require("../models/MongooseClient.js");
+    // @ts-ignore Let me be :-) Haha, can't run the resulting JS
+    // import { dbConnection } from "../models/MongooseClient";
     // standardizeTagDelimiters();
     insertDescriptionHTML(dbConnection);
 }
+//# sourceMappingURL=CardsMongoDB.js.map

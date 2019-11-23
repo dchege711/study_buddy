@@ -92,3 +92,4 @@ exports.getIDsOfSelectedTags = function () {
     });
     return setCardIDs;
 };
+//# sourceMappingURL=TagsBarUtilities.js.map

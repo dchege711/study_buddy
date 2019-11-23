@@ -4,8 +4,9 @@
  *
  * @module
  */
-var dbConnection = require("./MongooseClient.js");
-var Metadata = require("./mongoose_models/MetadataCardSchema.js");
+Object.defineProperty(exports, "__esModule", { value: true });
+var MongooseClient_1 = require("./MongooseClient");
+var MetadataCardSchema_1 = require("./mongoose_models/MetadataCardSchema");
 /**
  * @description Reset the daily card review streaks.
  */
@@ -14,16 +15,16 @@ function resetStreaks() {
     var currentTimeStamp = Date.now();
     var todaysDate = (new Date(currentTimeStamp)).toDateString();
     return new Promise(function (resolve, reject) {
-        Metadata
+        MetadataCardSchema_1.Metadata
             .find({ metadataIndex: 0 }).exec()
             .then(function (metadataDocs) {
             for (var _i = 0, metadataDocs_1 = metadataDocs; _i < metadataDocs_1.length; _i++) {
                 var metadataDoc = metadataDocs_1[_i];
                 var streakObj = {
-                    timeStamp: metadataDoc.streak.get("timeStamp"),
-                    cardIDs: metadataDoc.streak.get("cardIDs"),
-                    length: metadataDoc.streak.get("length"),
-                    dailyTarget: metadataDoc.streak.get("dailyTarget")
+                    timeStamp: metadataDoc.streak.timeStamp,
+                    cardIDs: metadataDoc.streak.cardIDs,
+                    length: metadataDoc.streak.length,
+                    dailyTarget: metadataDoc.streak.dailyTarget
                 };
                 var timeStampDate = (new Date(streakObj.timeStamp)).toDateString();
                 if (todaysDate !== timeStampDate) {
@@ -43,7 +44,7 @@ function resetStreaks() {
                     }
                 });
             }
-            return Metadata.bulkWrite(bulkWriteOps);
+            return MetadataCardSchema_1.Metadata.bulkWrite(bulkWriteOps);
         })
             .then(function (bulkWriteOpResult) { resolve(bulkWriteOpResult); })
             .catch(function (err) { reject(err); });
@@ -54,7 +55,8 @@ if (require.main === module) {
     resetStreaks()
         .then(function (result) {
         console.log("Reset the streak counters for " + result.modifiedCount + " documents");
-        return dbConnection.closeMongooseConnection();
+        return MongooseClient_1.closeMongooseConnection();
     })
         .catch(function (err) { console.error(err); });
 }
+//# sourceMappingURL=DailyTasks.js.map

@@ -1,17 +1,12 @@
 "use strict";
-var LogInUtilities = require("../models/LogInUtilities.js");
-var controllerUtils = require("./ControllerUtilities.js");
-var config = require("../config.js");
-var convertObjectToResponse = controllerUtils.convertObjectToResponse;
-var sendResponseFromPromise = controllerUtils.sendResponseFromPromise;
-var defaultTemplateObject = {
-    APP_NAME: config.APP_NAME, LOGGED_IN: false
-};
+Object.defineProperty(exports, "__esModule", { value: true });
+var LoginUtils = require("../models/LogInUtilities");
+var ControllerUtilities_1 = require("./ControllerUtilities");
 /**
  * @description Middleware designed to ensure that users are logged in before
  * using certain URLs
  */
-exports.requireLogIn = function (req, res, next) {
+function requireLogIn(req, res, next) {
     if (!req.session.user) {
         res.redirect("/login");
     }
@@ -23,16 +18,18 @@ exports.requireLogIn = function (req, res, next) {
         next();
     }
     else if (req.cookies.session_token) {
-        exports.logInBySessionToken(req.cookies.session_token, res, next);
+        logInBySessionToken(req.cookies.session_token, res, next);
     }
-};
+}
+exports.requireLogIn = requireLogIn;
+;
 /**
  * @description Middleware for authenticating browsers that provide a session
  * token. If the token is invalid (e.g. after a password reset or after 30 days),
  * we redirect the browser to the login page.
  */
-exports.logInBySessionToken = function (req, res, next) {
-    LogInUtilities
+function logInBySessionToken(req, res, next) {
+    LoginUtils
         .authenticateByToken(req.cookies.session_token)
         .then(function (auth_response) {
         if (auth_response.success) {
@@ -44,84 +41,105 @@ exports.logInBySessionToken = function (req, res, next) {
             res.redirect("/login");
         }
     })
-        .catch(function (err) { convertObjectToResponse(err, null, res); });
-};
-exports.handleLogIn = function (req, res) {
+        .catch(function (err) { ControllerUtilities_1.handleServerError(err, res); });
+}
+exports.logInBySessionToken = logInBySessionToken;
+;
+function handleLogIn(req, res) {
     if (req.session.user) {
         res.redirect("/home");
     }
     else if (req.cookies.session_token) {
-        exports.logInBySessionToken(req, res, function () { res.redirect("/home"); });
+        logInBySessionToken(req, res, function () { res.redirect("/home"); });
     }
     else {
-        res.render("pages/welcome_page", defaultTemplateObject);
+        res.render("pages/welcome_page");
     }
-};
-exports.registerUser = function (req, res) {
-    sendResponseFromPromise(LogInUtilities.registerUserAndPassword(req.body), res);
-};
-exports.loginUser = function (req, res, next) {
-    LogInUtilities
+}
+exports.handleLogIn = handleLogIn;
+;
+function registerUser(req, res) {
+    ControllerUtilities_1.sendResponseFromPromise(LoginUtils.registerUserAndPassword(req.body), res);
+}
+exports.registerUser = registerUser;
+;
+function loginUser(req, res, next) {
+    LoginUtils
         .authenticateUser(req.body)
         .then(function (confirmation) {
         if (confirmation.status === 200 && confirmation.success) {
             req.session.user = confirmation.message;
-            var expiry_date = new Date(Date.now() + 1000 * 3600 * 24 * 30);
-            expiry_date = expiry_date.toString();
+            var expiry_date = (new Date(Date.now() + 1000 * 3600 * 24 * 30)).toString();
             res.setHeader("Set-Cookie", ["session_token=" + confirmation.message.token_id + ";Expires=" + expiry_date]);
         }
-        convertObjectToResponse(null, confirmation, res);
+        ControllerUtilities_1.convertObjectToResponse(confirmation, res);
     })
-        .catch(function (err) { convertObjectToResponse(err, null, res); });
-};
+        .catch(function (err) { ControllerUtilities_1.handleServerError(err, res); });
+}
+exports.loginUser = loginUser;
+;
 /**
  * @description When a user logs out, we delete the token that we issued upon
  * their initial login and redirect them to the welcome/login page.
  */
-exports.logoutUser = function (req, res) {
+function logoutUser(req, res) {
     var session_token = req.session.user.token_id;
     delete req.session.user;
-    LogInUtilities
+    LoginUtils
         .deleteSessionToken(session_token)
         .then(function (deleteInfo) {
         res.setHeader("Set-Cookie", ["session_token=null;Expires=Thu, 01 Jan 1970 00:00:00 GMT"]);
-        convertObjectToResponse(null, deleteInfo, res);
+        ControllerUtilities_1.convertObjectToResponse(deleteInfo, res);
     })
-        .catch(function (err) { convertObjectToResponse(err, null, res); });
-};
-exports.sendValidationEmailGet = function (req, res) {
-    res.render("pages/send_validation_url.ejs", defaultTemplateObject);
-};
-exports.sendValidationEmailPost = function (req, res) {
-    sendResponseFromPromise(LogInUtilities.sendAccountValidationLink(req.body), res);
-};
-exports.verifyAccount = function (req, res) {
+        .catch(function (err) { ControllerUtilities_1.handleServerError(err, res); });
+}
+exports.logoutUser = logoutUser;
+;
+function sendValidationEmailGet(_, res) {
+    res.render("pages/send_validation_url.ejs");
+}
+exports.sendValidationEmailGet = sendValidationEmailGet;
+;
+function sendValidationEmailPost(req, res) {
+    ControllerUtilities_1.sendResponseFromPromise(LoginUtils.sendAccountValidationLink(req.body), res);
+}
+exports.sendValidationEmailPost = sendValidationEmailPost;
+;
+function verifyAccount(req, res) {
     var verification_uri = req.path.split("/verify-account/")[1];
-    sendResponseFromPromise(LogInUtilities.validateAccount(verification_uri), res);
-};
-exports.resetPasswordGet = function (req, res) {
-    res.render("pages/reset_password_request.ejs", defaultTemplateObject);
-};
-exports.resetPasswordPost = function (req, res) {
-    sendResponseFromPromise(LogInUtilities.sendResetLink(req.body), res);
-};
-exports.resetPasswordLinkGet = function (req, res) {
+    ControllerUtilities_1.sendResponseFromPromise(LoginUtils.validateAccount(verification_uri), res);
+}
+exports.verifyAccount = verifyAccount;
+;
+function resetPasswordGet(_, res) {
+    res.render("pages/reset_password_request.ejs");
+}
+exports.resetPasswordGet = resetPasswordGet;
+;
+function resetPasswordPost(req, res) {
+    ControllerUtilities_1.sendResponseFromPromise(LoginUtils.sendResetLink(req.body), res);
+}
+exports.resetPasswordPost = resetPasswordPost;
+;
+function resetPasswordLinkGet(req, res) {
     var reset_password_uri = req.path.split("/reset-password-link/")[1];
-    LogInUtilities
+    LoginUtils
         .validatePasswordResetLink(reset_password_uri)
         .then(function (results) {
         if (results.success) {
-            res.render("pages/reset_password.ejs", defaultTemplateObject);
+            res.render("pages/reset_password.ejs");
         }
         else {
-            convertObjectToResponse(null, results, res);
+            ControllerUtilities_1.convertObjectToResponse(results, res);
         }
     })
-        .catch(function (err) { convertObjectToResponse(err, null, res); });
-};
-exports.resetPasswordLinkPost = function (req, res) {
+        .catch(function (err) { ControllerUtilities_1.handleServerError(err, res); });
+}
+exports.resetPasswordLinkGet = resetPasswordLinkGet;
+;
+function resetPasswordLinkPost(req, res) {
     var reset_password_uri = req.path.split("/reset-password-link/")[1];
-    LogInUtilities
+    LoginUtils
         .validatePasswordResetLink(reset_password_uri)
         .then(function (validLinkConfirmation) {
         if (validLinkConfirmation.success) {
@@ -129,16 +147,18 @@ exports.resetPasswordLinkPost = function (req, res) {
             payload.reset_password_uri = reset_password_uri;
             var todays_datetime = new Date();
             payload.reset_request_time = todays_datetime.toString();
-            return LogInUtilities.resetPassword(payload);
+            return LoginUtils.resetPassword(payload);
         }
         else {
-            convertObjectToResponse(null, validLinkConfirmation, res);
-            return Promise.reject("DUMMY");
+            ControllerUtilities_1.convertObjectToResponse(validLinkConfirmation, res);
+            return;
         }
     })
-        .then(function (reset_confirmation) {
-        convertObjectToResponse(null, reset_confirmation, res);
+        .then(function (resetConfirmation) {
+        ControllerUtilities_1.convertObjectToResponse(resetConfirmation, res);
     })
-        .catch(function (err) { if (err !== "DUMMY")
-        convertObjectToResponse(err, null, res); });
-};
+        .catch(function (err) { ControllerUtilities_1.handleServerError(err, res); });
+}
+exports.resetPasswordLinkPost = resetPasswordLinkPost;
+;
+//# sourceMappingURL=AuthenticationController.js.map

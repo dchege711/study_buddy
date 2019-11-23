@@ -422,3 +422,4 @@ function CardsManager(tags_and_ids, userID, cardSourceURL, minicards) {
 }
 ;
 module.exports = CardsManager;
+//# sourceMappingURL=CardsManager.js.map

@@ -81,3 +81,4 @@ function Graph(directed) {
     };
 }
 module.exports = Graph;
+//# sourceMappingURL=Graph.js.map

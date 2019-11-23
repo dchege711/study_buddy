@@ -1,36 +1,18 @@
+"use strict";
 /**
  * @description A model for representing cards in the database.
  *
  * @module
  */
-var mongoose = require('mongoose');
-/**
- * The schema for cards in the database
- *
- * @param {Number} urgency
- * [Spaced Repetition]{@link https://en.wikipedia.org/wiki/Spaced_repetition}
- * is commonly practised when a user has to retain a large amount of
- * information indefinitely. It exploits the
- * [Spacing Effect]{@link https://en.wikipedia.org/wiki/Spacing_effect}, the
- * phenomenon whereby learning is greater when studying is spread out over time,
- * as opposed to studying the same amount of content in a single session.
- * Flashcard software usually adjusts the spacing time based on whether the
- * user provided the right answer. Answers may at times be too complex to
- * define in code. We therefore depend on the user updating the `card.urgency`
- * attribute in lieu of providing an answer to the flash card. Since the cards
- * are shown in decreasing order of urgency, cards that are ranked lower will
- * appear much later in subsequent review sessions.
- *
- * @param {Boolean} isPublic
- *  If `false`, then the card is private. A private flashcard is only visible
- *  to its owner. It will not appear in the search results at the `/browse` page. In contrast, a public card will appear in the search results as a read-only card. Any user that adds the card to their own collection will get a separate copy of the card.
- */
-var cardSchema = new mongoose.Schema({
+Object.defineProperty(exports, "__esModule", { value: true });
+var mongoose = require("mongoose");
+/** The schema for cards in the database. */
+exports.CardSchema = new mongoose.Schema({
     title: { type: String, default: "", trim: true },
     description: { type: String, trim: true, default: "" },
     descriptionHTML: { type: String, trim: true, default: "" },
     tags: { type: String, lowercase: true, trim: true, default: "" },
-    urgency: { type: Number, default: 10 },
+    urgency: { type: Number, default: 10, max: 10, min: 0 },
     metadataIndex: { type: Number, default: 0 },
     createdById: { type: Number, required: true },
     isPublic: { type: Boolean, default: false },
@@ -50,33 +32,37 @@ var cardSchema = new mongoose.Schema({
  * Create a text index to enable case-insensitive search across the specified
  * fields. [docs](https://docs.mongodb.com/manual/tutorial/control-results-of-text-search/)
  */
-cardSchema.index({
+exports.CardSchema.index({
     title: "text", description: "text", tags: "text"
 }, {
     weights: { title: 1, description: 1, tags: 2 },
     name: "TextIndex"
 });
-/*
- * The schema has now been compiled into a mongoose model. I can now use it
- * find, create, update and delete objects of the Card type.
+/**
+ * Calling `mongoose.model` compiles the schema into a mongoose model. I can
+ * now use it find, create, update and delete objects of the Card type.
  *
- * Also, Every model has an associated connection (this will be the default
- * connection when you use mongoose.model()).
- * You create a new connection and call .model() on it to create the
- * documents on a different database.
- *
+ * Every model has an associated connection (this will be the default
+ * connection when you use `mongoose.model()`). One create a new connection and
+ * call `.model()` on it to create the documents on a different database.
  */
-var CardModel = mongoose.model('Card', cardSchema);
-module.exports = CardModel;
+/** A database model of a card created by a user. */
+var Card = mongoose.model('Card', exports.CardSchema);
+exports.Card = Card;
 if (require.main === module) {
     // Run this script as main if you change the indexes
     // http://thecodebarbarian.com/whats-new-in-mongoose-5-2-syncindexes
-    CardModel
-        .syncIndexes()
+    // Note from Mongoose: It is not recommended that you run [syncIndexes] in 
+    // production. Index creation may impact database performance depending 
+    // on your load. Use with caution.
+    Card
+        .syncIndexes({})
+        // @ts-ignore @todo Investigate this
         .then(function (msg) { console.log(msg); })
         .catch(function (err) { console.error(err); });
-    CardModel
+    Card
         .listIndexes()
         .then(function (indexes) { console.log(indexes); })
         .catch(function (err) { console.error(err); });
 }
+//# sourceMappingURL=CardSchema.js.map

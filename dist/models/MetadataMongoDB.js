@@ -1,4 +1,9 @@
 "use strict";
+/**
+ * Handle actions related to the metadata of the cards in the database.
+ *
+ * @module
+ */
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,31 +40,25 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-/**
- * Handle actions related to the metadata of the cards in the database.
- *
- * @module
- */
-var User = require("./mongoose_models/UserSchema.js");
-var Metadata = require('./mongoose_models/MetadataCardSchema');
-var Card = require('./mongoose_models/CardSchema.js');
+Object.defineProperty(exports, "__esModule", { value: true });
 var fs = require("fs");
-var querySanitizer = require("./SanitizationAndValidation.js").sanitizeQuery;
-var config = require("../config.js");
+var UserSchema_1 = require("./mongoose_models/UserSchema");
+var MetadataCardSchema_1 = require("./mongoose_models/MetadataCardSchema");
+var CardSchema_1 = require("./mongoose_models/CardSchema");
+var SanitizationAndValidation_1 = require("./SanitizationAndValidation");
+var config_1 = require("../config");
 /**
- * @description Create & save a new metadata document for a user
- * @param {JSON} payload Must contain `userIDInApp` and `metadataIndex` as keys
- * @return {Promise} resolves with a JSON object with `success`, `status` and
- * `message` as keys.
+ * @description Create & save a new metadata document for the user. If
+ * successful, the `message` attribute contains a `Metadata` object.
  */
-exports.create = function (payload) {
-    payload = querySanitizer(payload);
+function create(payload) {
+    payload = SanitizationAndValidation_1.sanitizeQuery(payload);
     return new Promise(function (resolve, reject) {
         if (payload.userIDInApp === undefined || payload.metadataIndex === undefined) {
             reject(new Error("Please provide a userIDInApp and a metadataIndex."));
         }
         else {
-            Metadata.count({
+            MetadataCardSchema_1.Metadata.count({
                 createdById: payload.userIDInApp,
                 metadataIndex: payload.metadataIndex
             }).exec()
@@ -68,8 +67,7 @@ exports.create = function (payload) {
                     reject(new Error("The metadata document already exists."));
                 }
                 else {
-                    return Metadata
-                        .create({
+                    return MetadataCardSchema_1.Metadata.create({
                         createdById: payload.userIDInApp,
                         metadataIndex: payload.metadataIndex,
                         stats: [], node_information: []
@@ -84,18 +82,17 @@ exports.create = function (payload) {
                 .catch(function (err) { reject(err); });
         }
     });
-};
+}
+exports.create = create;
+;
 /**
- * @description Read all the metadata associated with a user's cards.
- *
- * @param {JSON} payload Must contain `userIDInApp` as a key
- * @returns {Promise} If successful, the `message` attribute is an array of
- * JSON `Metadata` objects
+ * @description Read all the metadata associated with a user's cards. If
+ * successful, the `message` property has a `Metadata[]` value.
  */
-exports.read = function (payload) {
-    payload = querySanitizer(payload);
+function read(payload) {
+    payload = SanitizationAndValidation_1.sanitizeQuery(payload);
     return new Promise(function (resolve, reject) {
-        Metadata
+        MetadataCardSchema_1.Metadata
             .find({ createdById: payload.userIDInApp }).exec()
             .then(function (metadataDocs) {
             resolve({
@@ -104,58 +101,53 @@ exports.read = function (payload) {
         })
             .catch(function (err) { reject(err); });
     });
+}
+exports.read = read;
+;
+// https://stackoverflow.com/questions/44497388/typescript-array-to-string-literal-type/54061487#54061487
+var tuple = function () {
+    var args = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        args[_i] = arguments[_i];
+    }
+    return args;
 };
+var cardProperties = tuple.apply(void 0, Object.keys(CardSchema_1.CardSchema.obj));
 /**
- * Update the metadata with the new cards' details. This method
- * is usually called by CardsMongoDB.update(). An array is needed to prevent
- * race conditions when updating metadata from more than one card.
- *
- * @param {Array} savedCards Array of cards
- *
- * @param {JSON} metadataQuery An identifier for the metadata document. This
- * argument was added in order to update the global public user account. If not
- * specified, it defaults to the owner of the first card in `savedCards`.
- *
- * @param {String} attributeName A sortable attribute of the card that will be
- * used to rank the cards in the metadata. Possible values include `urgency`,
- * `numChildren`.
- *
- * @returns {Promise} resolves with a JSON with `success`, `status` and
- * `message` as keys. If successful, `message` has a metadata JSON object.
+ * @description Update the metadata with the new cards' details. This method
+ * is usually called by CardsMongoDB.update(). An array of cards is needed to
+ * avoid race conditions when updating metadata from more than one card. If the
+ * call succeeds, the `message` attribute has a `Metadata` document.
  */
-exports.update = function (savedCards, metadataQuery, attributeName) {
+function update(savedCards, metadataQuery, statsKey) {
+    if (statsKey === void 0) { statsKey = "urgency"; }
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
             /*
              * How many cards before we need a new metadata JSON?
              * (400 + 150 * num_id_metadata) * 5 bytes/char <= 16MB
-             * num_id_metadata <= 21330. So let's say 15,000 cards max
+             * num_id_metadata <= 21330. So let's say 15,000 cards max to be safe.
              * Will that ever happen, probably not!
              */
-            if (savedCards[0].metadataIndex === undefined) {
-                savedCards[0].metadataIndex = 0;
-            }
             if (metadataQuery === undefined) {
                 metadataQuery = {
                     createdById: savedCards[0].createdById,
-                    metadataIndex: savedCards[0].metadataIndex
+                    metadataIndex: savedCards[0].metadataIndex || 0
                 };
             }
-            if (attributeName === undefined)
-                attributeName = "urgency";
             return [2 /*return*/, new Promise(function (resolve, reject) {
                     var _this = this;
                     if (savedCards[0].createdById === undefined) {
                         reject(new Error("MetadataMongoDB.update() was called for a card without an owner"));
                         return;
                     }
-                    Metadata
+                    MetadataCardSchema_1.Metadata
                         .findOne(metadataQuery).exec()
                         .then(function (metadataDoc) {
                         savedCards.forEach(function (savedCard) { return __awaiter(_this, void 0, void 0, function () {
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
-                                    case 0: return [4 /*yield*/, updateMetadataWithCardDetails(savedCard, metadataDoc, attributeName)];
+                                    case 0: return [4 /*yield*/, updateMetadataWithCardDetails(savedCard, metadataDoc, statsKey)];
                                     case 1:
                                         metadataDoc = _a.sent();
                                         return [2 /*return*/];
@@ -173,18 +165,19 @@ exports.update = function (savedCards, metadataQuery, attributeName) {
                 })];
         });
     });
-};
+}
+exports.update = update;
+;
 /**
- * @description Update the metadata for a public card.
+ * @description Update the metadata for cards that can be viewed by anyone.
  *
- * @param {Array} cards an array of JSON flashcards
- *
- * @returns {Promise} resolves with a JSON with `success`, `status` and
- * `message` as keys. If successful, `message` has a metadata JSON object.
- *
+ * @param cards A list of cards that changed. Some might have become private,
+ * so we need to remove them from the metadata of the public user. Others might
+ * have become public, so we need to add them to the public user's metadata.
  */
-exports.updatePublicUserMetadata = function (cards) {
-    var cardsToAdd = [], cardsToRemove = [];
+function updatePublicUserMetadata(cards) {
+    var cardsToAdd = [];
+    var cardsToRemove = [];
     for (var i = 0; i < cards.length; i++) {
         if (cards[i].isPublic)
             cardsToAdd.push(cards[i]);
@@ -193,10 +186,10 @@ exports.updatePublicUserMetadata = function (cards) {
     }
     return new Promise(function (resolve, reject) {
         var _this = this;
-        User
-            .findOne({ username: config.PUBLIC_USER_USERNAME }).exec()
+        UserSchema_1.User
+            .findOne({ username: config_1.PUBLIC_USER_USERNAME }).exec()
             .then(function (publicUser) { return __awaiter(_this, void 0, void 0, function () {
-            var query, metadataDocs;
+            var query, msg;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -205,12 +198,12 @@ exports.updatePublicUserMetadata = function (cards) {
                             createdById: publicUser.userIDInApp,
                             metadataIndex: 0 // Because this is the first document
                         };
-                        return [2 /*return*/, exports.update(cardsToAdd, query, "numChildren")];
-                    case 1: return [4 /*yield*/, exports.read({ userIDInApp: publicUser.userIDInApp })];
+                        return [2 /*return*/, update(cardsToAdd, query, "numChildren")];
+                    case 1: return [4 /*yield*/, read({ userIDInApp: publicUser.userIDInApp })];
                     case 2:
-                        metadataDocs = _a.sent();
+                        msg = _a.sent();
                         return [2 /*return*/, Promise.resolve({
-                                message: metadataDocs.message[0], success: true
+                                message: msg.message[0], success: true, status: 200
                             })];
                 }
             });
@@ -248,36 +241,49 @@ exports.updatePublicUserMetadata = function (cards) {
         })
             .catch(function (err) { reject(err); });
     });
-};
+}
+exports.updatePublicUserMetadata = updatePublicUserMetadata;
 /**
- * @description Delete all the metadata associated with the user.
- * @param {JSON} payload Contains `userIDInApp` as a key
- * @returns {Promise} resolves with a JSON object keyed by `success`, `status`
- * and `message`
+ * @description Delete all the metadata associated with the user. If successful,
+ * the `message` property holds the number of items deleted.
  */
-exports.deleteAllMetadata = function (payload) {
-    payload = querySanitizer(payload);
+function deleteAllMetadata(payload) {
+    payload = SanitizationAndValidation_1.sanitizeQuery(payload);
     return new Promise(function (resolve, reject) {
-        Metadata
+        MetadataCardSchema_1.Metadata
             .deleteMany({ createdById: payload.userIDInApp }).exec()
             .then(function (deleteConfirmation) {
-            resolve({ success: true, status: 200, message: deleteConfirmation });
+            resolve({
+                success: true, status: 200,
+                message: deleteConfirmation.deletedCount
+            });
         })
             .catch(function (err) { reject(err); });
     });
-};
+}
+exports.deleteAllMetadata = deleteAllMetadata;
+;
 /**
- * @param {JSON} payload Must contain `cardID` that has the id of the card
- * to be placed into trash, and `userIDInApp`, the ID of the user who owns
- * the card.
- * @returns {Promise} resolves with a JSON keyed by `success`, `status` and
- * `message`
+ * @description Send the card matching `payload` to the trash. The trash is
+ * where cards that haven't been deleted permanently are tracked. We learned
+ * that we should never use a warning when we meant undo.
+ * {@link http://alistapart.com/article/neveruseawarning}.
+ *
+ * Seems like a good design decision. Users who really want to delete a card
+ * might be unsatisifed, but I bet they're in the minority(?). Furthermore,
+ * they can permanently delete a card from the accounts page. Amazing how much
+ * fiddling goes in the backend, just to allow a user to delete and then save
+ * themselves 3 seconds later by hitting `Undo`.
+ *
+ * @todo This method shouldn't have any HTML associated with it!
+ *
+ * @todo What happens when `cardID` gets scrubbed off by `sanitizeQuery`?
  */
-exports.sendCardToTrash = function (payload) {
-    payload = querySanitizer(payload);
+function sendCardToTrash(payload) {
+    payload = SanitizationAndValidation_1.sanitizeQuery(payload);
     var prevResults = {};
     return new Promise(function (resolve, reject) {
-        Card
+        CardSchema_1.Card
             .findOne({ _id: payload.cardID, createdById: payload.createdById }).exec()
             .then(function (card) {
             if (card === null) {
@@ -288,7 +294,7 @@ exports.sendCardToTrash = function (payload) {
             if (card.metadataIndex === undefined)
                 card.metadataIndex = 0;
             prevResults.card = card;
-            return Metadata.findOne({
+            return MetadataCardSchema_1.Metadata.findOne({
                 createdById: card.createdById, metadataIndex: card.metadataIndex
             }).exec();
         })
@@ -310,9 +316,8 @@ exports.sendCardToTrash = function (payload) {
             // Add the card to the trashed items associated with the user
             // Associate the deletion time so that we can have a clean up 
             // of all cards in the trash that are older than 30 days
-            if (!metadataDoc.trashed_cards || metadataDoc.trashed_cards.length == 0) {
-                metadataDoc.trashed_cards = [];
-                metadataDoc.trashed_cards.push({});
+            if (!metadataDoc.trashed_cards) {
+                metadataDoc.trashed_cards = [{}];
             }
             metadataDoc.trashed_cards[0][trashedCardID] = Date.now();
             // This is necessary. All that hair pulling can now stop :-/
@@ -329,19 +334,20 @@ exports.sendCardToTrash = function (payload) {
         })
             .catch(function (err) { reject(err); });
     });
-};
+}
+exports.sendCardToTrash = sendCardToTrash;
+;
 /**
  * @description Restore a card from the trash, back into the user's list of
  * current cards.
- * @param {JSON} restoreCardArgs Expected keys: `cardID`, `createdById`
- * @returns {Promise} resolves with a JSON keyed by `success`, `status` and
- * `message`
+ *
+ * @todo Return the restored card instead of a confirmatory string.
  */
-exports.restoreCardFromTrash = function (restoreCardArgs) {
+function restoreCardFromTrash(restoreCardArgs) {
     var prevResults = {};
-    restoreCardArgs = querySanitizer(restoreCardArgs);
+    restoreCardArgs = SanitizationAndValidation_1.sanitizeQuery(restoreCardArgs);
     return new Promise(function (resolve, reject) {
-        Card
+        CardSchema_1.Card
             .findOne({
             _id: restoreCardArgs.cardID, createdById: restoreCardArgs.createdById
         }).exec()
@@ -350,11 +356,13 @@ exports.restoreCardFromTrash = function (restoreCardArgs) {
                 resolve({
                     success: false, status: 200, message: "Card wasn't found."
                 });
+                return;
             }
             else {
                 prevResults.card = card;
                 return removeCardFromMetadataTrash(card);
             }
+            /** @todo: There's probably a bug here... */
         })
             .then(function (metadataDoc) {
             return updateMetadataWithCardDetails(prevResults.card, metadataDoc);
@@ -370,7 +378,9 @@ exports.restoreCardFromTrash = function (restoreCardArgs) {
         })
             .catch(function (err) { reject(err); });
     });
-};
+}
+exports.restoreCardFromTrash = restoreCardFromTrash;
+;
 /**
  * @description Permanently delete a card from the user's trash.
  *
@@ -378,10 +388,10 @@ exports.restoreCardFromTrash = function (restoreCardArgs) {
  * @returns {Promise} resolves with a JSON keyed by `success`, `status` and
  * `message`
  */
-exports.deleteCardFromTrash = function (deleteCardArgs) {
-    deleteCardArgs = querySanitizer(deleteCardArgs);
+function deleteCardFromTrash(deleteCardArgs) {
+    deleteCardArgs = SanitizationAndValidation_1.sanitizeQuery(deleteCardArgs);
     return new Promise(function (resolve, reject) {
-        Card
+        CardSchema_1.Card
             .findOneAndRemove({
             _id: deleteCardArgs.cardID,
             createdById: deleteCardArgs.createdById
@@ -392,6 +402,7 @@ exports.deleteCardFromTrash = function (deleteCardArgs) {
                     success: false, status: 200,
                     message: "The card wasn't found in the database."
                 });
+                return;
             }
             return removeCardFromMetadataTrash(deletedCard);
         })
@@ -403,34 +414,33 @@ exports.deleteCardFromTrash = function (deleteCardArgs) {
         })
             .catch(function (err) { reject(err); });
     });
-};
+}
+exports.deleteCardFromTrash = deleteCardFromTrash;
+;
 /**
  * @description Remove the card from the trash records of the metadata object.
  * This method does not save the modified metadata into the database!
  *
- * @param {JSON} cardIdentifier JSON object that contains the keys
- * `createdById` and `_id`.
- *
- * @returns {Promise} resolves with the modified metadata document. It is up to
- * the callee to persist the saved metadata in the database.
+ * @todo Why don't we save the metadata?
  */
-function removeCardFromMetadataTrash(cardIdentifier) {
+function removeCardFromMetadataTrash(filter) {
     return new Promise(function (resolve, reject) {
-        Metadata
-            .find({ createdById: cardIdentifier.createdById }).exec()
+        MetadataCardSchema_1.Metadata
+            .find({ createdById: filter.createdById }).exec()
             .then(function (matchingMetadataDocs) {
-            if (matchingMetadataDocs.length === 0)
-                resolve({});
+            if (matchingMetadataDocs.length === 0) {
+                resolve(null);
+            }
             for (var i = 0; i < matchingMetadataDocs.length; i++) {
                 var metadataDoc = matchingMetadataDocs[i];
-                if (cardIdentifier._id in metadataDoc.trashed_cards[0]) {
-                    delete metadataDoc.trashed_cards[0][cardIdentifier._id];
+                if (filter._id in metadataDoc.trashed_cards[0]) {
+                    delete metadataDoc.trashed_cards[0][filter._id];
                     metadataDoc.markModified("trashed_cards");
                     resolve(metadataDoc);
                     return;
                 }
             }
-            resolve(matchingMetadataDocs[0]);
+            resolve(null);
         })
             .catch(function (err) { reject(err); });
     });
@@ -438,16 +448,13 @@ function removeCardFromMetadataTrash(cardIdentifier) {
 /**
  * @description Fetch all the user's cards and compile them into a JSON file.
  *
- * @param {Number} userIDInApp The ID of the user whose cards should be exported
- * to a .json file.
- *
- * @returns {Promise} resolves with two string arguments. The first one is a path
- * to the written JSON file. The 2nd argument is the name of the JSON file.
+ * @returns A promise that resolves with two string arguments. The first one is
+ * a path to the written JSON file. The 2nd argument is the name of that JSON file.
  */
-exports.writeCardsToJSONFile = function (userIDInApp) {
-    var query = sanitizeQuery({ userIDInApp: userIDInApp });
+function writeCardsToJSONFile(userIDInApp) {
+    var query = SanitizationAndValidation_1.sanitizeQuery({ userIDInApp: userIDInApp });
     return new Promise(function (resolve, reject) {
-        Card
+        CardSchema_1.Card
             .find({ createdById: query.userIDInApp }).exec()
             .then(function (cards) {
             var cardData = [];
@@ -461,6 +468,7 @@ exports.writeCardsToJSONFile = function (userIDInApp) {
             var jsonFileName = "flashcards_" + userIDInApp + ".json";
             var jsonFilePath = process.cwd() + "/" + jsonFileName;
             ;
+            /** Good Lord! What monstrosity did I write back then? */
             fs.open(jsonFilePath, "w", function (err, fileDescriptor) {
                 if (err) {
                     reject(err);
@@ -486,50 +494,35 @@ exports.writeCardsToJSONFile = function (userIDInApp) {
         })
             .catch(function (err) { reject(err); });
     });
-};
+}
+exports.writeCardsToJSONFile = writeCardsToJSONFile;
+;
 /**
- * @description Helper method for updating the metadata from a given card. This
+ * @description Helper method for updating the metadata with `savedCard`. This
  * method does not persist the modified metadata document into the database. It
  * is up to the callee to save the changes once they're done manipulating the
  * metadata.
- *
- * @param {JSON} savedCard The card that whose details should be added to the
- * metadata.
- * @param {JSON} metadataDoc A Mongoose Schema object that is used to store the
- * current user's metadata.
- * @param {String}
- * @returns {Promise} resolved with a reference to the modified metadata doc
  */
 function updateMetadataWithCardDetails(savedCard, metadataDoc, attributeName) {
-    var sortableAttribute;
-    if (attributeName === undefined) {
-        sortableAttribute = savedCard.urgency;
-    }
-    else if (attributeName === "numChildren") {
-        sortableAttribute = savedCard.idsOfUsersWithCopy.split(", ").length;
-    }
-    else {
-        sortableAttribute = savedCard[attributeName];
-    }
+    if (attributeName === void 0) { attributeName = "urgency"; }
+    var attributeValue = savedCard.get(attributeName);
     var cardID = savedCard._id;
-    if (metadataDoc.stats.length == 0)
-        metadataDoc.stats.push({});
-    if (metadataDoc.node_information.length == 0) {
-        metadataDoc.node_information.push({});
-    }
     var metadataStats = metadataDoc.stats[0];
     var metadataNodeInfo = metadataDoc.node_information[0];
     // Save this card in the stats field where it only appears once
-    if (metadataStats[cardID] === undefined)
+    if (metadataStats[cardID] === undefined) {
         metadataStats[cardID] = {};
-    metadataStats[cardID].urgency = sortableAttribute;
+    }
+    else {
+        metadataStats[cardID].urgency = attributeValue;
+    }
     metadataDoc.markModified("stats");
     // Keep track of which tags have been changed
     var prevTagStillExists = {};
     if (savedCard.previousTags) {
         savedCard.previousTags.split(" ").forEach(function (prevTag) {
             if (prevTag !== "") {
-                prevTag = prevTag.trim();
+                prevTag = prevTag.trim(); // @todo: Wait, what?
                 prevTagStillExists[prevTag] = false;
             }
         });
@@ -551,7 +544,7 @@ function updateMetadataWithCardDetails(savedCard, metadataDoc, attributeName) {
                 if (strippedTag in prevTagStillExists) {
                     prevTagStillExists[strippedTag] = true;
                 }
-                metadataNodeInfo[strippedTag][cardID].urgency = sortableAttribute;
+                metadataNodeInfo[strippedTag][cardID].urgency = attributeValue;
             }
         });
     }
@@ -568,27 +561,26 @@ function updateMetadataWithCardDetails(savedCard, metadataDoc, attributeName) {
     return Promise.resolve(metadataDoc);
 }
 /**
- * @description Update the settings of the given user.
- * @param {JSON} newUserSettings Supported keys:
- * @returns {Promise} resolves with a JSON keyed by `success`, `status` and
- * `message`
+ * @description Update the profile settings of the given user. If settings were
+ * updated (including overwriting with the same value), `success` is set and
+ * `message` holds the updated `User` object.
  */
-exports.updateUserSettings = function (newUserSettings) {
-    newUserSettings = querySanitizer(newUserSettings);
+function updateUserSettings(newUserSettings) {
+    newUserSettings = SanitizationAndValidation_1.sanitizeQuery(newUserSettings);
     var supportedChanges = new Set(["cardsAreByDefaultPrivate", "dailyTarget"]);
-    var validChanges = [];
+    var validSettingKeys = [];
     Object.keys(newUserSettings).forEach(function (setting) {
         if (supportedChanges.has(setting))
-            validChanges.push(setting);
+            validSettingKeys.push(setting);
     });
     return new Promise(function (resolve, reject) {
-        if (validChanges.length == 0) {
+        if (validSettingKeys.length == 0) {
             resolve({
                 success: false, status: 200, message: "No changes were made."
             });
         }
         var updatedUser;
-        User
+        UserSchema_1.User
             .findOne({ userIDInApp: newUserSettings.userIDInApp }).exec()
             .then(function (existingUser) {
             if (existingUser === null) {
@@ -597,61 +589,60 @@ exports.updateUserSettings = function (newUserSettings) {
                     success: false, status: 200
                 });
             }
-            for (var i = 0; i < validChanges.length; i++) {
-                existingUser[validChanges[i]] = newUserSettings[validChanges[i]];
+            for (var i = 0; i < validSettingKeys.length; i++) {
+                // @ts-ignore: I'm sure that the keys exist on the user obj
+                existingUser[validSettingKeys[i]] = newUserSettings[validSettingKeys[i]];
             }
             return existingUser.save();
         })
-            .then(function (saveResults) {
-            updatedUser = saveResults;
+            .then(function (savedUser) {
+            updatedUser = savedUser;
             if (newUserSettings.dailyTarget) {
-                return Metadata.findOne({
+                return MetadataCardSchema_1.Metadata.findOne({
                     createdById: newUserSettings.userIDInApp, metadataIndex: 0
                 }).exec();
             }
             else {
                 resolve({
-                    message: "User settings updated!", success: true,
-                    status: 200, user: updatedUser
+                    message: updatedUser, success: true, status: 200,
                 });
+                return;
             }
         })
             .then(function (metadataDoc) {
             if (newUserSettings.dailyTarget) {
-                metadataDoc.streak.set("dailyTarget", newUserSettings.dailyTarget);
+                metadataDoc.streak.dailyTarget = newUserSettings.dailyTarget;
                 metadataDoc.markModified("streak");
             }
             return metadataDoc.save();
         })
             .then(function (_) {
             resolve({
-                message: "User settings updated!", success: true,
-                status: 200, user: updatedUser
+                message: updatedUser, success: true, status: 200
             });
         })
             .catch(function (err) { reject(err); });
     });
-};
+}
+exports.updateUserSettings = updateUserSettings;
+;
 /**
  * @description Update the streak object for the current user. Assumes that the
- * streak object is up to date.
- *
- * @param {JSON} streakUpdateObj Expected properties: `userIDInApp`, `cardIDs`
- *
- * @returns {Object} the saved metadata object with the updated streak
+ * streak object is up to date. If successful, the `message` property holds a
+ * streak object.
  */
-exports.updateStreak = function (streakUpdateObj) {
-    streakUpdateObj = querySanitizer(streakUpdateObj);
+function updateStreak(streakUpdateObj) {
+    streakUpdateObj = SanitizationAndValidation_1.sanitizeQuery(streakUpdateObj);
     return new Promise(function (resolve, reject) {
-        Metadata
+        MetadataCardSchema_1.Metadata
             .findOne({ createdById: streakUpdateObj.userIDInApp, metadataIndex: 0 }).exec()
             .then(function (metadataDoc) {
-            var idsReviewedCards = new Set(metadataDoc.streak.get("cardIDs"));
+            var idsReviewedCards = new Set(metadataDoc.streak.cardIDs);
             for (var _i = 0, _a = streakUpdateObj.cardIDs; _i < _a.length; _i++) {
                 var cardID = _a[_i];
                 idsReviewedCards.add(cardID);
             }
-            metadataDoc.streak.set('cardIDs', Array.from(idsReviewedCards));
+            metadataDoc.streak.cardIDs = Array.from(idsReviewedCards);
             metadataDoc.markModified("streak");
             return metadataDoc.save();
         })
@@ -662,4 +653,7 @@ exports.updateStreak = function (streakUpdateObj) {
         })
             .catch(function (err) { reject(err); });
     });
-};
+}
+exports.updateStreak = updateStreak;
+;
+//# sourceMappingURL=MetadataMongoDB.js.map

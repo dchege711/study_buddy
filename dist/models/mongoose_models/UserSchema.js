@@ -1,11 +1,14 @@
+"use strict";
 /**
  * @description A model for representing users in the database.
  *
  * @module
  */
-var mongoose = require('mongoose');
-var isEmail = require("validator").isEmail;
-var userSchema = new mongoose.Schema({
+Object.defineProperty(exports, "__esModule", { value: true });
+var mongoose = require("mongoose");
+var validator_1 = require("validator");
+/** The schema used to represent the user in the database. */
+exports.UserSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,
@@ -22,7 +25,7 @@ var userSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
-        validate: [isEmail, 'Please provide a valid email address']
+        validate: [validator_1.isEmail, 'Please provide a valid email address']
     },
     reset_password_uri: String,
     reset_password_timestamp: Number,
@@ -36,4 +39,6 @@ var userSchema = new mongoose.Schema({
     collection: "study_buddy_users",
     strict: true
 });
-module.exports = mongoose.model('User', userSchema);
+var User = mongoose.model('User', exports.UserSchema);
+exports.User = User;
+//# sourceMappingURL=UserSchema.js.map
