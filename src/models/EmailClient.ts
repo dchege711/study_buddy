@@ -22,7 +22,7 @@ const transporter = nodemailer.createTransport({
 });
 
 /** A helper interface for my mail sender */
-interface IEmailConfirmation extends IBaseMessage {
+export interface IEmailConfirmation extends IBaseMessage {
     message: {
         accepted: string[];
         rejected: string[];

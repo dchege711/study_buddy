@@ -1,6 +1,6 @@
 import { dbConnection, closeMongooseConnection } from "./MongooseClient"; 
 
-import * as LoginUtils from "./LogInUtilities";
+import * as UserModel from "./UserModel";
 import { getRandomCards } from "./SampleCardsUtils";
 import { 
     PUBLIC_USER_USERNAME, PUBLIC_USER_EMAIL, 
@@ -33,12 +33,12 @@ function getDebugAccount(overwrite=true): Promise<User> {
                 if (user && !overwrite) {
                     resolve(user); return;
                 }
-                return LoginUtils.deleteAccount({
+                return UserModel.deleteAccount({
                     emailAddress: DEBUG_ACCOUNT_DETAILS.emailAddress
                 });
             })
             .then((_: IBaseMessage) => {
-                return LoginUtils.registerUser(DEBUG_ACCOUNT_DETAILS);
+                return UserModel.registerUser(DEBUG_ACCOUNT_DETAILS);
             })
             .then((_: IBaseMessage) => {
                 resolve(
@@ -61,7 +61,7 @@ export function getAuthTokenForDebugUser(): Promise<UserAuthenticationToken> {
     return new Promise(function(resolve, reject) {
         getDebugAccount(true)
             .then((_) => {
-                return LoginUtils.authenticateUser({
+                return UserModel.authenticateUser({
                     userNameOrEmailAddress: DEBUG_ACCOUNT_DETAILS.emailAddress,
                     password: DEBUG_ACCOUNT_DETAILS.password
                 })

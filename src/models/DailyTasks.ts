@@ -11,7 +11,7 @@ import { ReviewStreak, User, UserPrefences } from "./DBModels";
  * 
  * @returns Resolves with the number of streaks that were updated
  */
-function updateStreaks(): Promise<number> {
+function resetDailyStreaks(): Promise<number> {
     let currentTimeStamp = Date.now();
     let todaysDateStr = (new Date(currentTimeStamp)).toDateString();
 
@@ -53,7 +53,7 @@ function updateStreaks(): Promise<number> {
 };
 
 if (require.main === module) {
-    updateStreaks()
+    resetDailyStreaks()
         .then((numUpdated) => {
             console.log(`Reset the streak counters for ${numUpdated} users.`);
         })
