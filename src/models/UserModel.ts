@@ -5,21 +5,21 @@
  * @module
  */
 
-import { 
-    User, UserAuthenticationToken, ACCOUNT_VALIDATION_TOKEN_TYPE, INewFlashCard, UserAuthenticationData, SESSION_TOKEN_TYPE, PASSWORD_RESET_TOKEN_TYPE 
-} from "./DBModels";
-import { createMany as createManyCards } from "./FlashCardModel";
+import * as fs from "fs";
+import { Op } from "sequelize/types";
 
+import { 
+    User, UserAuthenticationToken, ACCOUNT_VALIDATION_TOKEN_TYPE, INewFlashCard, UserAuthenticationData, SESSION_TOKEN_TYPE, PASSWORD_RESET_TOKEN_TYPE, UserPrefences, ReviewStreak, FlashCard 
+} from "./DBModels";
+import { createMany as createManyCards, read as readCards } from "./FlashCardModel";
 import * as Email from "./EmailClient";
 import { APP_NAME, BASE_URL } from "../config";
 import { IBaseMessage } from "../controllers/ControllerUtilities";
 import { STARTER_CARDS } from "./SampleCardsUtils"
-
 import { 
     LOWER_CASE, DIGITS, getSaltAndHash, getHash, getRandomString 
 } from "./Utils"
-import { Op } from "sequelize/types";
-import { sanitizeQuery, ISearchQuery } from "./SanitizationAndValidation";
+import { sanitizeQuery, ISearchQuery, IClientFacingFlashCard } from "./SanitizationAndValidation";
 
 /**
  * @description Clean up resources, e.g. the email client
@@ -542,6 +542,67 @@ export function resetPassword(
     });
 };
 
+/**
+ * @description Update the preferences of the user whose id is `userId`
+ * @todo Try to crash this method by providing invalid values.
+ * @param userId The ID of the user whose preferences will be updated
+ * @param newPrefs The new preferences
+ */
+export function updateUserPreferences(
+        userId: string, newPrefs: Partial<UserPrefences>): Promise<IBaseMessage> {
+    newPrefs = sanitizeQuery(<ISearchQuery>newPrefs);
+    userId = sanitizeQuery({userId: userId}).userId;
+    return new Promise(function(resolve, reject) {
+        UserPrefences
+            .findOne({where: {userId: userId}})
+            .then((prefs: UserPrefences) => {
+                if (newPrefs.cardsAreByDefaultPrivate !== undefined) {
+                    prefs.cardsAreByDefaultPrivate = newPrefs.cardsAreByDefaultPrivate
+                }
+                if (newPrefs.dailyTarget) {
+                    prefs.dailyTarget = newPrefs.dailyTarget;
+                }
+                return newPrefs.save();
+            })
+            .then((updatedPrefs: UserPrefences) => {
+                resolve({
+                    success: true, status: 200, message: updatedPrefs
+                });
+            })
+            .catch((err: Error) => { console.error(err); });
+    });
+}
+
+/**
+ * @description Update the streak for this user. Extend it with the cards in
+ * `payload.cardIds`
+ * 
+ * @todo Do I need to check that `cardIds` are not in `streak.getFlashCards`
+ * before calling `streak.addFlashCards(cardIds)`?
+ * 
+ * @param payload Expected keys: `userId`, `cardIds`
+ */
+export function updateStreak(payload: Pick<ISearchQuery, "userId" | "cardIds">): 
+        Promise<IBaseMessage> {
+    payload = sanitizeQuery(payload);
+    return new Promise(function(resolve, reject) {
+        ReviewStreak
+            .findOne({where: {userId: payload.userId}})
+            .then(async (streak: ReviewStreak) => {
+                if (!streak) {
+                    reject({
+                        success: false, status: 200, message: "User not found."
+                    });
+                    return;
+                }
+                await streak.addFlashCards(payload.cardIds);
+                resolve({
+                    message: streak, success: true, status: 200
+                });
+            })
+            .catch((err: Error) => { console.error(err); });
+    });
+}
 
 /**
  * @description Permanently delete a user's account and all related cards.
@@ -563,3 +624,42 @@ export function deleteAccount(identifier: ISearchQuery): Promise<IBaseMessage> {
             .catch((err: Error) => { reject(err); });
     });
 };
+
+/**
+ * @description Fetch all the user's cards and compile them into a JSON file.
+ * 
+ * @returns A promise that resolves with two string arguments. The first one is 
+ * a path to the written JSON file. The 2nd argument is the name of that JSON file.
+ */
+export function writeCardsToJSONFile(userId: string): Promise<[string, string]> {
+    userId = sanitizeQuery({userId: userId}).userId;
+    return new Promise(function(resolve, reject) {
+        readCards({ ownerId: userId})
+            .then((cardsPayload: IBaseMessage) => {
+                let cards: IClientFacingFlashCard[] = cardsPayload.message;
+                let jsonFileName = `flashcards_${userId}.json`;
+                let jsonFilePath = `${process.cwd()}/${jsonFileName}`;;
+                /** Good Lord! What monstrosity did I write back then? */
+                fs.open(jsonFilePath, "w", (err: Error, fileDescriptor) => {
+                    if (err) { reject(err); } 
+                    else {
+                        fs.write(fileDescriptor, JSON.stringify(cards), (writeErr) => {
+                            if (writeErr) {
+                                reject(writeErr);
+                            } else {
+                                fs.close(fileDescriptor, (closeErr) => {
+                                    if (closeErr) {
+                                        reject(closeErr);
+                                    } else {
+                                        resolve([jsonFilePath, jsonFileName]);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            })
+            .catch((err: Error) => { reject(err); });
+    });       
+};
+
