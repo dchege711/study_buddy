@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import { requireLogIn } from "../controllers/AuthenticationController";
 import * as InAppController from "../controllers/InAppController";
+import { DummyError } from "../models/Utils";
 
 const InAppRouter = Router();
 
@@ -19,11 +20,7 @@ InAppRouter.post("/browse", InAppController.browsePagePost);
 
 InAppRouter.get("/account", requireLogIn, InAppController.accountGet);
 
-InAppRouter.post("/read-metadata", requireLogIn, InAppController.readMetadata);
-
 InAppRouter.post("/read-tag-groups", requireLogIn, InAppController.readTagGroups);
-
-InAppRouter.post("/read-public-metadata", InAppController.readPublicMetadata);
 
 InAppRouter.post("/add-card", requireLogIn, InAppController.addCard);
 
@@ -47,6 +44,11 @@ InAppRouter.get("/account/download-user-data", requireLogIn, InAppController.dow
 
 InAppRouter.post("/account/delete-account", requireLogIn, InAppController.deleteAccount);
 
-InAppRouter.post("/account/update-settings", requireLogIn, InAppController.updateUserSettings);
+InAppRouter.post("/account/update-settings", requireLogIn, InAppController.updateUserPreferences);
+
+/** Dummy route added to test error handling on the application. */
+InAppRouter.get("/5bc75664-dummy-server-error-url", (_, __) => {
+    throw new DummyError("This string shouldn't appear to the user.");
+})
 
 export { InAppRouter };
