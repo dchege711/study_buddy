@@ -19,7 +19,13 @@
  * @module
  */
 
-import { Sequelize, Model, DataTypes, HasOneGetAssociationMixin, BelongsToGetAssociationMixin, HasManyGetAssociationsMixin, BelongsToManyAddAssociationMixin, BelongsToManyGetAssociationsMixin, HasManySetAssociationsMixin, HasManyAddAssociationMixin } from "sequelize";
+import { 
+    Sequelize, Model, DataTypes, HasOneGetAssociationMixin, 
+    BelongsToGetAssociationMixin, HasManyGetAssociationsMixin, 
+    BelongsToManyGetAssociationsMixin, HasManySetAssociationsMixin, 
+    HasManyAddAssociationMixin, HasOneSetAssociationMixin, 
+    HasOneCreateAssociationMixin, BelongsToSetAssociationMixin 
+} from "sequelize";
 
 import { DATABASE_URI } from "../config";
 import { getRandomString, ALPHANUMERICS } from "./Utils";
@@ -49,8 +55,15 @@ export class User extends Model {
     updatedAt!: Date;
 
     getUserAuthenticationData!: HasOneGetAssociationMixin<UserAuthenticationData>;
+    createUserAuthenticationData!: HasOneCreateAssociationMixin<UserAuthenticationData>;
+    setUserAuthenticationData!: HasOneSetAssociationMixin<UserAuthenticationData, UserAuthenticationData>;
+    
     getUserPrefences!: HasOneGetAssociationMixin<UserPrefences>;
+    createUserPreferences!: HasOneCreateAssociationMixin<UserPrefences>;
+    setUserPreferences!: HasOneSetAssociationMixin<UserPrefences, UserPrefences>;
+
     getReviewStreak!: HasOneGetAssociationMixin<ReviewStreak>;
+    createReviewStreak!: HasOneCreateAssociationMixin<ReviewStreak>;
 
 };
 User.init({
@@ -170,14 +183,32 @@ UserPrefences.init({
 }, { sequelize, timestamps: false });
 User.hasOne(UserPrefences);
 
+/** 
+ * A `UserAuthenticationToken` with this type allows a user to reset their 
+ * password 
+ */
+export const PASSWORD_RESET_TOKEN_TYPE = "passwordReset";
+
+/** 
+ * A `UserAuthenticationToken` with this type allows a user to log into their
+ * account without providing their password.
+ */
+export const SESSION_TOKEN_TYPE = "session";
+
+/** 
+ * A `UserAuthenticationToken` with this type allows a user to confirm that they
+ * control the email address associated with the account.
+ */
+export const ACCOUNT_VALIDATION_TOKEN_TYPE = "accountValidation";
+
 /**
  * @description The types of authentication tokens:
  * - `passwordReset` allows the user to reset their password
  * - `sessionToken` allows the app to login users w/o prompting for a password
  * - `accountValidation` allows the user to validate their account after signup
  */
-export const AUTH_TOKEN_TYPES = [
-    "passwordReset", "sessionToken", "accountValidation"
+const AUTH_TOKEN_TYPES = [
+    PASSWORD_RESET_TOKEN_TYPE, SESSION_TOKEN_TYPE, ACCOUNT_VALIDATION_TOKEN_TYPE
 ];
 
 /** Token used for authentication functionality in lieu of user password. */
@@ -191,6 +222,7 @@ export class UserAuthenticationToken extends Model {
     tokenValue!: string;
 
     getUser: BelongsToGetAssociationMixin<User>;
+    setUser!: BelongsToSetAssociationMixin<User, User>;
 
     readonly createdAt!: Date;
     readonly updatedAt!: Date;
@@ -296,6 +328,16 @@ export class FlashCard extends Model {
      */
     isPublic: boolean;
 
+    /**
+     * If non-zero, then the user deleted this card at the time represented by
+     * the timestamp (in ms since Unix). Trashed cards can be restored by the
+     * user. The timestamp is stored so that stale cards can be permanently
+     * deleted. 'Stale' == 30 days since the card was trashed.
+     * 
+     * If zero, then this card is active.
+     */
+    trashedTimestamp: number;
+
     /** 
      * The number of times this card has been marked as a duplicate. We try to 
      * keep the `browse` page free of duplicates. Users have an option of 
@@ -326,7 +368,7 @@ export class FlashCard extends Model {
     parentId: string;
 
     getTags!: HasManyGetAssociationsMixin<Tag>;
-    setTags!: HasManySetAssociationsMixin<Tag, "id">;
+    setTags!: HasManySetAssociationsMixin<Tag, Tag[]>;
 }
 
 FlashCard.init({
@@ -369,6 +411,15 @@ FlashCard.init({
     isPublic: {
         type: DataTypes.BOOLEAN,
         allowNull: false
+    },
+
+    trashedTimestamp: {
+        type: DataTypes.NUMBER,
+        allowNull: false,
+        defaultValue: 0,
+        validate: {
+            min: 0
+        }
     },
 
     numTimesFlaggedAsDuplicate: {
@@ -448,6 +499,7 @@ export class ReviewStreak extends Model {
     streakLength!: number;
 
     getFlashCards!: HasManyGetAssociationsMixin<FlashCard>;
+    addFlashCards!: HasManyAddAssociationMixin<FlashCard, FlashCard[] | string[]>;
 };
 
 ReviewStreak.init({
