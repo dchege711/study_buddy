@@ -449,7 +449,7 @@ export function flagCard(
  * Each inner array will have tags that were found on a same card.
  */
 export function getTagGroupings(payload: Pick<ISearchQuery, "userId">):
-    Promise<IBaseMessage> {
+        Promise<IBaseMessage> {
     payload = sanitizeQuery(payload);
     return new Promise(function(resolve, reject) {
         FlashCard
@@ -467,4 +467,97 @@ export function getTagGroupings(payload: Pick<ISearchQuery, "userId">):
     });
 }
 
+/**
+ * @description Set the 'in-trash' status of this card.
+ * @param payload Identifier for the card.
+ * @param trash Should the card be moved to the trash?
+ * @returns If `success` is set, `message` contains the updated card.
+ */
+function setTrashedStatusOfCard(
+    payload: Pick<ISearchQuery, "cardId" | "ownerId">, trash=true): 
+        Promise<IBaseMessage> {
+    payload = sanitizeQuery(payload);
+    return new Promise(function(resolve, reject) {
+        FlashCard
+            .findOne({
+                where: {id: payload.cardId, ownerId: payload.ownerId}
+            })
+            .then((card: FlashCard) => {
+                if (!card) {
+                    resolve({
+                        success: false, status: 200, 
+                        message: "The card wasn't found."
+                    });
+                    return;
+                }
+                card.trashedTimestamp = trash ? Date.now(): 0;
+                return card.save();
+            })
+            .then((updatedCard: FlashCard) => {
+                resolve({
+                    success: true, status: 200, 
+                    message: updatedCard
+                });
+            })
+            .catch((err: Error) => { reject(err); });
+    });
+}
 
+/**
+ * @description Send the card matching `payload` to the trash. The trash is 
+ * where cards that haven't been deleted permanently are tracked. We learned 
+ * that we should never use a warning when we meant undo. 
+ * {@link http://alistapart.com/article/neveruseawarning}.
+ * 
+ * Seems like a good design decision. Users who really want to delete a card 
+ * might be unsatisifed, but I bet they're in the minority(?). Furthermore, 
+ * they can permanently delete a card from the accounts page. Amazing how much 
+ * fiddling goes in the backend, just to allow a user to delete and then save 
+ * themselves 3 seconds later by hitting `Undo`.
+ * 
+ * @todo What happens when `cardId` gets scrubbed off by `sanitizeQuery`?
+ */
+export function trashCard(payload: Pick<ISearchQuery, "cardId" | "ownerId">):
+        Promise<IBaseMessage> {
+    payload = sanitizeQuery(payload);
+    return setTrashedStatusOfCard(payload, true);
+}
+
+/**
+ * @description Restore a card from the trash, back into the user's list of
+ * currently active cards.
+ * 
+ * @todo Return the restored card instead of a confirmatory string.
+ */
+export function restoreCardFromTrash(
+    payload: Pick<ISearchQuery, "cardId" | "ownerId">): 
+    Promise<IBaseMessage> {
+    payload = sanitizeQuery(payload);
+    return setTrashedStatusOfCard(payload, false);
+}
+
+/**
+ * @description Permanently delete a card from the user's trash.
+ * 
+ * @returns {Promise} resolves with a JSON keyed by `success`, `status` and  
+ * `message`
+ */
+export function permanentlyDeleteCard(
+    payload: Pick<ISearchQuery, "cardId" | "ownerId">): 
+    Promise<IBaseMessage> {
+    payload = sanitizeQuery(payload);
+
+    return new Promise(function(resolve, reject) {
+        FlashCard
+            .destroy({
+                where: {id: payload.cardId, ownerId: payload.ownerId}
+            })
+            .then((numDestroyed: number) => {
+                resolve({
+                    success: numDestroyed > 0 ? true: false, 
+                    status: 200, message: numDestroyed
+                });
+            })
+            .catch((err: Error) => { reject(err); });
+    });
+}
