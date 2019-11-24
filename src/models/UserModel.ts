@@ -19,6 +19,7 @@ import {
     LOWER_CASE, DIGITS, getSaltAndHash, getHash, getRandomString 
 } from "./Utils"
 import { Op } from "sequelize/types";
+import { sanitizeQuery, ISearchQuery } from "./SanitizationAndValidation";
 
 /**
  * @description Clean up resources, e.g. the email client
@@ -548,11 +549,11 @@ export function resetPassword(
  * @returns {Promise} If `success` is set, `message` contains a confirmation 
  * string.
  */
-export function deleteAccount(userId: number): Promise<IBaseMessage> {
-
+export function deleteAccount(identifier: ISearchQuery): Promise<IBaseMessage> {
+    identifier = sanitizeQuery(identifier);
     return new Promise(function(resolve, reject) {
         User
-            .destroy({where: {id: userId}})
+            .destroy({where: identifier})
             .then((_: any) => {
                 resolve({
                     success: true, status: 200,
