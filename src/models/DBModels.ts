@@ -43,8 +43,8 @@ export class User extends Model {
     userName!: string;
 
     /** 
-     * The email address associated with this user's account.
-     * Stored as lower-case.
+     * The email address associated with this user's account. Stored as
+     * lower-case.
      */
     emailAddress!: string;
 
