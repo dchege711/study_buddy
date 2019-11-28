@@ -40,9 +40,17 @@ describe("FlashCardModel", function() {
         it("should not expose inner db structure to the client", function() {
             throw new Error("Test not implemented.");
         });
+
+        it("should read all cards belonging to the user.", function() {
+            throw new Error("Not implemented yet.");
+        });
     });
 
     describe("update", function() {
+        it("should gracefully fail if the card is actually new.", function() {
+            throw new Error("Not implemented yet.");
+        });
+
         it("should have persisted changes on returning.", function() {
             throw new Error("Test not implemented.");
         });

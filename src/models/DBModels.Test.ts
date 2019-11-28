@@ -21,7 +21,7 @@ describe("DB.Models", function() {
             throw new Error("Not implemented yet.");
         });
 
-        it("should reject invalid usernames", function() {
+        it("should reject invalid usernames and/or emails", function() {
             throw new Error("Not implemented yet.");
         });
 
