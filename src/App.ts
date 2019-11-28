@@ -1,6 +1,5 @@
 import express = require("express");
 import session = require("express-session");
-import MongoStore = require("connect-mongo");
 import path = require("path");
 import bodyParser = require("body-parser");
 import cookieParser = require("cookie-parser");
@@ -8,19 +7,12 @@ import enforce = require("express-sslify");
 
 import { Response, Request, NextFunction } from "express";
 
-import { AuthenticationRouter } from "./routes/AuthenticationRoutes";
-import { InAppRouter } from "./routes/InAppRoutes"
+import { AuthenticationRouter } from "./routes/AuthenticationRouter";
+import { InAppRouter } from "./routes/InAppRouter"
 import { PORT, APP_NAME, BASE_URL } from "./config";
-import { addOrFetchPublicUser } from "./models/Miscellaneous";
-import * as LoginUtils from "./models/LogInUtilities";
-import { DummyError } from "./AppUtils";
+import * as UserModel from "./models/UserModel";
+import { DummyError } from "./models/Utils";
 
-// Needed to get a Mongoose instance running for this process
-import { dbConnection, closeMongooseConnection } from "./models/MongooseClient";
-const mongoStore = MongoStore(session);
-
-// Set up the default account for publicly viewable cards
-(async () => { await addOrFetchPublicUser(); })();
 
 /** The application itself. It has all the routes and listeners defined. */
 const App = express();
@@ -36,10 +28,6 @@ App.use(session({
     // httpOnly: false,
     resave: false,
     name: "c13u-study-buddy",
-    store: new mongoStore({
-        mongooseConnection: dbConnection,
-        touchAfter: 24 * 3600
-    }),
     saveUninitialized: true
 }));
 App.use(bodyParser.urlencoded({ extended: true }));
@@ -124,11 +112,8 @@ export { App };
 
 export function shutdownServer(): Promise<void> {
     return new Promise(function(resolve, reject) {
-        LoginUtils
+        UserModel
             .close()
-            .then(function() { 
-                return closeMongooseConnection(); 
-            })
             .then(() => {
                 resolve();
             })
