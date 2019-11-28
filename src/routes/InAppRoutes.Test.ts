@@ -1,9 +1,9 @@
 import assert = require("assert");
 
-import { InAppRouter } from "./InAppRoutes";
-import { GET, POST, RouteChecker } from "./TestUtilsRouter";
+import { InAppRouter } from "./InAppRouter";
+import { GET, POST, RouteChecker } from "./RouterUtils.Test";
 
-describe("AuthenticationRouter.ExpectedRoutes", function() {
+describe("InAppRoutes.ExpectedRoutes", function() {
     it("should define routes for these URLs", function() {
 
         const expectedRoutes = [
@@ -19,10 +19,10 @@ describe("AuthenticationRouter.ExpectedRoutes", function() {
         ];
 
         const routeChecker = new RouteChecker(InAppRouter);
-        expectedRoutes.forEach((routeAndMethod) => {
+        expectedRoutes.forEach(([path, method]) => {
             assert.ok(
-                routeChecker.hasRoute(routeAndMethod[0], routeAndMethod[1]), 
-                `Missing method: ${routeAndMethod[1]}; path: ${routeAndMethod[0]}`
+                routeChecker.hasRoute(path, method), 
+                `Missing method: ${method}; path: ${path}`
             );
         });
 
