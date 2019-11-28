@@ -7,8 +7,6 @@
 import * as showdown from "showdown";
 import * as xss from "xss";
 
-import { ICard, INewCard } from "./mongoose_models/CardSchema";
-import { IIncomingCard } from "./CardsMongoDB";
 import { INewFlashCard, FlashCard } from "./DBModels";
 
 /** 
