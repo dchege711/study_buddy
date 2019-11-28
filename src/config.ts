@@ -18,13 +18,24 @@ export { NODE_ENV };
  * @returns The database URI based on the value of `NODE_ENV`.
  */
 function getDBURI(): string {
-    if (NODE_ENV === "production") return process.env.STUDY_BUDDY_MLAB_MONGO_URI;
-    if (NODE_ENV === "development") return process.env.STUDY_BUDDY_MLAB_TEST_DB_URI;
+    switch (NODE_ENV) {
+        case 'production_heroku':
+            return process.env.DATABASE_URL;
+        case 'development':
+            let userName = process.env.STUDY_BUDDY_POSTGRES_USER_NAME;
+            let password = process.env.STUDY_BUDDY_POSTGRES_USER_PASSWORD;
+            let dbName = process.env.STUDY_BUDDY_POSTGRES_DB_NAME;
+            return `host=localhost dbname=${dbName} user=${userName} password=${password}`;
+        case 'testing':
+            return "host=localhost dbname=travis_ci_test user=postgres";
+        default:
+            throw new Error("The database URI is not defined.");
+    }
 }
 
-/** The URI used to connected to the MongoDB database. */
-const MONGO_URI = getDBURI();
-export { MONGO_URI };
+/** The URI used to connected to the underlying database. */
+const DATABASE_URI = getDBURI();
+export { DATABASE_URI };
 
 /**
  * @returns The base URL of the app depending on the value of `NODE_ENV`.
