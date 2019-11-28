@@ -240,28 +240,6 @@ export function search(
 };
 
 /**
- * @description Append a copy of the hyphenated/underscored words in `s` 
- * without the hyphens/underscores. Useful for pre-processing search queries. 
- * For instance, the input: `arrays dynamic_programming iterative-algorithms` 
- * would lead to: 
- * `arrays dynamic_programming iterative-algorithms dynamic programming iterative algorithms`
- * 
- * @todo Not entirely true. Interest in `dynamic_programming` doesn't mean a 
- * user is interested in `dynamic` and `programming` as separate terms. A better 
- * approach would be filtering out stop words and asking the user to enquote 
- * phrases that should be matched exactly.
- */
-let splitTags = function(s: string) {
-    let possibleTags = s.match(/[\w|\d]+(\_|-){1}[\w|\d]+/g);
-    if (possibleTags === null) return s;
-    
-    for (let i = 0; i < possibleTags.length; i++) {
-        s += " " + possibleTags[i].split(/[\_-]/g).join(" ");
-    }
-    return s;
-}
-
-/**
  * @description Search the database for cards matching the specified schema. 
  * Return the results to the callback function that was passed in.
  * 
@@ -432,7 +410,7 @@ export function flagCard(
     return new Promise(function(resolve, reject) {
         FlashCard
             // @ts-ignore This example is in the docs
-            .increment(colsToIncrement, { by: 1, where: {id: payload.cardId }})
+            .increment(colsToIncrement, { by: 1, where: {id: payload.cardId, isPublic: true }})
             .then((_: any) => {
                 resolve({
                     status: 200, success: true, message: `Card flagged successfully!`
