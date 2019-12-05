@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Attach",
+            "name": "Debug App",
             "type": "node",
             "request": "attach",
             "port": 9229,
@@ -20,5 +20,32 @@
             "name": "Launch",
             "program": "${workspaceFolder}/server.js"
         }, 
+        {
+            // Adapted from https://medium.com/@benlesh/debugging-typescript-mocha-tests-with-vscode-89310051531
+            // Mimicking this npm command (package.json):
+            // mocha --require ts-node/register --file src/TestConfig.ts --exit --timeout 40000 'src/**/*Test.ts --grep *'
+            // It's not yet working...
+            "type": "node",
+            "request": "launch",
+            "name": "Mocha Tests",
+            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+            "args": [
+                // Allows us to run without compiling the ts ourselves
+                "--require ts-node/register",
+                // Which files should have setup/teardown?
+                "--file src/TestConfig.ts", 
+                // Because we're in debug mode
+                "--no-timeout",
+                // Because I don't know how to clean up after myself :-(
+                "--exit", 
+                // Where should mocha look for the tests?
+                "${workspaceFolder}/src/**/*Test.ts",
+                // Any tests that you wish to selectively run
+                "--grep AppUtils"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "protocol": "inspector"
+        }
     ]
 }
