@@ -308,7 +308,7 @@ export function authenticateUser(
                 }
 
                 try {
-                    let authData: UserAuthenticationData = user.getUserAuthenticationData();
+                    let authData = await user.getUserAuthenticationData();
                     let computedHash = await getHash(password, authData.passwordSalt);
                     let hashOnFile = authData.passwordHash;
                     for (let i = 0; i < computedHash.length; i++) {

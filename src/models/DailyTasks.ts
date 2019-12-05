@@ -33,7 +33,7 @@ function resetDailyStreaks(): Promise<number> {
 
                         // Otherwise, update it
                         let prefs: UserPrefences = await user.getUserPrefences();
-                        let reviewedCount = await streak.getFlashCards().length;
+                        let reviewedCount = (await streak.getFlashCards()).length;
                         if (reviewedCount < prefs.dailyTarget) {
                             streak.streakLength = 0;
                         } else {
