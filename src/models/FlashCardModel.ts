@@ -56,14 +56,27 @@ function setTagsToCard(card: FlashCard, tagValues: string[]):
     Promise<FlashCard> {
     return new Promise(function(resolve, reject) {
         findOrCreateTags(tagValues)
-            .then((tags) => {
-                return card.setTags(tags);
-            })
-            .then((savedCard: FlashCard) => {
-                resolve(savedCard);
+            .then(async (tags) => {
+                await card.setTags(tags);
+                resolve(card);
             })
             .catch((err: Error) => { reject(err); });
     });
+}
+
+/**
+ * @description A utility function for fetching the tags as a string[] instead
+ * of the internal representation as a separate table.
+ */
+async function cardTagsToArray(card: IClientFacingFlashCard): Promise<string[]> {
+    try {
+        let tagValues: string[];
+        (await card.getTags()).forEach((tag) => { tagValues.push(tag.value); });
+        return tagValues;
+    } catch (err) {
+        console.error(err);
+        return [];
+    }
 }
 
 /**
@@ -151,10 +164,10 @@ export function read(
                 where: <WhereOptions>query,
                 attributes: attributesToFetch
             })
-            .then((cards: IClientFacingFlashCard[]) => {
+            .then(async (cards: IClientFacingFlashCard[]) => {
                 if (ATTACH_TAGS) {
                     for (let i = 0; i < cards.length; i++) {
-                        cards[i].tags = cards[i].getTags();
+                        cards[i].tags = await cardTagsToArray(cards[i]);
                     }
                 }
                 resolve({
@@ -363,7 +376,7 @@ export function duplicateCard(
                 let res = await create({
                     title: preExistingCard.title,
                     rawDescription: preExistingCard.rawDescription,
-                    tags: preExistingCard.getTags(),
+                    tags: (await cardTagsToArray(preExistingCard)),
                     isPublic: payload.isPublic,
                     ownerId: payload.userId,
                     urgency: 10, /** See FlashCard.init */
@@ -432,10 +445,10 @@ export function getTagGroupings(payload: Pick<ISearchQuery, "userId">):
     return new Promise(function(resolve, reject) {
         FlashCard
             .findAll({where: { ownerId: payload.userId }})
-            .then((cards: FlashCard[]) => {
-                let tagsArray = [];
+            .then(async (cards: FlashCard[]) => {
+                let tagsArray: string[][] = [];
                 for (let i = 0; i < cards.length; i++) {
-                    tagsArray.push(cards[i].getTags());
+                    tagsArray.push(await cardTagsToArray(cards[i]));
                 }
                 resolve({
                     success: true, message: tagsArray, status: 200
