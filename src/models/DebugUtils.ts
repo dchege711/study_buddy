@@ -1,12 +1,8 @@
-import { dbConnection, closeMongooseConnection } from "./MongooseClient"; 
-
 import * as UserModel from "./UserModel";
 import { getRandomCards } from "./SampleCardsUtils";
 import { 
-    PUBLIC_USER_USERNAME, PUBLIC_USER_EMAIL, 
     DEBUG_USERNAME, DEBUG_PASSWORD, DEBUG_EMAIL_ADDRESS
 } from "../config";
-import { getRandomString } from "./Utils";
 import { UserAuthenticationToken, User, INewFlashCard } from "./DBModels";
 import { createMany as createManyCards } from "./FlashCardModel";
 import { IBaseMessage } from "../controllers/ControllerUtilities";

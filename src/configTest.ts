@@ -11,7 +11,6 @@ describe("Config.ExpectedValues", function() {
         assert.ok(config.APP_NAME);
         assert.ok(config.PORT);
         assert.ok(config.NODE_ENV);
-        assert.ok(config.MONGO_URI);
         assert.ok(config.BASE_URL);
         assert.ok(config.EMAIL_ADDRESS);
         assert.ok(config.MAILGUN_LOGIN);
@@ -22,7 +21,5 @@ describe("Config.ExpectedValues", function() {
             assert.ok(config.DEBUG_PASSWORD);
             assert.ok(config.DEBUG_OPERATION_TIMEOUT_MS);
         }
-        assert.ok(config.PUBLIC_USER_USERNAME);
-        assert.ok(config.PUBLIC_USER_EMAIL);
     });
 });
