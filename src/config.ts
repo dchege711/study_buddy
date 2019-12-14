@@ -25,7 +25,7 @@ function getDBURI(): string {
             let userName = process.env.STUDY_BUDDY_POSTGRES_USER_NAME;
             let password = process.env.STUDY_BUDDY_POSTGRES_USER_PASSWORD;
             let dbName = process.env.STUDY_BUDDY_POSTGRES_DB_NAME;
-            return `host=localhost dbname=${dbName} user=${userName} password=${password}`;
+            return `postgres://${userName}:${password}@localhost:5432/${dbName}`;
         case 'testing':
             return "host=localhost dbname=travis_ci_test user=postgres";
         default:

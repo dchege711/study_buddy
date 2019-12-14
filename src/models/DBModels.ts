@@ -133,12 +133,12 @@ UserAuthenticationData.init({
     },
 
     passwordSalt: {
-        type: DataTypes.ARRAY,
+        type: DataTypes.ARRAY(DataTypes.NUMBER),
         allowNull: false,
     },
 
     passwordHash: {
-        type: DataTypes.ARRAY,
+        type: DataTypes.ARRAY(DataTypes.NUMBER),
         allowNull: false,
     },
 }, { sequelize, timestamps: false });
