@@ -6,7 +6,7 @@
  */
 
 import * as fs from "fs";
-import { Op } from "sequelize/types";
+import { Op } from "sequelize";
 
 import { 
     User, UserAuthenticationToken, ACCOUNT_VALIDATION_TOKEN_TYPE, INewFlashCard, UserAuthenticationData, SESSION_TOKEN_TYPE, PASSWORD_RESET_TOKEN_TYPE, UserPrefences, ReviewStreak, FlashCard 

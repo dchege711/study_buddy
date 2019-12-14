@@ -10,7 +10,7 @@ import {
 import { IBaseMessage } from "../controllers/ControllerUtilities";
 
 import { FlashCard, INewFlashCard, Tag } from "./DBModels";
-import { WhereOptions, FindOptions, Op, Model } from "sequelize/types";
+import { WhereOptions, FindOptions, Op, Model } from "sequelize";
 
 /** 
  * Create new tags for each val in `tagsValues`, if no `Tag` has a value `val`.
