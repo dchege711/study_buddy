@@ -1,5 +1,7 @@
+# Custom ignores
+
 .DS_Store
-node_modules
+dist/
 
 # Ignore template for Node 
 
