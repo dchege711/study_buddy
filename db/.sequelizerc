@@ -1,0 +1,10 @@
+const path = require("path");
+
+const AppConfig = require("../../dist/config.js");
+
+module.exports = {
+    "config": path.resolve("config", "config.js"),
+    "models-path": path.resolve("..", "src", "models", "db"),
+    "migrations-path": path.resolve("migrations"), 
+    "url": AppConfig.DATABASE_URI
+}

@@ -60,6 +60,7 @@
     "pg": "^7.12.1",
     "pg-hstore": "^2.3.3",
     "sequelize": "^5.21.3",
+    "sequelize-cli": "^5.5.1",
     "showdown": "^1.9.1",
     "sjcl": "1.0.7",
     "validator": "^10.7.1",
@@ -97,7 +98,7 @@
     "ts-node": "^8.4.1",
     "tslint": "^5.20.0",
     "typescript": "^3.6.4",
-    "webpack": "^4.25.1",
+    "webpack": "^4.41.4",
     "webpack-cli": "^3.1.2",
     "why-is-node-running": "2.0.2"
   },
