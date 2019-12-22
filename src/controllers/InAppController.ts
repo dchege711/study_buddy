@@ -9,7 +9,7 @@ import {
 import { 
     ISearchQuery, IClientFacingFlashCard 
 } from "../models/SanitizationAndValidation";
-import { INewFlashCard } from "../models/DBModels";
+import { INewFlashCard } from "../models/db/DBModels";
 
 /**
  * @description Read the card whose id is `req.body.cardId` and owned by the

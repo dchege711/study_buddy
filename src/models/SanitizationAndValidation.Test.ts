@@ -1,5 +1,5 @@
 import { sanitizeCard, sanitizeQuery } from "./SanitizationAndValidation";
-import { INewFlashCard } from "./DBModels";
+import { INewFlashCard } from "./db/DBModels";
 
 describe("SanitizationAndValidation", function() {
 

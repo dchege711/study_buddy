@@ -4,7 +4,7 @@
  * @module
  */
 
-import { ReviewStreak, User, UserPrefences } from "./DBModels";
+import { ReviewStreak, User, UserPrefences } from "./db/DBModels";
 
 /**
  * @description Reset the daily card review streaks.

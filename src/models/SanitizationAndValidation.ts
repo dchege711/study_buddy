@@ -7,7 +7,7 @@
 import * as showdown from "showdown";
 import * as xss from "xss";
 
-import { INewFlashCard, FlashCard } from "./DBModels";
+import { INewFlashCard, FlashCard } from "./db/DBModels";
 
 /** 
  * The converter is used to turn the markdown in the cards into html. 

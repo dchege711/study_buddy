@@ -10,7 +10,7 @@ import { Op } from "sequelize";
 
 import { 
     User, UserAuthenticationToken, ACCOUNT_VALIDATION_TOKEN_TYPE, INewFlashCard, UserAuthenticationData, SESSION_TOKEN_TYPE, PASSWORD_RESET_TOKEN_TYPE, UserPrefences, ReviewStreak, FlashCard 
-} from "./DBModels";
+} from "./db/DBModels";
 import { createMany as createManyCards, read as readCards } from "./FlashCardModel";
 import * as Email from "./EmailClient";
 import { APP_NAME, BASE_URL } from "../config";

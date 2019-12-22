@@ -3,7 +3,7 @@ import { getRandomCards } from "./SampleCardsUtils";
 import { 
     DEBUG_USERNAME, DEBUG_PASSWORD, DEBUG_EMAIL_ADDRESS
 } from "../config";
-import { UserAuthenticationToken, User, INewFlashCard } from "./DBModels";
+import { UserAuthenticationToken, User, INewFlashCard } from "./db/DBModels";
 import { createMany as createManyCards } from "./FlashCardModel";
 import { IBaseMessage } from "../controllers/ControllerUtilities";
 

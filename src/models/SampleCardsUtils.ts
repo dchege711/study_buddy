@@ -3,7 +3,7 @@
  * users.
  */
 
-import { FlashCard, INewFlashCard } from "./DBModels";
+import { FlashCard, INewFlashCard } from "./db/DBModels";
 
 type ISampleCard = Partial<INewFlashCard>;
 

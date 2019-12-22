@@ -9,7 +9,7 @@ import {
 } from "./SanitizationAndValidation";
 import { IBaseMessage } from "../controllers/ControllerUtilities";
 
-import { FlashCard, INewFlashCard, Tag } from "./DBModels";
+import { FlashCard, INewFlashCard, Tag } from "./db/DBModels";
 import { WhereOptions, FindOptions, Op, Model } from "sequelize";
 
 /** 
