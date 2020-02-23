@@ -1,10 +1,14 @@
 const path = require("path");
 
-const AppConfig = require("../../dist/config.js");
+const AppConfig = require("../dist/config.js");
 
 module.exports = {
-    "config": path.resolve("config", "config.js"),
+    // Contains all the models for the project
     "models-path": path.resolve("..", "src", "models", "db"),
+
+    // Contains all migration files
     "migrations-path": path.resolve("migrations"), 
+
+    // The database connection string to use (instead of using --config files)
     "url": AppConfig.DATABASE_URI
 }
