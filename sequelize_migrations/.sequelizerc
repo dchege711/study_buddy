@@ -1,0 +1,17 @@
+const AppConfig = require("../dist/config.js");
+
+module.exports = {
+    // Contains all the models for the project. This is where 
+    // `$ npx sequelize-cli model:generate` would have created the files.
+    "models-path": "/Users/dchege711/study_buddy/dist/models/db/",
+
+    // Contains all migration files. This is where 
+    // `$ npx sequelize-cli migration:generate` writes the migration files.
+    "migrations-path": "/Users/dchege711/study_buddy/sequelize_migrations/migrations/", 
+
+    // The database connection string to use (instead of using --config files).
+    "url": AppConfig.DATABASE_URI,
+
+    // When available show various debug information.
+    debug: true,
+}
