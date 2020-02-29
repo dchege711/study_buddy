@@ -69,7 +69,7 @@ export class User extends Model {
 User.init({
 
     id: {
-        type: DataTypes.UUIDV4,
+        type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
     },
@@ -127,7 +127,7 @@ export class UserAuthenticationData extends Model {
 
 UserAuthenticationData.init({
     id: {
-        type: DataTypes.UUIDV4,
+        type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
     },
@@ -157,7 +157,7 @@ export class UserPrefences extends Model {
 
 UserPrefences.init({
     id: {
-        type: DataTypes.UUIDV4,
+        type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
     },
@@ -230,7 +230,7 @@ export class UserAuthenticationToken extends Model {
 
 UserAuthenticationToken.init({
     id: {
-        type: DataTypes.UUIDV4,
+        type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
     },
@@ -373,7 +373,7 @@ export class FlashCard extends Model {
 
 FlashCard.init({
     id: {
-        type: DataTypes.UUIDV4,
+        type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
     },
@@ -472,7 +472,7 @@ export class Tag extends Model {
 
 Tag.init({
     id: {
-        type: DataTypes.UUIDV4,
+        type: DataTypes.UUID,
         primaryKey: true,
         defaultValue: DataTypes.UUIDV4
     },
@@ -504,7 +504,7 @@ export class ReviewStreak extends Model {
 
 ReviewStreak.init({
     id: {
-        type: DataTypes.UUIDV4,
+        type: DataTypes.UUID,
         primaryKey: true,
         defaultValue: DataTypes.UUIDV4
     },
