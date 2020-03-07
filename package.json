@@ -81,6 +81,7 @@
     "@types/sjcl": "^1.0.28",
     "@types/supertest": "^2.0.8",
     "@types/validator": "^10.11.3",
+    "acorn": "^7.1.1",
     "babel": "^6.23.0",
     "babel-loader": "^8.0.4",
     "circular-dependency-plugin": "^5.0.2",
