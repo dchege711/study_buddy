@@ -133,12 +133,12 @@ UserAuthenticationData.init({
     },
 
     passwordSalt: {
-        type: DataTypes.ARRAY(DataTypes.NUMBER),
+        type: DataTypes.ARRAY(DataTypes.INTEGER),
         allowNull: false,
     },
 
     passwordHash: {
-        type: DataTypes.ARRAY(DataTypes.NUMBER),
+        type: DataTypes.ARRAY(DataTypes.INTEGER),
         allowNull: false,
     },
 }, { sequelize, timestamps: false });
@@ -400,7 +400,7 @@ FlashCard.init({
     },
 
     urgency: {
-        type: DataTypes.NUMBER,
+        type: DataTypes.DECIMAL,
         allowNull: false,
         validate: {
             max: 10,
@@ -414,16 +414,12 @@ FlashCard.init({
     },
 
     trashedTimestamp: {
-        type: DataTypes.NUMBER,
-        allowNull: false,
-        defaultValue: 0,
-        validate: {
-            min: 0
-        }
+        type: DataTypes.DATE,
+        allowNull: true,
     },
 
     numTimesFlaggedAsDuplicate: {
-        type: DataTypes.NUMBER,
+        type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0,
         validate: {
@@ -432,7 +428,7 @@ FlashCard.init({
     },
 
     numTimesFlaggedForReview: {
-        type: DataTypes.NUMBER,
+        type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0,
         validate: {
@@ -510,7 +506,7 @@ ReviewStreak.init({
     },
 
     lastResetTimestamp: {
-        type: DataTypes.NUMBER
+        type: DataTypes.DATE
     },
 
     streakLength: {
