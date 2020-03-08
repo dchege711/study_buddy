@@ -8,6 +8,6 @@ I'll be using `Sequelize-CLI` to handle database migrations for me. `$ npx seque
 
 We'll therefore be editing the migration files ourselves. The first migration file will be nasty, but it's gotta be done. I think subsequent migrations will be few and far between.
 
-`$ npx sequelize-cli db:migrate` ensures ther migration table exists and runs any migration files that haven't been ran yet.
+`$ npx sequelize-cli db:migrate` ensures the migration table exists and runs any migration files that haven't been ran yet.
 
 `$ npx sequelize-cli db:migrate:undo` reverts the most recent migration.

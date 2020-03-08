@@ -1,0 +1,195 @@
+DROP TYPE IF EXISTS "public"."enum_UserAuthenticationTokens_tokenType"
+------------------------------------
+CREATE TABLE IF NOT EXISTS "Users" ("id" UUID,
+"userName" VARCHAR(255) NOT NULL UNIQUE,
+"emailAddress" VARCHAR(255) NOT NULL UNIQUE,
+"hasValidatedAccount" BOOLEAN NOT NULL DEFAULT false,
+"createdAt" TIMESTAMP WITH TIME ZONE NOT NULL,
+"updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL,
+PRIMARY KEY ("id"))
+------------------------------------
+SELECT i.relname AS name,
+ix.indisprimary AS primary,
+ix.indisunique AS unique,
+ix.indkey AS indkey,
+array_agg(a.attnum) as column_indexes,
+array_agg(a.attname) AS column_names,
+pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t,
+pg_class i,
+pg_index ix,
+pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'Users' GROUP BY i.relname,
+ix.indexrelid,
+ix.indisprimary,
+ix.indisunique,
+ix.indkey ORDER BY i.relname
+------------------------------------
+CREATE TABLE IF NOT EXISTS "UserAuthenticationData" ("id" UUID,
+"passwordSalt" INTEGER[] NOT NULL,
+"passwordHash" INTEGER[] NOT NULL,
+"UserId" UUID REFERENCES "Users" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+PRIMARY KEY ("id"))
+------------------------------------
+SELECT i.relname AS name,
+ix.indisprimary AS primary,
+ix.indisunique AS unique,
+ix.indkey AS indkey,
+array_agg(a.attnum) as column_indexes,
+array_agg(a.attname) AS column_names,
+pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t,
+pg_class i,
+pg_index ix,
+pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'UserAuthenticationData' GROUP BY i.relname,
+ix.indexrelid,
+ix.indisprimary,
+ix.indisunique,
+ix.indkey ORDER BY i.relname
+------------------------------------
+CREATE TABLE IF NOT EXISTS "UserPrefences" ("id" UUID,
+"cardsAreByDefaultPrivate" BOOLEAN NOT NULL DEFAULT true,
+"dailyTarget" INTEGER NOT NULL DEFAULT 7,
+"UserId" UUID REFERENCES "Users" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+PRIMARY KEY ("id"))
+------------------------------------
+SELECT i.relname AS name,
+ix.indisprimary AS primary,
+ix.indisunique AS unique,
+ix.indkey AS indkey,
+array_agg(a.attnum) as column_indexes,
+array_agg(a.attname) AS column_names,
+pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t,
+pg_class i,
+pg_index ix,
+pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'UserPrefences' GROUP BY i.relname,
+ix.indexrelid,
+ix.indisprimary,
+ix.indisunique,
+ix.indkey ORDER BY i.relname
+------------------------------------
+DROP TYPE IF EXISTS "public"."enum_UserAuthenticationTokens_tokenType"
+------------------------------------
+SELECT t.typname enum_name,
+array_agg(e.enumlabel ORDER BY enumsortorder) enum_value FROM pg_type t JOIN pg_enum e ON t.oid = e.enumtypid JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace WHERE n.nspname = 'public' AND t.typname='enum_UserAuthenticationTokens_tokenType' GROUP BY 1
+------------------------------------
+DROP TYPE IF EXISTS "public"."enum_UserAuthenticationTokens_tokenType"
+CREATE TYPE "public"."enum_UserAuthenticationTokens_tokenType" AS ENUM('passwordReset',
+'session',
+'accountValidation')
+------------------------------------
+Executing (default): WITH ranges AS (  SELECT pg_range.rngtypid, pg_type.typname AS rngtypname,         pg_type.typarray AS rngtyparray, pg_range.rngsubtype    FROM pg_range LEFT OUTER JOIN pg_type ON pg_type.oid = pg_range.rngtypid)SELECT pg_type.typname, pg_type.typtype, pg_type.oid, pg_type.typarray,       ranges.rngtypname, ranges.rngtypid, ranges.rngtyparray  FROM pg_type LEFT OUTER JOIN ranges ON pg_type.oid = ranges.rngsubtype WHERE (pg_type.typtype IN('b', 'e'));
+CREATE TABLE IF NOT EXISTS "UserAuthenticationTokens" ("id" UUID,
+"tokenType" "public"."enum_UserAuthenticationTokens_tokenType" NOT NULL,
+"tokenValue" VARCHAR(255) UNIQUE,
+"createdAt" TIMESTAMP WITH TIME ZONE NOT NULL,
+"updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL,
+"UserId" UUID REFERENCES "Users" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+PRIMARY KEY ("id"))
+------------------------------------
+SELECT i.relname AS name,
+ix.indisprimary AS primary,
+ix.indisunique AS unique,
+ix.indkey AS indkey,
+array_agg(a.attnum) as column_indexes,
+array_agg(a.attname) AS column_names,
+pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t,
+pg_class i,
+pg_index ix,
+pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'UserAuthenticationTokens' GROUP BY i.relname,
+ix.indexrelid,
+ix.indisprimary,
+ix.indisunique,
+ix.indkey ORDER BY i.relname
+------------------------------------
+CREATE TABLE IF NOT EXISTS "ReviewStreaks" ("id" UUID,
+"lastResetTimestamp" TIMESTAMP WITH TIME ZONE,
+"streakLength" INTEGER DEFAULT 0,
+"UserId" UUID REFERENCES "Users" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+PRIMARY KEY ("id"))
+------------------------------------
+SELECT i.relname AS name,
+ix.indisprimary AS primary,
+ix.indisunique AS unique,
+ix.indkey AS indkey,
+array_agg(a.attnum) as column_indexes,
+array_agg(a.attname) AS column_names,
+pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t,
+pg_class i,
+pg_index ix,
+pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'ReviewStreaks' GROUP BY i.relname,
+ix.indexrelid,
+ix.indisprimary,
+ix.indisunique,
+ix.indkey ORDER BY i.relname
+------------------------------------
+CREATE TABLE IF NOT EXISTS "FlashCards" ("id" UUID,
+"title" VARCHAR(255) NOT NULL,
+"rawDescription" TEXT NOT NULL,
+"htmlDescription" TEXT NOT NULL,
+"urgency" DECIMAL NOT NULL,
+"isPublic" BOOLEAN NOT NULL,
+"trashedTimestamp" TIMESTAMP WITH TIME ZONE,
+"numTimesFlaggedAsDuplicate" INTEGER NOT NULL DEFAULT 0,
+"numTimesFlaggedForReview" INTEGER NOT NULL DEFAULT 0,
+"createdAt" TIMESTAMP WITH TIME ZONE NOT NULL,
+"updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL,
+"ownerId" UUID REFERENCES "Users" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+"FlashCardId" UUID REFERENCES "FlashCards" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+"parentId" UUID REFERENCES "FlashCards" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+"ReviewStreakId" UUID REFERENCES "ReviewStreaks" ("id") ON DELETE SET NULL ON UPDATE CASCADE,
+PRIMARY KEY ("id"))
+------------------------------------
+SELECT i.relname AS name,
+ix.indisprimary AS primary,
+ix.indisunique AS unique,
+ix.indkey AS indkey,
+array_agg(a.attnum) as column_indexes,
+array_agg(a.attname) AS column_names,
+pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t,
+pg_class i,
+pg_index ix,
+pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'FlashCards' GROUP BY i.relname,
+ix.indexrelid,
+ix.indisprimary,
+ix.indisunique,
+ix.indkey ORDER BY i.relname
+------------------------------------
+CREATE TABLE IF NOT EXISTS "Tags" ("id" UUID,
+"value" VARCHAR(255) NOT NULL,
+PRIMARY KEY ("id"))
+------------------------------------
+SELECT i.relname AS name,
+ix.indisprimary AS primary,
+ix.indisunique AS unique,
+ix.indkey AS indkey,
+array_agg(a.attnum) as column_indexes,
+array_agg(a.attname) AS column_names,
+pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t,
+pg_class i,
+pg_index ix,
+pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'Tags' GROUP BY i.relname,
+ix.indexrelid,
+ix.indisprimary,
+ix.indisunique,
+ix.indkey ORDER BY i.relname
+------------------------------------
+CREATE TABLE IF NOT EXISTS "FlashCardTag" ("createdAt" TIMESTAMP WITH TIME ZONE NOT NULL,
+"updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL,
+"TagId" UUID  REFERENCES "Tags" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+"FlashCardId" UUID  REFERENCES "FlashCards" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
+PRIMARY KEY ("TagId",
+"FlashCardId"))
+------------------------------------
+SELECT i.relname AS name,
+ix.indisprimary AS primary,
+ix.indisunique AS unique,
+ix.indkey AS indkey,
+array_agg(a.attnum) as column_indexes,
+array_agg(a.attname) AS column_names,
+pg_get_indexdef(ix.indexrelid) AS definition FROM pg_class t,
+pg_class i,
+pg_index ix,
+pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND t.relkind = 'r' and t.relname = 'FlashCardTag' GROUP BY i.relname,
+ix.indexrelid,
+ix.indisprimary,
+ix.indisunique,
+ix.indkey ORDER BY i.relname
+------------------------------------

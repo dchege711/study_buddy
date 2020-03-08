@@ -3,5 +3,6 @@
     "eslint.enable": true,
     "markdownlint.config":{
         "MD041": false
-    }
+    },
+    "python.pythonPath": "/Users/dchege711/anaconda3/envs/tiger_leagues/bin/python"
 }
