@@ -133,6 +133,7 @@ def generate_migration_file(reason: str):
             ["npx", "sequelize-cli", "migration:generate", "--name", reason],
             check=True, capture_output=True)
         logging.info("...SUCCESS!")
+        logging.info("See https://sequelize.org/master/manual/migrations.html#migration-skeleton")
 
     except subprocess.CalledProcessError as err:
         logging.info("...FAILED!")
