@@ -90,6 +90,7 @@
     "jsdoc": "~3.6.3",
     "mathjax": "^2.7.5",
     "mocha": "^5.2.0",
+    "mongodb": "^3.5.4",
     "node-mocks-http": "^1.8.0",
     "nodemon": "^1.19.2",
     "nyc": "^14.1.1",
