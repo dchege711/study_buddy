@@ -101,7 +101,7 @@ async function transferUser(mongoUser: MongoUser): Promise<string> {
         console.log(`Created <${user.userName}>: prefs - ${userPrefs.id}, auth - ${authData.id}`);
         return user.id;
     } catch (err) {
-        throw err;
+        console.error(err);
     }
 }
 
@@ -113,10 +113,10 @@ function transferUsers(db: Db) {
                 try {
                     oldUserIdToNewId[user.userIDInApp] = await transferUser(user);
                 } catch (err) {
-                    throw err;
+                    console.error(err);
                 }
             }, function(err) {
-                throw err;
+                console.error(err);
             }
         );
 }
@@ -156,10 +156,10 @@ function transferFlashCards(db: Db) {
                     }
                     
                 } catch (err) {
-                    throw err;
+                    console.error(err);
                 }
             }, function(err) {
-                throw err;
+                console.error(err);
             }
         );
 
@@ -174,7 +174,7 @@ function transferFlashCards(db: Db) {
             let children = await parent.getChildren();
             console.info(`Imported ${children.length} children for '${parent.title}'`);
         } catch (err) {
-            throw err;
+            console.error(err);
         }
     });
 
@@ -190,7 +190,7 @@ async function markCardsAsTrashed(oldCardIdToTrashTimestamp: {[s: string]: numbe
             console.info(`Card [${card.title}] was trashed on ${card.trashedTimestamp}`);
         }
     } catch (err) {
-        throw err;
+        console.error(err);
     }
 }
 
@@ -213,7 +213,7 @@ async function transferStreak(metadata: MongoMetadata) {
         let cardsInStreak = await streak.getFlashCards();
         console.info(`[${user.userName}] has a ${streak.streakLength} day streak with ${cardsInStreak.length} cards`);
     } catch (err) {
-        throw err;
+        console.error(err);
     }
 }
 
@@ -228,19 +228,18 @@ function transferMetadata(db: Db) {
                     }
                     transferStreak(metadata);
                 } catch (err) {
-                    throw err;
+                    console.error(err);
                 }
             }, function(err) {
-                throw err;
+                console.error(err);
             }
         );
 }
 
 function importData(db: Db) {
-    console.info()
     transferUsers(db);
-    transferFlashCards(db);
-    transferMetadata(db);
+    // transferFlashCards(db);
+    // transferMetadata(db);
 }
 
 async function main(dbURI: string) {
@@ -262,7 +261,5 @@ if (require.main === module) {
         process.exit(1);
     }
     const mongoURI = process.argv[2];
-    console.info(mongoURI);
-    console.error(mongoURI);
     main(mongoURI);
 }
