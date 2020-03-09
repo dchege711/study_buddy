@@ -481,7 +481,7 @@ function setTrashedStatusOfCard(
                     });
                     return;
                 }
-                card.trashedTimestamp = trash ? Date.now(): 0;
+                card.trashedTimestamp = trash ? new Date() : null;
                 return card.save();
             })
             .then((updatedCard: FlashCard) => {

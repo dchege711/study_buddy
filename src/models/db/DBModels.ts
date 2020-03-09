@@ -329,14 +329,14 @@ export class FlashCard extends Model {
     isPublic: boolean;
 
     /**
-     * If non-zero, then the user deleted this card at the time represented by
+     * If not null, then the user deleted this card at the time represented by
      * the timestamp (in ms since Unix). Trashed cards can be restored by the
      * user. The timestamp is stored so that stale cards can be permanently
      * deleted. 'Stale' == 30 days since the card was trashed.
      * 
-     * If zero, then this card is active.
+     * If null, then this card is active.
      */
-    trashedTimestamp: number;
+    trashedTimestamp: Date;
 
     /** 
      * The number of times this card has been marked as a duplicate. We try to 
@@ -363,7 +363,7 @@ export class FlashCard extends Model {
     getOwner!: BelongsToGetAssociationMixin<User>;
     
     getChildren!: HasManyGetAssociationsMixin<FlashCard>;
-    addChildren!: HasManyAddAssociationMixin<FlashCard, FlashCard>;
+    addChildren!: HasManyAddAssociationMixin<FlashCard, FlashCard[] | string[]>;
     getParent!: BelongsToGetAssociationMixin<FlashCard>;
     parentId: string;
 
@@ -486,7 +486,7 @@ export class ReviewStreak extends Model {
     readonly id!: string;
 
     /** The last time when this review streak was reset to zero. */
-    lastResetTimestamp!: number;
+    lastResetTimestamp!: Date;
 
     /** 
      * The number of consecutive days for which the user has reviewed enough
