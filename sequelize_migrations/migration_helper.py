@@ -122,24 +122,52 @@ def diff_sql_dumps_if_possible():
 
     fd.close()
     
+def generate_migration_file(reason: str):
+    """
+    Generate an empty migration file in `./migrations`. `reason` gets appended
+    to the migration's file name.
+    """
+    logging.info("Generating [empty] migration file...")
+    try:
+        results = subprocess.run(
+            ["npx", "sequelize-cli", "migration:generate", "--name", reason],
+            check=True, capture_output=True)
+        logging.info("...SUCCESS!")
+
+    except subprocess.CalledProcessError as err:
+        logging.info("...FAILED!")
+        logging.error(err.with_traceback())
 
 def main():
-    os.chdir(WORKING_DIR)
-    logging.info("Working from {}".format(WORKING_DIR))
-
     parser = argparse.ArgumentParser(
         description="A meta-helper script for managing my database migrations.")
 
     parser.add_argument(
-        "--reason", type=str, 
+        "--reason", type=str, default="",
         help="The reason for the migration, preferably without whitespace, "
              "e.g. 'add-user-table'. If specified, a new SQL dump file will be "
-             "created and diff'd")
+             "created.")
+
+    parser.add_argument(
+        "--diff", type=bool, default=True,
+        help="If set, create a diff file of the most recent two dump files."
+    )
+
+    parser.add_argument(
+        "--generate", type=bool, default=True,
+        help="If set, run 'sequelize-cli migration:generate'."
+    )
     
     args = parser.parse_args()
 
-    if args.reason: current_dump_path = make_sql_dump(args.reason)
-    diff_sql_dumps_if_possible()
+    os.chdir(WORKING_DIR)
+    logging.info("Working from {}".format(WORKING_DIR))
+
+    if args.reason: make_sql_dump(args.reason)
+    
+    if args.diff: diff_sql_dumps_if_possible()
+
+    if args.generate: generate_migration_file(args.reason)
 
 if __name__ == "__main__":
     main()
