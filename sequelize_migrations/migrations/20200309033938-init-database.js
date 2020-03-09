@@ -249,14 +249,38 @@ module.exports = {
   async down (queryInterface, Sequelize) {
     const transaction = await queryInterface.sequelize.transaction();
     try {
-      await queryInterface.dropTable('UserAuthenticationData', { transaction });
-      await queryInterface.dropTable('UserPrefences', { transaction });
-      await queryInterface.dropTable('UserAuthenticationTokens', { transaction });
-      await queryInterface.dropTable('FlashCardTag', { transaction });
-      await queryInterface.dropTable('Tags', { transaction });
-      await queryInterface.dropTable('FlashCards', { transaction });
-      await queryInterface.dropTable('ReviewStreaks', { transaction });
-      await queryInterface.dropTable('Users', { transaction });
+      await queryInterface.sequelize.query(
+        `DROP TABLE IF EXISTS "UserAuthenticationData" CASCADE;`,
+        { transaction: transaction }
+      );
+      await queryInterface.sequelize.query(
+        `DROP TABLE IF EXISTS "UserPrefences" CASCADE;`,
+        { transaction: transaction }
+      );
+      await queryInterface.sequelize.query(
+        `DROP TABLE IF EXISTS "UserAuthenticationTokens" CASCADE;`,
+        { transaction: transaction }
+      );
+      await queryInterface.sequelize.query(
+        `DROP TABLE IF EXISTS "FlashCardTag" CASCADE;`,
+        { transaction: transaction }
+      );
+      await queryInterface.sequelize.query(
+        `DROP TABLE IF EXISTS "Tags" CASCADE;`,
+        { transaction: transaction }
+      );
+      await queryInterface.sequelize.query(
+        `DROP TABLE IF EXISTS "FlashCards" CASCADE;`,
+        { transaction: transaction }
+      );
+      await queryInterface.sequelize.query(
+        `DROP TABLE IF EXISTS "ReviewStreaks" CASCADE;`,
+        { transaction: transaction }
+      );
+      await queryInterface.sequelize.query(
+        `DROP TABLE IF EXISTS "Users" CASCADE;`,
+        { transaction: transaction }
+      );
       await queryInterface.sequelize.query(
         `DROP TYPE IF EXISTS "public"."enum_UserAuthenticationTokens_tokenType";`
       );
