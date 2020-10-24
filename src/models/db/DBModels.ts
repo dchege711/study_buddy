@@ -384,7 +384,7 @@ FlashCard.init({
         get() {
             return this.getDataValue('title');
         },
-        set(val) {
+        set(val: string) {
             this.setDataValue('title', val);
         }
     },
