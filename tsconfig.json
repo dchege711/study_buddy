@@ -1,7 +1,9 @@
 {
+    // See https://www.typescriptlang.org/tsconfig for reference.
     "compilerOptions": {
         "outDir": "./dist", 
         "allowJs": true,
+        "baseUrl": "./",
         "target": "es6",
         "sourceMap": true,
         "noEmitOnError": true,
@@ -9,6 +11,7 @@
         // https://www.typescriptlang.org/tsconfig#module. "CommonJS" is adviced
         // but I'm only interested in a working build.
         "module": "CommonJS",
+        "moduleResolution": "node"
     },
     "include": [
         "./src/**/*"
