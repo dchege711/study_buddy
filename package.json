@@ -75,6 +75,7 @@
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.19.1",
     "@types/nodemailer": "^6.4.0",
+    "@types/sequelize": "^4.28.9",
     "@types/showdown": "^1.9.3",
     "@types/sjcl": "^1.0.29",
     "@types/supertest": "^2.0.10",
