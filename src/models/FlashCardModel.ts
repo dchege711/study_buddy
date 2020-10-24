@@ -19,7 +19,7 @@ async function findOrCreateTags(tagValues: string[]): Promise<Tag[]> {
     try {
         let tagValuesSet = new Set(tagValues);
         let alreadyExistingTags = await Tag.findAll({
-            where: { value: { in: tagValues } }
+            where: { value: { [Op.in]: tagValues } }
         });
         alreadyExistingTags.forEach((tag: Tag) => {
             tagValuesSet.delete(tag.value)
