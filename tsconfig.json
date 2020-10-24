@@ -6,6 +6,9 @@
         "sourceMap": true,
         "noEmitOnError": true,
         "noImplicitAny": true,
+        // https://www.typescriptlang.org/tsconfig#module. "CommonJS" is adviced
+        // but I'm only interested in a working build.
+        "module": "CommonJS",
     },
     "include": [
         "./src/**/*"
