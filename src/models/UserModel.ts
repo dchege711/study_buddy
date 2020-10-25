@@ -257,7 +257,7 @@ export function registerUser(registrationDetails: {
         try {
           // - Save the salt and hash to enable logging in
           let saltAndHash = await getSaltAndHash(password);
-          await savedUser.createUserAuthenticationData({
+          await savedUser.createUserAuthenticationDatum({
             passwordSalt: saltAndHash[0],
             passwordHash: saltAndHash[1],
           });
@@ -344,7 +344,7 @@ export function authenticateUser(authDetails: {
         }
 
         try {
-          let authData = await user.getUserAuthenticationData();
+          let authData = await user.getUserAuthenticationDatum();
           let computedHash = await getHash(password, authData.passwordSalt);
           let hashOnFile = authData.passwordHash;
           for (let i = 0; i < computedHash.length; i++) {
@@ -564,7 +564,7 @@ export function resetPassword(resetRequest: {
 
           // Reset the user's password
           let saltAndHash = await getSaltAndHash(resetRequest.password);
-          await user.createUserAuthenticationData({
+          await user.createUserAuthenticationDatum({
             passwordSalt: saltAndHash[0],
             passwordHash: saltAndHash[1],
           });

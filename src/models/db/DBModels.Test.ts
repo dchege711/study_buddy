@@ -20,6 +20,7 @@ import {
   ReviewStreak,
   USER_CREATE_OPTIONS,
   IUserAuthenticationData,
+  UserAuthenticationData,
 } from "./DBModels";
 import {
   VALID_EMAIL_ADDRESSES,
@@ -254,23 +255,17 @@ describe("DB.Models", function () {
           );
         });
 
-        it.skip("should prevent its UserAuthenticationDatum from being deleted", async function () {
+        it("should prevent its UserAuthenticationDatum from being deleted", async function () {
           let user: User = await User.create(
             generateUserDetails(),
             USER_CREATE_OPTIONS
           );
-          let streak = await user.getReviewStreak();
-          await ReviewStreak.destroy({
-            where: { id: streak.id },
+          let authData = await user.getUserAuthenticationDatum();
+          await UserAuthenticationData.destroy({
+            where: { id: authData.id },
           }).should.be.rejectedWith(ForeignKeyConstraintError, `table "Users"`);
         });
       });
-    });
-  });
-
-  describe.skip("UserAuthenticationDatum", function () {
-    it("should have a valid 1:1 association with `User`", function () {
-      throw new Error("Not implemented yet.");
     });
   });
 

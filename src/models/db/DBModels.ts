@@ -72,11 +72,13 @@ export class User extends Model {
   /** Date when this user was updated. Auto-populated. */
   updatedAt?: Date;
 
-  getUserAuthenticationData?: HasOneGetAssociationMixin<UserAuthenticationData>;
-  createUserAuthenticationData?: HasOneCreateAssociationMixin<
+  getUserAuthenticationDatum?: BelongsToGetAssociationMixin<
     UserAuthenticationData
   >;
-  setUserAuthenticationData?: HasOneSetAssociationMixin<
+  createUserAuthenticationDatum?: BelongsToCreateAssociationMixin<
+    UserAuthenticationData
+  >;
+  setUserAuthenticationDatum?: BelongsToSetAssociationMixin<
     UserAuthenticationData,
     UserAuthenticationData
   >;
@@ -85,7 +87,6 @@ export class User extends Model {
   createUserPreferences?: HasOneCreateAssociationMixin<UserPrefences>;
   setUserPreferences?: HasOneSetAssociationMixin<UserPrefences, UserPrefences>;
 
-  ReviewStreak?: ReviewStreak;
   getReviewStreak?: BelongsToGetAssociationMixin<ReviewStreak>;
   createReviewStreak?: BelongsToCreateAssociationMixin<ReviewStreak>;
 }
@@ -610,8 +611,7 @@ const UserToReviewStreak = User.belongsTo(ReviewStreak, {
 export type IReviewStreak = Partial<ReviewStreak>;
 
 /** The data required to create a user in the database. */
-export interface IUser
-  extends Pick<User, "emailAddress" | "userName"> {
+export interface IUser extends Pick<User, "emailAddress" | "userName"> {
   ReviewStreak: IReviewStreak;
   // Sequelize singularizes things, so hence "datum".
   UserAuthenticationDatum: IUserAuthenticationData;
