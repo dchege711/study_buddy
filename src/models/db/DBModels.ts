@@ -24,7 +24,8 @@ import {
     BelongsToGetAssociationMixin, HasManyGetAssociationsMixin, 
     BelongsToManyGetAssociationsMixin, HasManySetAssociationsMixin, 
     HasManyAddAssociationMixin, HasOneSetAssociationMixin, 
-    HasOneCreateAssociationMixin, BelongsToSetAssociationMixin 
+    HasOneCreateAssociationMixin, BelongsToSetAssociationMixin, BelongsToCreateAssociationMixin,
+    CreateOptions
 } from "sequelize";
 
 import { DATABASE_URI } from "../../config";
@@ -33,37 +34,46 @@ import { getRandomString, ALPHANUMERICS } from "../Utils";
 export const sequelize = new Sequelize(DATABASE_URI);
 
 export class User extends Model {
-    /** An identifier of this user instance. */
-    readonly id!: string;
+    /** 
+     * A UUIDv4 identifier. Auto-populated on creation. Is the PK.
+     */
+    readonly id?: string;
 
     /** 
      * A unique alphanumeric username. Chosen by the user on account creation.
-     * Stored as lower case.
+     * Stored as a lower case string.
      */
     userName!: string;
 
     /** 
-     * The email address associated with this user's account. Stored as
-     * lower-case.
+     * The email address associated with this user's account. Stored as a lower
+     * case string.
      */
     emailAddress!: string;
 
-    /** `true` iff this user has validated their account. */
-    hasValidatedAccount!: boolean;
+    /**
+     * Tracks whether the email address associated with the user account has
+     * been validated. Defaults to `false`
+     */
+    hasValidatedAccount?: boolean;
 
-    createdAt!: Date;
-    updatedAt!: Date;
+    /** Date when this user was created. Auto-populated. */
+    createdAt?: Date;
 
-    getUserAuthenticationData!: HasOneGetAssociationMixin<UserAuthenticationData>;
-    createUserAuthenticationData!: HasOneCreateAssociationMixin<UserAuthenticationData>;
-    setUserAuthenticationData!: HasOneSetAssociationMixin<UserAuthenticationData, UserAuthenticationData>;
+    /** Date when this user was updated. Auto-populated. */
+    updatedAt?: Date;
+
+    getUserAuthenticationData?: HasOneGetAssociationMixin<UserAuthenticationData>;
+    createUserAuthenticationData?: HasOneCreateAssociationMixin<UserAuthenticationData>;
+    setUserAuthenticationData?: HasOneSetAssociationMixin<UserAuthenticationData, UserAuthenticationData>;
     
-    getUserPrefences!: HasOneGetAssociationMixin<UserPrefences>;
-    createUserPreferences!: HasOneCreateAssociationMixin<UserPrefences>;
-    setUserPreferences!: HasOneSetAssociationMixin<UserPrefences, UserPrefences>;
+    getUserPrefences?: HasOneGetAssociationMixin<UserPrefences>;
+    createUserPreferences?: HasOneCreateAssociationMixin<UserPrefences>;
+    setUserPreferences?: HasOneSetAssociationMixin<UserPrefences, UserPrefences>;
 
-    getReviewStreak!: HasOneGetAssociationMixin<ReviewStreak>;
-    createReviewStreak!: HasOneCreateAssociationMixin<ReviewStreak>;
+    ReviewStreak?: ReviewStreak;
+    getReviewStreak?: BelongsToGetAssociationMixin<ReviewStreak>;
+    createReviewStreak?: BelongsToCreateAssociationMixin<ReviewStreak>;
 
 };
 User.init({
@@ -483,19 +493,25 @@ Tag.belongsToMany(FlashCard, { through: "FlashCardTag" });
 FlashCard.belongsToMany(Tag, { through: "FlashCardTag" });
 
 export class ReviewStreak extends Model {
-    readonly id!: string;
+    /** A UUIDv4 identifier. Auto-populated on creation. Is the PK. */
+    readonly id?: string;
 
-    /** The last time when this review streak was reset to zero. */
-    lastResetTimestamp!: Date;
+    /** 
+     * The last time when this review streak was reset to zero. Defaults to the
+     * time when this instance was created.
+     */
+    lastResetTimestamp?: Date;
 
     /** 
      * The number of consecutive days for which the user has reviewed enough
-     * cards to meet their daily target.
+     * cards to meet their daily target. Defaults to zero.
      */
-    streakLength!: number;
+    streakLength?: number;
 
-    getFlashCards!: HasManyGetAssociationsMixin<FlashCard>;
-    addFlashCards!: HasManyAddAssociationMixin<FlashCard, FlashCard[] | string[]>;
+    getFlashCards?: HasManyGetAssociationsMixin<FlashCard>;
+    addFlashCards?: HasManyAddAssociationMixin<FlashCard, FlashCard[] | string[]>;
+
+    getUser?: BelongsToGetAssociationMixin<User>;
 };
 
 ReviewStreak.init({
@@ -507,8 +523,11 @@ ReviewStreak.init({
 
     lastResetTimestamp: {
         type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
         validate: {
-            isBefore: (new Date(Date.now())).toDateString()
+            // We only care about the date part. `isBefore` by itself would
+            // reject today's date.
+            isBefore: (new Date(Date.now() + 1000 * 3600 * 24)).toDateString()
         }
     },
 
@@ -523,5 +542,34 @@ ReviewStreak.init({
 }, { sequelize, timestamps: false});
 
 ReviewStreak.hasMany(FlashCard);
-User.hasOne(ReviewStreak);
+
+/**
+ * We want a 1:1 relationship, where a `User` instance is linked to a non-null
+ * `ReviewStreak` instance. It's okay for a `ReviewStreak` instance to be
+ * orphaned.
+ * 
+ * Docs: https://sequelize.org/master/manual/assocs.html#defining-the-sequelize-associations
+ * 
+ * ```typescript
+ * User.belongsTo(ReviewStreak) // Foreign key will be defined in `User`
+ * ```
+ */
+const UserToReviewStreak = User.belongsTo(ReviewStreak, {
+    foreignKey: { allowNull: false }, 
+    onDelete: 'RESTRICT'});
+
+/** All values for review streaks have defaults, so nothing needed. */ 
+export type IReviewStreakCreationValues = Partial<ReviewStreak>;
+
+/** The data required to create a user in the database. */
+export interface IUserCreationValues extends Pick<User, "emailAddress" | "userName"> {
+    ReviewStreak: IReviewStreakCreationValues
+};
+
+const USER_CREATE_OPTIONS: CreateOptions = {
+    include: [{
+        association: UserToReviewStreak
+    }]
+};
+export { USER_CREATE_OPTIONS }
 

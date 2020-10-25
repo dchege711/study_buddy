@@ -2,13 +2,24 @@
  * @description Test relations and properties of the database and its models.
  */
 
-import { UniqueConstraintError, ValidationError } from "sequelize";
+import {
+  UniqueConstraintError,
+  ValidationError,
+  ForeignKeyConstraintError,
+} from "sequelize";
 import { isUUID } from "validator";
 
 import * as chai from "chai";
 import * as chaiAsPromised from "chai-as-promised";
 
-import { sequelize, User, ReviewStreak } from "./DBModels";
+import {
+  sequelize,
+  IUserCreationValues,
+  User,
+  IReviewStreakCreationValues,
+  ReviewStreak,
+  USER_CREATE_OPTIONS,
+} from "./DBModels";
 import {
   VALID_EMAIL_ADDRESSES,
   INVALID_EMAIL_ADDRESSES,
@@ -25,21 +36,19 @@ describe("DB.Models", function () {
     return sequelize.sync({ force: true, logging: false });
   });
 
-  interface IUserCreationDetails {
-    userName: string;
-    emailAddress: string;
-    hasValidatedAccount: boolean;
-  }
+  const dummyReviewStreakDetails: IReviewStreakCreationValues = {};
 
-  const dummyUserDetails: IUserCreationDetails = {
+  const dummyUserDetails: IUserCreationValues = {
     userName: "user",
     emailAddress: "user@example.com",
-    hasValidatedAccount: false,
+    ReviewStreak: dummyReviewStreakDetails,
   };
 
   describe("User", function () {
     it("should generate a UUID as a primary key", function () {
-      return User.create(dummyUserDetails).then(function (user: User) {
+      return User.create(dummyUserDetails, USER_CREATE_OPTIONS).then(function (
+        user: User
+      ) {
         const primaryKeys: string[] = User.primaryKeyAttributes;
         assert(primaryKeys.length == 1, "There should be one primary key");
         assert(primaryKeys[0] === "id", "The PK should be 'id'");
@@ -48,7 +57,7 @@ describe("DB.Models", function () {
     });
 
     it("should generate a timestamp for creation date", function () {
-      return User.create(dummyUserDetails).then(function(user: User) {
+      return User.create(dummyUserDetails).then(function (user: User) {
         assert.isOk(user.createdAt, "There should be a createdAt timestamp");
         const currentTime = Date.now();
         const creationTime = user.createdAt.getTime();
@@ -60,15 +69,15 @@ describe("DB.Models", function () {
     describe("UserNames", function () {
       // Should also take care of duplicate user names as they're a subset.
       it("should treat the username as case-insensitive", function () {
-        let user1: IUserCreationDetails = {
+        let user1: IUserCreationValues = {
           emailAddress: "user-1@example.com",
           userName: "user",
-          hasValidatedAccount: false,
+          ReviewStreak: dummyReviewStreakDetails,
         };
-        let user2: IUserCreationDetails = {
+        let user2: IUserCreationValues = {
           emailAddress: "user-2@example.com",
           userName: "UsEr",
-          hasValidatedAccount: false,
+          ReviewStreak: dummyReviewStreakDetails,
         };
 
         assert(user1.userName !== user2.userName);
@@ -85,16 +94,15 @@ describe("DB.Models", function () {
             })
             .should.be.rejectedWith(ValidationError, "userName must be unique"),
         ]);
-        
       });
 
       let emailDistinguisher = 0;
-      function testUser(userName: string): IUserCreationDetails {
+      function testUser(userName: string): IUserCreationValues {
         emailDistinguisher += 1;
         return {
           emailAddress: `user-${emailDistinguisher}@example.com`,
           userName: userName,
-          hasValidatedAccount: false,
+          ReviewStreak: dummyReviewStreakDetails,
         };
       }
 
@@ -113,15 +121,15 @@ describe("DB.Models", function () {
     describe("Email Addresses", function () {
       // Should also take care of duplicate email addresses as they're a subset.
       it("should treat the email address as case-insensitive", function () {
-        let user1: IUserCreationDetails = {
+        let user1: IUserCreationValues = {
           emailAddress: "a@example.com",
           userName: "user",
-          hasValidatedAccount: false,
+          ReviewStreak: dummyReviewStreakDetails,
         };
-        let user2: IUserCreationDetails = {
+        let user2: IUserCreationValues = {
           emailAddress: "A@eXaMpLe.Com",
           userName: "user2",
-          hasValidatedAccount: false,
+          ReviewStreak: dummyReviewStreakDetails,
         };
 
         assert(user1.emailAddress !== user2.emailAddress);
@@ -137,12 +145,12 @@ describe("DB.Models", function () {
       });
 
       let userNameDistinguisher = 0;
-      function testUser(emailAddress: string): IUserCreationDetails {
+      function testUser(emailAddress: string): IUserCreationValues {
         userNameDistinguisher += 1;
         return {
           emailAddress: emailAddress,
           userName: `user${userNameDistinguisher}`,
-          hasValidatedAccount: false,
+          ReviewStreak: dummyReviewStreakDetails,
         };
       }
 
@@ -192,8 +200,26 @@ describe("DB.Models", function () {
       throw new Error("Not implemented yet.");
     });
 
-    it("should have a valid 1:1 relationship w/ `ReviewStreak`", function () {
-      throw new Error("Not implemented yet.");
+    describe("Associations", function () {
+      describe("ReviewStreak", function () {
+        it("should not exist without a ReviewStreak", function () {
+          return User.create(dummyUserDetails).should.be.rejectedWith(
+            ValidationError,
+            "ReviewStreakId"
+          );
+        });
+
+        it("should prevent its ReviewStreak from being deleted", async function () {
+          let user: User = await User.create(
+            dummyUserDetails,
+            USER_CREATE_OPTIONS
+          );
+          let streak = await user.getReviewStreak();
+          await ReviewStreak.destroy({
+            where: { id: streak.id },
+          }).should.be.rejectedWith(ForeignKeyConstraintError, `table "Users"`);
+        });
+      });
     });
   });
 
@@ -272,20 +298,78 @@ describe("DB.Models", function () {
   });
 
   describe("ReviewStreak", function () {
-    it("should have a 1:1 association with `User`", function () {
-      throw new Error("Not implemented yet.");
+    describe("Associations", function () {
+      describe("User", function () {
+        it("could exist without a User", function () {
+          return ReviewStreak.create(dummyReviewStreakDetails).should.be
+            .fulfilled;
+        });
+
+        it("should be orphaned if the associated User is deleted", async function () {
+          let user: User = await User.create(
+            dummyUserDetails,
+            USER_CREATE_OPTIONS
+          );
+          const streakID = (await user.getReviewStreak()).id;
+          let streak = await ReviewStreak.findByPk(streakID);
+          assert.isNotNull(streak);
+
+          const numUsersDeleted = await User.destroy({
+            where: { id: user.id },
+          });
+          assert.equal(numUsersDeleted, 1);
+
+          streak = await ReviewStreak.findByPk(streakID);
+          assert.isNotNull(streak);
+        });
+      });
+
+      it("should have a 1:1 association with User", function () {
+        return User.create(dummyUserDetails).then(async function (u: User) {
+          const originalStreak: ReviewStreak = await u.createReviewStreak(
+            dummyReviewStreakDetails
+          );
+          assert.isOk(originalStreak.id, "The review streak should get saved.");
+
+          let streak = await u.getReviewStreak();
+          assert.equal(streak.id, originalStreak.id);
+
+          const secondStreak: ReviewStreak = await u.createReviewStreak(
+            dummyReviewStreakDetails
+          );
+          assert.isNotOk(
+            secondStreak,
+            "New streak should not have been created"
+          );
+
+          streak = await u.getReviewStreak();
+          assert.equal(
+            streak.id,
+            originalStreak.id,
+            "New review streaks override old ones"
+          );
+
+          let secondStreakUser = await secondStreak.getUser();
+          assert.isNull(
+            secondStreakUser,
+            `New streak should be orphaned, not belonging to ${secondStreakUser.userName}`
+          );
+        });
+      });
     });
 
     it("should only allow non-negative streak-lengths", function () {
-      return ReviewStreak
-        .create({lastResetTimestamp: new Date(Date.now()), streakLength: -3})
-        .should.be.rejectedWith(ValidationError, "streakLength");
+      return ReviewStreak.create({
+        lastResetTimestamp: new Date(Date.now()),
+        streakLength: -3,
+      }).should.be.rejectedWith(ValidationError, "streakLength");
     });
 
     it("should reject reset times that are in the future", function () {
-      return ReviewStreak
-        .create({lastResetTimestamp: new Date(Date.now() + 10000), streakLength: 4})
-        .should.be.rejectedWith(ValidationError, "lastResetTimestamp");
+      return ReviewStreak.create({
+        lastResetTimestamp: new Date(Date.now() + 10000),
+        streakLength: 4,
+      }).should.be.rejectedWith(ValidationError, "lastResetTimestamp");
     });
   });
 });
