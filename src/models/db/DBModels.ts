@@ -506,7 +506,10 @@ ReviewStreak.init({
     },
 
     lastResetTimestamp: {
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
+        validate: {
+            isBefore: (new Date(Date.now())).toDateString()
+        }
     },
 
     streakLength: {

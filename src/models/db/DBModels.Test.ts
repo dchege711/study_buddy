@@ -281,5 +281,11 @@ describe("DB.Models", function () {
         .create({lastResetTimestamp: new Date(Date.now()), streakLength: -3})
         .should.be.rejectedWith(ValidationError, "streakLength");
     });
+
+    it("should reject reset times that are in the future", function () {
+      return ReviewStreak
+        .create({lastResetTimestamp: new Date(Date.now() + 10000), streakLength: 4})
+        .should.be.rejectedWith(ValidationError, "lastResetTimestamp");
+    });
   });
 });
