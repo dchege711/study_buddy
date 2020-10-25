@@ -19,7 +19,7 @@ const VALID_EMAIL_ADDRESSES: string[] = [
   "firstname-lastname@example.com",
 
   // The weird ones... TODO(#83)
-  `much.“more\ unusual”@example.com`,
+  // `much.“more\ unusual”@example.com`,
   // `very.unusual.“@”.unusual.com@example.com`,
   // `very.“(),:;<>[]”.VERY.“very@\\ "very”.unusual@strange.example.com`,
 ];
