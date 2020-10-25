@@ -57,7 +57,9 @@ describe("DB.Models", function () {
     });
 
     it("should generate a timestamp for creation date", function () {
-      return User.create(dummyUserDetails).then(function (user: User) {
+      return User.create(dummyUserDetails, USER_CREATE_OPTIONS).then(function (
+        user: User
+      ) {
         assert.isOk(user.createdAt, "There should be a createdAt timestamp");
         const currentTime = Date.now();
         const creationTime = user.createdAt.getTime();
@@ -86,8 +88,8 @@ describe("DB.Models", function () {
         );
 
         return Promise.all([
-          User.create(user1).should.be.fulfilled,
-          User.create(user2)
+          User.create(user1, USER_CREATE_OPTIONS).should.be.fulfilled,
+          User.create(user2, USER_CREATE_OPTIONS)
             .catch(function (err: ValidationError) {
               err.message += `; ${err.errors[0].message}`;
               throw err;
@@ -109,10 +111,10 @@ describe("DB.Models", function () {
       it("should reject invalid usernames", function () {
         return Promise.all(
           ["!beginning", "end?", "😌 🏀", "*"].map(function (userName) {
-            return User.create(testUser(userName)).should.be.rejectedWith(
-              ValidationError,
-              "username"
-            );
+            return User.create(
+              testUser(userName),
+              USER_CREATE_OPTIONS
+            ).should.be.rejectedWith(ValidationError, "username");
           })
         );
       });
@@ -137,8 +139,8 @@ describe("DB.Models", function () {
           user1.emailAddress.toLowerCase() ===
             user2.emailAddress.toLocaleLowerCase()
         );
-        return User.create(user1).then(function (_: User) {
-          return User.create(user2).should.be.rejectedWith(
+        return User.create(user1, USER_CREATE_OPTIONS).then(function (_: User) {
+          return User.create(user2, USER_CREATE_OPTIONS).should.be.rejectedWith(
             UniqueConstraintError
           );
         });
@@ -157,7 +159,7 @@ describe("DB.Models", function () {
       it("should reject invalid email addresses", function () {
         return Promise.all(
           INVALID_EMAIL_ADDRESSES.map(function (emailAddress) {
-            return User.create(testUser(emailAddress))
+            return User.create(testUser(emailAddress), USER_CREATE_OPTIONS)
               .then(function (u: User) {
                 return Promise.reject(
                   new ValidationError(
@@ -173,9 +175,10 @@ describe("DB.Models", function () {
       it("should accept valid email addresses", function () {
         return Promise.all(
           VALID_EMAIL_ADDRESSES.map(function (emailAddress) {
-            return User.create(testUser(emailAddress)).catch(function (
-              err: ValidationError
-            ) {
+            return User.create(
+              testUser(emailAddress),
+              USER_CREATE_OPTIONS
+            ).catch(function (err: ValidationError) {
               err.message += `; received >>>${err.errors[0].value}<<<`;
               throw err;
             }).should.be.fulfilled;
