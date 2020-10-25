@@ -8,7 +8,7 @@ import { isUUID } from "validator";
 import * as chai from "chai";
 import * as chaiAsPromised from "chai-as-promised";
 
-import { sequelize, User } from "./DBModels";
+import { sequelize, User, ReviewStreak } from "./DBModels";
 import {
   VALID_EMAIL_ADDRESSES,
   INVALID_EMAIL_ADDRESSES,
@@ -38,13 +38,6 @@ describe("DB.Models", function () {
   };
 
   describe("User", function () {
-    it("should reject incomplete initialization of users", function () {
-      return User.create({ userName: "test-user" }).should.be.rejectedWith(
-        ValidationError,
-        "cannot be null"
-      );
-    });
-
     it("should generate a UUID as a primary key", function () {
       return User.create(dummyUserDetails).then(function (user: User) {
         const primaryKeys: string[] = User.primaryKeyAttributes;
@@ -205,20 +198,12 @@ describe("DB.Models", function () {
   });
 
   describe("UserAuthenticationData", function () {
-    it("should reject incomplete initialization", function () {
-      throw new Error("not implemented yet.");
-    });
-
     it("should have a valid 1:1 association with `User`", function () {
       throw new Error("Not implemented yet.");
     });
   });
 
   describe("UserPrefences", function () {
-    it("should reject incomplete initialization", function () {
-      throw new Error("not implemented yet.");
-    });
-
     it("should have card privacy set to true by default", function () {
       throw new Error("Not implemented yet.");
     });
@@ -233,10 +218,6 @@ describe("DB.Models", function () {
   });
 
   describe("UserAuthenticationToken", function () {
-    it("should reject incomplete initialization", function () {
-      throw new Error("not implemented yet.");
-    });
-
     it("should set a default unique token value", function () {
       throw new Error("Not implemented yet.");
     });
@@ -247,10 +228,6 @@ describe("DB.Models", function () {
   });
 
   describe("FlashCard", function () {
-    it("should reject incomplete initialization", function () {
-      throw new Error("Not implemented yet.");
-    });
-
     it("should overwrite htmlDescription before saving a card", function () {
       throw new Error("Not implemented yet.");
     });
@@ -285,10 +262,6 @@ describe("DB.Models", function () {
   });
 
   describe("Tag", function () {
-    it("should reject incomplete initialization", function () {
-      throw new Error("Not implemented yet.");
-    });
-
     it("value should be unique but case-sensitive", function () {
       throw new Error("Not implemented yet.");
     });
@@ -299,16 +272,14 @@ describe("DB.Models", function () {
   });
 
   describe("ReviewStreak", function () {
-    it("should reject incomplete initialization", function () {
-      throw new Error("Not implemented yet.");
-    });
-
     it("should have a 1:1 association with `User`", function () {
       throw new Error("Not implemented yet.");
     });
 
     it("should only allow non-negative streak-lengths", function () {
-      throw new Error("Not implemented yet.");
+      return ReviewStreak
+        .create({lastResetTimestamp: new Date(Date.now()), streakLength: -3})
+        .should.be.rejectedWith(ValidationError, "streakLength");
     });
   });
 });

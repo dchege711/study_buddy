@@ -511,7 +511,10 @@ ReviewStreak.init({
 
     streakLength: {
         type: DataTypes.INTEGER,
-        defaultValue: 0
+        defaultValue: 0,
+        validate: {
+            min: 0
+        },
     },
 
 }, { sequelize, timestamps: false});
