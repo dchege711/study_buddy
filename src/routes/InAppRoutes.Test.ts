@@ -4,7 +4,7 @@ import { InAppRouter } from "./InAppRouter";
 import { GET, POST, RouteChecker } from "./RouterUtils.Test";
 
 describe("InAppRoutes.ExpectedRoutes", function () {
-  it("should define routes for these URLs", function () {
+  it.skip("should define routes for these URLs", function () {
     const expectedRoutes = [
       ["/read-card", POST],
       ["/read-public-card", POST],
