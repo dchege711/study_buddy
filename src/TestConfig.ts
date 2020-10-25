@@ -5,14 +5,11 @@
  * {@link https://mochajs.org/#-file-filedirectoryglob}
  */
 
-import assert = require("assert");
-
 // const whyIsNodeRunning = require("why-is-node-running");
 
 before(function () {
 });
 
-// Clean the database before each test.
 beforeEach(async function() {
 });
 

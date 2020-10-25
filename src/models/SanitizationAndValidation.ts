@@ -171,9 +171,12 @@ export interface ISearchQuery {
  * @description Sanitize `query` and return it.
  */
 export function sanitizeQuery(query: ISearchQuery): ISearchQuery {
+    if (!query) return query; // TODO: Is this the way to handle null queries?
 
     let keys = Object.keys(query);
     for (let i = 0; i < keys.length; i++) {
+        let val = query[keys[i]];
+        if (!val) continue; // Null values are permitted.
         // Delete all values that begin with `$` to prevent NoSQL injection.
         if (/^\$/.test(query[keys[i]].toString())) delete query[keys[i]];
     }

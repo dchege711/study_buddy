@@ -75,14 +75,20 @@ interface MongoMetadata {
  * A mapping from user IDs used in MongoDB to the newly generated user IDs for
  * Postgres.
  */
-let oldUserIdToNewId: {[n: number] : string};
+let oldUserIdToNewId: {[n: number] : string} = {};
 
-let oldCardIdToNewCardId: {[s: string]: string};
+let oldCardIdToNewCardId: {[s: string]: string} = {};
 
-let oldParentToOldChildren: {[s: string]: string[]};
+let oldParentToOldChildren: {[s: string]: string[]} = {};
 
 async function transferUser(mongoUser: MongoUser): Promise<string> {
     try {
+        let preExistingUser = await User.findOne({where: {userName: mongoUser.username}});
+        if (preExistingUser) {
+            console.log(`Found ${preExistingUser.userName} already in the db`);
+            return preExistingUser.id;
+        }
+
         let user = await User.create({
             userName: mongoUser.username,
             emailAddress: mongoUser.email,
@@ -238,8 +244,8 @@ function transferMetadata(db: Db) {
 
 function importData(db: Db) {
     transferUsers(db);
-    // transferFlashCards(db);
-    // transferMetadata(db);
+    transferFlashCards(db);
+    transferMetadata(db);
 }
 
 async function main(dbURI: string) {
