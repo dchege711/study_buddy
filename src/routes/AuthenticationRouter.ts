@@ -4,14 +4,22 @@
 
 import { Router } from "express";
 
-import { 
-    handleLogIn, registerUser, loginUser, logoutUser, sendValidationEmailGet, 
-    sendValidationEmailPost, verifyAccount, resetPasswordGet, resetPasswordPost, 
-    resetPasswordLinkGet, resetPasswordLinkPost 
-} from "../controllers/AuthenticationController"
+import {
+  handleLogIn,
+  registerUser,
+  loginUser,
+  logoutUser,
+  sendValidationEmailGet,
+  sendValidationEmailPost,
+  verifyAccount,
+  resetPasswordGet,
+  resetPasswordPost,
+  resetPasswordLinkGet,
+  resetPasswordLinkPost,
+} from "../controllers/AuthenticationController";
 
 /**
- * A AuthenticationRouter with routes for registering users, logging in users, processing 
+ * A AuthenticationRouter with routes for registering users, logging in users, processing
  * account validation emails and processing password resets.
  */
 const AuthenticationRouter = Router();

@@ -18,19 +18,19 @@ export { NODE_ENV };
  * @returns The database URI based on the value of `NODE_ENV`.
  */
 function getDBURI(): string {
-    switch (NODE_ENV) {
-        case 'production_heroku':
-            return process.env.DATABASE_URL;
-        case 'development':
-            let userName = process.env.STUDY_BUDDY_POSTGRES_USER_NAME;
-            let password = process.env.STUDY_BUDDY_POSTGRES_USER_PASSWORD;
-            let dbName = process.env.STUDY_BUDDY_POSTGRES_DB_NAME;
-            return `postgres://${userName}:${password}@localhost:5432/${dbName}`;
-        case 'testing':
-            return "host=localhost dbname=travis_ci_test user=postgres";
-        default:
-            throw new Error("The database URI is not defined.");
-    }
+  switch (NODE_ENV) {
+    case "production_heroku":
+      return process.env.DATABASE_URL;
+    case "development":
+      let userName = process.env.STUDY_BUDDY_POSTGRES_USER_NAME;
+      let password = process.env.STUDY_BUDDY_POSTGRES_USER_PASSWORD;
+      let dbName = process.env.STUDY_BUDDY_POSTGRES_DB_NAME;
+      return `postgres://${userName}:${password}@localhost:5432/${dbName}`;
+    case "testing":
+      return "host=localhost dbname=travis_ci_test user=postgres";
+    default:
+      throw new Error("The database URI is not defined.");
+  }
 }
 
 /** The URI used to connected to the underlying database. */
@@ -41,8 +41,8 @@ export { DATABASE_URI };
  * @returns The base URL of the app depending on the value of `NODE_ENV`.
  */
 function getAppBaseURL() {
-    if (NODE_ENV === "production") return "https://cards.c13u.com";
-    if (NODE_ENV === "development") return `http://127.0.0.0:${PORT}`;
+  if (NODE_ENV === "production") return "https://cards.c13u.com";
+  if (NODE_ENV === "development") return `http://127.0.0.0:${PORT}`;
 }
 
 /** The web URL from which all other app URLs are based of. */
@@ -74,11 +74,11 @@ const DEBUG_PASSWORD = "i_know_how_to_keep_passwords_safe_amirite?";
 export { DEBUG_PASSWORD };
 
 /** The time allowed before a test times out */
-const DEBUG_OPERATION_TIMEOUT_MS = 3000; 
+const DEBUG_OPERATION_TIMEOUT_MS = 3000;
 export { DEBUG_OPERATION_TIMEOUT_MS };
 
-/** 
- * The username of the global user. All public cards are treated as if they're 
+/**
+ * The username of the global user. All public cards are treated as if they're
  * owned by the public user.
  */
 const PUBLIC_USER_USERNAME = "c13u";

@@ -1,6 +1,6 @@
 /**
  * Provide functionality for sanitizing and validating user input on the server.
- * 
+ *
  * @module
  */
 
@@ -41,144 +41,150 @@ import { INewFlashCard, FlashCard } from "./db/DBModels";
  * {@tutorial main.editing_cards}
  */
 const converter = new showdown.Converter({
-    headerLevelStart: 4, literalMidWordUnderscores: true,
-    literalMidWordAsterisks: true, simpleLineBreaks: true,
-    emoji: true, backslashEscapesHTMLTags: false, tables: true,
-    parseImgDimensions: true, simplifiedAutoLink: true,
-    strikethrough: true, tasklists: true, openLinksInNewWindow: true,
-    disableForced4SpacesIndentedSublists: true
+  headerLevelStart: 4,
+  literalMidWordUnderscores: true,
+  literalMidWordAsterisks: true,
+  simpleLineBreaks: true,
+  emoji: true,
+  backslashEscapesHTMLTags: false,
+  tables: true,
+  parseImgDimensions: true,
+  simplifiedAutoLink: true,
+  strikethrough: true,
+  tasklists: true,
+  openLinksInNewWindow: true,
+  disableForced4SpacesIndentedSublists: true,
 });
 
 export interface IClientFacingFlashCard extends Partial<FlashCard> {
-    /**
-     * Internally, the `tags` are not available as a string, but the client
-     * doesn't need to know that `tags` are in a separate table. Before
-     * returning a card, the `tags` field should be populated.
-     */
-    tags?: string[];
+  /**
+   * Internally, the `tags` are not available as a string, but the client
+   * doesn't need to know that `tags` are in a separate table. Before
+   * returning a card, the `tags` field should be populated.
+   */
+  tags?: string[];
 }
 
 /**
- * @description Return `card` after it has been sanitized. Sanitization helps 
+ * @description Return `card` after it has been sanitized. Sanitization helps
  * prevent malicious actions, e.g an XSS attack. Sanitization is done in place.
  * If `rawDescription` is part of the incoming card, `htmlDescription` will
  * contain a sanitized HTML version of `rawDescription`
  */
-export function sanitizeCard(card: INewFlashCard | IClientFacingFlashCard):
-    INewFlashCard | IClientFacingFlashCard {
-    
-    // At least make sure there are no SQL attacks
-    card = sanitizeQuery(<ISearchQuery>card);
+export function sanitizeCard(
+  card: INewFlashCard | IClientFacingFlashCard
+): INewFlashCard | IClientFacingFlashCard {
+  // At least make sure there are no SQL attacks
+  card = sanitizeQuery(<ISearchQuery>card);
 
-    if (card.title !== undefined) {
-        card.title = xss(card.title);
+  if (card.title !== undefined) {
+    card.title = xss(card.title);
+  }
+
+  if (card.rawDescription !== undefined) {
+    let outputHTML = converter.makeHtml(
+      String.raw`${card.rawDescription.replace(/\\/g, "\\\\")}`
+    );
+
+    // Otherwise, the HTML renders with '&nbsp;' literals instead of spaces
+    outputHTML = xss(outputHTML).replace(/&amp;nbsp;/g, "&nbsp;");
+
+    if (outputHTML.match(/\[spoiler\]/i)) {
+      outputHTML = outputHTML.replace(
+        /\[spoiler\]/i,
+        "<span id='spoiler'>[spoiler]</span>"
+      );
+      outputHTML += `<span id="spoiler_end"></span>`;
     }
 
-    if (card.rawDescription !== undefined) {
-        let outputHTML = converter.makeHtml(
-            String.raw`${card.rawDescription.replace(/\\/g, "\\\\")}`
-        );
+    card.htmlDescription = outputHTML;
+  }
 
-        // Otherwise, the HTML renders with '&nbsp;' literals instead of spaces
-        outputHTML = xss(outputHTML).replace(/&amp;nbsp;/g, "&nbsp;");
+  if (card.urgency !== undefined) {
+    card.urgency = Number(card.urgency);
+    if (Number.isNaN(card.urgency)) card.urgency = 10;
 
-        if (outputHTML.match(/\[spoiler\]/i)) {
-            outputHTML = outputHTML.replace(
-                /\[spoiler\]/i, "<span id='spoiler'>[spoiler]</span>"
-            );
-            outputHTML += `<span id="spoiler_end"></span>`;
-        }
+    if (card.urgency > 10) card.urgency = 10;
+    else if (card.urgency < 0) card.urgency = 0;
+  }
 
-        card.htmlDescription = outputHTML;
-    }
+  if (card.parentId !== undefined) {
+    card.parentId = xss(card.parentId);
+  }
 
-    if (card.urgency !== undefined) {
-
-        card.urgency = Number(card.urgency);
-        if (Number.isNaN(card.urgency)) card.urgency = 10;
-        
-        if (card.urgency > 10) card.urgency = 10;
-        else if (card.urgency < 0) card.urgency = 0;
-    }
-
-    if (card.parentId !== undefined) {
-        card.parentId = xss(card.parentId);
-    }
-
-    return card;
+  return card;
 }
 
 /**
- * This interface is not designed to make sense as a whole. It is a catch all 
- * for any possible key-value pair that we can receive from the server. As such, 
- * all of these properties have better descriptions on the interfaces of the 
+ * This interface is not designed to make sense as a whole. It is a catch all
+ * for any possible key-value pair that we can receive from the server. As such,
+ * all of these properties have better descriptions on the interfaces of the
  * proper objects, e.g. `dailyTarget` is defined completely in `User`
  */
 export interface ISearchQuery {
+  [s: string]: number | string | boolean | string[];
 
-    [s: string]: number | string | boolean | string[];
+  /** The App ID of the user. */
+  userIDInApp?: number;
 
-    /** The App ID of the user. */
-    userIDInApp?: number;
+  /** The ID of the user who owns the resource. */
+  ownerId?: string;
 
-    /** The ID of the user who owns the resource. */
-    ownerId?: string;
+  /** The index of the metadata document. */
+  metadataIndex?: number;
 
-    /** The index of the metadata document. */
-    metadataIndex?: number;
+  /** The App ID of the creator of the document being searched for. */
+  createdById?: string;
 
-    /** The App ID of the creator of the document being searched for. */
-    createdById?: string;
+  /** The App ID of the creator of the document being searched for. */
+  userId?: string;
 
-    /** The App ID of the creator of the document being searched for. */
-    userId?: string;
+  /** The ID of the card. */
+  cardId?: string;
 
-    /** The ID of the card. */
-    cardId?: string;
+  /** A string of card IDs. */
+  cardIds?: string[];
 
-    /** A string of card IDs. */
-    cardIds?: string[];
+  /** Should the user's cards be private unless told otherwise? */
+  cardsAreByDefaultPrivate?: boolean;
 
-    /** Should the user's cards be private unless told otherwise? */
-    cardsAreByDefaultPrivate?: boolean;
+  /** How many cards does the user want to review per time period? */
+  dailyTarget?: number;
 
-    /** How many cards does the user want to review per time period? */
-    dailyTarget?: number;
+  /** What card content is the user searching for? */
+  queryString?: string;
 
-    /** What card content is the user searching for? */
-    queryString?: string;
+  /** What is the maximum number of results that should be fetched? */
+  limit?: number;
 
-    /** What is the maximum number of results that should be fetched? */
-    limit?: number;
+  /** The timestamp of the earliest date by which the objects were created */
+  creationStartDate?: number;
 
-    /** The timestamp of the earliest date by which the objects were created */
-    creationStartDate?: number;
+  /** The timestamp of the latest date by which the objects were created */
+  creationEndDate?: number;
 
-    /** The timestamp of the latest date by which the objects were created */
-    creationEndDate?: number;
+  /** Is the targeted resource public? */
+  isPublic?: boolean;
 
-    /** Is the targeted resource public? */
-    isPublic?: boolean;
+  /** Has this card been flagged for review? */
+  markedForReview?: boolean;
 
-    /** Has this card been flagged for review? */
-    markedForReview?: boolean;
-
-    /** Has this card been flagged as a duplicate? */
-    markedAsDuplicate?: boolean;
+  /** Has this card been flagged as a duplicate? */
+  markedAsDuplicate?: boolean;
 }
 
 /**
  * @description Sanitize `query` and return it.
  */
 export function sanitizeQuery(query: ISearchQuery): ISearchQuery {
-    if (!query) return query; // TODO: Is this the way to handle null queries?
+  if (!query) return query; // TODO: Is this the way to handle null queries?
 
-    let keys = Object.keys(query);
-    for (let i = 0; i < keys.length; i++) {
-        let val = query[keys[i]];
-        if (!val) continue; // Null values are permitted.
-        // Delete all values that begin with `$` to prevent NoSQL injection.
-        if (/^\$/.test(query[keys[i]].toString())) delete query[keys[i]];
-    }
-    return query;
+  let keys = Object.keys(query);
+  for (let i = 0; i < keys.length; i++) {
+    let val = query[keys[i]];
+    if (!val) continue; // Null values are permitted.
+    // Delete all values that begin with `$` to prevent NoSQL injection.
+    if (/^\$/.test(query[keys[i]].toString())) delete query[keys[i]];
+  }
+  return query;
 }
