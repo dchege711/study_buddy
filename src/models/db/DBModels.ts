@@ -607,12 +607,12 @@ const UserToReviewStreak = User.belongsTo(ReviewStreak, {
 });
 
 /** All values for review streaks have defaults, so nothing needed. */
-export type IReviewStreakCreationValues = Partial<ReviewStreak>;
+export type IReviewStreak = Partial<ReviewStreak>;
 
 /** The data required to create a user in the database. */
 export interface IUserCreationValues
   extends Pick<User, "emailAddress" | "userName"> {
-  ReviewStreak: IReviewStreakCreationValues;
+  ReviewStreak: IReviewStreak;
   // Sequelize singularizes things, so hence "datum".
   UserAuthenticationDatum: IUserAuthenticationData;
 }

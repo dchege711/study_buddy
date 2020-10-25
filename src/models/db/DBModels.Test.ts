@@ -16,7 +16,7 @@ import {
   sequelize,
   IUserCreationValues,
   User,
-  IReviewStreakCreationValues,
+  IReviewStreak,
   ReviewStreak,
   USER_CREATE_OPTIONS,
   IUserAuthenticationData,
@@ -38,8 +38,8 @@ describe("DB.Models", function () {
   });
 
   function generateReviewStreakDetails(
-    pReviewStreak: Partial<IReviewStreakCreationValues> = {}
-  ): IReviewStreakCreationValues {
+    pReviewStreak: Partial<IReviewStreak> = {}
+  ): IReviewStreak {
     return {
       lastResetTimestamp: pReviewStreak.lastResetTimestamp
         ? pReviewStreak.lastResetTimestamp
@@ -64,7 +64,7 @@ describe("DB.Models", function () {
   function generateUserDetails(
     pUser: Partial<IUserCreationValues> = {},
     pUserAuthData: Partial<IUserAuthenticationData> = {},
-    pReviewStreak: Partial<IReviewStreakCreationValues> = {}
+    pReviewStreak: Partial<IReviewStreak> = {}
   ) {
     return {
       userName: pUser.userName ? pUser.userName : "user",
