@@ -34,6 +34,7 @@ import {
   BelongsToSetAssociationMixin,
   BelongsToCreateAssociationMixin,
   CreateOptions,
+  ValidationError,
 } from "sequelize";
 
 import { DATABASE_URI } from "../../config";
@@ -553,9 +554,13 @@ ReviewStreak.init(
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
       validate: {
-        // We only care about the date part. `isBefore` by itself would
-        // reject today's date.
-        isBefore: new Date(Date.now() + 1000 * 3600 * 24).toDateString(),
+        isNotInTheFuture(val: Date) {
+          if (val.getTime() > Date.now()) {
+            throw new ValidationError(
+              `lastResetTimestamp, ${val}, cannot be in the future`
+            );
+          }
+        },
       },
     },
 
