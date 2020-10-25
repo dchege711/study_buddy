@@ -40,7 +40,7 @@ import {
 import { DATABASE_URI } from "../../config";
 import { getRandomString, ALPHANUMERICS } from "../Utils";
 
-export const sequelize = new Sequelize(DATABASE_URI);
+export const sequelize = new Sequelize(DATABASE_URI, {logging: false});
 
 export class User extends Model {
   /**
