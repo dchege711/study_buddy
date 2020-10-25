@@ -83,7 +83,7 @@ User.init({
         },
         validate: {
             is: {
-                args: /[_\-A-Za-z0-9]+/,
+                args: /^[_\-A-Za-z0-9]+$/,
                 msg: "The username may only contain characters in A-Z, 0-9, -, or _"
             }
         },
