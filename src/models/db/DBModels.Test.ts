@@ -19,6 +19,7 @@ import {
   IReviewStreakCreationValues,
   ReviewStreak,
   USER_CREATE_OPTIONS,
+  IUserAuthenticationData,
 } from "./DBModels";
 import {
   VALID_EMAIL_ADDRESSES,
@@ -37,11 +38,16 @@ describe("DB.Models", function () {
   });
 
   const dummyReviewStreakDetails: IReviewStreakCreationValues = {};
+  const dummyUserAuthData: IUserAuthenticationData = {
+    passwordHash: [0, 1, 2, 3, 4],
+    passwordSalt: [5, 6, 7, 8, 9],
+  };
 
   const dummyUserDetails: IUserCreationValues = {
     userName: "user",
     emailAddress: "user@example.com",
     ReviewStreak: dummyReviewStreakDetails,
+    UserAuthenticationDatum: dummyUserAuthData,
   };
 
   describe("User", function () {
@@ -75,11 +81,13 @@ describe("DB.Models", function () {
           emailAddress: "user-1@example.com",
           userName: "user",
           ReviewStreak: dummyReviewStreakDetails,
+          UserAuthenticationDatum: dummyUserAuthData,
         };
         let user2: IUserCreationValues = {
           emailAddress: "user-2@example.com",
           userName: "UsEr",
           ReviewStreak: dummyReviewStreakDetails,
+          UserAuthenticationDatum: dummyUserAuthData,
         };
 
         assert(user1.userName !== user2.userName);
@@ -105,6 +113,7 @@ describe("DB.Models", function () {
           emailAddress: `user-${emailDistinguisher}@example.com`,
           userName: userName,
           ReviewStreak: dummyReviewStreakDetails,
+          UserAuthenticationDatum: dummyUserAuthData,
         };
       }
 
@@ -127,11 +136,13 @@ describe("DB.Models", function () {
           emailAddress: "a@example.com",
           userName: "user",
           ReviewStreak: dummyReviewStreakDetails,
+          UserAuthenticationDatum: dummyUserAuthData,
         };
         let user2: IUserCreationValues = {
           emailAddress: "A@eXaMpLe.Com",
           userName: "user2",
           ReviewStreak: dummyReviewStreakDetails,
+          UserAuthenticationDatum: dummyUserAuthData,
         };
 
         assert(user1.emailAddress !== user2.emailAddress);
@@ -153,6 +164,7 @@ describe("DB.Models", function () {
           emailAddress: emailAddress,
           userName: `user${userNameDistinguisher}`,
           ReviewStreak: dummyReviewStreakDetails,
+          UserAuthenticationDatum: dummyUserAuthData,
         };
       }
 
@@ -195,10 +207,6 @@ describe("DB.Models", function () {
       throw new Error("Not implemented yet.");
     });
 
-    it.skip("should have a valid one-to-one relationship w/ `UserAuthenticationData`", function () {
-      throw new Error("Not implemented yet.");
-    });
-
     it.skip("should have a valid 1:1 relationship w/ `UserPreferences`", function () {
       throw new Error("Not implemented yet.");
     });
@@ -223,10 +231,30 @@ describe("DB.Models", function () {
           }).should.be.rejectedWith(ForeignKeyConstraintError, `table "Users"`);
         });
       });
+
+      describe("UserAuthenticationDatum", function () {
+        it("should not exist without a UserAuthenticationDatum", function () {
+          return User.create(dummyUserDetails).should.be.rejectedWith(
+            ValidationError,
+            "UserAuthenticationDatumId"
+          );
+        });
+
+        it.skip("should prevent its UserAuthenticationDatum from being deleted", async function () {
+          let user: User = await User.create(
+            dummyUserDetails,
+            USER_CREATE_OPTIONS
+          );
+          let streak = await user.getReviewStreak();
+          await ReviewStreak.destroy({
+            where: { id: streak.id },
+          }).should.be.rejectedWith(ForeignKeyConstraintError, `table "Users"`);
+        });
+      });
     });
   });
 
-  describe.skip("UserAuthenticationData", function () {
+  describe.skip("UserAuthenticationDatum", function () {
     it("should have a valid 1:1 association with `User`", function () {
       throw new Error("Not implemented yet.");
     });

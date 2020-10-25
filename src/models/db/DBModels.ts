@@ -40,7 +40,7 @@ import {
 import { DATABASE_URI } from "../../config";
 import { getRandomString, ALPHANUMERICS } from "../Utils";
 
-export const sequelize = new Sequelize(DATABASE_URI, {logging: false});
+export const sequelize = new Sequelize(DATABASE_URI, { logging: false });
 
 export class User extends Model {
   /**
@@ -169,7 +169,20 @@ UserAuthenticationData.init(
   },
   { sequelize, timestamps: false }
 );
-User.hasOne(UserAuthenticationData);
+
+export type IUserAuthenticationData = Pick<
+  UserAuthenticationData,
+  "passwordHash" | "passwordSalt"
+>;
+
+/**
+ * A `User` row has a FK to a `UserAuthenticationData`. The
+ * `UserAuthenticationData` row may not be deleted before this `User` instance.
+ */
+const UserToUserAuthenticationData = User.belongsTo(UserAuthenticationData, {
+  foreignKey: { allowNull: false },
+  onDelete: "RESTRICT",
+});
 
 /** Configurable user settings. */
 export class UserPrefences extends Model {
@@ -600,12 +613,17 @@ export type IReviewStreakCreationValues = Partial<ReviewStreak>;
 export interface IUserCreationValues
   extends Pick<User, "emailAddress" | "userName"> {
   ReviewStreak: IReviewStreakCreationValues;
+  // Sequelize singularizes things, so hence "datum".
+  UserAuthenticationDatum: IUserAuthenticationData;
 }
 
 const USER_CREATE_OPTIONS: CreateOptions = {
   include: [
     {
       association: UserToReviewStreak,
+    },
+    {
+      association: UserToUserAuthenticationData,
     },
   ],
 };
