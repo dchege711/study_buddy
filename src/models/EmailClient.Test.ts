@@ -18,7 +18,7 @@ describe("EmailClientTest", function () {
     });
   });
 
-  it("should only send emails to validated accounts.", function () {
+  it.skip("should only send emails to validated accounts.", function () {
     throw new Error("Not implemented yet.");
   });
 });

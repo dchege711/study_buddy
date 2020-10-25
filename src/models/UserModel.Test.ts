@@ -2,7 +2,7 @@ import * as assert from "assert";
 
 import * as UserModel from "./UserModel";
 
-describe("UserModel", function () {
+describe.skip("UserModel", function () {
   describe("sendAccountValidationLink", function () {
     it("should not send emails to addresses that don't hae an account", function () {
       throw new Error("Not implemented yet.");

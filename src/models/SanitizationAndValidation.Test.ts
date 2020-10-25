@@ -27,7 +27,7 @@ describe("SanitizationAndValidation", function () {
     });
   });
 
-  describe("sanitizeQuery", function () {
+  describe.skip("sanitizeQuery", function () {
     // Same as sanitize cards, e.g. filter malicious input.
 
     it("should strip attributes with wrong types.", function () {

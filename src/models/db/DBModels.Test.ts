@@ -184,19 +184,19 @@ describe("DB.Models", function () {
       });
     });
 
-    it("should link to one password hash and salt", function () {
+    it.skip("should link to one password hash and salt", function () {
       throw new Error("Not implemented yet.");
     });
 
-    it("should link to one preferences document", function () {
+    it.skip("should link to one preferences document", function () {
       throw new Error("Not implemented yet.");
     });
 
-    it("should have a valid one-to-one relationship w/ `UserAuthenticationData`", function () {
+    it.skip("should have a valid one-to-one relationship w/ `UserAuthenticationData`", function () {
       throw new Error("Not implemented yet.");
     });
 
-    it("should have a valid 1:1 relationship w/ `UserPreferences`", function () {
+    it.skip("should have a valid 1:1 relationship w/ `UserPreferences`", function () {
       throw new Error("Not implemented yet.");
     });
 
@@ -223,13 +223,13 @@ describe("DB.Models", function () {
     });
   });
 
-  describe("UserAuthenticationData", function () {
+  describe.skip("UserAuthenticationData", function () {
     it("should have a valid 1:1 association with `User`", function () {
       throw new Error("Not implemented yet.");
     });
   });
 
-  describe("UserPrefences", function () {
+  describe.skip("UserPrefences", function () {
     it("should have card privacy set to true by default", function () {
       throw new Error("Not implemented yet.");
     });
@@ -243,7 +243,7 @@ describe("DB.Models", function () {
     });
   });
 
-  describe("UserAuthenticationToken", function () {
+  describe.skip("UserAuthenticationToken", function () {
     it("should set a default unique token value", function () {
       throw new Error("Not implemented yet.");
     });
@@ -253,7 +253,7 @@ describe("DB.Models", function () {
     });
   });
 
-  describe("FlashCard", function () {
+  describe.skip("FlashCard", function () {
     it("should overwrite htmlDescription before saving a card", function () {
       throw new Error("Not implemented yet.");
     });
@@ -287,7 +287,7 @@ describe("DB.Models", function () {
     });
   });
 
-  describe("Tag", function () {
+  describe.skip("Tag", function () {
     it("value should be unique but case-sensitive", function () {
       throw new Error("Not implemented yet.");
     });

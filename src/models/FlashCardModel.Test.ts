@@ -1,4 +1,4 @@
-describe("FlashCardModel", function () {
+describe.skip("FlashCardModel", function () {
   describe("create", function () {
     it("should have stored the card in the db on return.", function () {
       throw new Error("Test not implemented.");
@@ -40,13 +40,13 @@ describe("FlashCardModel", function () {
       throw new Error("Test not implemented.");
     });
 
-    it("should read all cards belonging to the user.", function () {
+    it.skip("should read all cards belonging to the user.", function () {
       throw new Error("Not implemented yet.");
     });
   });
 
   describe("update", function () {
-    it("should gracefully fail if the card is actually new.", function () {
+    it.skip("should gracefully fail if the card is actually new.", function () {
       throw new Error("Not implemented yet.");
     });
 
