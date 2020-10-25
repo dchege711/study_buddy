@@ -14,7 +14,7 @@ import * as chaiAsPromised from "chai-as-promised";
 
 import {
   sequelize,
-  IUserCreationValues,
+  IUser,
   User,
   IReviewStreak,
   ReviewStreak,
@@ -62,7 +62,7 @@ describe("DB.Models", function () {
   }
 
   function generateUserDetails(
-    pUser: Partial<IUserCreationValues> = {},
+    pUser: Partial<IUser> = {},
     pUserAuthData: Partial<IUserAuthenticationData> = {},
     pReviewStreak: Partial<IReviewStreak> = {}
   ) {
@@ -129,7 +129,7 @@ describe("DB.Models", function () {
       });
 
       let emailDistinguisher = 0;
-      function testUser(userName: string): IUserCreationValues {
+      function testUser(userName: string): IUser {
         emailDistinguisher += 1;
         return generateUserDetails({
           emailAddress: `user-${emailDistinguisher}@example.com`,
@@ -174,7 +174,7 @@ describe("DB.Models", function () {
       });
 
       let userNameDistinguisher = 0;
-      function testUser(emailAddress: string): IUserCreationValues {
+      function testUser(emailAddress: string): IUser {
         userNameDistinguisher += 1;
         return generateUserDetails({
           emailAddress: emailAddress,

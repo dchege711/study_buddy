@@ -610,7 +610,7 @@ const UserToReviewStreak = User.belongsTo(ReviewStreak, {
 export type IReviewStreak = Partial<ReviewStreak>;
 
 /** The data required to create a user in the database. */
-export interface IUserCreationValues
+export interface IUser
   extends Pick<User, "emailAddress" | "userName"> {
   ReviewStreak: IReviewStreak;
   // Sequelize singularizes things, so hence "datum".
