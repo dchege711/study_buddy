@@ -323,39 +323,6 @@ describe("DB.Models", function () {
           assert.isNotNull(streak);
         });
       });
-
-      it("should have a 1:1 association with User", function () {
-        return User.create(dummyUserDetails).then(async function (u: User) {
-          const originalStreak: ReviewStreak = await u.createReviewStreak(
-            dummyReviewStreakDetails
-          );
-          assert.isOk(originalStreak.id, "The review streak should get saved.");
-
-          let streak = await u.getReviewStreak();
-          assert.equal(streak.id, originalStreak.id);
-
-          const secondStreak: ReviewStreak = await u.createReviewStreak(
-            dummyReviewStreakDetails
-          );
-          assert.isNotOk(
-            secondStreak,
-            "New streak should not have been created"
-          );
-
-          streak = await u.getReviewStreak();
-          assert.equal(
-            streak.id,
-            originalStreak.id,
-            "New review streaks override old ones"
-          );
-
-          let secondStreakUser = await secondStreak.getUser();
-          assert.isNull(
-            secondStreakUser,
-            `New streak should be orphaned, not belonging to ${secondStreakUser.userName}`
-          );
-        });
-      });
     });
 
     it("should only allow non-negative streak-lengths", function () {
