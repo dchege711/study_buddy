@@ -37,58 +37,80 @@ describe("DB.Models", function () {
     return sequelize.sync({ force: true, logging: false });
   });
 
-  const dummyReviewStreakDetails: IReviewStreakCreationValues = {};
-  const dummyUserAuthData: IUserAuthenticationData = {
-    passwordHash: [0, 1, 2, 3, 4],
-    passwordSalt: [5, 6, 7, 8, 9],
-  };
+  function generateReviewStreakDetails(
+    pReviewStreak: Partial<IReviewStreakCreationValues> = {}
+  ): IReviewStreakCreationValues {
+    return {
+      lastResetTimestamp: pReviewStreak.lastResetTimestamp
+        ? pReviewStreak.lastResetTimestamp
+        : new Date(Date.now()),
+      streakLength: pReviewStreak.streakLength ? pReviewStreak.streakLength : 0,
+    };
+  }
 
-  const dummyUserDetails: IUserCreationValues = {
-    userName: "user",
-    emailAddress: "user@example.com",
-    ReviewStreak: dummyReviewStreakDetails,
-    UserAuthenticationDatum: dummyUserAuthData,
-  };
+  function generateUserAuthData(
+    pUserAuthData: Partial<IUserAuthenticationData> = {}
+  ): IUserAuthenticationData {
+    return {
+      passwordHash: pUserAuthData.passwordHash
+        ? pUserAuthData.passwordHash
+        : [0, 1, 2, 3, 4],
+      passwordSalt: pUserAuthData.passwordSalt
+        ? pUserAuthData.passwordSalt
+        : [5, 6, 7, 8, 9],
+    };
+  }
+
+  function generateUserDetails(
+    pUser: Partial<IUserCreationValues> = {},
+    pUserAuthData: Partial<IUserAuthenticationData> = {},
+    pReviewStreak: Partial<IReviewStreakCreationValues> = {}
+  ) {
+    return {
+      userName: pUser.userName ? pUser.userName : "user",
+      emailAddress: pUser.emailAddress
+        ? pUser.emailAddress
+        : "user@example.com",
+      ReviewStreak: generateReviewStreakDetails(pReviewStreak),
+      UserAuthenticationDatum: generateUserAuthData(pUserAuthData),
+    };
+  }
 
   describe("User", function () {
     it("should generate a UUID as a primary key", function () {
-      return User.create(dummyUserDetails, USER_CREATE_OPTIONS).then(function (
-        user: User
-      ) {
-        const primaryKeys: string[] = User.primaryKeyAttributes;
-        assert(primaryKeys.length == 1, "There should be one primary key");
-        assert(primaryKeys[0] === "id", "The PK should be 'id'");
-        assert(isUUID(user.id, "4"), "User ID should be a UUIDv4");
-      });
+      return User.create(generateUserDetails(), USER_CREATE_OPTIONS).then(
+        function (user: User) {
+          const primaryKeys: string[] = User.primaryKeyAttributes;
+          assert(primaryKeys.length == 1, "There should be one primary key");
+          assert(primaryKeys[0] === "id", "The PK should be 'id'");
+          assert(isUUID(user.id, "4"), "User ID should be a UUIDv4");
+        }
+      );
     });
 
     it("should generate a timestamp for creation date", function () {
-      return User.create(dummyUserDetails, USER_CREATE_OPTIONS).then(function (
-        user: User
-      ) {
-        assert.isOk(user.createdAt, "There should be a createdAt timestamp");
-        const currentTime = Date.now();
-        const creationTime = user.createdAt.getTime();
-        assert.isBelow(creationTime, currentTime);
-        assert.isAbove(creationTime, currentTime - 5000); // 5,000ms = 5 sec ago
-      });
+      return User.create(generateUserDetails(), USER_CREATE_OPTIONS).then(
+        function (user: User) {
+          assert.isOk(user.createdAt, "There should be a createdAt timestamp");
+          const currentTime = Date.now();
+          const creationTime = user.createdAt.getTime();
+          assert.isBelow(creationTime, currentTime);
+          assert.isAbove(creationTime, currentTime - 5000); // 5,000ms = 5 sec ago
+        }
+      );
     });
 
     describe("UserNames", function () {
       // Should also take care of duplicate user names as they're a subset.
       it("should treat the username as case-insensitive", function () {
-        let user1: IUserCreationValues = {
+        let user1 = generateUserDetails({
           emailAddress: "user-1@example.com",
           userName: "user",
-          ReviewStreak: dummyReviewStreakDetails,
-          UserAuthenticationDatum: dummyUserAuthData,
-        };
-        let user2: IUserCreationValues = {
+        });
+        let user2 = generateUserDetails({
           emailAddress: "user-2@example.com",
           userName: "UsEr",
-          ReviewStreak: dummyReviewStreakDetails,
-          UserAuthenticationDatum: dummyUserAuthData,
-        };
+        });
 
         assert(user1.userName !== user2.userName);
         assert(
@@ -109,12 +131,10 @@ describe("DB.Models", function () {
       let emailDistinguisher = 0;
       function testUser(userName: string): IUserCreationValues {
         emailDistinguisher += 1;
-        return {
+        return generateUserDetails({
           emailAddress: `user-${emailDistinguisher}@example.com`,
           userName: userName,
-          ReviewStreak: dummyReviewStreakDetails,
-          UserAuthenticationDatum: dummyUserAuthData,
-        };
+        });
       }
 
       it("should reject invalid usernames", function () {
@@ -132,18 +152,14 @@ describe("DB.Models", function () {
     describe("Email Addresses", function () {
       // Should also take care of duplicate email addresses as they're a subset.
       it("should treat the email address as case-insensitive", function () {
-        let user1: IUserCreationValues = {
+        let user1 = generateUserDetails({
           emailAddress: "a@example.com",
           userName: "user",
-          ReviewStreak: dummyReviewStreakDetails,
-          UserAuthenticationDatum: dummyUserAuthData,
-        };
-        let user2: IUserCreationValues = {
+        });
+        let user2 = generateUserDetails({
           emailAddress: "A@eXaMpLe.Com",
           userName: "user2",
-          ReviewStreak: dummyReviewStreakDetails,
-          UserAuthenticationDatum: dummyUserAuthData,
-        };
+        });
 
         assert(user1.emailAddress !== user2.emailAddress);
         assert(
@@ -160,12 +176,10 @@ describe("DB.Models", function () {
       let userNameDistinguisher = 0;
       function testUser(emailAddress: string): IUserCreationValues {
         userNameDistinguisher += 1;
-        return {
+        return generateUserDetails({
           emailAddress: emailAddress,
           userName: `user${userNameDistinguisher}`,
-          ReviewStreak: dummyReviewStreakDetails,
-          UserAuthenticationDatum: dummyUserAuthData,
-        };
+        });
       }
 
       it("should reject invalid email addresses", function () {
@@ -214,7 +228,7 @@ describe("DB.Models", function () {
     describe("Associations", function () {
       describe("ReviewStreak", function () {
         it("should not exist without a ReviewStreak", function () {
-          return User.create(dummyUserDetails).should.be.rejectedWith(
+          return User.create(generateUserDetails()).should.be.rejectedWith(
             ValidationError,
             "ReviewStreakId"
           );
@@ -222,7 +236,7 @@ describe("DB.Models", function () {
 
         it("should prevent its ReviewStreak from being deleted", async function () {
           let user: User = await User.create(
-            dummyUserDetails,
+            generateUserDetails(),
             USER_CREATE_OPTIONS
           );
           let streak = await user.getReviewStreak();
@@ -234,7 +248,7 @@ describe("DB.Models", function () {
 
       describe("UserAuthenticationDatum", function () {
         it("should not exist without a UserAuthenticationDatum", function () {
-          return User.create(dummyUserDetails).should.be.rejectedWith(
+          return User.create(generateUserDetails()).should.be.rejectedWith(
             ValidationError,
             "UserAuthenticationDatumId"
           );
@@ -242,7 +256,7 @@ describe("DB.Models", function () {
 
         it.skip("should prevent its UserAuthenticationDatum from being deleted", async function () {
           let user: User = await User.create(
-            dummyUserDetails,
+            generateUserDetails(),
             USER_CREATE_OPTIONS
           );
           let streak = await user.getReviewStreak();
@@ -332,13 +346,13 @@ describe("DB.Models", function () {
     describe("Associations", function () {
       describe("User", function () {
         it("could exist without a User", function () {
-          return ReviewStreak.create(dummyReviewStreakDetails).should.be
+          return ReviewStreak.create(generateReviewStreakDetails()).should.be
             .fulfilled;
         });
 
         it("should be orphaned if the associated User is deleted", async function () {
           let user: User = await User.create(
-            dummyUserDetails,
+            generateUserDetails(),
             USER_CREATE_OPTIONS
           );
           const streakID = (await user.getReviewStreak()).id;
