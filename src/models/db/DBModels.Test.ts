@@ -54,6 +54,16 @@ describe("DB.Models", function () {
       });
     });
 
+    it("should generate a timestamp for creation date", function () {
+      return User.create(dummyUserDetails).then(function(user: User) {
+        assert.isOk(user.createdAt, "There should be a createdAt timestamp");
+        const currentTime = Date.now();
+        const creationTime = user.createdAt.getTime();
+        assert.isBelow(creationTime, currentTime);
+        assert.isAbove(creationTime, currentTime - 5000); // 5,000ms = 5 sec ago
+      });
+    });
+
     describe("UserNames", function () {
       // Should also take care of duplicate user names as they're a subset.
       it("should treat the username as case-insensitive", function () {
@@ -171,10 +181,6 @@ describe("DB.Models", function () {
           })
         );
       });
-    });
-
-    it("should have a timestamp for creation date", function () {
-      throw new Error("Not implemented yet.");
     });
 
     it("should link to one password hash and salt", function () {
