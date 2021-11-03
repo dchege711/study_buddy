@@ -60,7 +60,7 @@
     "path": "0.12.7",
     "showdown": "1.9.1",
     "sjcl": "1.0.7",
-    "validator": "^10.7.1",
+    "validator": "^13.7.0",
     "xss": "1.0.3"
   },
   "devDependencies": {
