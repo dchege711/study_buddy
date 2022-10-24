@@ -73,7 +73,7 @@
     "jsdoc": "~3.6.3",
     "mathjax": "^2.7.5",
     "mocha": "^5.2.0",
-    "nodemon": "^1.19.2",
+    "nodemon": "^2.0.20",
     "nyc": "^14.1.1",
     "selenium-webdriver": "4.0.0-alpha.1",
     "webpack": "^4.25.1",
