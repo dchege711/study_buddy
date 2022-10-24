@@ -7,8 +7,10 @@ exports.PORT = process.env.PORT || 5000;
 exports.NODE_ENV = process.env.NODE_ENV;
 
 if (exports.NODE_ENV === "production") {
+    exports.MONGO_URI = process.env.STUDY_BUDDY_MLAB_MONGO_URI;
     exports.BASE_URL = "https://cards.c13u.com";
 } else if (exports.NODE_ENV === "development") {
+    exports.MONGO_URI = "invalid://use-memory-db";
     exports.BASE_URL = `http://localhost:${exports.PORT}`;
 } else {
     throw Error("Please set the NODE_ENV environment variable.");
