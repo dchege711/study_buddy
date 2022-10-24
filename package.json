@@ -30,7 +30,7 @@
     "test": "node models/Miscellaneous.js && npm run mocha_tests && npm run selenium_tests",
     "mocha_tests": "nyc mocha --no-warnings --recursive --sort --timeout 40000 './tests/mocha_tests/*/*.js'",
     "selenium_tests": "cd tests/selenium_tests/ && nyc ./run_selenium_tests.sh firefox headless && cd ../../",
-    "heroku-postbuild": "echo Skip build on Heroku", 
+    "heroku-postbuild": "echo Skip build on Heroku",
     "docs": "jsdoc -c ./config.jsdoc.js"
   },
   "repository": {

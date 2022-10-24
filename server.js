@@ -1,14 +1,14 @@
 /**
- * We use [express-session]{@link https://github.com/expressjs/session} and 
- * some custom middleware to support persistent logins. In case we'll need to 
- * support Facebook/Twitter/Google logins in the future, we'll use 
- * [passport]{@link http://www.passportjs.org/docs/configure/}. For now, 
+ * We use [express-session]{@link https://github.com/expressjs/session} and
+ * some custom middleware to support persistent logins. In case we'll need to
+ * support Facebook/Twitter/Google logins in the future, we'll use
+ * [passport]{@link http://www.passportjs.org/docs/configure/}. For now,
  * Passport is an overkill.
  */
 
 var express = require("express");
 var session = require("express-session");
-var MongoStore = require('connect-mongo')(session);
+var MongoStore = require('connect-mongo');
 var path = require("path");
 var bodyParser = require("body-parser");
 var cookieParser = require("cookie-parser");
@@ -39,8 +39,8 @@ app.use(session({
     httpOnly: false,
     resave: false,
     name: "c13u-study-buddy",
-    store: new MongoStore({
-        mongooseConnection: dbConnection.mongooseConnection,
+    store: MongoStore.create({
+        mongoUrl: config.MONGO_URI,
         touchAfter: 24 * 3600
     }),
     saveUninitialized: true
@@ -59,10 +59,10 @@ app.use("/", InAppRoutes);
 app.use(function (err, req, res, next) {
     console.error(err.stack)
     res.status(500).render(
-        "pages/5xx_error_page.ejs", 
-        { 
-            response_JSON: {status: 500, message: "Internal Server Error"}, 
-            APP_NAME: config.APP_NAME 
+        "pages/5xx_error_page.ejs",
+        {
+            response_JSON: {status: 500, message: "Internal Server Error"},
+            APP_NAME: config.APP_NAME
         }
     );
 });
@@ -70,7 +70,7 @@ app.use(function (err, req, res, next) {
 // Handling 404: https://expressjs.com/en/starter/faq.html
 app.use(function (req, res, next) {
     res.status(404).render(
-        "pages/4xx_error_page.ejs", 
+        "pages/4xx_error_page.ejs",
         {
             response_JSON: {status: 404, message: "Page Not Found"},
             APP_NAME: config.APP_NAME
