@@ -3,8 +3,8 @@
 
     <head>
         <title><%= APP_NAME %>: Home</title>
-        <% include ../partials/header.ejs %>
-        <% include ../partials/syntax_highlighting_and_latex.ejs %>
+        <%- include('../partials/header.ejs'); %>
+        <%- include('../partials/syntax_highlighting_and_latex.ejs'); %>
         <script type="text/javascript" src="/dist/CardsManager.bundle.min.js"></script>
         <script type="text/javascript" src="/dist/CardTemplateUtilities.bundle.min.js"></script>
         <script type="text/javascript" src="/dist/TagsBarUtilities.bundle.min.js"></script>
@@ -16,19 +16,19 @@
                 background-image: linear-gradient(45deg, #ffc719 100%, #bf033b 0%);
             }
         </style>
-        
+
     </head>
 
     <body onload="initializeHomepage();">
 
-        <% include ../partials/navbar.ejs %>
+        <%- include('../partials/navbar.ejs'); %>
 
         <div id="main_div">
 
             <div class="w3-container" id="status_bar">
 
                 <div id="card_search_container" class="w3-half">
-                    <% include ../partials/search_bar_dropdown.ejs %>
+                    <%- include('../partials/search_bar_dropdown.ejs'); %>
                 </div>
 
                 <div class="w3-half">
@@ -38,29 +38,29 @@
                             <span class='w3-right' id="streak_text"></span>
                         </span>
                     </div>
-                        
+
                     <div class="w3-quarter">
                         <label class="w3-right switch tooltip">
                             <input type="checkbox" id="reviewModeToggle" onchange="toggleOption('reviewModeToggle');">
                             <span class="slider round" id="review_mode_label"></span>
                             <span class="tooltiptext" id="review_mode_tooltip">
-                                After the urgency of a card has been modified, automatically 
-                                save the current card and load the next card. 
+                                After the urgency of a card has been modified, automatically
+                                save the current card and load the next card.
                                 <a href="/wiki#review_mode" target="_blank">Read more</a>
                             </span>
                         </label>
                     </div>
 
                 </div>
-                
+
             </div>
 
             <div>
                 <p class="w3-left w3-quarter w3-container tooltip">
                     <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> The Tagging and Urgency System
                     <span class="tooltiptext" id="tagging_system_tooltip">
-                        The tags with the most urgent cards appear earlier on the list. 
-                        "#probability (7)" means that there are 7 cards that have 'probability' as one of their tags. 
+                        The tags with the most urgent cards appear earlier on the list.
+                        "#probability (7)" means that there are 7 cards that have 'probability' as one of their tags.
                         <a href="/wiki/#tagging_system" target="_blank">Read more</a>
                     </span>
                 </p>
@@ -69,28 +69,28 @@
 
             <div class="w3-container">
 
-                <% include ../partials/tags_bar_template.ejs %>
+                <%- include('../partials/tags_bar_template.ejs'); %>
 
                 <div class="w3-threequarter w3-right flexbox" id="minicards_search_results">
                 </div>
 
             </div>
-            
+
         </div>
 
         <div id="card_modal" class="w3-modal">
             <div id="card_container_holder" class="w3-modal-content">
-                <% include ../partials/card_template.ejs %>
+                <%- include('../partials/card_template.ejs'); %>
             </div>
         </div>
 
-        <% include ../partials/footer.ejs %>
+        <%- include('../partials/footer.ejs'); %>
 
 
         <script type="text/javascript">
-            
-            /* If a user is logged in, there'll be some metadata about them in 
-             * Local Storage. 
+
+            /* If a user is logged in, there'll be some metadata about them in
+             * Local Storage.
              */
             let metadata, state, autocomplete, cardsManager;
             const userSettings = AppUtilities.getAccountInfo();
@@ -145,7 +145,7 @@
                             card_is_public_toggle: userSettings.cardsAreByDefaultPrivate
                         }
                         if (!state.tagsAndIDs) state.tagsAndIDs = {};
-                        
+
                         autocomplete = new AutoComplete();
                         autocomplete.initializePrefixTree(Object.keys(state.tagsAndIDs));
                         cardsManager = new CardsManager(state.tagsAndIDs, state.currentUserID, "/read-card", minicards);
@@ -183,9 +183,9 @@
             function displayFullCard(cardID) {
                 cardsManager
                     .fetchCard(cardID)
-                    .then((card) => { 
+                    .then((card) => {
                         // 2x so that the spoiler box can have positive dimensions
-                        renderCard(card); renderCard(card); 
+                        renderCard(card); renderCard(card);
                     })
                     .catch((err) => { console.error(err); });
             }
@@ -193,8 +193,8 @@
             function initializeCards() {
                 cardsManager
                     .initializeFromTags(null)
-                    .then(() => { 
-                        refreshMinicards(); 
+                    .then(() => {
+                        refreshMinicards();
                         colorUrgencyQuartiles(cardsManager.quartiles());
                     })
                     .catch((err) => { console.error(err); });
@@ -214,7 +214,7 @@
             function fetchPreviousCard() {
                 fetchCard(cardsManager.previous);
             }
-    
+
             function fetchNextCard() {
                 fetchCard(cardsManager.next);
             }
@@ -228,7 +228,7 @@
             }
 
             function filterCards() {
-                
+
                 // I apologize for this embarassing line. :-(
                 let tagsToUse = TagsBarUtilities.getSelectedTags();
 
@@ -242,26 +242,26 @@
                 // Update the cards being displayed
                 cardsManager
                     .initializeFromTags(tagsToUse)
-                    .then(() => { 
+                    .then(() => {
                         refreshMinicards();
-                        colorUrgencyQuartiles(cardsManager.quartiles()); 
+                        colorUrgencyQuartiles(cardsManager.quartiles());
                     })
                     .catch((err) => { console.error(err); });
             }
 
             /**
-             * Color the quartile marker with the quartile range for the 
-             * current selection of cards. The quartile marker is located right 
+             * Color the quartile marker with the quartile range for the
+             * current selection of cards. The quartile marker is located right
              * below the urgency slider.
-             * 
-             * @param {Array} quartiles The values of the 1st, 2nd, 3rd and 4th 
+             *
+             * @param {Array} quartiles The values of the 1st, 2nd, 3rd and 4th
              * quartiles. Assumes the maximum urgency is 10.
-             */ 
+             */
             function colorUrgencyQuartiles(quartiles) {
                 if (quartiles.length == 5) {
                     let barWidthIDs = [
-                        "zeroth_quartile_marker", 
-                        "first_quartile_marker", "second_quartile_marker", 
+                        "zeroth_quartile_marker",
+                        "first_quartile_marker", "second_quartile_marker",
                         "third_quartile_marker", "fourth_quartile_marker"
                     ];
                     let barWidthPercentages = [
@@ -270,12 +270,12 @@
                     for (let i = 1; i < quartiles.length; i++) {
                         barWidthPercentages[i] = Math.floor((quartiles[i] - quartiles[i-1]) * 10);
                     }
-                    
+
                     for (let i = 0; i < barWidthIDs.length; i++) {
                         document.getElementById(barWidthIDs[i]).style.width = `${barWidthPercentages[i]}%`;
                     }
                 }
-                 
+
             }
 
             function renderCard(card) {
@@ -297,7 +297,7 @@
                 if (!card.urgency) card.urgency = 0;
 
                 elementRefs.cardTitleElement.value = card.title;
-                
+
                 elementRefs.cardDescriptionElement.innerHTML = card.descriptionHTML;
 
                 let tagsHTML = "";
@@ -311,7 +311,7 @@
                 elementRefs.alreadySetTagsElement.innerHTML = tagsHTML;
                 elementRefs.cardUrgencyElement.value = card.urgency;
                 elementRefs.cardUrgencyNumberElement.innerText = card.urgency;
-                elementRefs.cardDescriptionElement.removeAttribute("contenteditable");                
+                elementRefs.cardDescriptionElement.removeAttribute("contenteditable");
                 elementRefs.cardIsPublicToggleElement.checked = card.isPublic;
                 state.cardIsPublicToggle = card.isPublic;
                 if (card.isPublic) {
@@ -319,7 +319,7 @@
                 } else {
                     elementRefs.shareableLinkElement.innerText = "";
                 }
-                
+
                 // Reset the contents of the current_card variable
                 state.currentCardID = card._id;
                 state.cardPostURL = "/update-card";
@@ -395,7 +395,7 @@
                     }
                     elementRefs.tagsAutocompleteResultsElement.innerHTML = autocompleteHTML;
                 }
-                
+
             }
 
             function suggestNewTags(tagInputElement) {
@@ -434,16 +434,16 @@
             }
 
             /**
-             * @description Insert `&nbsp;&nbsp;&nbsp;&nbsp;` if the user 
-             * pressed the `tab` key. The downside to this is that deleting a 
-             * 'tab' requires 4 backspaces. We tried inserting a tab character 
-             * instead but for it to render, we needed to add 
-             * `white-space: pre-wrap;` as a style attribute. This however 
-             * inserts to much whitespace between separate lines of texts. 
-             * Since flash cards are more frequently read than written, we 
-             * prioritized having the flash cards as compact as possible in 
+             * @description Insert `&nbsp;&nbsp;&nbsp;&nbsp;` if the user
+             * pressed the `tab` key. The downside to this is that deleting a
+             * 'tab' requires 4 backspaces. We tried inserting a tab character
+             * instead but for it to render, we needed to add
+             * `white-space: pre-wrap;` as a style attribute. This however
+             * inserts to much whitespace between separate lines of texts.
+             * Since flash cards are more frequently read than written, we
+             * prioritized having the flash cards as compact as possible in
              * order to avoid the need to scroll down when reading them.
-             * 
+             *
              * {@tutorial main.editing_cards}
              */
             function insertTabsIfNecessary(event) {
@@ -482,7 +482,7 @@
                     state.currentCardTags.forEach((tag) => { autocomplete.updatePrefixTree(tag); });
                 }
                 payload.isPublic = state.card_is_public_toggle;
-                
+
                 // If the tags or urgency has been changed, update the sidebar to reflect current info
                 let rerenderSideBar = state.currentCardTagsHaveChanged || state.changedItems.has("card_urgency");
 
@@ -507,7 +507,7 @@
                     .catch((err) => { console.error(err); });
 
             }
-            
+
             function moveCardToTrash() {
                 // Remove the card from the ones that get displayed
                 let removedCardID = cardsManager.removeCard(state.currentCardID);
@@ -522,7 +522,7 @@
                     }
 
                     // Request the server to trash the card
-                    AppUtilities.sendHTTPRequest("POST", "/trash-card", 
+                    AppUtilities.sendHTTPRequest("POST", "/trash-card",
                         {
                             cardID: removedCardID, createdById: state.currentUserID
                         })
@@ -537,7 +537,7 @@
 
             function restoreCardFromTrash(card_to_restore_id, card_to_restore_urgency) {
                 AppUtilities.sendHTTPRequest(
-                    "POST", "/restore-from-trash", 
+                    "POST", "/restore-from-trash",
                     {
                         createdById: state.currentUserID,
                         cardID: card_to_restore_id,
@@ -552,18 +552,18 @@
                     })
                     .catch((err) => { console.error(err); });
             }
-            
+
             /*
-             * @description Reset the queue of cards to be viewed. 
+             * @description Reset the queue of cards to be viewed.
              * @param {Array} abbreviated_cards Array of JSON objects having the
              * keys `_id`, and `urgency`
-             */  
+             */
             function reInitializeCards(abbreviated_cards) {
                 elementRefs.cardSearchResultsElement.innerHTML = "";
                 cardsManager.initializeFromMinicards(abbreviated_cards)
-                    .then(() => { 
+                    .then(() => {
                         refreshMinicards();
-                        colorUrgencyQuartiles(cardsManager.quartiles()); 
+                        colorUrgencyQuartiles(cardsManager.quartiles());
                     })
                     .catch((err) => { console.error(err); });
             }

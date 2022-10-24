@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <% include ../partials/header.ejs %>
+        <%- include('../partials/header.ejs'); %>
         <title><%= APP_NAME %>: Browse/Search</title>
         <script type="text/javascript" src="/dist/CardsManager.bundle.min.js"></script>
         <script type="text/javascript" src="/dist/CardTemplateUtilities.bundle.min.js"></script>
         <script type="text/javascript" src="/dist/TagsBarUtilities.bundle.min.js"></script>
         <script type="text/javascript" src="/dist/AutoComplete.bundle.min.js"></script>
-        <% include ../partials/syntax_highlighting_and_latex.ejs %>
+        <%- include('../partials/syntax_highlighting_and_latex.ejs'); %>
     </head>
 
     <body>
-        <% include ../partials/navbar.ejs %>
+        <%- include('../partials/navbar.ejs'); %>
 
         <div id="main_div">
             <div class="w3-container" id="search_div">
 
                 <div id="card_search_container" class="w3-half">
-                    <% include ../partials/search_bar_dropdown.ejs %>
+                    <%- include('../partials/search_bar_dropdown.ejs'); %>
                 </div>
 
 
@@ -27,7 +27,7 @@
 
                 <div class="w3-container">
 
-                    <% include ../partials/tags_bar_template.ejs %>
+                    <%- include('../partials/tags_bar_template.ejs'); %>
 
                     <p id="current_tag_selection" class="w3-right"></p>
 
@@ -49,10 +49,10 @@
 
                 <div id="card_modal" class="w3-modal">
                     <div id="card_container_holder" class="w3-modal-content">
-                        <% include ../partials/search_result_card_template.ejs %>
+                        <%- include('../partials/search_result_card_template.ejs'); %>
                     </div>
                 </div>
-                
+
             </div>
 
         </div>
@@ -68,7 +68,7 @@
             currentCardID: null,
             currentTagSelectionElement: document.getElementById("current_tag_selection"),
             searchResultsElement: document.getElementById("minicards_search_results")
-        }; 
+        };
 
         AppUtilities
             .sendHTTPRequest("POST", "/read-public-metadata", {})
@@ -92,7 +92,7 @@
             cardTagsElement: document.getElementById("card_tags"),
             cardPopularityElement: document.getElementById("card_popularity")
         };
-    
+
         function handleSearchInputChange() {
             state.queryString = elementRefs.searchInputElement.value;
         }
@@ -106,7 +106,7 @@
             } else {
                 currentTagsString = Array.from(TagsBarUtilities.getSelectedTags()).join(", ");
                 payload = {cardIDs: Array.from(selectedIDs)};
-            }  
+            }
 
             AppUtilities
                 .sendHTTPRequest("POST", "/browse", payload)
@@ -140,11 +140,11 @@
                     [{
                         _id: cardID, urgency: Number.POSITIVE_INFINITY,
                         tags: document.getElementById(`tags${cardID}`).innerText.split(", ")
-                    }], 
+                    }],
                     includeTagNeighbors=true
                 )
                 .then(() => { return cardsManager.next(); })
-                .then((card) => { 
+                .then((card) => {
                     // 2x so that the spoiler box can have positive dimensions
                     renderCard(card); renderCard(card);
                     elementRefs.cardContainerHolderElement.style.display = "block";
@@ -175,7 +175,7 @@
                 }
                 return;
             }
-            
+
             let flagObject = { cardID: state.currentCardID };
             flagObject[reason] = true;
             AppUtilities
@@ -198,8 +198,8 @@
             }
             AppUtilities
                 .sendHTTPRequest(
-                    "POST", "/duplicate-card", 
-                    { 
+                    "POST", "/duplicate-card",
+                    {
                         cardID: state.currentCardID,
                         newCardIsPrivate: USER_INFO.cardsAreByDefaultPrivate
                     })
@@ -220,19 +220,19 @@
                 CardTemplateUtilities.displayPopUp("Out of cards!", 1500);
                 return;
             }
-    
+
             elementRefs.cardTitleElement.innerHTML = card.title;
             elementRefs.cardDescriptionElement.innerHTML = card.descriptionHTML;
-        
+
             elementRefs.cardTagsElement.innerText = card.tags.trim().replace(/\s/g, ", ");
             elementRefs.cardPopularityElement.innerText = card.idsOfUsersWithCopy.split(", ").length;
             state.currentCardID = card._id;
-        
+
             PrettifyCards.addSyntaxHighlighting();
             PrettifyCards.renderLatex(["card_description"]);
 
             CardTemplateUtilities.syncSpoilerBox();
-    
+
         };
 
     </script>
