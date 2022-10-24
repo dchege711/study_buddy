@@ -39,7 +39,7 @@ app.use(session({
     httpOnly: false,
     resave: false,
     name: "c13u-study-buddy",
-    store: MongoStore.create({
+    store: config.IS_DEV ? session.MemoryStore() : MongoStore.create({
         mongoUrl: config.MONGO_URI,
         touchAfter: 24 * 3600
     }),
@@ -62,7 +62,8 @@ app.use(function (err, req, res, next) {
         "pages/5xx_error_page.ejs",
         {
             response_JSON: {status: 500, message: "Internal Server Error"},
-            APP_NAME: config.APP_NAME
+            APP_NAME: config.APP_NAME,
+            LOGGED_IN: false,
         }
     );
 });
@@ -73,7 +74,8 @@ app.use(function (req, res, next) {
         "pages/4xx_error_page.ejs",
         {
             response_JSON: {status: 404, message: "Page Not Found"},
-            APP_NAME: config.APP_NAME
+            APP_NAME: config.APP_NAME,
+            LOGGED_IN: false,
         }
     );
 });

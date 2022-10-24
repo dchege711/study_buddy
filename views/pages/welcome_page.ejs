@@ -2,7 +2,7 @@
 <html>
     <head>
         <title><%= APP_NAME %>: Login</title>
-        <% include ../partials/header.ejs %>
+        <%- include('../partials/header.ejs'); %>
         <script src="/dist/AppUtilities.bundle.min.js"></script>
     </head>
 
@@ -15,34 +15,34 @@
 
     <body onload="AppUtilities.processParams();">
 
-        <% include ../partials/navbar.ejs %>
+        <%- include('../partials/navbar.ejs'); %>
 
         <div id="main_div" class="w3-display-container">
-            
+
             <div id="welcome_page_content" class="w3-container w3-display-middle w3-third w3-center w3-padding-large">
 
                 <form class="w3-padding-large tab_content" id="login_form" method="post">
-                
+
                     <label for="username"> Username or Email Address: </label>
                     <input class="w3-input" type="text" name="username_or_email" required/>
-                
-                    <br />
-                    <br />
-                
-                    <label for="password"> Password: </label>
-                    <input class="w3-input" type="password" name="password" 
-                        id="login_password" minlength="8" required/>
-                
-                    <br />
-                    <br />
-                
-                    <button class="w3-button w3-center w3-green" type="submit" 
-                        id="login_submit" onclick="return logInUser('login_form', '/login')">Log In</button>
-                    
+
                     <br />
                     <br />
 
-                    <button class="w3-button w3-center w3-blue" 
+                    <label for="password"> Password: </label>
+                    <input class="w3-input" type="password" name="password"
+                        id="login_password" minlength="8" required/>
+
+                    <br />
+                    <br />
+
+                    <button class="w3-button w3-center w3-green" type="submit"
+                        id="login_submit" onclick="return logInUser('login_form', '/login')">Log In</button>
+
+                    <br />
+                    <br />
+
+                    <button class="w3-button w3-center w3-blue"
                         id="display_signup_form" onclick="return displayForm('signup_form')">
                         ... or Sign Up for a New Account</button>
 
@@ -55,33 +55,33 @@
                 <form class="w3-padding-large hidden tab_content" id="signup_form" method="post">
 
                     <label for="email">Email Address: </label>
-                    <input class="w3-input" type="email" name="email" 
+                    <input class="w3-input" type="email" name="email"
                         required/>
 
                     <br />
                     <br />
-                    
+
                     <label for="username"> Choose an alphanumeric username: </label>
-                    <input class="w3-input" type="text" name="username" 
+                    <input class="w3-input" type="text" name="username"
                         pattern="[_\-A-Za-z0-9]+" required/>
-                    
-                    <br />
-                    <br />
-                    
-                    <label for="password"> Choose a password: </label>
-                    <input class="w3-input" type="password" name="password" 
-                        id="signup_password" minlength="8" required/>
-                    
-                    <br />
-                    <br />
-                    
-                    <button class="w3-button w3-center w3-green" type="submit" 
-                        id="signup_submit" onclick="return signUpUser('signup_form', '/register-user')">Sign Up</button>
-                    
+
                     <br />
                     <br />
 
-                    <button class="w3-button w3-center w3-blue" 
+                    <label for="password"> Choose a password: </label>
+                    <input class="w3-input" type="password" name="password"
+                        id="signup_password" minlength="8" required/>
+
+                    <br />
+                    <br />
+
+                    <button class="w3-button w3-center w3-green" type="submit"
+                        id="signup_submit" onclick="return signUpUser('signup_form', '/register-user')">Sign Up</button>
+
+                    <br />
+                    <br />
+
+                    <button class="w3-button w3-center w3-blue"
                         id="display_login_form" onclick="return displayForm('login_form')">
                         ... or go back to LogIn</button>
                 </form>
@@ -91,16 +91,16 @@
             </div>
 
         </div>
-        
-        
-        <% include ../partials/footer.ejs %>
+
+
+        <%- include('../partials/footer.ejs'); %>
 
         <script type="text/javascript">
 
             /*
              * @description Toggle the form being displayed.
              * @param {string} form_id The ID of the form to be displayed.
-             * 
+             *
              */
             function displayForm(form_id) {
                 var elements = document.getElementsByClassName("tab_content");
@@ -128,18 +128,18 @@
                         }
                     })
                     .catch((err) => { console.error(err); });
-                    
+
                 return false;
             }
-            
+
             /**
-             * @description Populate Local Storage with the necessary data to 
+             * @description Populate Local Storage with the necessary data to
              * display the users cards.
-             * 
+             *
              * @param {JSON} `sessionInfoObject` A JSON document that identifies
              * this session on the server.
-             * 
-             */ 
+             *
+             */
             function setupInitializationData(sessionInfoObject) {
                 localStorage.setItem(
                     "session_info", JSON.stringify(sessionInfoObject.message)
@@ -163,7 +163,7 @@
 
             /*
             * @description Sign up a new user and log them in.
-            * 
+            *
             * @param {string} formID The ID of the form that has credentials
             * @param {string} url The URL at which the form will be processed
             */
@@ -194,9 +194,9 @@
 
                 return false;
             }
-            
+
         </script>
 
     </body>
-    
+
 </html>

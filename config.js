@@ -10,11 +10,13 @@ if (exports.NODE_ENV === "production") {
     exports.MONGO_URI = process.env.STUDY_BUDDY_MLAB_MONGO_URI;
     exports.BASE_URL = "https://cards.c13u.com";
 } else if (exports.NODE_ENV === "development") {
-    exports.MONGO_URI = process.env.STUDY_BUDDY_MLAB_TEST_DB_URI;
+    exports.MONGO_URI = "invalid://use-memory-db";
     exports.BASE_URL = `http://localhost:${exports.PORT}`;
 } else {
     throw Error("Please set the NODE_ENV environment variable.");
 }
+
+exports.IS_DEV = exports.NODE_ENV === "development";
 
 exports.EMAIL_ADDRESS = process.env.STUDY_BUDDY_DEFAULT_EMAIL_ADDRESS;
 exports.MAILGUN_LOGIN = process.env.STUDY_BUDDY_MAILGUN_LOGIN;
@@ -23,7 +25,7 @@ exports.MAILGUN_PASSWORD = process.env.STUDY_BUDDY_MAILGUN_PASSWORD;
 exports.DEBUG_EMAIL_ADDRESS = process.env.STUDY_BUDDY_EMAIL_ADDRESS;
 exports.DEBUG_USERNAME = "test-study-buddy-user";
 exports.DEBUG_PASSWORD = "i_know_how_to_keep_passwords_safe_amirite?";
-exports.DEBUG_OPERATION_TIMEOUT_MS = 3000; 
+exports.DEBUG_OPERATION_TIMEOUT_MS = 3000;
 
 exports.PUBLIC_USER_USERNAME = "c13u";
 exports.PUBLIC_USER_EMAIL = process.env.STUDY_BUDDY_DEFAULT_EMAIL_ADDRESS;

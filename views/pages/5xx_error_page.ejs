@@ -3,17 +3,17 @@
 
     <head>
         <title><%= APP_NAME %>: 5xx Page</title>
-        <% include ../partials/header.ejs %>
+        <%- include('../partials/header.ejs'); %>
     </head>
 
     <body>
 
-        <% include ../partials/navbar.ejs %>
+        <%- include('../partials/navbar.ejs'); %>
 
         <div id="main_div">
-        
+
             <div style="margin: 5% 20% 10% 20%">
-        
+
                 <h3>
                     <%= response_JSON.status %>
                 </h3>
@@ -23,11 +23,11 @@
                 </p>
 
             </div>
-        
+
         </div>
 
 
-        <% include ../partials/footer.ejs %>
+        <%- include('../partials/footer.ejs'); %>
 
     </body>
 

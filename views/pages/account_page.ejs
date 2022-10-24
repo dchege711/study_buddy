@@ -3,8 +3,8 @@
 
     <head>
         <title><%= APP_NAME %>: Account Page</title>
-        <% include ../partials/header.ejs %>
-        <% include ../partials/syntax_highlighting_and_latex.ejs %>
+        <%- include('../partials/header.ejs'); %>
+        <%- include('../partials/syntax_highlighting_and_latex.ejs'); %>
         <script type="text/javascript" src="/dist/CardsManager.bundle.min.js"></script>
         <script type="text/javascript" src="/dist/CardTemplateUtilities.bundle.min.js"></script>
 
@@ -34,7 +34,7 @@
 
     <body onload="initializeAccountPage();">
 
-        <% include ../partials/navbar.ejs %>
+        <%- include('../partials/navbar.ejs'); %>
 
         <div id="main_div">
 
@@ -53,7 +53,7 @@
                     </p>
 
                     <form id="accountSettingsForm" method="POST">
-                    
+
                         <% if (account_info.cardsAreByDefaultPrivate) { %>
                             <input type="checkbox" class="w3-check" name="cardsAreByDefaultPrivate" checked>
                         <% } else { %>
@@ -61,14 +61,14 @@
                         <% } %>
 
                         <label class="w3-label" for="cardsAreByDefaultPrivate">If checked, your cards will be private (except the ones that you explicitly set as public)</label>
-                        
+
                         <br /><br />
                         <label class="w3-label" for="dailyTarget">Minimum number of cards to review per day</label>
                         <input type="number" name="dailyTarget" value="<%= account_info.dailyTarget %>">
 
 
                         <input type="text" style="display:none" name="userIDInApp" value="<%= account_info.userIDInApp %>">
-                        
+
                         <br><br>
                         <input type="submit" class="w3-btn w3-round-xxlarge w3-left w3-blue" value="Save Changes" onclick="return updateAccountSettings();">
                     </form>
@@ -80,8 +80,8 @@
                     <h3 class="account_header">Restore/Delete Cards from Trash</h3>
 
                     <p>
-                        The trash only holds a card for 30 days, after which the 
-                        card will be permanently deleted. Use this option to either 
+                        The trash only holds a card for 30 days, after which the
+                        card will be permanently deleted. Use this option to either
                         delete cards permanently, or restore them to your active cards.
 
                         <br><br>
@@ -90,17 +90,17 @@
                             <b id="trash_button_text">
                                 <i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> View Trashed Cards
                             </b>
-                        </button>    
+                        </button>
 
                         <br>
                     </p>
 
                     <div>
-                    
-                        <% include ../partials/trashed_card_template.ejs %>
-                    
+
+                        <%- include('../partials/trashed_card_template.ejs'); %>
+
                     </div>
-                    
+
                 </div>
 
                 <div class="account_section">
@@ -132,7 +132,7 @@
                         </button>
 
                     </p>
-                
+
                 </div>
 
                 <div class="account_section">
@@ -140,7 +140,7 @@
                     <h3 class="account_header">Delete account</h3>
 
                     <p>
-                        Careful now. Once you delete your account, there is no going back. 
+                        Careful now. Once you delete your account, there is no going back.
                         Please be sure. You might want to download your data first.
                         <br>
                         <br>
@@ -149,9 +149,9 @@
                                 <i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> Delete Account
                             </b>
                         </button>
-                    
+
                     </p>
-                    
+
                 </div>
 
             </div>
@@ -159,7 +159,7 @@
         </div>
 
 
-        <% include ../partials/footer.ejs %>
+        <%- include('../partials/footer.ejs'); %>
 
     </body>
 
@@ -192,7 +192,7 @@
                     );
 
                     document.getElementById("trash_button_text").innerHTML = `<i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> View ${Object.keys(state.trashed_cards).length} Trashed Cards`;
-                    
+
                 })
                 .catch((err) => { console.error(err); });
         }
@@ -224,7 +224,7 @@
                     .then(() => { return cardsManager.next(); })
                     .then((card) => { renderTrashedCard(card); })
                     .catch((err) => { console.error(err); });
-    
+
             }
         }
 
@@ -259,14 +259,14 @@
                 PrettifyCards.renderLatex(["card_title", "card_description"]);
 
             }
-            
+
         }
 
         function modifyTrash(endpoint) {
             AppUtilities
                 .sendHTTPRequest(
-                    "POST", endpoint, 
-                    { 
+                    "POST", endpoint,
+                    {
                         cardID: state.current_card_id,
                         createdById: state.metadata.createdById
                     }
@@ -288,9 +288,9 @@
         function updateAccountSettings() {
             AppUtilities
                 .sendForm("accountSettingsForm", "/account/update-settings")
-                .then((confirmation) => { 
+                .then((confirmation) => {
                     confirmation = JSON.parse(confirmation);
-                    alert(confirmation.message); 
+                    alert(confirmation.message);
                 })
                 .catch((err) => { console.error(err); });
 
