@@ -22,6 +22,4 @@ services:
         value: flashcards@c13u.com
       - key: STUDY_BUDDY_MAILGUN_LOGIN # Imported from Heroku app
         value: flashcards@c13u.com
-      - key: STUDY_BUDDY_MLAB_MONGO_URI # Imported from Heroku app
-        value: mongodb+srv://c13uprod:0ZURnhGzjNhNPf9H@c13u.5uy1z.mongodb.net/c13u?retryWrites&#x3D;true&amp;w&#x3D;majority
 
