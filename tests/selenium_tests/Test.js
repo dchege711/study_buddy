@@ -21,8 +21,8 @@ async function runTestSuite(headless=true) {
             console.log(`\n${numTestsPassed}/${numTotalTests} tests passed!`);
             passedAllTests = numTestsPassed === numTotalTests;
         })
-        .catch((err) =>{ 
-            console.error(err); 
+        .catch((err) =>{
+            console.error(err);
         });
 
     return Promise.resolve(passedAllTests);

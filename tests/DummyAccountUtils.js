@@ -29,16 +29,16 @@ exports.getDummyAccount = function() {
                     password: dummyAccountDetails.password
                 });
             })
-            .then((confirmation) => { 
+            .then((confirmation) => {
                 if (confirmation.success) resolve(confirmation.message);
-                else reject(new Error(confirmation.message)); 
+                else reject(new Error(confirmation.message));
             })
             .catch((err) => { reject(err); });
     });
 };
 
 /**
- * @description Creates the dummy account if it doesn't exist. Populates the 
+ * @description Creates the dummy account if it doesn't exist. Populates the
  * dummy account with `numCards` cards.
  * @returns {Promise} resolves with a JSON representation of a logged in user.
  */
@@ -58,7 +58,7 @@ exports.populateDummyAccount = function(numCards=50) {
                 resolve(loggedInUser)
             })
             .catch((err) => { reject(err); });
-    }); 
+    });
 }
 
 if (require.main === module) {
@@ -66,11 +66,11 @@ if (require.main === module) {
     const dbConnection = require("../models/MongooseClient.js");
     let numCards = 60;
     exports.populateDummyAccount(numCards)
-        .then((user) => { 
+        .then((user) => {
             console.log(`Created user ${user.username} and gave them ${numCards} cards`);
-            return dbConnection.closeMongooseConnection(); 
+            return dbConnection.closeMongooseConnection();
         })
         .catch((err) => { console.error(err); });
-        
+
 }
 

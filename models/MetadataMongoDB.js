@@ -2,7 +2,7 @@
 
 /**
  * Handle actions related to the metadata of the cards in the database.
- * 
+ *
  * @module
  */
 
@@ -16,7 +16,7 @@ const config = require("../config.js");
 /**
  * @description Create & save a new metadata document for a user
  * @param {JSON} payload Must contain `userIDInApp` and `metadataIndex` as keys
- * @return {Promise} resolves with a JSON object with `success`, `status` and 
+ * @return {Promise} resolves with a JSON object with `success`, `status` and
  * `message` as keys.
  */
 exports.create = function (payload) {
@@ -26,7 +26,7 @@ exports.create = function (payload) {
             reject(new Error("Please provide a userIDInApp and a metadataIndex."));
         } else {
             Metadata.count({
-                createdById: payload.userIDInApp, 
+                createdById: payload.userIDInApp,
                 metadataIndex: payload.metadataIndex
             }).exec()
             .then((count) => {
@@ -48,16 +48,16 @@ exports.create = function (payload) {
             })
             .catch((err) => { reject(err); });
         }
-    
+
     })
 };
 
 /**
  * @description Read all the metadata associated with a user's cards.
- * 
+ *
  * @param {JSON} payload Must contain `userIDInApp` as a key
- * @returns {Promise} If successful, the `message` attribute is an array of 
- * JSON `Metadata` objects 
+ * @returns {Promise} If successful, the `message` attribute is an array of
+ * JSON `Metadata` objects
  */
 exports.read = function (payload) {
     payload = querySanitizer(payload);
@@ -76,19 +76,19 @@ exports.read = function (payload) {
 /**
  * Update the metadata with the new cards' details. This method
  * is usually called by CardsMongoDB.update(). An array is needed to prevent
- * race conditions when updating metadata from more than one card. 
- * 
+ * race conditions when updating metadata from more than one card.
+ *
  * @param {Array} savedCards Array of cards
- * 
- * @param {JSON} metadataQuery An identifier for the metadata document. This 
- * argument was added in order to update the global public user account. If not 
+ *
+ * @param {JSON} metadataQuery An identifier for the metadata document. This
+ * argument was added in order to update the global public user account. If not
  * specified, it defaults to the owner of the first card in `savedCards`.
- * 
- * @param {String} attributeName A sortable attribute of the card that will be 
- * used to rank the cards in the metadata. Possible values include `urgency`, 
+ *
+ * @param {String} attributeName A sortable attribute of the card that will be
+ * used to rank the cards in the metadata. Possible values include `urgency`,
  * `numChildren`.
- * 
- * @returns {Promise} resolves with a JSON with `success`, `status` and 
+ *
+ * @returns {Promise} resolves with a JSON with `success`, `status` and
  * `message` as keys. If successful, `message` has a metadata JSON object.
  */
 exports.update = async function (savedCards, metadataQuery, attributeName) {
@@ -140,12 +140,12 @@ exports.update = async function (savedCards, metadataQuery, attributeName) {
 
 /**
  * @description Update the metadata for a public card.
- * 
+ *
  * @param {Array} cards an array of JSON flashcards
- * 
- * @returns {Promise} resolves with a JSON with `success`, `status` and 
+ *
+ * @returns {Promise} resolves with a JSON with `success`, `status` and
  * `message` as keys. If successful, `message` has a metadata JSON object.
- * 
+ *
  */
 exports.updatePublicUserMetadata = function(cards) {
 
@@ -193,7 +193,7 @@ exports.updatePublicUserMetadata = function(cards) {
                     });
                     delete metadataStats[cardID];
                 }
-                
+
                 metadataDoc.markModified("stats");
                 metadataDoc.markModified("node_information");
                 return metadataDoc.save();
@@ -203,13 +203,13 @@ exports.updatePublicUserMetadata = function(cards) {
             })
             .catch((err) => { reject(err); });
     });
-    
+
 }
 
 /**
  * @description Delete all the metadata associated with the user.
  * @param {JSON} payload Contains `userIDInApp` as a key
- * @returns {Promise} resolves with a JSON object keyed by `success`, `status` 
+ * @returns {Promise} resolves with a JSON object keyed by `success`, `status`
  * and `message`
  */
 exports.deleteAllMetadata = function (payload) {
@@ -228,7 +228,7 @@ exports.deleteAllMetadata = function (payload) {
  * @param {JSON} payload Must contain `cardID` that has the id of the card
  * to be placed into trash, and `userIDInApp`, the ID of the user who owns
  * the card.
- * @returns {Promise} resolves with a JSON keyed by `success`, `status` and  
+ * @returns {Promise} resolves with a JSON keyed by `success`, `status` and
  * `message`
  */
 exports.sendCardToTrash = function (payload) {
@@ -267,7 +267,7 @@ exports.sendCardToTrash = function (payload) {
                 delete metadataStats[trashedCardID];
 
                 // Add the card to the trashed items associated with the user
-                // Associate the deletion time so that we can have a clean up 
+                // Associate the deletion time so that we can have a clean up
                 // of all cards in the trash that are older than 30 days
                 if (!metadataDoc.trashed_cards || metadataDoc.trashed_cards.length == 0) {
                     metadataDoc.trashed_cards = [];
@@ -296,7 +296,7 @@ exports.sendCardToTrash = function (payload) {
  * @description Restore a card from the trash, back into the user's list of
  * current cards.
  * @param {JSON} restoreCardArgs Expected keys: `cardID`, `createdById`
- * @returns {Promise} resolves with a JSON keyed by `success`, `status` and  
+ * @returns {Promise} resolves with a JSON keyed by `success`, `status` and
  * `message`
  */
 exports.restoreCardFromTrash = function (restoreCardArgs) {
@@ -336,9 +336,9 @@ exports.restoreCardFromTrash = function (restoreCardArgs) {
 
 /**
  * @description Permanently delete a card from the user's trash.
- * 
+ *
  * @param {JSON} restoreCardArgs Expected keys: `cardID`, `createdById`
- * @returns {Promise} resolves with a JSON keyed by `success`, `status` and  
+ * @returns {Promise} resolves with a JSON keyed by `success`, `status` and
  * `message`
  */
 exports.deleteCardFromTrash = function(deleteCardArgs) {
@@ -352,10 +352,10 @@ exports.deleteCardFromTrash = function(deleteCardArgs) {
             .then((deletedCard) => {
                 if (deletedCard === null) {
                     resolve({
-                        success: false, status: 200, 
+                        success: false, status: 200,
                         message: "The card wasn't found in the database."
                     });
-                }   
+                }
                 return removeCardFromMetadataTrash(deletedCard);
             })
             .then((modifiedMetadataDoc) => {
@@ -369,14 +369,14 @@ exports.deleteCardFromTrash = function(deleteCardArgs) {
 };
 
 /**
- * @description Remove the card from the trash records of the metadata object. 
+ * @description Remove the card from the trash records of the metadata object.
  * This method does not save the modified metadata into the database!
- * 
- * @param {JSON} cardIdentifier JSON object that contains the keys 
+ *
+ * @param {JSON} cardIdentifier JSON object that contains the keys
  * `createdById` and `_id`.
- * 
- * @returns {Promise} resolves with the modified metadata document. It is up to 
- * the callee to persist the saved metadata in the database. 
+ *
+ * @returns {Promise} resolves with the modified metadata document. It is up to
+ * the callee to persist the saved metadata in the database.
  */
 function removeCardFromMetadataTrash(cardIdentifier) {
     return new Promise(function(resolve, reject) {
@@ -401,11 +401,11 @@ function removeCardFromMetadataTrash(cardIdentifier) {
 
 /**
  * @description Fetch all the user's cards and compile them into a JSON file.
- * 
+ *
  * @param {Number} userIDInApp The ID of the user whose cards should be exported
  * to a .json file.
- * 
- * @returns {Promise} resolves with two string arguments. The first one is a path 
+ *
+ * @returns {Promise} resolves with two string arguments. The first one is a path
  * to the written JSON file. The 2nd argument is the name of the JSON file.
  */
 exports.writeCardsToJSONFile = function (userIDInApp) {
@@ -427,7 +427,7 @@ exports.writeCardsToJSONFile = function (userIDInApp) {
                 let jsonFilePath = `${process.cwd()}/${jsonFileName}`;;
 
                 fs.open(jsonFilePath, "w", (err, fileDescriptor) => {
-                    if (err) { reject(err); } 
+                    if (err) { reject(err); }
                     else {
                         fs.write(fileDescriptor, JSON.stringify(cardData), (writeErr) => {
                             if (writeErr) {
@@ -446,21 +446,21 @@ exports.writeCardsToJSONFile = function (userIDInApp) {
                 });
             })
             .catch((err) => { reject(err); });
-    });       
+    });
 };
 
 /**
- * @description Helper method for updating the metadata from a given card. This 
- * method does not persist the modified metadata document into the database. It 
- * is up to the callee to save the changes once they're done manipulating the 
+ * @description Helper method for updating the metadata from a given card. This
+ * method does not persist the modified metadata document into the database. It
+ * is up to the callee to save the changes once they're done manipulating the
  * metadata.
- * 
- * @param {JSON} savedCard The card that whose details should be added to the 
+ *
+ * @param {JSON} savedCard The card that whose details should be added to the
  * metadata.
  * @param {JSON} metadataDoc A Mongoose Schema object that is used to store the
  * current user's metadata.
  * @param {String}
- * @returns {Promise} resolved with a reference to the modified metadata doc 
+ * @returns {Promise} resolved with a reference to the modified metadata doc
  */
 function updateMetadataWithCardDetails(savedCard, metadataDoc, attributeName) {
 
@@ -534,14 +534,14 @@ function updateMetadataWithCardDetails(savedCard, metadataDoc, attributeName) {
             }
         }
     });
-    
+
     return Promise.resolve(metadataDoc);
 }
 
 /**
  * @description Update the settings of the given user.
- * @param {JSON} newUserSettings Supported keys: 
- * @returns {Promise} resolves with a JSON keyed by `success`, `status` and  
+ * @param {JSON} newUserSettings Supported keys:
+ * @returns {Promise} resolves with a JSON keyed by `success`, `status` and
  * `message`
  */
 exports.updateUserSettings = function(newUserSettings) {
@@ -551,7 +551,7 @@ exports.updateUserSettings = function(newUserSettings) {
     let validChanges = [];
     Object.keys(newUserSettings).forEach((setting) => {
         if (supportedChanges.has(setting)) validChanges.push(setting);
-    }) 
+    })
 
     return new Promise(function(resolve, reject) {
         if (validChanges.length == 0) {
@@ -583,7 +583,7 @@ exports.updateUserSettings = function(newUserSettings) {
                     }).exec();
                 } else {
                     resolve({
-                        message: "User settings updated!", success: true, 
+                        message: "User settings updated!", success: true,
                         status: 200, user: updatedUser
                     });
                 }
@@ -597,7 +597,7 @@ exports.updateUserSettings = function(newUserSettings) {
             })
             .then((_) => {
                 resolve({
-                    message: "User settings updated!", success: true, 
+                    message: "User settings updated!", success: true,
                     status: 200, user: updatedUser
                 });
             })
@@ -606,11 +606,11 @@ exports.updateUserSettings = function(newUserSettings) {
 };
 
 /**
- * @description Update the streak object for the current user. Assumes that the 
+ * @description Update the streak object for the current user. Assumes that the
  * streak object is up to date.
- * 
+ *
  * @param {JSON} streakUpdateObj Expected properties: `userIDInApp`, `cardIDs`
- * 
+ *
  * @returns {Object} the saved metadata object with the updated streak
  */
 exports.updateStreak = function(streakUpdateObj) {
@@ -625,14 +625,14 @@ exports.updateStreak = function(streakUpdateObj) {
                 }
                 metadataDoc.streak.set('cardIDs', Array.from(idsReviewedCards));
                 metadataDoc.markModified("streak");
-                return metadataDoc.save(); 
+                return metadataDoc.save();
             })
-            .then((savedMetadataDoc) => { 
+            .then((savedMetadataDoc) => {
                 resolve({
                     message: savedMetadataDoc.streak, success: true, status: 200
                 });
             })
             .catch((err) => { reject(err); });
     });
-    
+
 };

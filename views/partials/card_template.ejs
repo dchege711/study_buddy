@@ -2,7 +2,7 @@
 
     <div class="w3-container">
         <!--
-            For now, we display a shareable URL that opens in the `/browse` 
+            For now, we display a shareable URL that opens in the `/browse`
             page if the card still exists and is public.
         -->
         <p id="shareable_link" class="w3-left"></p>
@@ -13,7 +13,7 @@
 
     <div class="card-header w3-center w3-container">
         <label class="input-area-padded padding-small w3-twothird w3-left">
-            <input type="text" id="card_title" name="title" 
+            <input type="text" id="card_title" name="title"
                 class="w3-input" style="font-weight:bolder"
                 onkeydown="handleInputChange('card_title')"/>
         </label>
@@ -29,13 +29,13 @@
 
     <div class="w3-container">
 
-        <div class="w3-container" id="card_description" 
+        <div class="w3-container" id="card_description"
             onkeydown="insertTabsIfNecessary(event); handleInputChange('card_description')">
         </div>
         <p class="w3-right tooltip">
             <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> Formatting Help
             <span class="tooltiptext" id="formatting_help_tooltip">
-                You can use HTML, Markdown and LaTeX within your card's contents. 
+                You can use HTML, Markdown and LaTeX within your card's contents.
                 <a href="/wiki/#formatting" target="_blank">Read more</a>
             </span>
         </p>
@@ -46,7 +46,7 @@
             <strong>Tags: </strong>
             <span id="already_set_card_tags"></span>
             <div class="dropdown">
-                <input type="text" id="card_tag_input" placeholder="Add a new tag..." 
+                <input type="text" id="card_tag_input" placeholder="Add a new tag..."
                 onkeyup="handleTagsInputChange(event);" onfocus="suggestNewTags(this);" onblur="window.setTimeout(removeTagSuggestions, 300);"
                 class="w3-input dropbtn" />
                 <div class="dropdown-content" id="tags_autocomplete_results"></div>
@@ -57,24 +57,24 @@
 
         <div>
             <!--
-                We changed the urgency input from a number input type to a 
-                range input type. To set an urgency, using the range input type 
-                is faster since the user probably cares more about the relative  
-                value than the absolute value, e.g. *card X is half as 
-                important as the most important cards in my deck*. Furthermore, 
-                using a range requires one click, while using a number type 
+                We changed the urgency input from a number input type to a
+                range input type. To set an urgency, using the range input type
+                is faster since the user probably cares more about the relative
+                value than the absolute value, e.g. *card X is half as
+                important as the most important cards in my deck*. Furthermore,
+                using a range requires one click, while using a number type
                 requires a click and a type.
             -->
             <div class="w3-threequarter w3-left">
                 <label class="input-area-padded w3-padding-small">
                     <strong>Urgency</strong>
-                    <input id="card_urgency" type="range" name="urgency" 
-                        class="w3-input" min="0" max="10" step="0.01" 
+                    <input id="card_urgency" type="range" name="urgency"
+                        class="w3-input" min="0" max="10" step="0.01"
                         onChange="handleCardUrgencyChange();"
                     />
                 </label>
             </div>
-            
+
             <div class="w3-quarter w3-right">
                 <span id="card_urgency_number"><strong></strong></span>
                 <label class="w3-right switch tooltip">
@@ -84,7 +84,7 @@
                         <a href="/wiki#public_cards" target="_blank">More about public cards</a>
                     </span>
                 </label>
-                
+
             </div>
 
             <div class="w3-threequarter w3-left quartile_bar">
@@ -95,14 +95,14 @@
                     <li id="third_quartile_marker" style="background-color: blue"></li>
                     <li id="fourth_quartile_marker" style="background-color: red"></li>
                 </ul>
-                
+
             </div>
 
             <div class="w3-quarter w3-right tooltip">
                 <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> Help
                 <span class="tooltiptext" id="urgency_bar_help_tooltip">
-                    The green bar indicates where the urgency values of the first 
-                    25% of the cards lie. The orange bar does the same for the 
+                    The green bar indicates where the urgency values of the first
+                    25% of the cards lie. The orange bar does the same for the
                     next 25% of the cards, and so forth.
                     <a href="/wiki/#urgency_bars" target="_blank">Read more.</a>
                 </span>
@@ -123,7 +123,7 @@
 
         <div class="w3-center w3-third">
             <div class="popup">
-                <span class="popuptext w3-center w3-padding-small" 
+                <span class="popuptext w3-center w3-padding-small"
                  id="card_popup_element"></span>
             </div>
         </div>

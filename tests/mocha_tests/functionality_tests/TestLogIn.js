@@ -11,16 +11,16 @@ describe("Test LoginUtilities\n", function() {
     });
 
     after(function() {
-        return LogInUtilities.deleteAllAccounts([config.PUBLIC_USER_USERNAME]);        
+        return LogInUtilities.deleteAllAccounts([config.PUBLIC_USER_USERNAME]);
     });
 
     describe("#registerUserAndPassword()", function() {
 
         it("should reject incorrect signup info", function(done) {
             LogInUtilities
-                .registerUserAndPassword({ 
+                .registerUserAndPassword({
                     username: "test711@!", password: "dummy_password",
-                    email: "c13u.study.buddygmail.com" 
+                    email: "c13u.study.buddygmail.com"
                 })
                 .then(function(signupResult) {
                     done(new Error(signupResult.message));

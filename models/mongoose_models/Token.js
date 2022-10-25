@@ -1,6 +1,6 @@
 /**
  * @description A model for representing tokens.
- * 
+ *
  * @module
  */
 
@@ -15,7 +15,7 @@ var tokenSchema = new mongoose.Schema(
             unique: [true, "This token already exists"],
         },
         userIDInApp: String,
-        username: String, 
+        username: String,
         email: {
             type: String,
             required: true,

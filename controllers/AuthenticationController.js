@@ -12,7 +12,7 @@ const defaultTemplateObject = {
 };
 
 /**
- * @description Middleware designed to ensure that users are logged in before 
+ * @description Middleware designed to ensure that users are logged in before
  * using certain URLs
  */
 exports.requireLogIn = function (req, res, next) {
@@ -31,7 +31,7 @@ exports.requireLogIn = function (req, res, next) {
 
 /**
  * @description Middleware for authenticating browsers that provide a session
- * token. If the token is invalid (e.g. after a password reset or after 30 days), 
+ * token. If the token is invalid (e.g. after a password reset or after 30 days),
  * we redirect the browser to the login page.
  */
 exports.logInBySessionToken = function (req, res, next) {
@@ -87,7 +87,7 @@ exports.loginUser = function (req, res, next) {
 };
 
 /**
- * @description When a user logs out, we delete the token that we issued upon 
+ * @description When a user logs out, we delete the token that we issued upon
  * their initial login and redirect them to the welcome/login page.
  */
 exports.logoutUser = function (req, res) {

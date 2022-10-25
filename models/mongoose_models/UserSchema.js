@@ -1,6 +1,6 @@
 /**
  * @description A model for representing users in the database.
- * 
+ *
  * @module
  */
 

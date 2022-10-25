@@ -1,6 +1,6 @@
 /**
  * @description A model for representing metadata in the database.
- * 
+ *
  * @module
  */
 
@@ -17,7 +17,7 @@ var metadataSchema = new mongoose.Schema(
         trashed_cards: Array,
         stats: Array,
         streak: {
-            type: Map, 
+            type: Map,
             default: {
                 cardIDs: [], length: 0, dailyTarget: 25, timeStamp: Date.now
             }
