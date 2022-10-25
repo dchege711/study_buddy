@@ -19,13 +19,31 @@ if (exports.NODE_ENV === "production") {
 exports.IS_DEV = exports.NODE_ENV === "development";
 
 exports.EMAIL_ADDRESS = process.env.STUDY_BUDDY_DEFAULT_EMAIL_ADDRESS;
+if (!exports.EMAIL_ADDRESS) {
+    throw Error("Please set the STUDY_BUDDY_DEFAULT_EMAIL_ADDRESS env variable");
+}
+
 exports.MAILGUN_LOGIN = process.env.STUDY_BUDDY_MAILGUN_LOGIN;
+if (!exports.MAILGUN_LOGIN) {
+    throw Error("Please set the STUDY_BUDDY_MAILGUN_LOGIN env variable");
+}
+
 exports.MAILGUN_PASSWORD = process.env.STUDY_BUDDY_MAILGUN_PASSWORD;
+if (!exports.MAILGUN_PASSWORD) {
+    throw Error("Please set the STUDY_BUDDY_MAILGUN_PASSWORD env variable");
+}
 
 exports.DEBUG_EMAIL_ADDRESS = process.env.STUDY_BUDDY_EMAIL_ADDRESS;
+if (!exports.DEBUG_EMAIL_ADDRESS) {
+    throw Error("Please set the STUDY_BUDDY_EMAIL_ADDRESS env variable");
+}
+
 exports.DEBUG_USERNAME = "test-study-buddy-user";
 exports.DEBUG_PASSWORD = "i_know_how_to_keep_passwords_safe_amirite?";
 exports.DEBUG_OPERATION_TIMEOUT_MS = 3000;
 
 exports.PUBLIC_USER_USERNAME = "c13u";
 exports.PUBLIC_USER_EMAIL = process.env.STUDY_BUDDY_DEFAULT_EMAIL_ADDRESS;
+if (!exports.PUBLIC_USER_EMAIL) {
+    throw Error("Please set the STUDY_BUDDY_DEFAULT_EMAIL_ADDRESS env variable");
+}
