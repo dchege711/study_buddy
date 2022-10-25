@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/dchege711/study_buddy.svg?branch=master)](https://travis-ci.com/dchege711/study_buddy)
+[![Node.js CI](https://github.com/dchege711/study_buddy/actions/workflows/node.js.yml/badge.svg)](https://github.com/dchege711/study_buddy/actions/workflows/node.js.yml)
 
 The web app is live at [https://cards.c13u.com/](https://cards.c13u.com/)
 
