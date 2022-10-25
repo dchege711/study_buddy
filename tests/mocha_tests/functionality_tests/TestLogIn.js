@@ -2,19 +2,21 @@
 
 const dbConnection = require("../../../models/MongooseClient.js");
 var LogInUtilities = require("../../../models/LogInUtilities.js");
+var Miscellaneous = require("../../../models/Miscellaneous.js");
 const config = require("../../../config.js");
 
 describe("Test LoginUtilities\n", function() {
 
-    before(function() {
-        return LogInUtilities.deleteAllAccounts([config.PUBLIC_USER_USERNAME]);
-    });
-
-    after(function() {
-        return LogInUtilities.deleteAllAccounts([config.PUBLIC_USER_USERNAME]);
-    });
-
     describe("#registerUserAndPassword()", function() {
+        this.timeout(5000); // These tests may run slower than 2s in CI.
+
+        before(function() {
+            return Miscellaneous.addPublicUser();
+        });
+
+        after(function() {
+            return LogInUtilities.deleteAllAccounts([]);
+        });
 
         it("should reject incorrect signup info", function(done) {
             LogInUtilities

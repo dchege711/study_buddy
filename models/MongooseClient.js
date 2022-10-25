@@ -15,10 +15,21 @@
  */
 
 var mongoose = require("mongoose");
+var MongoMemoryServer = require("mongodb-memory-server").MongoMemoryServer;
+
 var config = require('../config');
 
 // Already 5 by default, but I might need to increase it one day...
-mongoose.connect(config.MONGO_URI, {poolSize: 12, useNewUrlParser: true});
+const connectionOptions = {poolSize: 12, useNewUrlParser: true};
+let mongoServer = null;
+if (config.IS_DEV) {
+    (async () => {
+        mongoServer = await MongoMemoryServer.create();
+        await mongoose.connect(mongoServer.getUri(), connectionOptions);
+      })();
+} else {
+    mongoose.connect(config.MONGO_URI, connectionOptions);
+}
 
 // Get Mongoose to use the global promise library.
 mongoose.Promise = global.Promise;
@@ -47,7 +58,10 @@ db.on("error", console.error.bind(console, "Connection Error:"));
   * @param {Function} callback The first parameter will be set in case of any
   * error
   */
-exports.closeMongooseConnection = function(callback) {
+exports.closeMongooseConnection = async function(callback) {
+    if (mongoServer)
+        mongoServer.stop();
+
     return mongoose.disconnect();
 };
 
