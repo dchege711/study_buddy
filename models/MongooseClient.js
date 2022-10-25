@@ -21,9 +21,10 @@ var config = require('../config');
 
 // Already 5 by default, but I might need to increase it one day...
 const connectionOptions = {poolSize: 12, useNewUrlParser: true};
+let mongoServer = null;
 if (config.IS_DEV) {
     (async () => {
-        const mongoServer = await MongoMemoryServer.create();
+        mongoServer = await MongoMemoryServer.create();
         await mongoose.connect(mongoServer.getUri(), connectionOptions);
       })();
 } else {
@@ -58,6 +59,9 @@ db.on("error", console.error.bind(console, "Connection Error:"));
   * error
   */
 exports.closeMongooseConnection = async function(callback) {
+    if (mongoServer)
+        mongoServer.stop();
+
     return mongoose.disconnect();
 };
 
