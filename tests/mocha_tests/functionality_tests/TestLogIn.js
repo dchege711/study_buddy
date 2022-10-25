@@ -8,7 +8,6 @@ const config = require("../../../config.js");
 describe("Test LoginUtilities\n", function() {
 
     describe("#registerUserAndPassword()", function() {
-        this.timeout(5000); // These tests may run slower than 2s in CI.
 
         before(function() {
             return Miscellaneous.addPublicUser();
