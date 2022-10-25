@@ -2,7 +2,7 @@
 
 /**
  * A collection of utilities that don't fit neatly in any given file.
- * 
+ *
  * @module
  */
 
@@ -13,7 +13,7 @@ const LogInUtils = require("./LogInUtilities.js");
 const config = require("../config.js");
 
 /**
- * @description Add a dummy user in order to make managing the browse page for 
+ * @description Add a dummy user in order to make managing the browse page for
  * public cards easier
  */
 exports.addPublicUser = function() {
@@ -30,7 +30,7 @@ exports.addPublicUser = function() {
             })
             .then((_) => {
                 return LogInUtils.registerUserAndPassword({
-                    username: config.PUBLIC_USER_USERNAME, 
+                    username: config.PUBLIC_USER_USERNAME,
                     email: config.PUBLIC_USER_EMAIL,
                     password: LogInUtils.getRandomString(20) // Never meant to login
                 });
@@ -57,11 +57,11 @@ exports.addPublicUser = function() {
 if (require.main === module) {
 
     const dbConnection = require("./MongooseClient.js");
-    
+
     exports.addPublicUser()
-        .then((confirmation) => { 
+        .then((confirmation) => {
             console.log(confirmation);
-            return dbConnection.closeMongooseConnection(); 
+            return dbConnection.closeMongooseConnection();
         })
         .then(() => {  process.exit(0); })
         .catch((err) => { console.error(err); process.exit(1); });

@@ -16,7 +16,7 @@ const DEBUG_USERNAME = config.DEBUG_USERNAME;
  * @description Test common actions that occur from the login page.
  */
 exports.test = async function(headless=true) {
-    
+
     let driver;
     if (headless) {
         driver = await new Builder()
@@ -31,10 +31,10 @@ exports.test = async function(headless=true) {
 
     /**
      * @description Helper method for printing the results of a test.
-     * 
+     *
      * @param {Boolean} result the outcome of the test
      * @param {String} testLabel the label of the test
-     * 
+     *
      * @returns {Void}
      */
     function printTestResult(result, testLabel) {
@@ -45,7 +45,7 @@ exports.test = async function(headless=true) {
             console.log('\x1b[31m%s\x1b[0m %s', `✖`, testLabel);
         }
     }
-    
+
     try {
 
         /**********************************************************************/
@@ -95,11 +95,11 @@ exports.test = async function(headless=true) {
             .manage()
             .getCookie("session_token")
             .then((optionsCookie) => { printTestResult(optionsCookie === null, testLabel); })
-            .catch((err) => { 
+            .catch((err) => {
                 if (err.name === "NoSuchCookieError") { printTestResult(true, testLabel); }
-                else { console.error(err); printTestResult(false, testLabel); } 
+                else { console.error(err); printTestResult(false, testLabel); }
             });
-        
+
         /**********************************************************************/
 
         testLabel = "Need to resubmit password after logging out"
@@ -141,13 +141,13 @@ exports.test = async function(headless=true) {
             .get("https://www.google.com/")
             .then((_) => { return driver.get(`${BASE_URL}`); })
             .then((_) => { return driver.getCurrentUrl(); })
-            .then((currentURL) => { 
+            .then((currentURL) => {
                 printTestResult(currentURL === `${BASE_URL}/home`, testLabel);
             })
             .catch((err) => { console.error(err); printTestResult(false, testLabel); });
 
         /**********************************************************************/
-        
+
         testLabel = "Request a validation URL and use it to validate account"
         numTotalTests += 1;
 
@@ -238,7 +238,7 @@ exports.test = async function(headless=true) {
                 printTestResult(storedContent.metadata !== undefined, testLabel);
             })
             .catch((err) => { console.error(err); printTestResult(false, testLabel); });
-        
+
         /**********************************************************************/
 
         testLabel = "Delete the new account";

@@ -35,8 +35,8 @@ describe("Test CardsMongoDB\n", function() {
             CardsDB
                 .create(card)
                 .then(function(confirmation) {
-                    if (confirmation.success) { 
-                        done(); 
+                    if (confirmation.success) {
+                        done();
                     } else {
                         done(new Error(confirmation.message));
                     }
@@ -69,8 +69,8 @@ describe("Test CardsMongoDB\n", function() {
                         done();
                     }
                 })
-                .catch(function(err) { 
-                    if (err !== "BREAK") done(err); 
+                .catch(function(err) {
+                    if (err !== "BREAK") done(err);
                 });
 
         });
@@ -118,11 +118,11 @@ describe("Test CardsMongoDB\n", function() {
                         done();
                     }
                 })
-                .catch(function(err) { 
-                    if (err !== "BREAK") done(err); 
+                .catch(function(err) {
+                    if (err !== "BREAK") done(err);
                 });
         });
 
     });
-    
+
 });

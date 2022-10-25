@@ -1,9 +1,9 @@
 "use strict";
 
 /**
- * A collection of functions that are useful for managing user state within the 
+ * A collection of functions that are useful for managing user state within the
  * app.
- * 
+ *
  * @module
  */
 
@@ -32,11 +32,11 @@ exports.close = function() {
 };
 
 /**
- * @description Generate a salt and a hash for the provided password. We found 
- * CrackStation's piece on [salted password hashing]{@link https://crackstation.net/hashing-security.htm} 
+ * @description Generate a salt and a hash for the provided password. We found
+ * CrackStation's piece on [salted password hashing]{@link https://crackstation.net/hashing-security.htm}
  * informative.
- * 
- * @returns {Promise} the resolved value is an array where the first element is 
+ *
+ * @returns {Promise} the resolved value is an array where the first element is
  * the salt and the second element is the hash.
  */
 let getSaltAndHash = function(password) {
@@ -50,7 +50,7 @@ let getSaltAndHash = function(password) {
 
 
 /**
- * @returns {Promise} resolves with the hash computed from the provided 
+ * @returns {Promise} resolves with the hash computed from the provided
  * `password` and `salt` parameters.
  */
 let getHash = async function(password, salt) {
@@ -61,7 +61,7 @@ let getHash = async function(password, salt) {
 /**
  * @description Generate a random string from the specified alphabet.
  * @param {Number} stringLength The length of the desired string.
- * @param {String} alphabet The characters that can be included in the string. 
+ * @param {String} alphabet The characters that can be included in the string.
  * If not specified, defaults to the alphanumeric characters.
  */
 exports.getRandomString = function(stringLength, alphabet) {
@@ -77,11 +77,11 @@ exports.getRandomString = function(stringLength, alphabet) {
 };
 
 /**
- * @description Generate a User ID and a validation string, and make sure they 
- * are unique in the database. This method does not save the generated user ID 
+ * @description Generate a User ID and a validation string, and make sure they
+ * are unique in the database. This method does not save the generated user ID
  * or validation URL.
- * 
- * @returns {Promise} the first param is a user ID and the second is a 
+ *
+ * @returns {Promise} the first param is a user ID and the second is a
  * validation string.
  */
 let getIdInAppAndValidationURI = async function() {
@@ -92,11 +92,11 @@ let getIdInAppAndValidationURI = async function() {
         validationURI = exports.getRandomString(32, LOWER_CASE + DIGITS);
         let conflictingUser = await new Promise(function(resolve, reject) {
             User
-                .findOne({ 
+                .findOne({
                     $or: [
-                        { userIDInApp: randomID }, 
+                        { userIDInApp: randomID },
                         { account_validation_uri: validationURI }
-                    ] 
+                    ]
                 }).exec()
                 .then((user) => {
                     resolve(user);
@@ -112,12 +112,12 @@ let getIdInAppAndValidationURI = async function() {
 
 /**
  * @description Generate a unique session token.
- * @param {JSON} user The user to be associated with this token. Expected keys: 
- * `userIDInApp`, `username`, `email`, `cardsAreByDefaultPrivate` and 
+ * @param {JSON} user The user to be associated with this token. Expected keys:
+ * `userIDInApp`, `username`, `email`, `cardsAreByDefaultPrivate` and
  * `createdAt`
- * @returns {Promise} resolves with a JSON object keyed by `success`, `status` 
- * and `message`. The message field contains the following keys: `token_id`, 
- * `userIDInApp`, `username`, `email`, `cardsAreByDefaultPrivate` and 
+ * @returns {Promise} resolves with a JSON object keyed by `success`, `status`
+ * and `message`. The message field contains the following keys: `token_id`,
+ * `userIDInApp`, `username`, `email`, `cardsAreByDefaultPrivate` and
  * `userRegistrationDate`.
  */
 let provideSessionToken = function(user) {
@@ -132,7 +132,7 @@ let provideSessionToken = function(user) {
                 } else {
                     return Token.create({
                         token_id: sessionToken, userIDInApp: user.userIDInApp,
-                        username: user.username, email: user.email, 
+                        username: user.username, email: user.email,
                         cardsAreByDefaultPrivate: user.cardsAreByDefaultPrivate,
                         userRegistrationDate: new Date(user.createdAt).toDateString()
                     })
@@ -147,11 +147,11 @@ let provideSessionToken = function(user) {
 
 /**
  * @description Send a validation URL to the email address associated with the
- * account. The validation URL must be present in `userDetails`. This method 
+ * account. The validation URL must be present in `userDetails`. This method
  * does not generate new validation URLs.
- * 
+ *
  * @param {JSON} userDetails Expected keys: `email`, `account_validation_uri`
- * @param {Promise} resolves with a JSON object having the keys `success`, 
+ * @param {Promise} resolves with a JSON object having the keys `success`,
  * `message`, `status`.
  */
 let sendAccountValidationURLToEmail = function(userDetails) {
@@ -167,7 +167,7 @@ let sendAccountValidationURLToEmail = function(userDetails) {
                     to: userDetails.email,
                     subject: `Please Validate Your ${config.APP_NAME} Account`,
                     text: `Welcome to ${config.APP_NAME}! Before you can log in, please click ` +
-                        `on this link to validate your account.\n\n` + 
+                        `on this link to validate your account.\n\n` +
                         `${config.BASE_URL}/verify-account/${userDetails.account_validation_uri}` +
                         `\n\nAgain, glad to have you onboard!`
                 })
@@ -188,7 +188,7 @@ let sendAccountValidationURLToEmail = function(userDetails) {
 
 /**
  * @param {JSON} payload Expected keys: `email`
- * @returns {Promise} resolves with a JSON object keyed by `success`, `status` 
+ * @returns {Promise} resolves with a JSON object keyed by `success`, `status`
  * and `message`
  */
 exports.sendAccountValidationLink = function(payload) {
@@ -226,14 +226,14 @@ exports.sendAccountValidationLink = function(payload) {
 };
 
 /**
- * @description Once an account is registered, the user needs to click on a 
- * validation link sent to the submitted email. ~~The user cannot log into 
- * the app before the email address is verified.~~ We observed a high bounce 
- * rate AND few signups, so we'll allow accounts with unvalidated email 
+ * @description Once an account is registered, the user needs to click on a
+ * validation link sent to the submitted email. ~~The user cannot log into
+ * the app before the email address is verified.~~ We observed a high bounce
+ * rate AND few signups, so we'll allow accounts with unvalidated email
  * addresses to sign in for at most 30 days.
- * 
+ *
  * @param {String} validationURI The validation URL of the associated account
- * @returns {Promise} resolves with a JSON object keyed by `success`, `status` 
+ * @returns {Promise} resolves with a JSON object keyed by `success`, `status`
  * and `message`
  */
 exports.validateAccount = function(validationURI) {
@@ -266,14 +266,14 @@ exports.validateAccount = function(validationURI) {
 /**
  * @description Register a new user using the provided password, username and email.
  * - If the username is taken, we let the user know that.
- * - If the email address is already taken, send an email to that address 
+ * - If the email address is already taken, send an email to that address
  * notifying them of the signup.
- * - If the input is invalid, e.g. a non alphanumeric username, raise an error 
+ * - If the input is invalid, e.g. a non alphanumeric username, raise an error
  * since it should have been caught on the client side.
  * - Otherwise, register the user and send them a validation link.
- * 
+ *
  * @param {JSON} payload Expected keys: `username`, `password`, `email`
- * @returns {Promise} resolves with a JSON object containing the keys `success`, 
+ * @returns {Promise} resolves with a JSON object containing the keys `success`,
  * `status` and `message`.
  */
 exports.registerUserAndPassword = function(payload) {
@@ -310,7 +310,7 @@ exports.registerUserAndPassword = function(payload) {
                     return Promise.reject("DUMMY");
                 })
                 .then(([salt, hash]) => {
-                    results.salt = salt; 
+                    results.salt = salt;
                     results.hash = hash;
                     return getIdInAppAndValidationURI();
                 })
@@ -379,8 +379,8 @@ exports.registerUserAndPassword = function(payload) {
                 .then((_) => {
                     resolve(prevResults.emailConfirmation);
                 })
-                .catch((err) => { 
-                    if (err !== "DUMMY") reject(err); 
+                .catch((err) => {
+                    if (err !== "DUMMY") reject(err);
                 });
 
         }
@@ -388,20 +388,20 @@ exports.registerUserAndPassword = function(payload) {
 };
 
 /**
- * @description Authenticate a user that is trying to log in. When a user 
- * successfully logs in, we set a token that will be sent on all subsequent 
- * requests. Logging in should be as painless as possible. Since the usernames 
- * only contain `[_\-A-Za-z0-9]+`, we can infer whether the submitted string 
- * was an email address or a username, and authenticate accordingly. If the 
- * username/email/password is incorrect, we send a generic 
- * `Invalid username/email or password` message without disclosing which is 
- * incorrect. It's possible to enumerate usernames, so this is not entirely 
+ * @description Authenticate a user that is trying to log in. When a user
+ * successfully logs in, we set a token that will be sent on all subsequent
+ * requests. Logging in should be as painless as possible. Since the usernames
+ * only contain `[_\-A-Za-z0-9]+`, we can infer whether the submitted string
+ * was an email address or a username, and authenticate accordingly. If the
+ * username/email/password is incorrect, we send a generic
+ * `Invalid username/email or password` message without disclosing which is
+ * incorrect. It's possible to enumerate usernames, so this is not entirely
  * foolproof.
- * 
+ *
  * @param {JSON} payload Expected keys: `username_or_email`, `password`
- * @returns {Promise} resolves with a JSON object keyed by `success`, `status` 
- * and `message`. The message field contains the following keys: `token_id`, 
- * `userIDInApp`, `username`, `email`, `cardsAreByDefaultPrivate` and 
+ * @returns {Promise} resolves with a JSON object keyed by `success`, `status`
+ * and `message`. The message field contains the following keys: `token_id`,
+ * `userIDInApp`, `username`, `email`, `cardsAreByDefaultPrivate` and
  * `userRegistrationDate`.
  */
 exports.authenticateUser = function(payload) {
@@ -426,7 +426,7 @@ exports.authenticateUser = function(payload) {
             .then((user) => {
                 if (user === null) {
                     resolve({
-                        success: false, status: 200, 
+                        success: false, status: 200,
                         message: "Incorrect username/email and/or password"
                     });
                 } else {
@@ -446,7 +446,7 @@ exports.authenticateUser = function(payload) {
                     return provideSessionToken(prevResults.user);
                 } else {
                     resolve({
-                        success: false, status: 200, 
+                        success: false, status: 200,
                         message: "Incorrect username/email and/or password"
                     });
                 }
@@ -458,9 +458,9 @@ exports.authenticateUser = function(payload) {
 };
 
 /**
- * @description Provide an authentication endpoint where a session token has 
+ * @description Provide an authentication endpoint where a session token has
  * been provided. Useful for maintaining persistent logins.
- * 
+ *
  * @param {String} tokenID The token ID that can be used for logging in.
  * @returns {Promise} resolves with a JSON doc w/ `success`, `status`
  *  and `message` as keys
@@ -495,7 +495,7 @@ exports.deleteSessionToken = function (sessionTokenID) {
         })
         .catch((err) => { reject(err); });
     });
-    
+
 };
 
 /**
@@ -504,7 +504,7 @@ exports.deleteSessionToken = function (sessionTokenID) {
  * and `message` as keys.
  */
 exports.sendResetLink = function(userIdentifier) {
-    
+
     let resetPasswordURI = exports.getRandomString(50, LOWER_CASE + DIGITS);
 
     return new Promise(function(resolve, reject) {
@@ -537,25 +537,25 @@ exports.sendResetLink = function(userIdentifier) {
                 return Email.sendEmail({
                     to: savedUser.email,
                     subject: `${config.APP_NAME} Password Reset`,
-                    text: `To reset your ${config.APP_NAME} password, ` + 
-                        `click on this link:\n\n${config.BASE_URL}` + 
-                        `/reset-password-link/${resetPasswordURI}` + 
+                    text: `To reset your ${config.APP_NAME} password, ` +
+                        `click on this link:\n\n${config.BASE_URL}` +
+                        `/reset-password-link/${resetPasswordURI}` +
                         `\n\nThe link is only valid for 2 hours. If you did not ` +
                         `request a password reset, please ignore this email.`
                 })
             })
-            .then((_) => { 
+            .then((_) => {
                 resolve({
                     success: true, status: 200,
                     message: `If ${userIdentifier.email} has an account, we've sent a password reset link`
-                }); 
+                });
             })
             .catch((err) => { if (err !== "DUMMY") reject(err); });
     });
 };
 
 /**
- * 
+ *
  * @param {String} resetPasswordURI The password reset uri sent in the email
  * @returns {Promise} resolves with a JSON object that has `success` and `message`
  * as its keys. Fails only if something goes wrong with the database.
@@ -570,9 +570,9 @@ exports.validatePasswordResetLink = function(resetPasswordURI) {
                         success: false, status: 404, message: "Page Not Found"
                     });
                 } else if (Date.now() > user.reset_password_timestamp + 2 * 3600 * 1000) {
-                    resolve({ 
-                        success: false, status: 200, redirect_url: `${config.BASE_URL}/reset-password`, 
-                        message: "Expired link. Please submit another reset request." 
+                    resolve({
+                        success: false, status: 200, redirect_url: `${config.BASE_URL}/reset-password`,
+                        message: "Expired link. Please submit another reset request."
                     });
                 } else {
                     resolve({
@@ -585,13 +585,13 @@ exports.validatePasswordResetLink = function(resetPasswordURI) {
 };
 
 /**
- * @description Reset the user's password. We also invalidate all previously 
- * issued session tokens so that the user has to provide their new password 
+ * @description Reset the user's password. We also invalidate all previously
+ * issued session tokens so that the user has to provide their new password
  * before logging into any session.
- * 
+ *
  * @param {payload} payload Expected keys: `reset_password_uri`, `password`,
  * `reset_info`.
- * @returns {Promise} resolves with a JSON object that has the keys `success` 
+ * @returns {Promise} resolves with a JSON object that has the keys `success`
  * and `message`.
  */
 exports.resetPassword = function(payload) {
@@ -643,9 +643,9 @@ exports.resetPassword = function(payload) {
 };
 
 /**
- * @description Fetch the User object as represented in the database. 
- * 
- * @returns {Promise} resolves with a JSON keyed by `status`, `message` and 
+ * @description Fetch the User object as represented in the database.
+ *
+ * @returns {Promise} resolves with a JSON keyed by `status`, `message` and
  * `success`. If `success` is set, the `message` property will contain the `user`
  * object.
  */
@@ -655,7 +655,7 @@ exports.getAccountDetails = function(identifierQuery) {
             .findOne(identifierQuery)
             .select("-salt -hash")
             .exec()
-            .then((user) => { 
+            .then((user) => {
                 resolve({success: true, status: 200, message: user});
             })
             .catch((err) => { reject(err); });
@@ -666,7 +666,7 @@ exports.getAccountDetails = function(identifierQuery) {
 /**
  * @description Permanently delete a user's account and all related cards.
  * @param {Number} userIDInApp The ID of the account that will be deleted.
- * @returns {Promise} resolves with a JSON object that has the keys `success` 
+ * @returns {Promise} resolves with a JSON object that has the keys `success`
  * and `message`.
  */
 exports.deleteAccount = function(userIDInApp) {
@@ -694,13 +694,13 @@ exports.deleteAccount = function(userIDInApp) {
 };
 
 /**
- * @description Delete all existing users from the database. This function only 
+ * @description Delete all existing users from the database. This function only
  * works when `config.NODE_ENV == 'development'`
- * 
- * @param {Array} usernamesToSpare A list of usernames whose accounts shouldn't 
+ *
+ * @param {Array} usernamesToSpare A list of usernames whose accounts shouldn't
  * be deleted. By default, the global public user is not deleted.
- * 
- * @returns {Promise} resolves with the number of accounts that were deleted. 
+ *
+ * @returns {Promise} resolves with the number of accounts that were deleted.
  */
 exports.deleteAllAccounts = function(usernamesToSpare=[config.PUBLIC_USER_USERNAME]) {
 
@@ -711,7 +711,7 @@ exports.deleteAllAccounts = function(usernamesToSpare=[config.PUBLIC_USER_USERNA
     }
 
     return new Promise(function(resolve, reject) {
-        
+
         User
             .find({username: {$nin: usernamesToSpare}}).exec()
             .then(async (existingUsers) => {

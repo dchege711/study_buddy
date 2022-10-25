@@ -3,7 +3,7 @@
 ### The Card Body
 
 * The card's body supports Markdown.
-  * If you're new to Markdown, [here's a handy cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet). 
+  * If you're new to Markdown, [here's a handy cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet).
   * models/SanitizationAndValidation.js
 * The card's body supports LaTeX.
   * If you're new to LaTeX, the [LaTeX Wikibook](https://en.wikibooks.org/wiki/LaTeX) and [ShareLaTeX docs](https://www.overleaf.com/learn/latex/Learn_LaTeX_in_30_minutes) are good tutorials.

@@ -1,8 +1,8 @@
 "use strict";
 
 /**
- * @description A collection of tasks that should be ran on a daily basis. 
- * 
+ * @description A collection of tasks that should be ran on a daily basis.
+ *
  * @module
  */
 
@@ -10,7 +10,7 @@ const dbConnection = require("./MongooseClient.js");
 const Metadata = require("./mongoose_models/MetadataCardSchema.js");
 
 /**
- * @description Reset the daily card review streaks. 
+ * @description Reset the daily card review streaks.
  */
 function resetStreaks() {
 
@@ -25,7 +25,7 @@ function resetStreaks() {
                 for (let metadataDoc of metadataDocs) {
                     let streakObj = {
                         timeStamp: metadataDoc.streak.get("timeStamp"),
-                        cardIDs: metadataDoc.streak.get("cardIDs"), 
+                        cardIDs: metadataDoc.streak.get("cardIDs"),
                         length: metadataDoc.streak.get("length"),
                         dailyTarget: metadataDoc.streak.get("dailyTarget")
                     };
@@ -35,13 +35,13 @@ function resetStreaks() {
                             streakObj.length += 1;
                         } else {
                             streakObj.length = 0;
-                        } 
+                        }
                     }
                     streakObj.cardIDs = [];
                     streakObj.timeStamp = currentTimeStamp;
                     bulkWriteOps.push({
                         updateOne: {
-                            filter: {_id: metadataDoc._id}, 
+                            filter: {_id: metadataDoc._id},
                             update: { $set: { streak: streakObj } }
                         }
                     })

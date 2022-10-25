@@ -7,7 +7,7 @@
         padding: 1%;
         margin-right: 10%;
     }
-    
+
     div#card_search_results {
         text-overflow: ellipsis;
         width: 49%;
@@ -20,13 +20,13 @@
         padding: 2%;
         margin: 0;
     }
-    
+
     div#card_search_results ul > li {
         border-bottom: 1px solid lightgray;
         padding: 4px;
         list-style-type: none;
     }
-    
+
     div#card_search_results ul > li:hover {
         color: white;
         background: black;
@@ -40,7 +40,7 @@
 </style>
 
 <!--
-    The search bar. Queries the server for matching cards then displays the top 
+    The search bar. Queries the server for matching cards then displays the top
     results in a dropdown list.
 -->
 
@@ -52,31 +52,31 @@
 </div>
 
 <script>
-    
+
     const CARD_SEARCH_INPUT_ELEMENT = document.getElementById("card_search_input");
     const CARD_SEARCH_RESULTS_ELEMENT = document.getElementById("card_search_results");
 
     /**
-     * @description 
-     * Provide search results for queries typed in the search bar. 
-     * We want to strike a balance between making frequent hits to the database 
+     * @description
+     * Provide search results for queries typed in the search bar.
+     * We want to strike a balance between making frequent hits to the database
      * and providing search feedback as the user types. Therefore:
-     *  - If the user pressed the space bar, ask the server for the top 7 results. 
+     *  - If the user pressed the space bar, ask the server for the top 7 results.
      *  - If the user pressed 'Enter', ask the server for all results.
      *  - If the user clicks on any of the 7 results, display that card and stop.
-     * 
-     * To minimize the amount of data being transferred between the client and 
-     * the database as the user types a query, the server returns partial 
-     * cards. These partial cards contain the `_id, urgency, title` fields and 
-     * nothing else. We display the titles in the dropdown menu that gets 
-     * updated as the user continues searching. Once the user has decided on 
-     * which card(s) to view, we use the already built functions to load the 
-     * card, i.e. first check if the card is in the cache, otherwise, fetch the 
+     *
+     * To minimize the amount of data being transferred between the client and
+     * the database as the user types a query, the server returns partial
+     * cards. These partial cards contain the `_id, urgency, title` fields and
+     * nothing else. We display the titles in the dropdown menu that gets
+     * updated as the user continues searching. Once the user has decided on
+     * which card(s) to view, we use the already built functions to load the
+     * card, i.e. first check if the card is in the cache, otherwise, fetch the
      * full card from the database.
      */
     function searchCards(event) {
         let keyPress = event.key;
-        // Only query the server if the user has entered a complete word or is 
+        // Only query the server if the user has entered a complete word or is
         // done typing.
         if (keyPress === " " || keyPress === "Enter") {
             let queryString = CARD_SEARCH_INPUT_ELEMENT.value.trim();

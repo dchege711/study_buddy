@@ -1,11 +1,11 @@
 "use strict";
 /**
- * A client for sending emails. Using Gmail is great for testing, but it 
- * prevents authenticating from suspicious devices (e.g. Heroku's servers). We 
+ * A client for sending emails. Using Gmail is great for testing, but it
+ * prevents authenticating from suspicious devices (e.g. Heroku's servers). We
  * chose [MailGun]{@link https://documentation.mailgun.com/en/latest/quickstart-sending.html#send-with-smtp-or-api}
  * which provides 10,000 free email sends per month.
- * 
- * @module 
+ *
+ * @module
  */
 
 const nodemailer = require("nodemailer");
@@ -23,12 +23,12 @@ let transporter = nodemailer.createTransport({
 });
 
 /**
- * 
- * @param {JSON} mailOptions Values are comma separated strings whose keys include: 
+ *
+ * @param {JSON} mailOptions Values are comma separated strings whose keys include:
  * `to`, `cc`, `bcc`, `subject`, `text`, `html`, except for `attachment`
  * which is an object with the keys `filename`, `content`, `path`, `href`,
  * `contentType`, `contentDisposition`, `cid`, `encoding`, `headers`, `raw`.
- * 
+ *
  * @returns {Promise} takes a JSON with `success` and `message` as the keys
  */
 exports.sendEmail = function(mailOptions) {

@@ -2,42 +2,42 @@
 
 /**
  * Provide functionality for sanitizing and validating user input on the server.
- * 
+ *
  * @module
  */
 
 const showdown = require("showdown");
 const xss = require("xss");
 
-/* 
- * The converter is used to turn the markdown in the cards into html. 
- * 
- * Since we're targeting users that store somewhat detailed flashcards, 
- * Markdown (in addition to LaTEX and syntax highlighting) will prove useful. 
- * Manually converting markdown to HTML is a project by itself. Since it's not 
- * the main purpose of the app, we were happy to import 
- * [Showdown]{@link https://github.com/showdownjs/showdown}. The library looks 
+/*
+ * The converter is used to turn the markdown in the cards into html.
+ *
+ * Since we're targeting users that store somewhat detailed flashcards,
+ * Markdown (in addition to LaTEX and syntax highlighting) will prove useful.
+ * Manually converting markdown to HTML is a project by itself. Since it's not
+ * the main purpose of the app, we were happy to import
+ * [Showdown]{@link https://github.com/showdownjs/showdown}. The library looks
  * mature and the documentation is sound.
- * 
- * Previously, users had to escape the LaTEX delimiter themselves and also 
- * escape underscores within inline LaTEX. This meant lines like `\(p_i = 2\)` 
- * had to be written as `\\(p\_i = 2\\)`. ~~With some regular expressions, we 
- * were able to support the former approach. We traded computational efficiency 
- * *(more code to automatically escape backslashes and replace automatically 
- * inserted `<em>, </em>` tags)* for convenience *(users entering normal 
- * LaTEX)*. We choose to make this correction on the client side since we can't 
+ *
+ * Previously, users had to escape the LaTEX delimiter themselves and also
+ * escape underscores within inline LaTEX. This meant lines like `\(p_i = 2\)`
+ * had to be written as `\\(p\_i = 2\\)`. ~~With some regular expressions, we
+ * were able to support the former approach. We traded computational efficiency
+ * *(more code to automatically escape backslashes and replace automatically
+ * inserted `<em>, </em>` tags)* for convenience *(users entering normal
+ * LaTEX)*. We choose to make this correction on the client side since we can't
  * afford that much storage capacity on the server side.~~
 
- * We configured `showdown.converter` to escape underscores and asterisks when 
- * converting markdown to HTML. Although we had activated these options before, 
- * `showdown.converter` wasn't applying them. The bug was fixed on Github. We 
- * downloaded the version of `showdown.min.js` available during commit 
- * `039dd66256e771716c20a807a2941974ac7c5873`. Since that version works fine, 
- * we use my downloaded copy instead of using the version hosted on the CDN 
- * since that might change over time. Later versions of the file insert extra 
- * whitespace in my code blocks, so we prefer maintaining the version from the 
+ * We configured `showdown.converter` to escape underscores and asterisks when
+ * converting markdown to HTML. Although we had activated these options before,
+ * `showdown.converter` wasn't applying them. The bug was fixed on Github. We
+ * downloaded the version of `showdown.min.js` available during commit
+ * `039dd66256e771716c20a807a2941974ac7c5873`. Since that version works fine,
+ * we use my downloaded copy instead of using the version hosted on the CDN
+ * since that might change over time. Later versions of the file insert extra
+ * whitespace in my code blocks, so we prefer maintaining the version from the
  * above commit.
- * 
+ *
  * {@tutorial main.editing_cards}
  */
 const converter = new showdown.Converter({
@@ -52,10 +52,10 @@ const converter = new showdown.Converter({
 
 /**
  * @description Sanitize the card to prevent malicious input, e.g XSS attack
- * 
- * @param {JSON} card A card object that is about to be saved into the 
+ *
+ * @param {JSON} card A card object that is about to be saved into the
  * database.
- * 
+ *
  * @returns {JSON} sanitized card
  */
 exports.sanitizeCard = function(card) {
@@ -85,7 +85,7 @@ exports.sanitizeCard = function(card) {
 
         card.urgency = Number(card.urgency);
         if (Number.isNaN(card.urgency)) card.urgency = 10;
-        
+
         if (card.urgency > 10) card.urgency = 10;
         else if (card.urgency < 0) card.urgency = 0;
     }
@@ -102,11 +102,11 @@ exports.sanitizeCard = function(card) {
 }
 
 /**
- * @description Prevent a NoSQL Injection in the search parameters. This is 
+ * @description Prevent a NoSQL Injection in the search parameters. This is
  * achieved by deleting all query values that begin with `$`.
- * 
+ *
  * @param {Object} query A mapping of query values, e.g. {username: "dchege711"}
- * 
+ *
  * @returns {Object} A sanitized version of the input.
  */
 exports.sanitizeQuery = function(query) {

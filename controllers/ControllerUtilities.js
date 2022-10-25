@@ -8,10 +8,10 @@ const generic_500_msg = {
 /**
  * @description A function to interpret JSON documents into server responses. It
  * is meant to be used as the last function in the controller modules.
- * 
+ *
  * @param {Error} err Any error that occurred in the preceding function
  * @param {JSON} result_JSON Expected keys: `status`, `success`, `message`
- * @param {Response} res An Express JS res object 
+ * @param {Response} res An Express JS res object
  */
 exports.convertObjectToResponse = function (err, result_JSON, res) {
     if (err) {
@@ -19,7 +19,7 @@ exports.convertObjectToResponse = function (err, result_JSON, res) {
         res.type(".html");
         res.status(500);
         res.render(
-            "pages/5xx_error_page.ejs", 
+            "pages/5xx_error_page.ejs",
             { response_JSON: generic_500_msg, APP_NAME: APP_NAME, LOGGED_IN: false }
         );
     } else {
@@ -42,21 +42,21 @@ exports.convertObjectToResponse = function (err, result_JSON, res) {
 };
 
 exports.deleteTempFile = function(filepath) {
-    fs.unlink(filepath, (err) => { 
-        if (err) console.error(err); 
+    fs.unlink(filepath, (err) => {
+        if (err) console.error(err);
     });
 };
 
 /**
- * @description Most of my controller code involves waiting for results from a 
- * promise, and then sending that response via the `res` object. This method 
+ * @description Most of my controller code involves waiting for results from a
+ * promise, and then sending that response via the `res` object. This method
  * prevents unnecessarily duplicated code.
- * 
- * @param {Promise} pendingPromise the promise should be such that calling 
+ *
+ * @param {Promise} pendingPromise the promise should be such that calling
  * `then` delivers the message that needs to be sent to the user.
- * 
- * @param {Response} res a reference to the Express Response object associated 
- * with the pending request 
+ *
+ * @param {Response} res a reference to the Express Response object associated
+ * with the pending request
  */
 exports.sendResponseFromPromise = function(pendingPromise, res) {
     pendingPromise

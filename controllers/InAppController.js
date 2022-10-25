@@ -13,13 +13,13 @@ const sendResponseFromPromise = controllerUtils.sendResponseFromPromise;
 
 /**
  * @param {Object} req The incoming HTTP request
- * 
- * @return {JSON} The key-value pairs that should be provided to templates by 
- * default. 
+ *
+ * @return {JSON} The key-value pairs that should be provided to templates by
+ * default.
  */
 function getDefaultTemplateVars(req = undefined) {
     return {
-        APP_NAME: config.APP_NAME, BASE_URL: config.BASE_URL, 
+        APP_NAME: config.APP_NAME, BASE_URL: config.BASE_URL,
         LOGGED_IN: req.session.user !== undefined
     };
 }
@@ -72,8 +72,8 @@ exports.browsePageGet = function(req, res) {
 exports.accountGet = function (req, res) {
     res.render(
         "pages/account_page.ejs", {
-            account_info: req.session.user, 
-            APP_NAME: config.APP_NAME, 
+            account_info: req.session.user,
+            APP_NAME: config.APP_NAME,
             LOGGED_IN: req.session.user !== undefined
         }
     );
