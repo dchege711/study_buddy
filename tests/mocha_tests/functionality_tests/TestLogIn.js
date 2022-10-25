@@ -2,19 +2,20 @@
 
 const dbConnection = require("../../../models/MongooseClient.js");
 var LogInUtilities = require("../../../models/LogInUtilities.js");
+var Miscellaneous = require("../../../models/Miscellaneous.js");
 const config = require("../../../config.js");
 
 describe("Test LoginUtilities\n", function() {
 
-    before(function() {
-        return LogInUtilities.deleteAllAccounts([config.PUBLIC_USER_USERNAME]);
-    });
-
-    after(function() {
-        return LogInUtilities.deleteAllAccounts([config.PUBLIC_USER_USERNAME]);
-    });
-
     describe("#registerUserAndPassword()", function() {
+
+        before(function() {
+            return Miscellaneous.addPublicUser();
+        });
+
+        after(function() {
+            return LogInUtilities.deleteAllAccounts([]);
+        });
 
         it("should reject incorrect signup info", function(done) {
             LogInUtilities
