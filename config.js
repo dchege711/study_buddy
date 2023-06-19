@@ -47,3 +47,8 @@ exports.PUBLIC_USER_EMAIL = process.env.STUDY_BUDDY_DEFAULT_EMAIL_ADDRESS;
 if (!exports.PUBLIC_USER_EMAIL) {
     throw Error("Please set the STUDY_BUDDY_DEFAULT_EMAIL_ADDRESS env variable");
 }
+
+exports.STUDY_BUDDY_SESSION_SECRET_1 = process.env.STUDY_BUDDY_SESSION_SECRET_1;
+if (!exports.STUDY_BUDDY_SESSION_SECRET_1) {
+    throw Error("Please set the STUDY_BUDDY_SESSION_SECRET_1 env variable");
+}

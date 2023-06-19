@@ -35,7 +35,7 @@ if (process.env.NODE_ENV === "production") {
 }
 
 app.use(session({
-    secret: "bad secret",
+    secret: [config.STUDY_BUDDY_SESSION_SECRET_1],
     httpOnly: false,
     resave: false,
     name: "c13u-study-buddy",
