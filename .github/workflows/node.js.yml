@@ -23,9 +23,9 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x]
+        node-version: [18.14.0]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-        # Use 14.x because that's what Render uses: https://render.com/docs/node-version/
+        # Use the same version used in Render: https://render.com/docs/node-version/
 
     steps:
     - uses: actions/checkout@v3
