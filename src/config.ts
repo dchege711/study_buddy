@@ -2,53 +2,51 @@
  * @description Access point for sensitive/central information.
  */
 
-exports.APP_NAME = "Flashcards by c13u";
-exports.PORT = process.env.PORT || 5000;
-exports.NODE_ENV = process.env.NODE_ENV;
+export const APP_NAME = "Flashcards by c13u";
+export const PORT = process.env.PORT || 5000;
 
-if (exports.NODE_ENV === "production") {
-    exports.MONGO_URI = process.env.STUDY_BUDDY_MLAB_MONGO_URI;
-    exports.BASE_URL = "https://cards.curiosities.dev";
-} else if (exports.NODE_ENV === "development") {
-    exports.MONGO_URI = "invalid://use-memory-db";
-    exports.BASE_URL = `http://localhost:${exports.PORT}`;
-} else {
-    throw Error("Please set the NODE_ENV environment variable.");
+export const NODE_ENV = process.env.NODE_ENV;
+export const IS_PROD = NODE_ENV === "production";
+export const IS_DEV = NODE_ENV === "development";
+
+if (!IS_DEV && !IS_PROD) {
+    throw Error("Please set the NODE_ENV environment variable to either 'production' or 'development'.");
 }
 
-exports.IS_DEV = exports.NODE_ENV === "development";
+export const MONGO_URI = IS_PROD ? process.env.STUDY_BUDDY_MLAB_MONGO_URI : "invalid://use-memory-db";
+export const BASE_URL = IS_PROD ? "https://cards.c13u.com" : `http://localhost:${PORT}`;
 
-exports.EMAIL_ADDRESS = process.env.STUDY_BUDDY_DEFAULT_EMAIL_ADDRESS;
-if (!exports.EMAIL_ADDRESS) {
+export const EMAIL_ADDRESS = process.env.STUDY_BUDDY_DEFAULT_EMAIL_ADDRESS;
+if (!EMAIL_ADDRESS) {
     throw Error("Please set the STUDY_BUDDY_DEFAULT_EMAIL_ADDRESS env variable");
 }
 
-exports.MAILGUN_LOGIN = process.env.STUDY_BUDDY_MAILGUN_LOGIN;
-if (!exports.MAILGUN_LOGIN) {
+export const MAILGUN_LOGIN = process.env.STUDY_BUDDY_MAILGUN_LOGIN;
+if (!MAILGUN_LOGIN) {
     throw Error("Please set the STUDY_BUDDY_MAILGUN_LOGIN env variable");
 }
 
-exports.MAILGUN_PASSWORD = process.env.STUDY_BUDDY_MAILGUN_PASSWORD;
-if (!exports.MAILGUN_PASSWORD) {
+export const MAILGUN_PASSWORD = process.env.STUDY_BUDDY_MAILGUN_PASSWORD;
+if (!MAILGUN_PASSWORD) {
     throw Error("Please set the STUDY_BUDDY_MAILGUN_PASSWORD env variable");
 }
 
-exports.DEBUG_EMAIL_ADDRESS = process.env.STUDY_BUDDY_EMAIL_ADDRESS;
-if (!exports.DEBUG_EMAIL_ADDRESS) {
+export const DEBUG_EMAIL_ADDRESS = process.env.STUDY_BUDDY_EMAIL_ADDRESS;
+if (!DEBUG_EMAIL_ADDRESS) {
     throw Error("Please set the STUDY_BUDDY_EMAIL_ADDRESS env variable");
 }
 
-exports.DEBUG_USERNAME = "test-study-buddy-user";
-exports.DEBUG_PASSWORD = "i_know_how_to_keep_passwords_safe_amirite?";
-exports.DEBUG_OPERATION_TIMEOUT_MS = 3000;
+export const DEBUG_USERNAME = "test-study-buddy-user";
+export const DEBUG_PASSWORD = "i_know_how_to_keep_passwords_safe_amirite?";
+export const DEBUG_OPERATION_TIMEOUT_MS = 3000;
 
-exports.PUBLIC_USER_USERNAME = "c13u";
-exports.PUBLIC_USER_EMAIL = process.env.STUDY_BUDDY_DEFAULT_EMAIL_ADDRESS;
-if (!exports.PUBLIC_USER_EMAIL) {
+export const PUBLIC_USER_USERNAME = "c13u";
+export const PUBLIC_USER_EMAIL = process.env.STUDY_BUDDY_DEFAULT_EMAIL_ADDRESS;
+if (!PUBLIC_USER_EMAIL) {
     throw Error("Please set the STUDY_BUDDY_DEFAULT_EMAIL_ADDRESS env variable");
 }
 
-exports.STUDY_BUDDY_SESSION_SECRET_1 = process.env.STUDY_BUDDY_SESSION_SECRET_1;
-if (!exports.STUDY_BUDDY_SESSION_SECRET_1) {
+export const STUDY_BUDDY_SESSION_SECRET_1 = process.env.STUDY_BUDDY_SESSION_SECRET_1;
+if (!STUDY_BUDDY_SESSION_SECRET_1) {
     throw Error("Please set the STUDY_BUDDY_SESSION_SECRET_1 env variable");
 }
