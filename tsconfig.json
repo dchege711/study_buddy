@@ -1,7 +1,9 @@
 {
     "compilerOptions": {
       "outDir": "./dist",
-      "target": "es5"
+      "target": "es5",
+      "skipLibCheck": true,
+      "esModuleInterop": true,
     },
     "include": ["./src/**/*"]
   }

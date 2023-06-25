@@ -1,20 +1,23 @@
 "use strict";
 
-const dbConnection = require("../../../models/MongooseClient.js");
-const Graph = require("../../../public/src/Graph.js");
-const CardsDB = require("../../../models/CardsMongoDB.js");
-const DummyAccountUtils = require("../../DummyAccountUtils.js");
-const LogInUtilities = require("../../../models/LogInUtilities.js");
+import { mongooseConnection } from "../../../models/MongooseClient";
 
-let userTagGroups;
+const Graph = require("../../../../public/src/Graph.js");
+
+import { deleteAllAccounts } from "../../../models/LogInUtilities";
+import { getTagGroupings } from "../../../models/CardsMongoDB";
+import { populateDummyAccount } from "../../DummyAccountUtils";
+
+let userTagGroups: string[][];
 let myGraph = new Graph();
+
 describe("Test Graph.js\n", function() {
 
     // Setup the data that will be used for testing
     before(function(done) {
-        DummyAccountUtils.populateDummyAccount(20)
+        populateDummyAccount(20)
             .then(function(user) {
-                return CardsDB.getTagGroupings({userIDInApp: user.userIDInApp});
+                return getTagGroupings({userIDInApp: user.userIDInApp});
             })
             .then(function(response) {
                 userTagGroups = response.message;
@@ -24,7 +27,7 @@ describe("Test Graph.js\n", function() {
     });
 
     after(function() {
-        return LogInUtilities.deleteAllAccounts();
+        return deleteAllAccounts();
     });
 
     it("should accept new edges", function(done) {

@@ -8,19 +8,23 @@
  * @module
  */
 
-const nodemailer = require("nodemailer");
-var config = require("../config.js");
+import { createTransport } from "nodemailer";
 
-let transporter = nodemailer.createTransport({
+import { APP_NAME, EMAIL_ADDRESS, MAILGUN_LOGIN, MAILGUN_PASSWORD } from "../config";
+import { BaseResponse } from "../types";
+
+let transporter = createTransport({
     pool: true,
     host: "smtp.mailgun.org",
     port: 587,
     secure: false,
     auth: {
-        user: config.MAILGUN_LOGIN,
-        pass: config.MAILGUN_PASSWORD
+        user: MAILGUN_LOGIN,
+        pass: MAILGUN_PASSWORD
     }
 });
+
+export type SendEmailConfirmation = BaseResponse & {message: string};
 
 /**
  *
@@ -31,8 +35,8 @@ let transporter = nodemailer.createTransport({
  *
  * @returns {Promise} takes a JSON with `success` and `message` as the keys
  */
-exports.sendEmail = function(mailOptions) {
-    mailOptions.from = `${config.APP_NAME} <${config.EMAIL_ADDRESS}>`;
+export function sendEmail(mailOptions): Promise<SendEmailConfirmation> {
+    mailOptions.from = `${APP_NAME} <${EMAIL_ADDRESS}>`;
     return new Promise(function(resolve, reject) {
         transporter.sendMail(mailOptions)
         .then((info) => {
@@ -45,11 +49,11 @@ exports.sendEmail = function(mailOptions) {
 /**
  * @description Clean up the resources before exiting this module.
  */
-exports.close = function() {
+export function close() {
     transporter.close();
 };
 
 // Close the SMTP pool before closing the application.
 process.on("SIGINT", function () {
-    exports.close();
+    close();
 });

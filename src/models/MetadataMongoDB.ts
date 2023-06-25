@@ -6,12 +6,14 @@
  * @module
  */
 
-const User = require("./mongoose_models/UserSchema.js");
-const Metadata = require('./mongoose_models/MetadataCardSchema');
-const Card = require('./mongoose_models/CardSchema.js');
-const fs = require("fs");
-const querySanitizer = require("./SanitizationAndValidation.js").sanitizeQuery;
-const config = require("../config.js");
+import * as fs from "fs";
+
+import { IUser, User } from "./mongoose_models/UserSchema";
+import { Metadata, IMetadata } from "./mongoose_models/MetadataCardSchema";
+import { Card, ICard } from "./mongoose_models/CardSchema";
+import { sanitizeQuery } from "./SanitizationAndValidation";
+import { PUBLIC_USER_USERNAME } from "../config";
+import { BaseResponse } from "../types";
 
 /**
  * @description Create & save a new metadata document for a user
@@ -19,8 +21,8 @@ const config = require("../config.js");
  * @return {Promise} resolves with a JSON object with `success`, `status` and
  * `message` as keys.
  */
-exports.create = function (payload) {
-    payload = querySanitizer(payload);
+export function create(payload) {
+    payload = sanitizeQuery(payload);
     return new Promise(function(resolve, reject) {
         if (payload.userIDInApp === undefined || payload.metadataIndex === undefined) {
             reject(new Error("Please provide a userIDInApp and a metadataIndex."));
@@ -52,6 +54,8 @@ exports.create = function (payload) {
     })
 };
 
+type MetadataReadResponse = BaseResponse & {message: Array<IMetadata>};
+
 /**
  * @description Read all the metadata associated with a user's cards.
  *
@@ -59,8 +63,8 @@ exports.create = function (payload) {
  * @returns {Promise} If successful, the `message` attribute is an array of
  * JSON `Metadata` objects
  */
-exports.read = function (payload) {
-    payload = querySanitizer(payload);
+export function read(payload): Promise<MetadataReadResponse> {
+    payload = sanitizeQuery(payload);
     return new Promise(function(resolve, reject) {
         Metadata
             .find({createdById: payload.userIDInApp}).exec()
@@ -72,6 +76,8 @@ exports.read = function (payload) {
             .catch((err) => { reject(err); });
     });
 };
+
+type MetadataUpdateResponse = BaseResponse & {message: IMetadata};
 
 /**
  * Update the metadata with the new cards' details. This method
@@ -91,7 +97,7 @@ exports.read = function (payload) {
  * @returns {Promise} resolves with a JSON with `success`, `status` and
  * `message` as keys. If successful, `message` has a metadata JSON object.
  */
-exports.update = async function (savedCards, metadataQuery, attributeName) {
+export async function update(savedCards, metadataQuery: Partial<IMetadata> = null,  attributeName: string = "urgency") : Promise<MetadataUpdateResponse> {
     /*
      * How many cards before we need a new metadata JSON?
      * (400 + 150 * num_id_metadata) * 5 bytes/char <= 16MB
@@ -102,14 +108,12 @@ exports.update = async function (savedCards, metadataQuery, attributeName) {
         savedCards[0].metadataIndex = 0;
     }
 
-    if (metadataQuery === undefined) {
+    if (metadataQuery === null) {
         metadataQuery = {
             createdById: savedCards[0].createdById,
             metadataIndex: savedCards[0].metadataIndex
         }
     }
-
-    if (attributeName === undefined) attributeName = "urgency";
 
     return new Promise(function(resolve, reject) {
         if (savedCards[0].createdById === undefined) {
@@ -147,7 +151,7 @@ exports.update = async function (savedCards, metadataQuery, attributeName) {
  * `message` as keys. If successful, `message` has a metadata JSON object.
  *
  */
-exports.updatePublicUserMetadata = function(cards) {
+export function updatePublicUserMetadata(cards): Promise<MetadataUpdateResponse>{
 
     let cardsToAdd = [], cardsToRemove = [];
     for (let i = 0; i < cards.length; i++) {
@@ -157,7 +161,7 @@ exports.updatePublicUserMetadata = function(cards) {
 
     return new Promise(function(resolve, reject) {
         User
-            .findOne({username: config.PUBLIC_USER_USERNAME}).exec()
+            .findOne({username: PUBLIC_USER_USERNAME}).exec()
             .then(async (publicUser) => {
                 if (cardsToAdd.length > 0) {
                     let query = {
@@ -212,8 +216,8 @@ exports.updatePublicUserMetadata = function(cards) {
  * @returns {Promise} resolves with a JSON object keyed by `success`, `status`
  * and `message`
  */
-exports.deleteAllMetadata = function (payload) {
-    payload = querySanitizer(payload);
+export function deleteAllMetadata(payload) {
+    payload = sanitizeQuery(payload);
     return new Promise(function(resolve, reject) {
         Metadata
             .deleteMany({createdById: payload.userIDInApp}).exec()
@@ -231,9 +235,9 @@ exports.deleteAllMetadata = function (payload) {
  * @returns {Promise} resolves with a JSON keyed by `success`, `status` and
  * `message`
  */
-exports.sendCardToTrash = function (payload) {
-    payload = querySanitizer(payload);
-    let prevResults = {};
+export function sendCardToTrash(payload) {
+    payload = sanitizeQuery(payload);
+    let prevResults : { card?: ICard } = {};
     return new Promise(function(resolve, reject) {
         Card
             .findOne({_id: payload.cardID, createdById: payload.createdById}).exec()
@@ -258,13 +262,13 @@ exports.sendCardToTrash = function (payload) {
                 prevResults.card.tags.split(" ").forEach(tagToRemove => {
                     tagToRemove = tagToRemove.trim();
                     if (tagToRemove !== "") {
-                        delete metadataNodeInfo[tagToRemove][trashedCardID];
+                        delete metadataNodeInfo[tagToRemove][trashedCardID.toString()];
                         if (Object.keys(metadataNodeInfo[tagToRemove]).length === 0) {
                             delete metadataNodeInfo[tagToRemove];
                         }
                     }
                 });
-                delete metadataStats[trashedCardID];
+                delete metadataStats[trashedCardID.toString()];
 
                 // Add the card to the trashed items associated with the user
                 // Associate the deletion time so that we can have a clean up
@@ -273,7 +277,7 @@ exports.sendCardToTrash = function (payload) {
                     metadataDoc.trashed_cards = [];
                     metadataDoc.trashed_cards.push({});
                 }
-                metadataDoc.trashed_cards[0][trashedCardID] = Date.now();
+                metadataDoc.trashed_cards[0][trashedCardID.toString()] = Date.now();
 
                 // This is necessary. All that hair pulling can now stop :-/
                 metadataDoc.markModified("stats");
@@ -299,9 +303,9 @@ exports.sendCardToTrash = function (payload) {
  * @returns {Promise} resolves with a JSON keyed by `success`, `status` and
  * `message`
  */
-exports.restoreCardFromTrash = function (restoreCardArgs) {
-    let prevResults = {};
-    restoreCardArgs = querySanitizer(restoreCardArgs);
+export function restoreCardFromTrash(restoreCardArgs) {
+    let prevResults : { card?: ICard } = {};
+    restoreCardArgs = sanitizeQuery(restoreCardArgs);
 
     return new Promise(function(resolve, reject) {
         Card
@@ -341,8 +345,8 @@ exports.restoreCardFromTrash = function (restoreCardArgs) {
  * @returns {Promise} resolves with a JSON keyed by `success`, `status` and
  * `message`
  */
-exports.deleteCardFromTrash = function(deleteCardArgs) {
-    deleteCardArgs = querySanitizer(deleteCardArgs);
+export function deleteCardFromTrash(deleteCardArgs) {
+    deleteCardArgs = sanitizeQuery(deleteCardArgs);
     return new Promise(function(resolve, reject) {
         Card
             .findOneAndRemove({
@@ -378,12 +382,12 @@ exports.deleteCardFromTrash = function(deleteCardArgs) {
  * @returns {Promise} resolves with the modified metadata document. It is up to
  * the callee to persist the saved metadata in the database.
  */
-function removeCardFromMetadataTrash(cardIdentifier) {
+function removeCardFromMetadataTrash(cardIdentifier) : Promise<IMetadata> {
     return new Promise(function(resolve, reject) {
         Metadata
             .find({createdById: cardIdentifier.createdById}).exec()
             .then((matchingMetadataDocs) => {
-                if (matchingMetadataDocs.length === 0) resolve({});
+                if (matchingMetadataDocs.length === 0) resolve(null);
                 for (let i = 0; i < matchingMetadataDocs.length; i++) {
                     let metadataDoc = matchingMetadataDocs[i];
                     if (cardIdentifier._id in metadataDoc.trashed_cards[0]) {
@@ -399,6 +403,11 @@ function removeCardFromMetadataTrash(cardIdentifier) {
     });
 }
 
+interface WriteCardsToJSONFileResult {
+    jsonFilePath: string;
+    jsonFileName: string;
+}
+
 /**
  * @description Fetch all the user's cards and compile them into a JSON file.
  *
@@ -408,7 +417,7 @@ function removeCardFromMetadataTrash(cardIdentifier) {
  * @returns {Promise} resolves with two string arguments. The first one is a path
  * to the written JSON file. The 2nd argument is the name of the JSON file.
  */
-exports.writeCardsToJSONFile = function (userIDInApp) {
+export function writeCardsToJSONFile(userIDInApp): Promise<WriteCardsToJSONFileResult> {
     let query = sanitizeQuery({userIDInApp: userIDInApp});
     return new Promise(function(resolve, reject) {
         Card
@@ -437,7 +446,7 @@ exports.writeCardsToJSONFile = function (userIDInApp) {
                                     if (closeErr) {
                                         reject(closeErr);
                                     } else {
-                                        resolve([jsonFilePath, jsonFileName]);
+                                        resolve({jsonFilePath, jsonFileName});
                                     }
                                 });
                             }
@@ -459,10 +468,11 @@ exports.writeCardsToJSONFile = function (userIDInApp) {
  * metadata.
  * @param {JSON} metadataDoc A Mongoose Schema object that is used to store the
  * current user's metadata.
- * @param {String}
+ * @param {String} attributeName The name of the attribute that should be used
+ * to sort the metadata.
  * @returns {Promise} resolved with a reference to the modified metadata doc
  */
-function updateMetadataWithCardDetails(savedCard, metadataDoc, attributeName) {
+function updateMetadataWithCardDetails(savedCard, metadataDoc, attributeName = "urgency") {
 
     let sortableAttribute;
     if (attributeName === undefined) {
@@ -538,14 +548,16 @@ function updateMetadataWithCardDetails(savedCard, metadataDoc, attributeName) {
     return Promise.resolve(metadataDoc);
 }
 
+type UpdateUserSettingsResult = BaseResponse & {message: string, user?: IUser};
+
 /**
  * @description Update the settings of the given user.
  * @param {JSON} newUserSettings Supported keys:
  * @returns {Promise} resolves with a JSON keyed by `success`, `status` and
  * `message`
  */
-exports.updateUserSettings = function(newUserSettings) {
-    newUserSettings = querySanitizer(newUserSettings);
+export function updateUserSettings(newUserSettings): Promise<UpdateUserSettingsResult> {
+    newUserSettings = sanitizeQuery(newUserSettings);
 
     let supportedChanges = new Set(["cardsAreByDefaultPrivate", "dailyTarget"]);
     let validChanges = [];
@@ -613,8 +625,8 @@ exports.updateUserSettings = function(newUserSettings) {
  *
  * @returns {Object} the saved metadata object with the updated streak
  */
-exports.updateStreak = function(streakUpdateObj) {
-    streakUpdateObj = querySanitizer(streakUpdateObj);
+export function updateStreak(streakUpdateObj) {
+    streakUpdateObj = sanitizeQuery(streakUpdateObj);
     return new Promise(function(resolve, reject) {
         Metadata
             .findOne({createdById: streakUpdateObj.userIDInApp, metadataIndex: 0}).exec()

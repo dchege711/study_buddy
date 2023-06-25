@@ -1,5 +1,5 @@
-var fs = require("fs");
-const APP_NAME = require("../config.js").APP_NAME;
+import { unlink } from "fs";
+import { APP_NAME } from "../config";
 
 const generic_500_msg = {
     success: false, status: 500, message: "Internal Server Error"
@@ -13,7 +13,7 @@ const generic_500_msg = {
  * @param {JSON} result_JSON Expected keys: `status`, `success`, `message`
  * @param {Response} res An Express JS res object
  */
-exports.convertObjectToResponse = function (err, result_JSON, res) {
+export function convertObjectToResponse (err, result_JSON, res) {
     if (err) {
         console.error(err);
         res.type(".html");
@@ -41,8 +41,8 @@ exports.convertObjectToResponse = function (err, result_JSON, res) {
     }
 };
 
-exports.deleteTempFile = function(filepath) {
-    fs.unlink(filepath, (err) => {
+export function deleteTempFile(filepath) {
+    unlink(filepath, (err) => {
         if (err) console.error(err);
     });
 };
@@ -58,7 +58,7 @@ exports.deleteTempFile = function(filepath) {
  * @param {Response} res a reference to the Express Response object associated
  * with the pending request
  */
-exports.sendResponseFromPromise = function(pendingPromise, res) {
+export function sendResponseFromPromise(pendingPromise, res) {
     pendingPromise
         .then((results) => { exports.convertObjectToResponse(null, results, res); })
         .catch((err) => { exports.convertObjectToResponse(err, null, res)});

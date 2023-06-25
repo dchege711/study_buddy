@@ -6,13 +6,15 @@
  * @module
  */
 
-const dbConnection = require("./MongooseClient.js");
-const Metadata = require("./mongoose_models/MetadataCardSchema.js");
+import * as mongoDB from "mongodb";
+
+import { Metadata } from "./mongoose_models/MetadataCardSchema";
+import { closeMongooseConnection } from "./MongooseClient";
 
 /**
  * @description Reset the daily card review streaks.
  */
-function resetStreaks() {
+function resetStreaks(): Promise<mongoDB.BulkWriteResult> {
 
     let bulkWriteOps = [];
     let currentTimeStamp = Date.now();
@@ -59,7 +61,7 @@ if (require.main === module) {
             console.log(
                 `Reset the streak counters for ${result.modifiedCount} documents`
             );
-            return dbConnection.closeMongooseConnection();
+            return closeMongooseConnection(null);
         })
         .catch((err) => { console.error(err); });
 }
