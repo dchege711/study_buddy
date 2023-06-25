@@ -1,51 +1,75 @@
-var express = require("express");
-var inAppController = require("../controllers/InAppController.js");
-var requireLogIn = require("../controllers/AuthenticationController.js").requireLogIn;
+import { Router } from "express";
 
-var router = express.Router();
+import { requireLogIn } from "../controllers/AuthenticationController";
+import {
+  readCard,
+  readPublicCard,
+  home,
+  wikiPage,
+  browsePageGet,
+  browsePagePost,
+  accountGet,
+  readMetadata,
+  readTagGroups,
+  readPublicMetadata,
+  addCard,
+  searchCards,
+  updateCard,
+  updateStreak,
+  deleteCard,
+  trashCard,
+  duplicateCard,
+  flagCard,
+  restoreCardFromTrash,
+  downloadUserData,
+  deleteAccount,
+  updateUserSettings,
+} from "../controllers/InAppController";
 
-router.post("/read-card", requireLogIn, inAppController.readCard);
+const router = Router();
 
-router.post("/read-public-card", inAppController.readPublicCard);
+router.post("/read-card", requireLogIn, readCard);
 
-router.get("/home", requireLogIn, inAppController.home);
+router.post("/read-public-card", readPublicCard);
 
-router.get("/wiki", inAppController.wikiPage);
+router.get("/home", requireLogIn, home);
 
-router.get("/browse", inAppController.browsePageGet);
+router.get("/wiki", wikiPage);
 
-router.post("/browse", inAppController.browsePagePost);
+router.get("/browse", browsePageGet);
 
-router.get("/account", requireLogIn, inAppController.accountGet);
+router.post("/browse", browsePagePost);
 
-router.post("/read-metadata", requireLogIn, inAppController.readMetadata);
+router.get("/account", requireLogIn, accountGet);
 
-router.post("/read-tag-groups", requireLogIn, inAppController.readTagGroups);
+router.post("/read-metadata", requireLogIn, readMetadata);
 
-router.post("/read-public-metadata", inAppController.readPublicMetadata);
+router.post("/read-tag-groups", requireLogIn, readTagGroups);
 
-router.post("/add-card", requireLogIn, inAppController.addCard);
+router.post("/read-public-metadata", readPublicMetadata);
 
-router.post("/search-cards", requireLogIn, inAppController.searchCards);
+router.post("/add-card", requireLogIn, addCard);
 
-router.post("/update-card", requireLogIn, inAppController.updateCard);
+router.post("/search-cards", requireLogIn, searchCards);
 
-router.post("/update-streak", requireLogIn, inAppController.updateStreak);
+router.post("/update-card", requireLogIn, updateCard);
 
-router.post("/delete-card", requireLogIn, inAppController.deleteCard);
+router.post("/update-streak", requireLogIn, updateStreak);
 
-router.post("/trash-card", requireLogIn, inAppController.trashCard);
+router.post("/delete-card", requireLogIn, deleteCard);
 
-router.post("/duplicate-card", requireLogIn, inAppController.duplicateCard);
+router.post("/trash-card", requireLogIn, trashCard);
 
-router.post("/flag-card", inAppController.flagCard);
+router.post("/duplicate-card", requireLogIn, duplicateCard);
 
-router.post("/restore-from-trash", requireLogIn, inAppController.restoreCardFromTrash);
+router.post("/flag-card", flagCard);
 
-router.get("/account/download-user-data", requireLogIn, inAppController.downloadUserData);
+router.post("/restore-from-trash", requireLogIn, restoreCardFromTrash);
 
-router.post("/account/delete-account", requireLogIn, inAppController.deleteAccount);
+router.get("/account/download-user-data", requireLogIn, downloadUserData);
 
-router.post("/account/update-settings", requireLogIn, inAppController.updateUserSettings);
+router.post("/account/delete-account", requireLogIn, deleteAccount);
+
+router.post("/account/update-settings", requireLogIn, updateUserSettings);
 
 module.exports = router;

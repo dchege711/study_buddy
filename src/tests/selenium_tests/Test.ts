@@ -1,22 +1,23 @@
 "use strict";
 
-const TestAuthActions = require("./TestAuthActions.js");
-const LoginUtils = require("../../models/LogInUtilities.js");
-const dbConnection = require("../../models/MongooseClient.js");
-const config = require("../../config.js");
+import { mongooseConnection } from "../../models/MongooseClient";
+
+import { deleteAllAccounts } from "../../models/LogInUtilities";
+import { PUBLIC_USER_USERNAME } from "../../config";
+
+import { testLoginPage } from "./TestAuthActions";
 
 let headless = process.argv[2] === "headless";
 
 async function runTestSuite(headless=true) {
 
     let passedAllTests = true;
-    let numDeleted = await LoginUtils.deleteAllAccounts([config.PUBLIC_USER_USERNAME]);
+    let numDeleted = await deleteAllAccounts([PUBLIC_USER_USERNAME]);
     console.log(`\n${numDeleted} account(s) were deleted\n`);
 
 
     console.log(`Testing signup paths...`);
-    await TestAuthActions
-        .test(headless=headless)
+    await testLoginPage(headless)
         .then(([numTestsPassed, numTotalTests]) => {
             console.log(`\n${numTestsPassed}/${numTotalTests} tests passed!`);
             passedAllTests = numTestsPassed === numTotalTests;

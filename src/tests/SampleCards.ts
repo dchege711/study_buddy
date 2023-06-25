@@ -1,4 +1,4 @@
-exports.sampleCards = [
+export const sampleCards = [
 
 {"title":"The Star (Arthur Clarke)","description":"* A people perished to pave way for the star of Bethlehem. The people knew their star would fail, and the end was nigh.","tags":"miscellaneous fiction arthur_clarke book_excerpts","urgency":1,"createdAt":"2018-02-18T03:26:14.389Z"
 },
@@ -721,7 +721,7 @@ const N = exports.sampleCards.length;
 /**
  * @returns {Array} contains at most `numCards` chosen at random without replacement.
  */
-exports.getRandomCards = function(numCards) {
+export function getRandomCards(numCards) {
     let cardIndexes = new Array(Math.min(numCards, exports.sampleCards.length));
     for (let i = 0; i < cardIndexes.length; i++) cardIndexes[i] = i;
     let randomIdx, temp;

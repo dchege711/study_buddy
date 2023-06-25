@@ -14,31 +14,28 @@
  * @module
  */
 
-var mongoose = require("mongoose");
-var MongoMemoryServer = require("mongodb-memory-server").MongoMemoryServer;
 
-var config = require('../config');
+import { connect, connection, disconnect } from "mongoose";
+import { MongoMemoryServer } from "mongodb-memory-server";
+import { IS_DEV, MONGO_URI } from "../config";
 
 // Already 5 by default, but I might need to increase it one day...
 const connectionOptions = {poolSize: 12, useNewUrlParser: true};
 let mongoServer = null;
-if (config.IS_DEV) {
+if (IS_DEV) {
     (async () => {
         mongoServer = await MongoMemoryServer.create();
-        await mongoose.connect(mongoServer.getUri(), connectionOptions);
+        await connect(mongoServer.getUri(), connectionOptions);
       })();
 } else {
-    mongoose.connect(config.MONGO_URI, connectionOptions);
+    connect(MONGO_URI, connectionOptions);
 }
 
-// Get Mongoose to use the global promise library.
-mongoose.Promise = global.Promise;
-
 // Get the default connection (this will be registered on mongoose)
-var db = mongoose.connection;
+export const mongooseConnection = connection;
 
 // Bind the connection to the error event (to get notifications)
-db.on("error", console.error.bind(console, "Connection Error:"));
+mongooseConnection.on("error", console.error.bind(console, "Connection Error:"));
 
 /*
  * Tip from MDN:
@@ -58,11 +55,11 @@ db.on("error", console.error.bind(console, "Connection Error:"));
   * @param {Function} callback The first parameter will be set in case of any
   * error
   */
-exports.closeMongooseConnection = async function(callback) {
+export async function closeMongooseConnection(callback) {
     if (mongoServer)
         mongoServer.stop();
 
-    return mongoose.disconnect();
+    return disconnect();
 };
 
 process.on("SIGINT", function () {
@@ -71,4 +68,3 @@ process.on("SIGINT", function () {
         .catch((err) => { console.error(err); process.exit(1); });
 });
 
-exports.mongooseConnection = db;

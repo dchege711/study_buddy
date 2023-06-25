@@ -1,9 +1,9 @@
 "use strict";
 
-const dbConnection = require("../../../models/MongooseClient.js");
-var LogInUtilities = require("../../../models/LogInUtilities.js");
-var Miscellaneous = require("../../../models/Miscellaneous.js");
-const config = require("../../../config.js");
+import { mongooseConnection } from "../../../models/MongooseClient";
+import { DEBUG_EMAIL_ADDRESS } from "../../../config";
+import { addPublicUser } from "../../../models/Miscellaneous";
+import * as LogInUtilities from "../../../models/LogInUtilities";
 
 describe("Test LoginUtilities\n", function() {
 
@@ -11,7 +11,7 @@ describe("Test LoginUtilities\n", function() {
         this.timeout(5000); // These tests may run slower than 2s in CI.
 
         before(function() {
-            return Miscellaneous.addPublicUser();
+            return addPublicUser();
         });
 
         after(function() {
@@ -34,7 +34,7 @@ describe("Test LoginUtilities\n", function() {
             return LogInUtilities
                 .registerUserAndPassword({
                     username: "test", password: "test_dummy_password",
-                    email: config.DEBUG_EMAIL_ADDRESS
+                    email: DEBUG_EMAIL_ADDRESS
                 });
         });
 
@@ -43,7 +43,7 @@ describe("Test LoginUtilities\n", function() {
             LogInUtilities
                 .registerUserAndPassword({
                     username: "test-dup", password: "test_dummy_password",
-                    email: config.DEBUG_EMAIL_ADDRESS
+                    email: DEBUG_EMAIL_ADDRESS
                 })
                 .then(function(signupResult) {
                     if (signupResult.success) done(new Error(signupResult.message));

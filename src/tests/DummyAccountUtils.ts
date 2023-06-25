@@ -1,39 +1,42 @@
 "use strict";
 
-const LoginUtilities = require("../models/LogInUtilities.js");
-const config = require("../config.js");
-const sampleCards = require("./SampleCards.js");
-const CardsDB = require("../models/CardsMongoDB.js");
-const Misc = require("../models/Miscellaneous.js");
+import { sampleCards, getRandomCards } from "./SampleCards";
+
+import * as LogInUtilities from "../models/LogInUtilities";
+import * as CardsDB from "../models/CardsMongoDB";
+import { IUser } from "../models/mongoose_models/UserSchema";
 
 /**
  * @returns {Promise} resolves with a JSON representation of a logged in user.
  */
-exports.getDummyAccount = function() {
+export function getDummyAccount(): Promise<LogInUtilities.AuthenticateUser> {
     let dummyAccountDetails = {
         username: config.DEBUG_USERNAME, password: config.DEBUG_PASSWORD,
         email: config.DEBUG_EMAIL_ADDRESS
     }
 
     return new Promise(function(resolve, reject) {
-        LoginUtilities.deleteAllAccounts([])
+        LogInUtilities.deleteAllAccounts([])
             .then((_) => {
-                return Misc.addPublicUser();
+                return misc.addPublicUser();
             })
             .then((_) => {
-                return LoginUtilities.registerUserAndPassword(dummyAccountDetails);
+                return LogInUtilities.registerUserAndPassword(dummyAccountDetails);
             })
             .then((_) => {
-                return LoginUtilities.authenticateUser({
+                return LogInUtilities.authenticateUser({
                     username_or_email: dummyAccountDetails.username,
                     password: dummyAccountDetails.password
                 });
             })
-            .then((confirmation) => {
-                if (confirmation.success) resolve(confirmation.message);
-                else reject(new Error(confirmation.message));
-            })
-            .catch((err) => { reject(err); });
+            .then((response) => {
+                if (typeof response.message === "string") {
+                    reject(response.message);
+                    return;
+                }
+
+                resolve(response.message);
+            });
     });
 };
 
@@ -42,20 +45,20 @@ exports.getDummyAccount = function() {
  * dummy account with `numCards` cards.
  * @returns {Promise} resolves with a JSON representation of a logged in user.
  */
-exports.populateDummyAccount = function(numCards=50) {
+export function populateDummyAccount(numCards=50): Promise<LogInUtilities.AuthenticateUser> {
     return new Promise(function(resolve, reject) {
-        exports.getDummyAccount()
-            .then(async (loggedInUser) => {
-                let cards = sampleCards.getRandomCards(numCards);
+        getDummyAccount()
+            .then(async (user) => {
+                let cards = getRandomCards(numCards);
                 for (let i = 0; i < cards.length; i++) {
                     let card = cards[i];
-                    card.createdById = loggedInUser.userIDInApp;
+                    card.createdById = user.userIDInApp;
                     if (i % 3 == 0) card.isPublic = false;
                     else card.isPublic = true;
                     await CardsDB.create(card);
                     console.log(`${i + 1}/${cards.length}: ${card.title}`);
                 }
-                resolve(loggedInUser)
+                resolve(user)
             })
             .catch((err) => { reject(err); });
     });

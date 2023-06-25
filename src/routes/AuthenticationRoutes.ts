@@ -1,29 +1,43 @@
-var express = require("express");
-var auth_controller = require("../controllers/AuthenticationController.js");
+import { Router } from "express";
 
-var router = express.Router();
+import {
+  handleLogIn,
+  registerUser,
+  loginUser,
+  logoutUser,
+  sendValidationEmailGet,
+  sendValidationEmailPost,
+  verifyAccount,
+  resetPasswordGet,
+  resetPasswordPost,
+  resetPasswordLinkGet,
+  resetPasswordLinkPost,
+} from "../controllers/AuthenticationController";
 
-router.get("/", auth_controller.handleLogIn);
-router.get("/login", auth_controller.handleLogIn);
+const router = Router();
 
-router.post("/register-user", auth_controller.registerUser);
+router.get("/", handleLogIn);
 
-router.post("/login", auth_controller.loginUser);
+router.get("/login", handleLogIn);
 
-router.post("/logout", auth_controller.logoutUser);
+router.post("/register-user", registerUser);
 
-router.get("/send-validation-email", auth_controller.sendValidationEmailGet);
+router.post("/login", loginUser);
 
-router.post("/send-validation-email", auth_controller.sendValidationEmailPost);
+router.post("/logout", logoutUser);
 
-router.get("/verify-account/*", auth_controller.verifyAccount);
+router.get("/send-validation-email", sendValidationEmailGet);
 
-router.get("/reset-password", auth_controller.resetPasswordGet);
+router.post("/send-validation-email", sendValidationEmailPost);
 
-router.post("/reset-password", auth_controller.resetPasswordPost);
+router.get("/verify-account/*", verifyAccount);
 
-router.get("/reset-password-link/*", auth_controller.resetPasswordLinkGet);
+router.get("/reset-password", resetPasswordGet);
 
-router.post("/reset-password-link/*", auth_controller.resetPasswordLinkPost);
+router.post("/reset-password", resetPasswordPost);
 
-module.exports = router;
+router.get("/reset-password-link/*", resetPasswordLinkGet);
+
+router.post("/reset-password-link/*", resetPasswordLinkPost);
+
+export = router;
