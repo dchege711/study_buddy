@@ -4,10 +4,24 @@
  * @module
  */
 
-var mongoose = require('mongoose');
-var isEmail = require("validator").isEmail;
+import { model, Schema, Document } from "mongoose";
+import validator from "validator";
 
-var userSchema = new mongoose.Schema(
+interface IUserRaw {
+    username: string;
+    salt: Array<number>;
+    hash: Array<number>;
+    userIDInApp: number;
+    email: string;
+    reset_password_uri: string;
+    reset_password_timestamp: number;
+    account_validation_uri: string;
+    account_is_valid: boolean;
+    cardsAreByDefaultPrivate: boolean;
+    dailyTarget: number;
+}
+
+let userSchema = new Schema<IUserRaw>(
     {
         username: {
             type: String,
@@ -25,7 +39,7 @@ var userSchema = new mongoose.Schema(
             type: String,
             required: true,
             unique: true,
-            validate: [isEmail, 'Please provide a valid email address']
+            validate: [validator.isEmail, 'Please provide a valid email address']
         },
         reset_password_uri: String,
         reset_password_timestamp: Number,
@@ -42,4 +56,5 @@ var userSchema = new mongoose.Schema(
     }
 );
 
-module.exports = mongoose.model('User', userSchema);
+export const User = model<IUser>('User', userSchema);
+export type IUser = IUserRaw & Document<any, any, IUserRaw>;

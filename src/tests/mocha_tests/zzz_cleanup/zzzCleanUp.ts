@@ -1,8 +1,7 @@
 "use strict";
 
-// const emailClient = require("../../models/EmailClient.js");
-const dbConnection = require("../../../models/MongooseClient.js");
-const LoginUtils = require("../../../models/LogInUtilities.js");
+import { mongooseConnection } from "../../../models/MongooseClient";
+import * as LogInUtilities from "../../../models/LogInUtilities";
 
 
 /**
@@ -18,7 +17,7 @@ const LoginUtils = require("../../../models/LogInUtilities.js");
 describe("Cleaning up pending actions\n", function() {
 
     it("close all pending actions", function() {
-        LoginUtils
+        LogInUtilities
             .close()
             .then(function() { return dbConnection.closeMongooseConnection(); })
     });

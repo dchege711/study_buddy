@@ -22,15 +22,14 @@
     ]
   },
   "scripts": {
-    "build": "webpack --config webpack.config.js",
+    "build": "tsc && webpack --config webpack.config.js",
     "jsdoc": "jsdoc -r models",
-    "start": "npm run build && node server.js",
+    "start": "npm run build && node dist/server.js",
     "debug": "nodemon --inspect=127.0.0.1:9229 server.js",
-    "single_test": "mocha  --no-warnings ./tests/mocha_tests/unit_tests/TestGraph.js",
+    "single_test": "mocha  --no-warnings ./src/tests/mocha_tests/unit_tests/TestGraph.js",
     "test": "npm run mocha_tests",
-    "mocha_tests": "nyc mocha --no-warnings --recursive --sort './tests/mocha_tests/*/*.js'",
-    "selenium_tests": "cd tests/selenium_tests/ && nyc ./run_selenium_tests.sh firefox headless && cd ../../",
-    "heroku-postbuild": "echo Skip build on Heroku",
+    "mocha_tests": "nyc mocha --no-warnings --recursive --sort './src/tests/mocha_tests/*/*.js'",
+    "selenium_tests": "cd src/tests/selenium_tests/ && nyc ./run_selenium_tests.sh firefox headless && cd ../../",
     "docs": "jsdoc -c ./config.jsdoc.js"
   },
   "repository": {
@@ -65,6 +64,11 @@
   },
   "devDependencies": {
     "@babel/core": "^7.1.5",
+    "@types/mocha": "^10.0.1",
+    "@types/mongoose": "^5.11.97",
+    "@types/showdown": "^2.0.1",
+    "@types/sjcl": "^1.0.30",
+    "@types/validator": "^13.7.17",
     "babel": "^6.23.0",
     "babel-loader": "^8.0.4",
     "circular-dependency-plugin": "^5.0.2",

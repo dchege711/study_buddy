@@ -1,6 +1,9 @@
 "use strict";
 
-const emailClient = require("../../../models/EmailClient.js");
+import * as emailClient from "../../../models/EmailClient";
+
+import { APP_NAME, EMAIL_ADDRESS, DEBUG_EMAIL_ADDRESS } from "../../../config";
+
 const config = require("../../../config.js");
 
 describe("Test EmailClient\n", function() {
@@ -9,8 +12,8 @@ describe("Test EmailClient\n", function() {
 
         it("should send an email successfully", function() {
             return emailClient.sendEmail({
-                from: `${config.APP_NAME} <${config.EMAIL_ADDRESS}>`,
-                to: config.DEBUG_EMAIL_ADDRESS,
+                from: `${APP_NAME} <${EMAIL_ADDRESS}>`,
+                to: DEBUG_EMAIL_ADDRESS,
                 subject: "Testing EmailClient",
                 text: "Because there's HTML, this text won't appear in the email.",
                 html: "<button style='color:blue;'>The button does nothing</button>"

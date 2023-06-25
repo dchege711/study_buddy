@@ -6,8 +6,9 @@
  * @module
  */
 
-const showdown = require("showdown");
-const xss = require("xss");
+import xss = require("xss")
+
+import { Converter } from "showdown";
 
 /*
  * The converter is used to turn the markdown in the cards into html.
@@ -40,7 +41,7 @@ const xss = require("xss");
  *
  * {@tutorial main.editing_cards}
  */
-const converter = new showdown.Converter({
+const converter = new Converter({
     headerLevelStart: 4, literalMidWordUnderscores: true,
     literalMidWordAsterisks: true, simpleLineBreaks: true,
     emoji: true, backslashEscapesHTMLTags: false, tables: true,
@@ -58,7 +59,7 @@ const converter = new showdown.Converter({
  *
  * @returns {JSON} sanitized card
  */
-exports.sanitizeCard = function(card) {
+export function sanitizeCard(card) {
     if (card.title !== undefined) {
         card.title = xss(card.title);
     }
@@ -109,7 +110,7 @@ exports.sanitizeCard = function(card) {
  *
  * @returns {Object} A sanitized version of the input.
  */
-exports.sanitizeQuery = function(query) {
+export function sanitizeQuery(query) {
 
     let keys = Object.keys(query);
     for (let i = 0; i < keys.length; i++) {

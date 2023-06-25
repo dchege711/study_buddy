@@ -1,15 +1,25 @@
 "use strict";
 
-const CardsDB = require("../models/CardsMongoDB.js");
-const User = require("./../models/mongoose_models/UserSchema.js");
-const MetadataDB = require("../models/MetadataMongoDB.js");
-const controllerUtils = require("./ControllerUtilities.js");
-const loginUtilities = require("../models/LogInUtilities.js");
-const config = require("../config.js");
+import * as CardsDB from "../models/CardsMongoDB";
+import { User } from "../models/mongoose_models/UserSchema";
+import * as MetadataDB from "../models/MetadataMongoDB";
+import * as controllerUtils from "./ControllerUtilities";
+import * as loginUtilities from "../models/LogInUtilities";
+import * as config from "../config";
+import { ICard } from "../models/mongoose_models/CardSchema";
+import { IMetadata } from "../models/mongoose_models/MetadataCardSchema";
 
 const convertObjectToResponse = controllerUtils.convertObjectToResponse;
 const deleteTempFile = controllerUtils.deleteTempFile;
 const sendResponseFromPromise = controllerUtils.sendResponseFromPromise;
+
+interface TemplateVariables {
+    APP_NAME: string,
+    BASE_URL: string,
+    LOGGED_IN: boolean,
+    SEARCH_ENDPOINT_URL?: string;
+    abbreviatedCards?: Array<Partial<ICard>>;
+}
 
 /**
  * @param {Object} req The incoming HTTP request
@@ -17,32 +27,32 @@ const sendResponseFromPromise = controllerUtils.sendResponseFromPromise;
  * @return {JSON} The key-value pairs that should be provided to templates by
  * default.
  */
-function getDefaultTemplateVars(req = undefined) {
+function getDefaultTemplateVars(req = undefined): TemplateVariables {
     return {
         APP_NAME: config.APP_NAME, BASE_URL: config.BASE_URL,
         LOGGED_IN: req.session.user !== undefined
     };
 }
 
-exports.readCard = function (req, res) {
+export function readCard (req, res) {
     sendResponseFromPromise(CardsDB.read(req.body), res);
 };
 
-exports.home = function (req, res) {
+export function home (req, res) {
     let templateVars = getDefaultTemplateVars(req);
     templateVars.SEARCH_ENDPOINT_URL = "/search-cards";
     res.render("pages/home.ejs", templateVars);
 };
 
-exports.wikiPage = function (req, res) {
+export function wikiPage (req, res) {
     res.render("pages/wiki_page.ejs", getDefaultTemplateVars(req));
 };
 
-exports.readPublicCard = function (req, res) {
+export function readPublicCard (req, res) {
     sendResponseFromPromise(CardsDB.readPublicCard(req.body), res);
 };
 
-exports.readPublicMetadata = function (req, res) {
+export function readPublicMetadata (req, res) {
     User
         .findOne({username: config.PUBLIC_USER_USERNAME})
         .then((publicUser) => {
@@ -53,23 +63,23 @@ exports.readPublicMetadata = function (req, res) {
         .catch((err) => { convertObjectToResponse(err, null, res); });
 }
 
-exports.browsePagePost = function(req, res) {
+export function browsePagePost(req, res) {
     sendResponseFromPromise(CardsDB.publicSearch(req.body), res);
 }
 
-exports.browsePageGet = function(req, res) {
+export function browsePageGet(req, res) {
     let templateVars = getDefaultTemplateVars(req);
     templateVars.SEARCH_ENDPOINT_URL = "/browse";
     CardsDB
         .publicSearch(req.query)
         .then((abbreviatedCards) => {
-            templateVars.abbreviatedCards = abbreviatedCards.message;
+            templateVars.abbreviatedCards = abbreviatedCards;
             res.render("pages/browse_cards_page.ejs", templateVars);
         })
         .catch((err) => {convertObjectToResponse(err, null, res); });
 };
 
-exports.accountGet = function (req, res) {
+export function accountGet (req, res) {
     res.render(
         "pages/account_page.ejs", {
             account_info: req.session.user,
@@ -79,8 +89,8 @@ exports.accountGet = function (req, res) {
     );
 };
 
-exports.readMetadata = function (req, res) {
-    let dataObject = {success: true, message: {}};
+export function readMetadata (req, res) {
+    let dataObject: {success: boolean; message: {metadataDocs?: Array<IMetadata>, minicards?: Array<Partial<ICard>>}} = {success: true, message: {}};
     MetadataDB.read(req.body)
         .then((metadataResponse) => {
             dataObject.message.metadataDocs = metadataResponse.message;
@@ -97,53 +107,53 @@ exports.readMetadata = function (req, res) {
         });
 };
 
-exports.readTagGroups = function(req, res) {
+export function readTagGroups(req, res) {
     sendResponseFromPromise(CardsDB.getTagGroupings(req.body), res);
 }
 
-exports.addCard = function (req, res) {
+export function addCard (req, res) {
     sendResponseFromPromise(CardsDB.create(req.body), res);
 };
 
-exports.searchCards = function (req, res) {
+export function searchCards (req, res) {
     let payload = req.body;
     payload.userIDInApp = req.session.user.userIDInApp;
     sendResponseFromPromise(CardsDB.search(req.body), res);
 };
 
-exports.updateCard = function (req, res) {
+export function updateCard (req, res) {
     sendResponseFromPromise(CardsDB.update(req.body), res);
 };
 
-exports.updateStreak = function (req, res) {
+export function updateStreak (req, res) {
     sendResponseFromPromise(MetadataDB.updateStreak(req.body), res);
 }
 
-exports.deleteCard = function (req, res) {
+export function deleteCard (req, res) {
     sendResponseFromPromise(MetadataDB.deleteCardFromTrash(req.body), res);
 };
 
-exports.trashCard = function (req, res) {
+export function trashCard (req, res) {
     sendResponseFromPromise(MetadataDB.sendCardToTrash(req.body), res);
 };
 
-exports.restoreCardFromTrash = function (req, res) {
+export function restoreCardFromTrash (req, res) {
     sendResponseFromPromise(MetadataDB.restoreCardFromTrash(req.body), res);
 };
 
-exports.downloadUserData = function(req, res) {
+export function downloadUserData(req, res) {
     MetadataDB
         .writeCardsToJSONFile(req.session.user.userIDInApp)
-        .then(([filepath, filename]) => {
-            res.download(filepath, filename, (err) => {
+        .then((writeResult) => {
+            res.download(writeResult.jsonFilePath, writeResult.jsonFileName, (err) => {
                 if (err) { console.error(err); }
-                else { deleteTempFile(filepath); }
+                else { deleteTempFile(writeResult.jsonFilePath); }
             });
         })
         .catch((err) => { convertObjectToResponse(err, null, res); });
 };
 
-exports.deleteAccount = function(req, res) {
+export function deleteAccount(req, res) {
     loginUtilities
         .deleteAccount(req.session.user.userIDInApp)
         .then((confirmation) => {
@@ -157,7 +167,7 @@ exports.deleteAccount = function(req, res) {
         .catch((err) => { convertObjectToResponse(err, null, res); });
 };
 
-exports.updateUserSettings = function(req, res) {
+export function updateUserSettings(req, res) {
     MetadataDB
         .updateUserSettings(req.body)
         .then((confirmation) => {
@@ -167,12 +177,12 @@ exports.updateUserSettings = function(req, res) {
         .catch((err) => { convertObjectToResponse(err, null, res); });
 };
 
-exports.duplicateCard = function(req, res) {
+export function duplicateCard(req, res) {
     let duplicateCardArgs = req.body;
     duplicateCardArgs.userIDInApp = req.session.user.userIDInApp;
     sendResponseFromPromise(CardsDB.duplicateCard(duplicateCardArgs), res);
 };
 
-exports.flagCard = function(req, res) {
+export function flagCard(req, res) {
     sendResponseFromPromise(CardsDB.flagCard(req.body), res);
 };
