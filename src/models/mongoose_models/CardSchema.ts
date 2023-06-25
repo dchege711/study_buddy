@@ -4,7 +4,7 @@
  * @module
  */
 
-var mongoose = require('mongoose');
+import { model, Schema, Types, Document } from "mongoose";
 
 /**
  * The schema for cards in the database
@@ -27,7 +27,28 @@ var mongoose = require('mongoose');
  *  If `false`, then the card is private. A private flashcard is only visible
  *  to its owner. It will not appear in the search results at the `/browse` page. In contrast, a public card will appear in the search results as a read-only card. Any user that adds the card to their own collection will get a separate copy of the card.
  */
-var cardSchema = new mongoose.Schema(
+interface ICardRaw {
+    _id: Types.ObjectId,
+    title: string;
+    description: string;
+    descriptionHTML: string;
+    tags: string;
+    urgency: number;
+    metadataIndex: number;
+    createdById: number;
+    isPublic: boolean;
+    lastReviewed: Date;
+    parent: string;
+    numChildren: number;
+    idsOfUsersWithCopy: string;
+    numTimesMarkedAsDuplicate: number;
+    numTimesMarkedForReview: number;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+
+var cardSchema = new Schema<ICardRaw>(
     {
         title: { type: String, default: "", trim: true },
         description: { type: String, trim: true, default: "" },
@@ -62,7 +83,6 @@ cardSchema.index(
     },
     {
         weights: {title: 1, description: 1, tags: 2},
-        name: "TextIndex"
     }
 );
 
@@ -76,18 +96,18 @@ cardSchema.index(
  * documents on a different database.
  *
  */
-let CardModel = mongoose.model('Card', cardSchema);
-module.exports = CardModel;
+export const Card = model<ICardRaw>('Card', cardSchema);
+export type ICard = ICardRaw & Document<any, any, ICardRaw>;
 
 if (require.main === module) {
     // Run this script as main if you change the indexes
     // http://thecodebarbarian.com/whats-new-in-mongoose-5-2-syncindexes
-    CardModel
+    Card
         .syncIndexes()
         .then((msg) => { console.log(msg); })
         .catch((err) => { console.error(err); });
 
-    CardModel
+    Card
         .listIndexes()
         .then((indexes) => { console.log(indexes); })
         .catch((err) => { console.error(err); });

@@ -1,21 +1,16 @@
 "use strict";
 
-const { Builder, until, Key } = require("selenium-webdriver");
-const firefox = require("selenium-webdriver/firefox");
-const chrome = require("selenium-webdriver/chrome");
-const config = require("../../config.js");
-const LoginUtils = require("../../models/LogInUtilities.js");
+import { Builder, until } from "selenium-webdriver";
+import { chrome } from "selenium-webdriver/chrome";
+import { firefox } from "selenium-webdriver/firefox";
 
-const TIMEOUT = config.DEBUG_OPERATION_TIMEOUT_MS;
-const BASE_URL = config.BASE_URL;
-const DEBUG_EMAIL_ADDRESS = config.DEBUG_EMAIL_ADDRESS;
-const DEBUG_PASSWORD = config.DEBUG_PASSWORD;
-const DEBUG_USERNAME = config.DEBUG_USERNAME;
+import { getAccountDetails } from "../../models/LogInUtilities";
+import { DEBUG_OPERATION_TIMEOUT_MS, BASE_URL, DEBUG_EMAIL_ADDRESS, DEBUG_PASSWORD, DEBUG_USERNAME } from "../../config";
 
 /**
  * @description Test common actions that occur from the login page.
  */
-exports.test = async function(headless=true) {
+export async function testLoginPage(headless=true) {
 
     let driver;
     if (headless) {
@@ -65,9 +60,9 @@ exports.test = async function(headless=true) {
             .then((webElement) => { webElement.sendKeys(DEBUG_PASSWORD); })
             .then(() => { return driver.findElement({ id: "signup_submit" }); })
             .then((webElement) => { return webElement.click(); })
-            .then(() => { return driver.sleep(TIMEOUT); })
+            .then(() => { return driver.sleep(DEBUG_OPERATION_TIMEOUT_MS); })
             .then(() => { return driver.switchTo().alert().accept(); })
-            .then(() => { return driver.wait(until.urlIs(`${BASE_URL}/home`), TIMEOUT); })
+            .then(() => { return driver.wait(until.urlIs(`${BASE_URL}/home`), DEBUG_OPERATION_TIMEOUT_MS); })
             .then((_) => { return driver.manage(); })
             .then((options) => { return options.getCookie("session_token"); })
             .then((optionsCookie) => { printTestResult(optionsCookie !== null, testLabel); })
@@ -79,9 +74,9 @@ exports.test = async function(headless=true) {
         numTotalTests += 1;
 
         await driver
-            .wait(until.elementLocated({id: "logout_button"}), TIMEOUT)
+            .wait(until.elementLocated({id: "logout_button"}), DEBUG_OPERATION_TIMEOUT_MS)
             .click()
-            .then(() => { return driver.wait(until.urlIs(`${BASE_URL}/`), TIMEOUT); })
+            .then(() => { return driver.wait(until.urlIs(`${BASE_URL}/`), DEBUG_OPERATION_TIMEOUT_MS); })
             .then((_) => { return driver.executeScript("return window.localStorage;"); })
             .then((storedContent) => { printTestResult(storedContent.length === 0, testLabel); })
             .catch((err) => { console.error(err); printTestResult(false, testLabel); });
@@ -152,17 +147,17 @@ exports.test = async function(headless=true) {
         numTotalTests += 1;
 
         await driver
-            .wait(until.elementLocated({id: "logout_button"}), TIMEOUT)
+            .wait(until.elementLocated({id: "logout_button"}), DEBUG_OPERATION_TIMEOUT_MS)
             .click()
             .then((_) => { return driver.get(`${BASE_URL}/send-validation-email`); })
             .then((_) => { return driver.findElement({id: "email"}); })
             .then((webElement) => { return webElement.sendKeys(DEBUG_EMAIL_ADDRESS); })
             .then(() => { return driver.findElement({id: "send_validation_url_button"}); })
             .then((webElement) => { return webElement.click(); })
-            .then(() => { return driver.wait(until.alertIsPresent(), TIMEOUT); })
+            .then(() => { return driver.wait(until.alertIsPresent(), DEBUG_OPERATION_TIMEOUT_MS); })
             .then(() => { return driver.switchTo().alert().accept(); })
-            .then(() => { return driver.wait(until.urlIs(`${BASE_URL}/`), TIMEOUT); })
-            .then((_) => { return LoginUtils.getAccountDetails({email: DEBUG_EMAIL_ADDRESS}); })
+            .then(() => { return driver.wait(until.urlIs(`${BASE_URL}/`), DEBUG_OPERATION_TIMEOUT_MS); })
+            .then((_) => { return getAccountDetails({email: DEBUG_EMAIL_ADDRESS}); })
             .then((results) => {
                 if (results.success) {
                     return driver.get(
@@ -172,9 +167,9 @@ exports.test = async function(headless=true) {
                     return Promise.reject(new Error("User wasn't found in the database"));
                 }
             })
-            .then(() => { return driver.wait(until.alertIsPresent(), TIMEOUT); })
+            .then(() => { return driver.wait(until.alertIsPresent(), DEBUG_OPERATION_TIMEOUT_MS); })
             .then(() => { return driver.switchTo().alert().accept(); })
-            .then(() => { return driver.wait(until.urlContains(`${BASE_URL}/login`), TIMEOUT); })
+            .then(() => { return driver.wait(until.urlContains(`${BASE_URL}/login`), DEBUG_OPERATION_TIMEOUT_MS); })
             .then((success) => { printTestResult(success, testLabel); })
             .catch((err) => { console.error(err); printTestResult(false, testLabel); });
 
@@ -185,15 +180,15 @@ exports.test = async function(headless=true) {
 
         await driver
             .findElement({id: "forgot_password_link"}).click()
-            .then(() => { return driver.wait(until.urlIs(`${BASE_URL}/reset-password`), TIMEOUT); })
+            .then(() => { return driver.wait(until.urlIs(`${BASE_URL}/reset-password`), DEBUG_OPERATION_TIMEOUT_MS); })
             .then((_) => { return driver.findElement({name: "email"}); })
             .then((webElement) => { return webElement.sendKeys(DEBUG_EMAIL_ADDRESS); })
             .then(() => { return driver.findElement({id: "reset_password_req_submit"}); })
             .then((webElement) => { return webElement.click(); })
-            .then(() => { return driver.wait(until.elementLocated({id: "go_back_to_login_button"}), TIMEOUT); })
+            .then(() => { return driver.wait(until.elementLocated({id: "go_back_to_login_button"}), DEBUG_OPERATION_TIMEOUT_MS); })
             .then((webElement) => { return webElement.click(); })
-            .then(() => { return driver.wait(until.urlIs(`${BASE_URL}/login`), TIMEOUT); })
-            .then((_) => { return LoginUtils.getAccountDetails({email: DEBUG_EMAIL_ADDRESS}); })
+            .then(() => { return driver.wait(until.urlIs(`${BASE_URL}/login`), DEBUG_OPERATION_TIMEOUT_MS); })
+            .then((_) => { return getAccountDetails({email: DEBUG_EMAIL_ADDRESS}); })
             .then((results) => {
                 if (results.success) {
                     return driver.get(`${BASE_URL}/reset-password-link/${results.message.reset_password_uri}`);
@@ -207,8 +202,8 @@ exports.test = async function(headless=true) {
             .then((webElement) => { return webElement.sendKeys(`${DEBUG_PASSWORD}${DEBUG_PASSWORD}`)})
             .then(() => { return driver.findElement({id: "reset_password_submit"}); })
             .then((webElement) => { return webElement.click(); })
-            .then(() => { return driver.wait(until.urlContains(`${BASE_URL}/`), TIMEOUT); })
-            .then(() => { return driver.wait(until.alertIsPresent(), TIMEOUT); })
+            .then(() => { return driver.wait(until.urlContains(`${BASE_URL}/`), DEBUG_OPERATION_TIMEOUT_MS); })
+            .then(() => { return driver.wait(until.alertIsPresent(), DEBUG_OPERATION_TIMEOUT_MS); })
             .then(() => { return driver.switchTo().alert().accept(); })
             .then((_) => { return driver.findElement({name: "username_or_email"}); })
             .then((webElement) => { return webElement.sendKeys(DEBUG_EMAIL_ADDRESS); })
@@ -216,7 +211,7 @@ exports.test = async function(headless=true) {
             .then((webElement) => { webElement.sendKeys(DEBUG_PASSWORD); })
             .then(() => { return driver.findElement({id: "login_submit"}); })
             .then((webElement) => { return webElement.click(); })
-            .then(() => { return driver.wait(until.alertIsPresent(), TIMEOUT); })
+            .then(() => { return driver.wait(until.alertIsPresent(), DEBUG_OPERATION_TIMEOUT_MS); })
             .then(() => { return driver.switchTo().alert().getText(); })
             .then((text) => {
                 if (text === `Incorrect username/email and/or password`) {
@@ -232,7 +227,7 @@ exports.test = async function(headless=true) {
             .then((webElement) => { return webElement.sendKeys(`${DEBUG_PASSWORD}${DEBUG_PASSWORD}`); })
             .then(() => { return driver.findElement({id: "login_submit"}); })
             .then((webElement) => { return webElement.click(); })
-            .then(() => { return driver.wait(until.urlIs(`${BASE_URL}/home`), TIMEOUT); })
+            .then(() => { return driver.wait(until.urlIs(`${BASE_URL}/home`), DEBUG_OPERATION_TIMEOUT_MS); })
             .then(() => { return driver.executeScript("return window.localStorage;")})
             .then((storedContent) => {
                 printTestResult(storedContent.metadata !== undefined, testLabel);
@@ -245,14 +240,14 @@ exports.test = async function(headless=true) {
         numTotalTests += 1;
 
         await driver
-            .wait(until.elementLocated({id: "account_button"}), TIMEOUT)
+            .wait(until.elementLocated({id: "account_button"}), DEBUG_OPERATION_TIMEOUT_MS)
             .then((accountButton) => { accountButton.click(); })
-            .then(() => { return driver.wait(until.urlIs(`${BASE_URL}/account`), TIMEOUT); })
+            .then(() => { return driver.wait(until.urlIs(`${BASE_URL}/account`), DEBUG_OPERATION_TIMEOUT_MS); })
             .then(() => { return driver.findElement({id: "delete_account_button"}); })
             .then((webElement) => { return webElement.click(); })
-            .then(() => { return driver.wait(until.alertIsPresent(), TIMEOUT); })
+            .then(() => { return driver.wait(until.alertIsPresent(), DEBUG_OPERATION_TIMEOUT_MS); })
             .then(() => { return driver.switchTo().alert().accept(); })
-            .then(() => { return driver.wait(until.urlIs(`${BASE_URL}/login`), TIMEOUT); })
+            .then(() => { return driver.wait(until.urlIs(`${BASE_URL}/login`), DEBUG_OPERATION_TIMEOUT_MS); })
             .then((loggedOut) => { printTestResult(loggedOut, testLabel); })
             .catch((err) => { console.error(err); printTestResult(false, testLabel); });
 

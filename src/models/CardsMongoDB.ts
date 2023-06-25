@@ -6,12 +6,13 @@
  * @module
  */
 
-const Card = require('./mongoose_models/CardSchema.js');
-const MetadataDB = require('./MetadataMongoDB.js');
-const sanitizer = require("./SanitizationAndValidation.js");
+import { Card, ICard } from "./mongoose_models/CardSchema";
+import * as MetadataDB from "./MetadataMongoDB";
+import { sanitizeCard, sanitizeQuery } from "./SanitizationAndValidation";
+import { BaseResponse } from "../types";
 
-const cardSanitizer = sanitizer.sanitizeCard;
-const querySanitizer = sanitizer.sanitizeQuery;
+type CardResponse = BaseResponse & { message?: ICard };
+type ICardToMetadata = ICard & {previousTags?: string};
 
 /**
  * Create a new card and add it to the user's current cards.
@@ -22,22 +23,23 @@ const querySanitizer = sanitizer.sanitizeQuery;
  * @returns {Promise} takes a JSON object with `success`, `status` and `message`
  * as its keys. If successful, the message will contain the saved card.
  */
-exports.create = function(payload) {
+export function create(payload): Promise<CardResponse> {
     return new Promise(function(resolve, reject) {
-        let returnedValues = {};
-        let sanitizedCard = cardSanitizer(payload);
+        let returnedValues: {savedCard?: ICardToMetadata, saveConfirmation?: CardResponse} = {};
+        let sanitizedCard = sanitizeCard(payload);
         Card
             .create(sanitizedCard)
             .then((savedCard) => {
                 returnedValues.savedCard = savedCard;
-                savedCard.previousTags = savedCard.tags;
-                return MetadataDB.update([savedCard]);
+                returnedValues.savedCard.previousTags = savedCard.tags;
+                return MetadataDB.update([returnedValues.savedCard]);
             })
             .then((confirmation) => {
-                if (confirmation.success) {
-                    confirmation.message = returnedValues.savedCard;
-                }
-                returnedValues.saveConfirmation = confirmation;
+                returnedValues.saveConfirmation = {
+                    success: confirmation.success,
+                    status: confirmation.status,
+                    message: confirmation.success ? returnedValues.savedCard : null
+                };
                 return MetadataDB.updatePublicUserMetadata([returnedValues.savedCard]);
             })
             .then((_) => { resolve(returnedValues.saveConfirmation); })
@@ -54,7 +56,7 @@ exports.create = function(payload) {
  * @returns {Promise} takes a JSON object with `success`, `status` and `message`
  * as its keys. If successful, the message will be an array of the saved cards' IDs
  */
-exports.createMany = function(unsavedCards) {
+export function createMany(unsavedCards) {
     return new Promise(async function(resolve, reject) {
         let savedCardsIDs = [];
         let saveConfirmation;
@@ -71,6 +73,8 @@ exports.createMany = function(unsavedCards) {
     });
 }
 
+type CardsReadResponse = BaseResponse & { message: Partial<ICard>[] };
+
 /**
  * Read a card(s) from the database.
  *
@@ -84,9 +88,9 @@ exports.createMany = function(unsavedCards) {
  * `message` as keys. If successful, `message` will be an array of all matching
  * cards.
  */
-exports.read = function(payload, projection="title description descriptionHTML tags urgency createdById isPublic") {
-    payload = querySanitizer(payload);
-    let query = {createdById: payload.userIDInApp};
+export function read(payload, projection="title description descriptionHTML tags urgency createdById isPublic") : Promise<CardsReadResponse> {
+    payload = sanitizeQuery(payload);
+    let query : Partial<ICard> = {createdById: payload.userIDInApp};
     if (payload.cardID !== undefined) query._id = payload.cardID;
     return new Promise(function(resolve, reject) {
         Card
@@ -100,6 +104,8 @@ exports.read = function(payload, projection="title description descriptionHTML t
     });
 };
 
+type CardsUpdateResponse = BaseResponse & { message: ICard };
+
 /**
  * Update an existing card. Some fields of the card are treated as constants,
  * e.g. `createdById` and `createdAt`
@@ -110,16 +116,16 @@ exports.read = function(payload, projection="title description descriptionHTML t
  * @returns {Promise} resolves with a JSON doc with `success`, `status` and
  * `message` as keys. If successful, `message` will be the updated card.
  */
-exports.update = function(cardJSON) {
+export function update(cardJSON): Promise<CardsUpdateResponse> {
 
-    let prevResults = {};
+    let prevResults : {previousTags?: string, savedCard?: ICardToMetadata} = {};
     const EDITABLE_ATTRIBUTES = new Set([
         "title", "description", "descriptionHTML", "tags", "urgency", "isPublic",
         "numTimesMarkedAsDuplicate", "numTimesMarkedForReview"
     ]);
 
-    let query = querySanitizer({cardID: cardJSON.cardID});
-    cardJSON = cardSanitizer(cardJSON);
+    let query = sanitizeQuery({cardID: cardJSON.cardID});
+    cardJSON = sanitizeCard(cardJSON);
 
     // findByIdAndUpdate will give me the old, not the updated, document.
     // I need to find the card, save it, and then call MetadataDB.update if need be
@@ -127,9 +133,10 @@ exports.update = function(cardJSON) {
     return new Promise(function(resolve, reject) {
         Card
             .findById(query.cardID).exec()
-            .then((existingCard) => {
+            .then(async (existingCard) => {
                 if (existingCard === null) {
                     resolve({success: false, status: 200, message: null});
+                    return null;
                 } else {
                     prevResults.previousTags = existingCard.tags;
                     Object.keys(cardJSON).forEach(cardKey => {
@@ -137,17 +144,17 @@ exports.update = function(cardJSON) {
                             existingCard[cardKey] = cardJSON[cardKey];
                         }
                     });
-                    return existingCard.save();
+                    return {success: true, status: 200, message: (await existingCard.save())};
                 }
             })
-            .then((savedCard) => {
+            .then((cardResponse) => {
                 if (cardJSON.hasOwnProperty("tags") || cardJSON.hasOwnProperty("urgency")) {
-                    savedCard.previousTags = prevResults.previousTags;
-                    prevResults.savedCard = savedCard;
-                    return MetadataDB.update([savedCard]);
+                    prevResults.savedCard = cardResponse.message;
+                    prevResults.savedCard.previousTags = prevResults.previousTags;
+                    return MetadataDB.update([prevResults.savedCard]);
                 } else {
-                    prevResults.savedCard = savedCard;
-                    return Promise.resolve("DUMMY");
+                    prevResults.savedCard = cardResponse.message;
+                    return null;
                 }
             })
             .then((_) => {
@@ -176,12 +183,12 @@ exports.update = function(cardJSON) {
  * `message` as keys.
  */
 exports.delete = function(payload) {
-    payload = querySanitizer(payload);
+    payload = sanitizeQuery(payload);
     return new Promise(function(resolve, reject) {
-        Card
-            .findByIdAndRemove(payload.cardID).exec()
-            .then((removedCard) => {
-                return MetadataDB.remove(removedCard);
+        MetadataDB
+            .sendCardToTrash(payload)
+            .then((_) => {
+                return Card.findByIdAndRemove(payload.cardID).exec()
             })
             .then((confirmation) => {
                 resolve(confirmation);
@@ -205,14 +212,14 @@ exports.delete = function(payload) {
  * as keys. If successful `message` will contain abbreviated cards that only
  * the `id`, `urgency` and `title` fields.
  */
-exports.search = function(payload) {
+export function search(payload) {
     /**
      * $expr is faster than $where because it does not execute JavaScript
      * and should be preferred where possible. Note that the JS expression
      * is processed for EACH document in the collection. Yikes!
      */
 
-    payload = querySanitizer(payload);
+    payload = sanitizeQuery(payload);
 
     if (payload.queryString !== undefined) {
         payload.queryString = splitTags(payload.queryString);
@@ -263,7 +270,7 @@ let splitTags = function(s) {
  * @returns {Promise} resolves with a JSON object. If `success` is set, then
  * the `message` attribute will be an array of matching cards.
  */
-let collectSearchResults = function(queryObject) {
+let collectSearchResults = function(queryObject): Promise<Array<Partial<ICard>>> {
     return new Promise(function(resolve, reject) {
         Card
             .find(queryObject.filter, queryObject.sortCriteria)
@@ -271,9 +278,6 @@ let collectSearchResults = function(queryObject) {
             .select(queryObject.projection)
             .limit(queryObject.limit)
             .exec()
-            .then((cards) => {
-                resolve({success: true, status: 200, message: cards});
-            })
             .catch((err) => { reject(err); });
     });
 }
@@ -293,10 +297,10 @@ let collectSearchResults = function(queryObject) {
  * @returns {Promise} resolves with a JSON object. If `success` is set, then
  * the `message` attribute will be an array of matching cards.
  */
-exports.publicSearch = function(payload) {
-    payload = querySanitizer(payload);
+export function publicSearch(payload): Promise<Array<Partial<ICard>>> {
+    payload = sanitizeQuery(payload);
 
-    let mandatoryFields = [{isPublic: true}];
+    let mandatoryFields : Array<any> = [{isPublic: true}];
     if (payload.userID !== undefined) {
         mandatoryFields.push({createdById: payload.userID});
     }
@@ -333,8 +337,8 @@ exports.publicSearch = function(payload) {
  * the `message` attribute will contain a single-element array containing the
  * matching card if any.
  */
-exports.readPublicCard = function(payload) {
-    payload = querySanitizer(payload);
+export function readPublicCard(payload) {
+    payload = sanitizeQuery(payload);
     return new Promise(function(resolve, reject) {
         if (payload.cardID === undefined) {
             resolve([{}]);
@@ -363,10 +367,10 @@ exports.readPublicCard = function(payload) {
  * as its keys. If successful, the message will contain the saved card. This
  * response is the same as that of `CardsMongoDB.create(payload)`.
  */
-exports.duplicateCard = function(payload) {
+export function duplicateCard(payload) {
     // Fetch the card to be duplicated
     return new Promise(function(resolve, reject) {
-        let queryObject = querySanitizer({ _id: payload.cardID, isPublic: true });
+        let queryObject = sanitizeQuery({ _id: payload.cardID, isPublic: true });
         Card
             .findOne(queryObject).exec()
             .then((preExistingCard) => {
@@ -412,9 +416,9 @@ exports.duplicateCard = function(payload) {
  * @returns {Promise} takes a JSON object with `success`, `status` and `message`
  * as its keys. If successful, the message will contain the saved card.
  */
-exports.flagCard = function(payload) {
-    payload = querySanitizer(payload);
-    let flagsToUpdate = {};
+export function flagCard(payload) {
+    payload = sanitizeQuery(payload);
+    let flagsToUpdate : any = {};
     if (payload.markedForReview) flagsToUpdate.numTimesMarkedForReview = 1;
     if (payload.markedAsDuplicate) flagsToUpdate.numTimesMarkedAsDuplicate = 1;
     return new Promise(function(resolve, reject) {
@@ -432,6 +436,8 @@ exports.flagCard = function(payload) {
     });
 }
 
+type TagGroupings = BaseResponse & { message: Array<Array<string>>};
+
 /**
  * @description Fetch the tags contained in the associated users cards.
  *
@@ -441,8 +447,8 @@ exports.flagCard = function(payload) {
  * as its keys. If successful, the message will contain an array of arrays. Each
  * inner array will have tags that were found on a same card.
  */
-exports.getTagGroupings = function(payload) {
-    payload = querySanitizer(payload);
+export function getTagGroupings(payload): Promise<TagGroupings> {
+    payload = sanitizeQuery(payload);
     return new Promise(function(resolve, reject) {
         Card
             .find({createdById: payload.userIDInApp})
@@ -453,7 +459,7 @@ exports.getTagGroupings = function(payload) {
                     tagsArray.push(cards[i].tags.split(" "));
                 }
                 resolve({
-                    success: true, message: tagsArray
+                    success: true, status: 200, message: tagsArray
                 })
             })
             .catch((err) => { reject(err); });
@@ -498,7 +504,7 @@ let insertDescriptionHTML = function(connection) {
     let cursor = Card.find({}).cursor();
     cursor.on("data", (card) => {
         let currentCard = card;
-        currentCard = cardSanitizer(currentCard);
+        currentCard = sanitizeCard(currentCard);
         currentCard.save((err, savedCard) => {
             if (err) console.log(err);
             else console.log(`Updated ${savedCard.title}`);

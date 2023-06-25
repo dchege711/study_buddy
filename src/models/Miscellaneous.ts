@@ -6,21 +6,21 @@
  * @module
  */
 
-const User = require("./mongoose_models/UserSchema.js");
-const Card = require("./mongoose_models/CardSchema.js");
-const MetadataDB = require("./MetadataMongoDB");
-const LogInUtils = require("./LogInUtilities.js");
-const config = require("../config.js");
+import { IUser, User } from "./mongoose_models/UserSchema";
+import { Card } from "./mongoose_models/CardSchema";
+import { updatePublicUserMetadata } from "./MetadataMongoDB";
+import { registerUserAndPassword, getRandomString } from "./LogInUtilities";
+import { PUBLIC_USER_EMAIL, PUBLIC_USER_USERNAME } from "../config";
 
 /**
  * @description Add a dummy user in order to make managing the browse page for
  * public cards easier
  */
-exports.addPublicUser = function() {
+export function addPublicUser() {
     return new Promise(function(resolve, reject) {
-        let prevResults = {};
+        let prevResults : {savedUser?: IUser } = {};
         User
-            .findOne({username: config.PUBLIC_USER_USERNAME, email: config.PUBLIC_USER_EMAIL}).exec()
+            .findOne({username: PUBLIC_USER_USERNAME, email: PUBLIC_USER_EMAIL}).exec()
             .then((savedUser) => {
                 if (savedUser) {
                     resolve("User already exists");
@@ -29,21 +29,21 @@ exports.addPublicUser = function() {
                 }
             })
             .then((_) => {
-                return LogInUtils.registerUserAndPassword({
-                    username: config.PUBLIC_USER_USERNAME,
-                    email: config.PUBLIC_USER_EMAIL,
-                    password: LogInUtils.getRandomString(20) // Never meant to login
+                return registerUserAndPassword({
+                    username: PUBLIC_USER_USERNAME,
+                    email: PUBLIC_USER_EMAIL,
+                    password: getRandomString(20) // Never meant to login
                 });
             })
             .then((_) => {
-                return User.findOne({username: config.PUBLIC_USER_USERNAME}).exec();
+                return User.findOne({username: PUBLIC_USER_USERNAME}).exec();
             })
             .then((savedUser) => {
                 prevResults.savedUser = savedUser;
                 return Card.find({isPublic: true}).exec();
             })
             .then((publicCards) => {
-                return MetadataDB.updatePublicUserMetadata(publicCards);
+                return updatePublicUserMetadata(publicCards);
             })
             .then((confirmation) => {
                 if (confirmation.success) resolve(`Success!`);

@@ -7,15 +7,16 @@
  * @module
  */
 
-const stanfordCrypto = require('sjcl');
-const User = require("./mongoose_models/UserSchema.js");
-const MetadataDB = require("./MetadataMongoDB.js");
-const Metadata = require("./mongoose_models/MetadataCardSchema");
-const Card = require("./mongoose_models/CardSchema");
-const CardsDB = require("./CardsMongoDB.js");
-const Token = require("./mongoose_models/Token.js");
-const Email = require("./EmailClient.js");
-const config = require("../config.js");
+import * as stanfordCrypto from "sjcl";
+import { IUser, User } from "./mongoose_models/UserSchema";
+import { Metadata } from "./mongoose_models/MetadataCardSchema";
+import { Card } from "./mongoose_models/CardSchema";
+import { createMany } from "./CardsMongoDB";
+import { IToken, Token } from "./mongoose_models/Token";
+import * as Email from "./EmailClient";
+import * as config from "../config";
+import { APP_NAME } from "../config";
+import { BaseResponse } from "../types";
 
 const DIGITS = "0123456789";
 const LOWER_CASE = "abcdefghijklmnopqrstuvwxyz";
@@ -24,12 +25,17 @@ const UPPER_CASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 /**
  * @description Clean up resources before exiting the script.
  */
-exports.close = function() {
+export function close() {
     return new Promise(function(resolve, reject) {
         Email.close();
-        resolve();
+        resolve(null);
     })
 };
+
+interface SaltAndHash {
+    salt: stanfordCrypto.BitArray;
+    hash: stanfordCrypto.BitArray;
+}
 
 /**
  * @description Generate a salt and a hash for the provided password. We found
@@ -39,12 +45,12 @@ exports.close = function() {
  * @returns {Promise} the resolved value is an array where the first element is
  * the salt and the second element is the hash.
  */
-let getSaltAndHash = function(password) {
+let getSaltAndHash = function(password): Promise<SaltAndHash> {
     return new Promise(function(resolve, reject) {
         // 8 words = 32 bytes = 256 bits, a paranoia of 7
         let salt = stanfordCrypto.random.randomWords(8, 7);
         let hash = stanfordCrypto.misc.pbkdf2(password, salt);
-        resolve([salt, hash]);
+        resolve({salt, hash});
     });
 };
 
@@ -64,10 +70,7 @@ let getHash = async function(password, salt) {
  * @param {String} alphabet The characters that can be included in the string.
  * If not specified, defaults to the alphanumeric characters.
  */
-exports.getRandomString = function(stringLength, alphabet) {
-    if (alphabet === undefined) {
-        alphabet = DIGITS + LOWER_CASE + UPPER_CASE;
-    }
+export function getRandomString(stringLength, alphabet = DIGITS + LOWER_CASE + UPPER_CASE) {
     let random_string = "";
     for (let i = 0; i < stringLength; i++) {
         // In JavaScript, concatenation is actually faster...
@@ -88,8 +91,8 @@ let getIdInAppAndValidationURI = async function() {
     let lookingForUniqueIDAndURL = true;
     let randomID = null, validationURI = null;
     while (lookingForUniqueIDAndURL) {
-        randomID = parseInt(exports.getRandomString(12, "123456789"), 10);
-        validationURI = exports.getRandomString(32, LOWER_CASE + DIGITS);
+        randomID = parseInt(getRandomString(12, "123456789"), 10);
+        validationURI = getRandomString(32, LOWER_CASE + DIGITS);
         let conflictingUser = await new Promise(function(resolve, reject) {
             User
                 .findOne({
@@ -120,15 +123,14 @@ let getIdInAppAndValidationURI = async function() {
  * `userIDInApp`, `username`, `email`, `cardsAreByDefaultPrivate` and
  * `userRegistrationDate`.
  */
-let provideSessionToken = function(user) {
-    let sessionToken = exports.getRandomString(64, LOWER_CASE + DIGITS + UPPER_CASE);
+let provideSessionToken = function(user): Promise<IToken> {
+    let sessionToken = getRandomString(64, LOWER_CASE + DIGITS + UPPER_CASE);
     return new Promise(async function(resolve, reject) {
         Token
             .findOne({value: sessionToken}).exec()
             .then(async (existingToken) => {
                 if (existingToken !== null) {
-                    let uniqueToken = await provideSessionToken(user);
-                    resolve({success: true, status: 200, message: uniqueToken});
+                    return await provideSessionToken(user);
                 } else {
                     return Token.create({
                         token_id: sessionToken, userIDInApp: user.userIDInApp,
@@ -137,9 +139,6 @@ let provideSessionToken = function(user) {
                         userRegistrationDate: new Date(user.createdAt).toDateString()
                     })
                 }
-            })
-            .then((savedToken) => {
-                resolve({success: true, status: 200, message: savedToken});
             })
             .catch((err) => { reject(err); });
     });
@@ -154,7 +153,7 @@ let provideSessionToken = function(user) {
  * @param {Promise} resolves with a JSON object having the keys `success`,
  * `message`, `status`.
  */
-let sendAccountValidationURLToEmail = function(userDetails) {
+let sendAccountValidationURLToEmail = function(userDetails): Promise<Email.SendEmailConfirmation> {
 
     return new Promise(function(resolve, reject) {
         if (!userDetails.email || !userDetails.account_validation_uri) {
@@ -165,8 +164,8 @@ let sendAccountValidationURLToEmail = function(userDetails) {
             Email
                 .sendEmail({
                     to: userDetails.email,
-                    subject: `Please Validate Your ${config.APP_NAME} Account`,
-                    text: `Welcome to ${config.APP_NAME}! Before you can log in, please click ` +
+                    subject: `Please Validate Your ${APP_NAME} Account`,
+                    text: `Welcome to ${APP_NAME}! Before you can log in, please click ` +
                         `on this link to validate your account.\n\n` +
                         `${config.BASE_URL}/verify-account/${userDetails.account_validation_uri}` +
                         `\n\nAgain, glad to have you onboard!`
@@ -191,7 +190,7 @@ let sendAccountValidationURLToEmail = function(userDetails) {
  * @returns {Promise} resolves with a JSON object keyed by `success`, `status`
  * and `message`
  */
-exports.sendAccountValidationLink = function(payload) {
+export function sendAccountValidationLink(payload) {
     return new Promise(function(resolve, reject) {
         User
             .findOne({email: payload.email}).exec()
@@ -236,7 +235,7 @@ exports.sendAccountValidationLink = function(payload) {
  * @returns {Promise} resolves with a JSON object keyed by `success`, `status`
  * and `message`
  */
-exports.validateAccount = function(validationURI) {
+export function validateAccount(validationURI) {
     return new Promise(function(resolve, reject) {
         User
             .findOne({account_validation_uri: validationURI}).exec()
@@ -263,6 +262,8 @@ exports.validateAccount = function(validationURI) {
     });
 };
 
+type RegisterUserAndPasswordResults = BaseResponse & {message: string};
+
 /**
  * @description Register a new user using the provided password, username and email.
  * - If the username is taken, we let the user know that.
@@ -276,9 +277,9 @@ exports.validateAccount = function(validationURI) {
  * @returns {Promise} resolves with a JSON object containing the keys `success`,
  * `status` and `message`.
  */
-exports.registerUserAndPassword = function(payload) {
+export function registerUserAndPassword(payload): Promise<RegisterUserAndPasswordResults> {
 
-    let prevResults = {};
+    let prevResults : {savedUser?: IUser, emailConfirmation?: Email.SendEmailConfirmation} = {};
 
     return new Promise(function(resolve, reject) {
         let username = payload.username;
@@ -307,9 +308,9 @@ exports.registerUserAndPassword = function(payload) {
                         success: false, status: 200,
                         message: rejectionReason
                     });
-                    return Promise.reject("DUMMY");
+                    return null;
                 })
-                .then(([salt, hash]) => {
+                .then(({salt, hash}) => {
                     results.salt = salt;
                     results.hash = hash;
                     return getIdInAppAndValidationURI();
@@ -323,21 +324,24 @@ exports.registerUserAndPassword = function(payload) {
                 })
                 .then((savedUser) => {
                     prevResults.savedUser = savedUser;
-                    return MetadataDB.create({
+                    return Metadata.create({
                         userIDInApp: savedUser.userIDInApp,
                         metadataIndex: 0
                     });
                 })
                 .then((metadataConfirmation) => {
-                    if (!metadataConfirmation.success) {
-                        resolve(metadataConfirmation); return Promise.reject("DUMMY");
+                    if (!metadataConfirmation) {
+                        resolve({
+                            success: false, status: 500,
+                            message: "Could not create user profile."
+                        }); return null;
                     } else {
                         return sendAccountValidationURLToEmail(prevResults.savedUser);
                     }
                 })
                 .then((emailConfirmation) => {
                     if (emailConfirmation.success) {
-                        emailConfirmation.message = `Welcome to ${config.APP_NAME}! We've also sent a validation URL to ${email}. Please validate your account within 30 days.`;
+                        emailConfirmation.message = `Welcome to ${APP_NAME}! We've also sent a validation URL to ${email}. Please validate your account within 30 days.`;
                         prevResults.emailConfirmation = emailConfirmation;
                         let starterCards = [
                             {
@@ -371,9 +375,9 @@ exports.registerUserAndPassword = function(payload) {
                                 urgency: 6, parent: "", isPublic: false
                             }
                         ]
-                        return CardsDB.createMany(starterCards);
+                        return createMany(starterCards);
                     } else {
-                        resolve(emailConfirmation); return Promise.reject("DUMMY");
+                        resolve(emailConfirmation); return null;
                     }
                 })
                 .then((_) => {
@@ -386,6 +390,11 @@ exports.registerUserAndPassword = function(payload) {
         }
     });
 };
+
+export type AuthenticateUser = Pick<IUser & IToken, "token_id" | "userIDInApp" | "username" | "email" | "cardsAreByDefaultPrivate" | "user_reg_date">;
+
+export type AuthenticateUserResponse = BaseResponse & { message:
+    AuthenticateUser | string};
 
 /**
  * @description Authenticate a user that is trying to log in. When a user
@@ -404,7 +413,7 @@ exports.registerUserAndPassword = function(payload) {
  * `userIDInApp`, `username`, `email`, `cardsAreByDefaultPrivate` and
  * `userRegistrationDate`.
  */
-exports.authenticateUser = function(payload) {
+export function authenticateUser(payload): Promise<AuthenticateUserResponse> {
 
     let identifierQuery;
     let submittedIdentifier = payload.username_or_email;
@@ -418,7 +427,7 @@ exports.authenticateUser = function(payload) {
         }
     }
     let password = payload.password;
-    let prevResults = {};
+    let prevResults : {user?: IUser} = {};
 
     return new Promise(function(resolve, reject) {
         User
@@ -451,11 +460,20 @@ exports.authenticateUser = function(payload) {
                     });
                 }
             })
-            .then((sessionConfirmation) => { resolve(sessionConfirmation); })
+            .then((token) => { resolve({ success: true, status: 200, message: {
+                token_id: token.token_id,
+                userIDInApp: prevResults.user.userIDInApp,
+                username: prevResults.user.username,
+                email: prevResults.user.email,
+                cardsAreByDefaultPrivate: prevResults.user.cardsAreByDefaultPrivate,
+                user_reg_date: token.user_reg_date
+            }}); })
             .catch((err) => { reject(err); });
     });
 
 };
+
+type AuthenticationTokenReponse = BaseResponse & { message: IToken | string};
 
 /**
  * @description Provide an authentication endpoint where a session token has
@@ -465,7 +483,7 @@ exports.authenticateUser = function(payload) {
  * @returns {Promise} resolves with a JSON doc w/ `success`, `status`
  *  and `message` as keys
  */
-exports.authenticateByToken = function(tokenID) {
+export function authenticateByToken(tokenID): Promise<AuthenticationTokenReponse> {
     return new Promise(function(resolve, reject) {
         Token
             .findOne({ token_id: tokenID }).exec()
@@ -487,7 +505,7 @@ exports.authenticateByToken = function(tokenID) {
  * @returns {Promise} resolves with a JSON object with keys `success`, `status`
  * and `message` as keys.
  */
-exports.deleteSessionToken = function (sessionTokenID) {
+export function deleteSessionToken(sessionTokenID) {
     return new Promise(function(resolve, reject) {
         Token.findOneAndRemove({token_id: sessionTokenID}).exec()
         .then((_) => {
@@ -503,16 +521,16 @@ exports.deleteSessionToken = function (sessionTokenID) {
  * @returns {Promise} resolves with a JSON object with keys `success`, `status`
  * and `message` as keys.
  */
-exports.sendResetLink = function(userIdentifier) {
+export function sendResetLink(userIdentifier) {
 
-    let resetPasswordURI = exports.getRandomString(50, LOWER_CASE + DIGITS);
+    let resetPasswordURI = getRandomString(50, LOWER_CASE + DIGITS);
 
     return new Promise(function(resolve, reject) {
         User
             .findOne({reset_password_uri: resetPasswordURI}).exec()
             .then(async (user) => {
                 if (user !== null) {
-                    let confirmation = await exports.sendResetLink(userIdentifier);
+                    let confirmation = await sendResetLink(userIdentifier);
                     resolve(confirmation);
                     return Promise.reject("DUMMY");
                 } else {
@@ -536,8 +554,8 @@ exports.sendResetLink = function(userIdentifier) {
                 // Multiline template strings render with unwanted line breaks...
                 return Email.sendEmail({
                     to: savedUser.email,
-                    subject: `${config.APP_NAME} Password Reset`,
-                    text: `To reset your ${config.APP_NAME} password, ` +
+                    subject: `${APP_NAME} Password Reset`,
+                    text: `To reset your ${APP_NAME} password, ` +
                         `click on this link:\n\n${config.BASE_URL}` +
                         `/reset-password-link/${resetPasswordURI}` +
                         `\n\nThe link is only valid for 2 hours. If you did not ` +
@@ -554,13 +572,15 @@ exports.sendResetLink = function(userIdentifier) {
     });
 };
 
+type PasswordResetLinkResponse = BaseResponse & { message: string, redirect_url?: string };
+
 /**
  *
  * @param {String} resetPasswordURI The password reset uri sent in the email
  * @returns {Promise} resolves with a JSON object that has `success` and `message`
  * as its keys. Fails only if something goes wrong with the database.
  */
-exports.validatePasswordResetLink = function(resetPasswordURI) {
+export function validatePasswordResetLink(resetPasswordURI): Promise<PasswordResetLinkResponse> {
     return new Promise(function(resolve, reject) {
         User
             .findOne({reset_password_uri: resetPasswordURI}).exec()
@@ -594,21 +614,21 @@ exports.validatePasswordResetLink = function(resetPasswordURI) {
  * @returns {Promise} resolves with a JSON object that has the keys `success`
  * and `message`.
  */
-exports.resetPassword = function(payload) {
-    let prevResults = {};
+export function resetPassword(payload) {
+    let prevResults: {user?: IUser} = {};
     return new Promise(function(resolve, reject) {
         User
             .findOne({reset_password_uri: payload.reset_password_uri}).exec()
             .then((user) => {
                 if (user === null) {
                     resolve({success: false, status: 404, message: "Page Not Found"});
-                    return Promise.reject("DUMMY");
+                    return null;
                 } else {
                     prevResults.user = user;
                     return getSaltAndHash(payload.password);
                 }
             })
-            .then(([salt, hash]) => {
+            .then(({salt, hash}) => {
                 let user = prevResults.user;
                 user.salt = salt;
                 user.hash = hash;
@@ -621,8 +641,8 @@ exports.resetPassword = function(payload) {
             .then(() => {
                 return Email.sendEmail({
                     to: prevResults.user.email,
-                    subject: `${config.APP_NAME}: Your Password Has Been Reset`,
-                    text: `Your ${config.APP_NAME} password was reset on ${payload.reset_request_time}. ` +
+                    subject: `${APP_NAME}: Your Password Has Been Reset`,
+                    text: `Your ${APP_NAME} password was reset on ${payload.reset_request_time}. ` +
                         `If this wasn't you, please request another password reset at ` +
                         `${config.BASE_URL}/reset-password`
                 });
@@ -649,7 +669,7 @@ exports.resetPassword = function(payload) {
  * `success`. If `success` is set, the `message` property will contain the `user`
  * object.
  */
-exports.getAccountDetails = function(identifierQuery) {
+export function getAccountDetails(identifierQuery) {
     return new Promise(function(resolve, reject) {
         User
             .findOne(identifierQuery)
@@ -669,7 +689,7 @@ exports.getAccountDetails = function(identifierQuery) {
  * @returns {Promise} resolves with a JSON object that has the keys `success`
  * and `message`.
  */
-exports.deleteAccount = function(userIDInApp) {
+export function deleteAccount(userIDInApp) {
 
     return new Promise(function(resolve, reject) {
         User
@@ -702,16 +722,15 @@ exports.deleteAccount = function(userIDInApp) {
  *
  * @returns {Promise} resolves with the number of accounts that were deleted.
  */
-exports.deleteAllAccounts = function(usernamesToSpare=[config.PUBLIC_USER_USERNAME]) {
+export function deleteAllAccounts(usernamesToSpare=[config.PUBLIC_USER_USERNAME]) {
 
     if (config.NODE_ENV !== "development") {
-        return new Promise.reject(
-            new Error(`Deleting all accounts isn't allowed in the ${config.NODE_ENV} environment`)
+        return Promise.reject(
+            `Deleting all accounts isn't allowed in the ${config.NODE_ENV} environment`
         );
     }
 
     return new Promise(function(resolve, reject) {
-
         User
             .find({username: {$nin: usernamesToSpare}}).exec()
             .then(async (existingUsers) => {
@@ -723,6 +742,5 @@ exports.deleteAllAccounts = function(usernamesToSpare=[config.PUBLIC_USER_USERNA
                 resolve(numAccountsDeleted);
             })
             .catch((err) => { reject(err); });
-
     });
 };
