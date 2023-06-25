@@ -5,11 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "command": "npm start",
+            "name": "Run npm start",
+            "request": "launch",
+            "type": "node-terminal"
+        },
+        {
             "name": "Attach",
             "type": "node",
             "request": "attach",
             "port": 9229,
-            "protocol": "inspector", 
+            "protocol": "inspector",
             "address": "localhost",
             "restart": true,
             "sourceMaps": false,
@@ -19,6 +25,6 @@
             "request": "launch",
             "name": "Launch",
             "program": "${workspaceFolder}/server.js"
-        }, 
+        },
     ]
 }
