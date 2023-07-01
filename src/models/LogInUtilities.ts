@@ -251,8 +251,7 @@ export async function registerUserAndPassword(payload: RegisterUserAndPasswordPa
         userIDInApp: userIDInApp, email: payload.email, account_is_valid: false,
         account_validation_uri: validationURI
     });
-    let metdataDoc = await Metadata.create({userIDInApp, metadataIndex: 0});
-    console.log(metdataDoc);
+    await Metadata.create({createdById: userIDInApp, metadataIndex: 0});
     await sendAccountValidationURLToEmail(user);
 
     let starterCards = [
