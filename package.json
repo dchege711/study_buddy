@@ -25,7 +25,7 @@
     "build": "tsc && webpack --config webpack.config.js",
     "jsdoc": "jsdoc -r models",
     "start": "npm run build && node dist/server.js",
-    "debug": "nodemon --inspect=127.0.0.1:9229 dist/server.js",
+    "debug": "node dist/server.js",
     "single_test": "npm run build && mocha  --no-warnings ./dist/tests/mocha_tests/unit_tests/TestGraph.js",
     "test": "npm run mocha_tests",
     "mocha_tests": "npm run build && nyc mocha --no-warnings --recursive --sort './dist/tests/mocha_tests/*/*.js'",
