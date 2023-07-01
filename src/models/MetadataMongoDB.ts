@@ -31,7 +31,7 @@ export async function create(payload: MetadataCreateParams): Promise<IMetadata> 
         metadataIndex: payload.metadataIndex
     }).exec();
     if (preExistingMetadata) {
-        return preExistingMetadata;
+        return Promise.reject("Metadata already exists");
     }
 
     return Metadata.create({
@@ -110,7 +110,7 @@ export async function update(
     });
     metadataDoc.markModified("stats");
     metadataDoc.markModified("node_information");
-    // await metadataDoc.save();
+    await metadataDoc.save();
 
     return metadataDoc;
 };
@@ -138,8 +138,9 @@ export async function updatePublicUserMetadata(cards: SavedCardParams[]): Promis
         ? await update(cardsToAdd, {createdById: user.userIDInApp, metadataIndex: 0}, "numChildren")
         : (await read({userIDInApp: user.userIDInApp}))[0];
 
-    let metadataStats = metadataDoc.stats[0];
-    let metadataNodeInfo = metadataDoc.node_information[0];
+    // TODO(dchege711): This shouldn't happen. Investigate why it does.
+    let metadataStats = metadataDoc.stats.length > 0 ? metadataDoc.stats[0]: {};
+    let metadataNodeInfo = metadataDoc.node_information.length > 0 ? metadataDoc.node_information[0]: {};
 
     for (let savedCard of cardsToRemove) {
         let cardID = savedCard.card._id;
@@ -420,7 +421,7 @@ function updateMetadataWithCardDetails(
     });
 
     metadataDoc.markModified("node_information");
-    return metadataDoc.save();
+    return Promise.resolve(metadataDoc);
 }
 
 type UpdateUserSettingsParams = Pick<IUser, "cardsAreByDefaultPrivate" | "dailyTarget" | "userIDInApp">;
