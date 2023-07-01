@@ -19,8 +19,8 @@ describe("Test Graph.js\n", function() {
             .then(function(user) {
                 return getTagGroupings({userIDInApp: user.userIDInApp});
             })
-            .then(function(response) {
-                userTagGroups = response.message;
+            .then(function(tagGroups) {
+                userTagGroups = tagGroups;
                 done();
             })
             .catch(function(err) { done(err); });

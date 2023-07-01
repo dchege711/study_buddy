@@ -1,4 +1,7 @@
 import { unlink } from "fs";
+
+import { Response } from "express";
+
 import { APP_NAME } from "../config";
 
 const generic_500_msg = {
@@ -13,7 +16,7 @@ const generic_500_msg = {
  * @param {JSON} result_JSON Expected keys: `status`, `success`, `message`
  * @param {Response} res An Express JS res object
  */
-export function convertObjectToResponse (err, result_JSON, res) {
+export function convertObjectToResponse (err: Error | null, result_JSON: any, res: Response) {
     if (err) {
         console.error(err);
         res.type(".html");
@@ -41,7 +44,7 @@ export function convertObjectToResponse (err, result_JSON, res) {
     }
 };
 
-export function deleteTempFile(filepath) {
+export function deleteTempFile(filepath: string) {
     unlink(filepath, (err) => {
         if (err) console.error(err);
     });
@@ -58,8 +61,8 @@ export function deleteTempFile(filepath) {
  * @param {Response} res a reference to the Express Response object associated
  * with the pending request
  */
-export function sendResponseFromPromise(pendingPromise, res) {
+export function sendResponseFromPromise(pendingPromise: Promise<any>, res: Response) {
     pendingPromise
-        .then((results) => { exports.convertObjectToResponse(null, results, res); })
-        .catch((err) => { exports.convertObjectToResponse(err, null, res)});
+        .then((results) => { convertObjectToResponse(null, results, res); })
+        .catch((err) => { convertObjectToResponse(err, null, res)});
 };

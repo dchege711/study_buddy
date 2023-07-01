@@ -17,6 +17,8 @@ import * as Email from "./EmailClient";
 import * as config from "../config";
 import { APP_NAME } from "../config";
 import { BaseResponse } from "../types";
+import { sanitizeQuery } from "./SanitizationAndValidation";
+import { FilterQuery } from "mongoose";
 
 const DIGITS = "0123456789";
 const LOWER_CASE = "abcdefghijklmnopqrstuvwxyz";
@@ -45,13 +47,11 @@ interface SaltAndHash {
  * @returns {Promise} the resolved value is an array where the first element is
  * the salt and the second element is the hash.
  */
-let getSaltAndHash = function(password): Promise<SaltAndHash> {
-    return new Promise(function(resolve, reject) {
-        // 8 words = 32 bytes = 256 bits, a paranoia of 7
-        let salt = stanfordCrypto.random.randomWords(8, 7);
-        let hash = stanfordCrypto.misc.pbkdf2(password, salt);
-        resolve({salt, hash});
-    });
+let getSaltAndHash = function(password: string): SaltAndHash {
+    // 8 words = 32 bytes = 256 bits, a paranoia of 7
+    let salt = stanfordCrypto.random.randomWords(8, 7);
+    let hash = stanfordCrypto.misc.pbkdf2(password, salt);
+    return {salt, hash};
 };
 
 
@@ -59,9 +59,8 @@ let getSaltAndHash = function(password): Promise<SaltAndHash> {
  * @returns {Promise} resolves with the hash computed from the provided
  * `password` and `salt` parameters.
  */
-let getHash = async function(password, salt) {
-    let hash = await stanfordCrypto.misc.pbkdf2(password, salt);
-    return Promise.resolve(hash);
+let getHash = function(password: string, salt: stanfordCrypto.BitArray): stanfordCrypto.BitArray {
+    return stanfordCrypto.misc.pbkdf2(password, salt);
 };
 
 /**
@@ -70,7 +69,7 @@ let getHash = async function(password, salt) {
  * @param {String} alphabet The characters that can be included in the string.
  * If not specified, defaults to the alphanumeric characters.
  */
-export function getRandomString(stringLength, alphabet = DIGITS + LOWER_CASE + UPPER_CASE) {
+export function getRandomString(stringLength: number, alphabet = DIGITS + LOWER_CASE + UPPER_CASE) {
     let random_string = "";
     for (let i = 0; i < stringLength; i++) {
         // In JavaScript, concatenation is actually faster...
@@ -78,6 +77,11 @@ export function getRandomString(stringLength, alphabet = DIGITS + LOWER_CASE + U
     }
     return random_string;
 };
+
+interface UniqueIDAndValidationURI {
+    userIDInApp: number;
+    validationURI: string;
+}
 
 /**
  * @description Generate a User ID and a validation string, and make sure they
@@ -87,30 +91,24 @@ export function getRandomString(stringLength, alphabet = DIGITS + LOWER_CASE + U
  * @returns {Promise} the first param is a user ID and the second is a
  * validation string.
  */
-let getIdInAppAndValidationURI = async function() {
-    let lookingForUniqueIDAndURL = true;
-    let randomID = null, validationURI = null;
+let getIdInAppAndValidationURI = async function(): Promise<UniqueIDAndValidationURI> {
+    let lookingForUniqueIDAndURL = true, userIDInApp: number = 0, validationURI: string = "";
     while (lookingForUniqueIDAndURL) {
-        randomID = parseInt(getRandomString(12, "123456789"), 10);
+        userIDInApp = parseInt(getRandomString(12, "123456789"), 10);
         validationURI = getRandomString(32, LOWER_CASE + DIGITS);
-        let conflictingUser = await new Promise(function(resolve, reject) {
-            User
-                .findOne({
-                    $or: [
-                        { userIDInApp: randomID },
-                        { account_validation_uri: validationURI }
-                    ]
-                }).exec()
-                .then((user) => {
-                    resolve(user);
-                })
-                .catch((err) => { console.error(err); reject(err); })
-        });
+        let conflictingUser = await User
+            .findOne({
+                $or: [
+                    { userIDInApp: userIDInApp },
+                    { account_validation_uri: validationURI }
+                ]
+            }).exec();
+
         if (conflictingUser === null) {
-            return Promise.resolve([randomID, validationURI]);
+            lookingForUniqueIDAndURL = false;
         }
-        lookingForUniqueIDAndURL = false;
     }
+    return Promise.resolve({userIDInApp, validationURI});
 };
 
 /**
@@ -123,24 +121,19 @@ let getIdInAppAndValidationURI = async function() {
  * `userIDInApp`, `username`, `email`, `cardsAreByDefaultPrivate` and
  * `userRegistrationDate`.
  */
-let provideSessionToken = function(user): Promise<IToken> {
+let provideSessionToken = async function(user: Pick<IUser, "userIDInApp" | "username" | "email" | "cardsAreByDefaultPrivate" | "createdAt">): Promise<IToken> {
     let sessionToken = getRandomString(64, LOWER_CASE + DIGITS + UPPER_CASE);
-    return new Promise(async function(resolve, reject) {
-        Token
-            .findOne({value: sessionToken}).exec()
-            .then(async (existingToken) => {
-                if (existingToken !== null) {
-                    return await provideSessionToken(user);
-                } else {
-                    return Token.create({
-                        token_id: sessionToken, userIDInApp: user.userIDInApp,
-                        username: user.username, email: user.email,
-                        cardsAreByDefaultPrivate: user.cardsAreByDefaultPrivate,
-                        userRegistrationDate: new Date(user.createdAt).toDateString()
-                    })
-                }
-            })
-            .catch((err) => { reject(err); });
+
+    let conflictingToken = await Token.findOne({value: sessionToken}).exec();
+    if (conflictingToken) {
+        return provideSessionToken(user);
+    }
+
+    return Token.create({
+        token_id: sessionToken, userIDInApp: user.userIDInApp,
+        username: user.username, email: user.email,
+        cardsAreByDefaultPrivate: user.cardsAreByDefaultPrivate,
+        userRegistrationDate: new Date(user.createdAt).toDateString()
     });
 };
 
@@ -153,35 +146,16 @@ let provideSessionToken = function(user): Promise<IToken> {
  * @param {Promise} resolves with a JSON object having the keys `success`,
  * `message`, `status`.
  */
-let sendAccountValidationURLToEmail = function(userDetails): Promise<Email.SendEmailConfirmation> {
-
-    return new Promise(function(resolve, reject) {
-        if (!userDetails.email || !userDetails.account_validation_uri) {
-            reject(
-                new Error(`Email address == ${userDetails.email} and validation_uri == ${userDetails.account_validation_uri}`)
-            );
-        } else {
-            Email
-                .sendEmail({
-                    to: userDetails.email,
-                    subject: `Please Validate Your ${APP_NAME} Account`,
-                    text: `Welcome to ${APP_NAME}! Before you can log in, please click ` +
-                        `on this link to validate your account.\n\n` +
-                        `${config.BASE_URL}/verify-account/${userDetails.account_validation_uri}` +
-                        `\n\nAgain, glad to have you onboard!`
-                })
-                .then((emailConfirmation) => {
-                    if (emailConfirmation.success) {
-                        resolve({
-                            success: true, status: 200,
-                            message: `If ${userDetails.email} has an account, we've sent a validation URL`
-                        });
-                    } else {
-                        reject(new Error(emailConfirmation.message));
-                    }
-                })
-                .catch((err) => { reject(err); });
-        }
+let sendAccountValidationURLToEmail = function(userDetails: Pick<IUser, "email" | "account_validation_uri">): Promise<string> {
+    return Email.sendEmail({
+        to: userDetails.email,
+        subject: `Please Validate Your ${APP_NAME} Account`,
+        text: `Welcome to ${APP_NAME}! Before you can log in, please click ` +
+            `on this link to validate your account.\n\n` +
+            `${config.BASE_URL}/verify-account/${userDetails.account_validation_uri}` +
+            `\n\nAgain, glad to have you onboard!`
+    }).then(() => {
+        return Promise.resolve(`If ${userDetails.email} has an account, we've sent a validation URL.`);
     });
 };
 
@@ -190,39 +164,28 @@ let sendAccountValidationURLToEmail = function(userDetails): Promise<Email.SendE
  * @returns {Promise} resolves with a JSON object keyed by `success`, `status`
  * and `message`
  */
-export function sendAccountValidationLink(payload) {
-    return new Promise(function(resolve, reject) {
-        User
-            .findOne({email: payload.email}).exec()
-            .then(async (user) => {
-                if (user === null) {
-                    resolve({
-                        success: true, status: 200,
-                        message: `If ${payload.email} has an account, we've sent a validation URL`
-                    });
-                    return Promise.reject("DUMMY");
-                } else if (user.account_validation_uri !== "verified") {
-                    user.account_is_valid = false;
-                    let idAndValidationURL = await getIdInAppAndValidationURI();
-                    user.account_validation_uri = idAndValidationURL[1];
-                    return user.save();
-                } else {
-                    resolve({
-                        success: true, status: 200,
-                        message: `${payload.email} has already validated their account.`
-                    });
-                    return Promise.reject("DUMMY");
-                }
-            })
-            .then((savedUser) => {
-                return sendAccountValidationURLToEmail(savedUser);
-            })
-            .then((emailConfirmation) => {
-                resolve(emailConfirmation);
-            })
-            .catch((err) => { if (err !== "DUMMY") reject(err); });
-    });
+export async function sendAccountValidationLink(payload: Pick<IUser, "email">): Promise<string> {
+    let user = await User.findOne({email: payload.email}).exec();
+    if (user === null) {
+        return `If ${payload.email} has an account, we've sent a validation URL`;
+    }
+
+    if (user.account_validation_uri === "verified") {
+        return `${payload.email} has already validated their account.`;
+    }
+
+    let {userIDInApp, validationURI} = await getIdInAppAndValidationURI();
+    user.account_validation_uri = validationURI;
+    await user.save();
+
+    return sendAccountValidationURLToEmail(user)
+        .then(() => `If ${payload.email} has an account, we've sent a validation URL`);
 };
+
+interface ValidateAccountResult {
+    redirect_url: string;
+    message: string;
+}
 
 /**
  * @description Once an account is registered, the user needs to click on a
@@ -235,34 +198,28 @@ export function sendAccountValidationLink(payload) {
  * @returns {Promise} resolves with a JSON object keyed by `success`, `status`
  * and `message`
  */
-export function validateAccount(validationURI) {
-    return new Promise(function(resolve, reject) {
-        User
-            .findOne({account_validation_uri: validationURI}).exec()
-            .then((user) => {
-                if (user === null) {
-                    resolve({
-                        success: false, status: 303, redirect_url: `/send-validation-email`,
-                        message: `The validation URL is either incorrect or stale. Please request for a new one from ${config.BASE_URL}/send-validation-email`
-                    });
-                    return Promise.reject("DUMMY");
-                } else {
-                    user.account_validation_uri = "verified";
-                    user.account_is_valid = true;
-                    return user.save();
-                }
-            })
-            .then((savedUser) => {
-                resolve({
-                    success: true, status: 303, redirect_url: `/login`,
-                    message: `Successfully validated ${savedUser.email}. Redirecting you to login`
-                });
-            })
-            .catch((err) => { if (err !== "DUMMY") reject(err); });
-    });
+export async function validateAccount(validationURI: string): Promise<ValidateAccountResult> {
+    let user = await User.findOne({account_validation_uri: validationURI}).exec();
+
+    // TODO(dchege711): How can we know that the user is already verified?
+    if (user === null) {
+        return {
+            redirect_url: `/send-validation-email`,
+            message: `The validation URL is invalid.`
+        };
+    }
+
+    user.account_validation_uri = "verified";
+    user.account_is_valid = true;
+    await user.save();
+
+    return {
+        redirect_url: `/login`,
+        message: `Successfully validated ${user.email}. Redirecting you to login`
+    };
 };
 
-type RegisterUserAndPasswordResults = BaseResponse & {message: string};
+type RegisterUserAndPasswordParams = Pick<IUser, "username" | "email"> & {password: string};
 
 /**
  * @description Register a new user using the provided password, username and email.
@@ -277,124 +234,70 @@ type RegisterUserAndPasswordResults = BaseResponse & {message: string};
  * @returns {Promise} resolves with a JSON object containing the keys `success`,
  * `status` and `message`.
  */
-export function registerUserAndPassword(payload): Promise<RegisterUserAndPasswordResults> {
+export async function registerUserAndPassword(payload: RegisterUserAndPasswordParams): Promise<string> {
+    payload = sanitizeQuery(payload);
 
-    let prevResults : {savedUser?: IUser, emailConfirmation?: Email.SendEmailConfirmation} = {};
+    let conflictingUser = await User.findOne({ $or: [{ username: payload.username }, { email: payload.email }]}).exec();
+    if (conflictingUser !== null) {
+        return conflictingUser.username === payload.username
+            ? "Username already taken."
+            : "Email already taken.";
+    }
 
-    return new Promise(function(resolve, reject) {
-        let username = payload.username;
-        let password = payload.password;
-        let email = payload.email;
-        let results = {salt: null, hash: null};
-
-        if (!username || !password || !email) {
-            resolve({
-                success: false, status: 200,
-                message: "At least one of these wasn't provided: username, password, email"
-            });
-        } else {
-
-            User
-                .findOne({ $or: [{ username: username }, { email: email }]}).exec()
-                .then((existingUser) => {
-                    if (existingUser === null) return getSaltAndHash(password);
-                    let rejectionReason = null;
-                    if (existingUser.username === username) {
-                        rejectionReason = "Username already taken."
-                    } else {
-                        rejectionReason = "Email already taken."
-                    }
-                    resolve({
-                        success: false, status: 200,
-                        message: rejectionReason
-                    });
-                    return null;
-                })
-                .then(({salt, hash}) => {
-                    results.salt = salt;
-                    results.hash = hash;
-                    return getIdInAppAndValidationURI();
-                })
-                .then(([userID, validationURI]) => {
-                    return User.create({
-                        username: username, salt: results.salt, hash: results.hash,
-                        userIDInApp: userID, email: email, account_is_valid: false,
-                        account_validation_uri: validationURI
-                    });
-                })
-                .then((savedUser) => {
-                    prevResults.savedUser = savedUser;
-                    return Metadata.create({
-                        userIDInApp: savedUser.userIDInApp,
-                        metadataIndex: 0
-                    });
-                })
-                .then((metadataConfirmation) => {
-                    if (!metadataConfirmation) {
-                        resolve({
-                            success: false, status: 500,
-                            message: "Could not create user profile."
-                        }); return null;
-                    } else {
-                        return sendAccountValidationURLToEmail(prevResults.savedUser);
-                    }
-                })
-                .then((emailConfirmation) => {
-                    if (emailConfirmation.success) {
-                        emailConfirmation.message = `Welcome to ${APP_NAME}! We've also sent a validation URL to ${email}. Please validate your account within 30 days.`;
-                        prevResults.emailConfirmation = emailConfirmation;
-                        let starterCards = [
-                            {
-                                title: "Example of a Card Title", tags: "sample_card",
-                                description: "# Hash Tags Create Headers\n\n* You can format your cards using markdown, e.g.\n* Bullet points\n\n1. Numbered lists\n\n *So*, **many**, ~~options~~\n\n> See [the Markdown Cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)",
-                                createdById: prevResults.savedUser.userIDInApp,
-                                urgency: 10, parent: "", isPublic: false
-                            },
-                            {
-                                title: "Sample Card With Image", tags: "sample_card",
-                                description: "When linking to an image, you can optionally specify the width and height (image credit: XKCD)\n\n![xkcd: Alpha Centauri](https://imgs.xkcd.com/comics/alpha_centauri.png =25%x10%)",
-                                createdById: prevResults.savedUser.userIDInApp,
-                                urgency: 9, parent: "", isPublic: false
-                            },
-                            {
-                                title: "Sample Card With Spoiler Tags", tags: "sample_card",
-                                description: "> How do I quiz myself? \n\n[spoiler]\n\n* Anything below the first '[spoiler]' will be covered by a gray box. \n* Hovering over / clicking on the gray box will reveal the content underneath.\n* Also note how the urgency influences the order of the cards. Cards with lower urgency are presented last.",
-                                createdById: prevResults.savedUser.userIDInApp,
-                                urgency: 8, parent: "", isPublic: false
-                            },
-                            {
-                                title: "Code Snippets and LaTeX", tags: "sample_card",
-                                description: "* Feel free to inline LaTeX \\(e = mc^2\\) or code: `int n = 10;`\n\n* Standalone LaTeX also works, e.g.\n$$ e = mc^2 $$\n\n* When writing code blocks, specify the language so that it's highlighted accordingly, e.g.\n```python\nimport sys\nprint(sys.version)\n```",
-                                createdById: prevResults.savedUser.userIDInApp,
-                                urgency: 7, parent: "", isPublic: false
-                            },
-                            {
-                                title: "Putting It All Together", tags: "sample_card",
-                                description: "> Give examples on when these problem solving techniques are appropriate:\n* Defining a recurrence relation.\n* Manipulating the definitions.\n* Analyzing all possible cases.\n\n\n\n[spoiler]\n\n### Define a recurrence and identify base/boundary conditions\n* Useful when knowing a previous state helps you find the next state.\n* Techniques include plug-and-chug and solving for characteristic equation.\n\n### Manipulating the Definitions\n* Useful for proving general statements with little to no specificity.\n\n### Analyzing all possible cases\n* Sometimes there's an invariant that summarizes all possible cases into a few cases, e.g. *Ramsey's 3 mutual friends/enemies for n >= 6*",
-                                createdById: prevResults.savedUser.userIDInApp,
-                                urgency: 6, parent: "", isPublic: false
-                            }
-                        ]
-                        return createMany(starterCards);
-                    } else {
-                        resolve(emailConfirmation); return null;
-                    }
-                })
-                .then((_) => {
-                    resolve(prevResults.emailConfirmation);
-                })
-                .catch((err) => {
-                    if (err !== "DUMMY") reject(err);
-                });
-
-        }
+    let {salt, hash} = await getSaltAndHash(payload.password);
+    let {userIDInApp, validationURI} = await getIdInAppAndValidationURI();
+    let user = await User.create({
+        username: payload.username, salt: salt, hash: hash,
+        userIDInApp: userIDInApp, email: payload.email, account_is_valid: false,
+        account_validation_uri: validationURI
     });
+    let metdataDoc = await Metadata.create({userIDInApp, metadataIndex: 0});
+    console.log(metdataDoc);
+    await sendAccountValidationURLToEmail(user);
+
+    let starterCards = [
+        {
+            title: "Example of a Card Title", tags: "sample_card",
+            description: "# Hash Tags Create Headers\n\n* You can format your cards using markdown, e.g.\n* Bullet points\n\n1. Numbered lists\n\n *So*, **many**, ~~options~~\n\n> See [the Markdown Cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)",
+            createdById: userIDInApp,
+            urgency: 10, parent: "", isPublic: false
+        },
+        {
+            title: "Sample Card With Image", tags: "sample_card",
+            description: "When linking to an image, you can optionally specify the width and height (image credit: XKCD)\n\n![xkcd: Alpha Centauri](https://imgs.xkcd.com/comics/alpha_centauri.png =25%x10%)",
+            createdById: userIDInApp,
+            urgency: 9, parent: "", isPublic: false
+        },
+        {
+            title: "Sample Card With Spoiler Tags", tags: "sample_card",
+            description: "> How do I quiz myself? \n\n[spoiler]\n\n* Anything below the first '[spoiler]' will be covered by a gray box. \n* Hovering over / clicking on the gray box will reveal the content underneath.\n* Also note how the urgency influences the order of the cards. Cards with lower urgency are presented last.",
+            createdById: userIDInApp,
+            urgency: 8, parent: "", isPublic: false
+        },
+        {
+            title: "Code Snippets and LaTeX", tags: "sample_card",
+            description: "* Feel free to inline LaTeX \\(e = mc^2\\) or code: `int n = 10;`\n\n* Standalone LaTeX also works, e.g.\n$$ e = mc^2 $$\n\n* When writing code blocks, specify the language so that it's highlighted accordingly, e.g.\n```python\nimport sys\nprint(sys.version)\n```",
+            createdById: userIDInApp,
+            urgency: 7, parent: "", isPublic: false
+        },
+        {
+            title: "Putting It All Together", tags: "sample_card",
+            description: "> Give examples on when these problem solving techniques are appropriate:\n* Defining a recurrence relation.\n* Manipulating the definitions.\n* Analyzing all possible cases.\n\n\n\n[spoiler]\n\n### Define a recurrence and identify base/boundary conditions\n* Useful when knowing a previous state helps you find the next state.\n* Techniques include plug-and-chug and solving for characteristic equation.\n\n### Manipulating the Definitions\n* Useful for proving general statements with little to no specificity.\n\n### Analyzing all possible cases\n* Sometimes there's an invariant that summarizes all possible cases into a few cases, e.g. *Ramsey's 3 mutual friends/enemies for n >= 6*",
+            createdById: userIDInApp,
+            urgency: 6, parent: "", isPublic: false
+        }
+    ]
+    await createMany(starterCards);
+
+    return `Welcome to ${APP_NAME}! We've also sent a validation URL to ${user.email}. Please validate your account within 30 days.`;
 };
 
 export type AuthenticateUser = Pick<IUser & IToken, "token_id" | "userIDInApp" | "username" | "email" | "cardsAreByDefaultPrivate" | "user_reg_date">;
 
-export type AuthenticateUserResponse = BaseResponse & { message:
-    AuthenticateUser | string};
+interface AuthenticateUserParam {
+    username_or_email: string;
+    password: string;
+}
 
 /**
  * @description Authenticate a user that is trying to log in. When a user
@@ -413,67 +316,47 @@ export type AuthenticateUserResponse = BaseResponse & { message:
  * `userIDInApp`, `username`, `email`, `cardsAreByDefaultPrivate` and
  * `userRegistrationDate`.
  */
-export function authenticateUser(payload): Promise<AuthenticateUserResponse> {
+export async function authenticateUser(payload: AuthenticateUserParam): Promise<AuthenticateUser> {
 
-    let identifierQuery;
+    let identifierQuery: FilterQuery<IUser> = {};
     let submittedIdentifier = payload.username_or_email;
-    if (submittedIdentifier === undefined) {
-        identifierQuery = { path_that_doesnt_exist: "invalid@username!@" };
+    if (submittedIdentifier.includes("@")) {
+        identifierQuery = { email: submittedIdentifier };
     } else {
-        if (submittedIdentifier.includes("@")) {
-            identifierQuery = { email: submittedIdentifier };
-        } else {
-            identifierQuery = { username: submittedIdentifier };
+        identifierQuery = { username: submittedIdentifier };
+    }
+
+    let password = payload.password;
+
+    let user = await User.findOne(identifierQuery).exec();
+    if (user === null) {
+        return Promise.reject("Incorrect username/email and/or password");
+    }
+
+    let computedHash = getHash(password, user.salt);
+    let thereIsAMatch = computedHash.length === user.hash.length;
+    if (thereIsAMatch) {
+        for (let i = 0; i < computedHash.length; i++) {
+            if (computedHash[i] !== user.hash[i]) {
+                thereIsAMatch = false; break;
+            }
         }
     }
-    let password = payload.password;
-    let prevResults : {user?: IUser} = {};
+    if (!thereIsAMatch) {
+        return Promise.reject("Incorrect username/email and/or password");
+    }
 
-    return new Promise(function(resolve, reject) {
-        User
-            .findOne(identifierQuery).exec()
-            .then((user) => {
-                if (user === null) {
-                    resolve({
-                        success: false, status: 200,
-                        message: "Incorrect username/email and/or password"
-                    });
-                } else {
-                    prevResults.user = user;
-                    return getHash(password, user.salt);
-                }
-            })
-            .then((computedHash) => {
-                let thereIsAMatch = true;
-                let hashOnFile = prevResults.user.hash;
-                for (let i = 0; i < computedHash.length; i++) {
-                    if (computedHash[i] !== hashOnFile[i]) {
-                        thereIsAMatch = false; break;
-                    }
-                }
-                if (thereIsAMatch) {
-                    return provideSessionToken(prevResults.user);
-                } else {
-                    resolve({
-                        success: false, status: 200,
-                        message: "Incorrect username/email and/or password"
-                    });
-                }
-            })
-            .then((token) => { resolve({ success: true, status: 200, message: {
-                token_id: token.token_id,
-                userIDInApp: prevResults.user.userIDInApp,
-                username: prevResults.user.username,
-                email: prevResults.user.email,
-                cardsAreByDefaultPrivate: prevResults.user.cardsAreByDefaultPrivate,
-                user_reg_date: token.user_reg_date
-            }}); })
-            .catch((err) => { reject(err); });
-    });
+    let userToken = await provideSessionToken(user);
 
+    return {
+        token_id: userToken.token_id,
+        userIDInApp: user.userIDInApp,
+        username: user.username,
+        email: user.email,
+        cardsAreByDefaultPrivate: user.cardsAreByDefaultPrivate,
+        user_reg_date: userToken.user_reg_date
+    };
 };
-
-type AuthenticationTokenReponse = BaseResponse & { message: IToken | string};
 
 /**
  * @description Provide an authentication endpoint where a session token has
@@ -483,19 +366,13 @@ type AuthenticationTokenReponse = BaseResponse & { message: IToken | string};
  * @returns {Promise} resolves with a JSON doc w/ `success`, `status`
  *  and `message` as keys
  */
-export function authenticateByToken(tokenID): Promise<AuthenticationTokenReponse> {
-    return new Promise(function(resolve, reject) {
-        Token
-            .findOne({ token_id: tokenID }).exec()
-            .then((token) => {
-                if (token === null) {
-                    resolve({status: 200, success: false, message: "Invalid login token"});
-                } else {
-                    resolve({status: 200, success: true, message: token});
-                }
-            })
-            .catch((err) => { reject(err); });
-    });
+export async function authenticateByToken(tokenID: string): Promise<IToken> {
+    let token = await Token.findOne({ token_id: tokenID }).exec();
+    if (token === null) {
+        return Promise.reject("Invalid token");
+    } else {
+        return token;
+    }
 };
 
 /**
@@ -505,71 +382,48 @@ export function authenticateByToken(tokenID): Promise<AuthenticationTokenReponse
  * @returns {Promise} resolves with a JSON object with keys `success`, `status`
  * and `message` as keys.
  */
-export function deleteSessionToken(sessionTokenID) {
-    return new Promise(function(resolve, reject) {
-        Token.findOneAndRemove({token_id: sessionTokenID}).exec()
-        .then((_) => {
-            resolve({status: 200, success: true, message: "Removed token"});
-        })
-        .catch((err) => { reject(err); });
-    });
-
+export async function deleteSessionToken(sessionTokenID: string): Promise<void> {
+    await Token.findOneAndRemove({token_id: sessionTokenID}).exec();
 };
+
+type ResetLinkParams = Pick<IUser, "email">;
 
 /**
  * @param {JSON} userIdentifier Expected key: `email_address`
  * @returns {Promise} resolves with a JSON object with keys `success`, `status`
  * and `message` as keys.
  */
-export function sendResetLink(userIdentifier) {
+export async function sendResetLink(userIdentifier: ResetLinkParams): Promise<string> {
+    let user = await User.findOne({email: userIdentifier.email}).exec();
+    if (!user) {
+        return `If ${userIdentifier.email} has an account, we've sent a password reset link`;
+    }
 
     let resetPasswordURI = getRandomString(50, LOWER_CASE + DIGITS);
+    while (true) {
+        let conflictingUser = await User.findOne({reset_password_uri: resetPasswordURI}).exec();
+        if (!conflictingUser) {
+            break;
+        }
+        resetPasswordURI = getRandomString(50, LOWER_CASE + DIGITS);
+    }
 
-    return new Promise(function(resolve, reject) {
-        User
-            .findOne({reset_password_uri: resetPasswordURI}).exec()
-            .then(async (user) => {
-                if (user !== null) {
-                    let confirmation = await sendResetLink(userIdentifier);
-                    resolve(confirmation);
-                    return Promise.reject("DUMMY");
-                } else {
-                    return User.findOne({email: userIdentifier.email}).exec();
-                }
-            })
-            .then((userWithMatchingEmail) => {
-                if (userWithMatchingEmail === null) {
-                    resolve({
-                        success: true, status: 200,
-                        message: `If ${userIdentifier.email} has an account, we've sent a password reset link`
-                    });
-                    return Promise.reject("DUMMY");
-                } else {
-                    userWithMatchingEmail.reset_password_uri = resetPasswordURI;
-                    userWithMatchingEmail.reset_password_timestamp = Date.now();
-                    return userWithMatchingEmail.save();
-                }
-            })
-            .then((savedUser) => {
-                // Multiline template strings render with unwanted line breaks...
-                return Email.sendEmail({
-                    to: savedUser.email,
-                    subject: `${APP_NAME} Password Reset`,
-                    text: `To reset your ${APP_NAME} password, ` +
-                        `click on this link:\n\n${config.BASE_URL}` +
-                        `/reset-password-link/${resetPasswordURI}` +
-                        `\n\nThe link is only valid for 2 hours. If you did not ` +
-                        `request a password reset, please ignore this email.`
-                })
-            })
-            .then((_) => {
-                resolve({
-                    success: true, status: 200,
-                    message: `If ${userIdentifier.email} has an account, we've sent a password reset link`
-                });
-            })
-            .catch((err) => { if (err !== "DUMMY") reject(err); });
+    user.reset_password_uri = resetPasswordURI;
+    user.reset_password_timestamp = Date.now();
+    await user.save();
+
+    // Multiline template strings render with unwanted line breaks...
+    await Email.sendEmail({
+        to: user.email,
+        subject: `${APP_NAME} Password Reset`,
+        text: `To reset your ${APP_NAME} password, ` +
+            `click on this link:\n\n${config.BASE_URL}` +
+            `/reset-password-link/${resetPasswordURI}` +
+            `\n\nThe link is only valid for 2 hours. If you did not ` +
+            `request a password reset, please ignore this email.`
     });
+
+    return `If ${userIdentifier.email} has an account, we've sent a password reset link`;
 };
 
 type PasswordResetLinkResponse = BaseResponse & { message: string, redirect_url?: string };
@@ -580,29 +434,20 @@ type PasswordResetLinkResponse = BaseResponse & { message: string, redirect_url?
  * @returns {Promise} resolves with a JSON object that has `success` and `message`
  * as its keys. Fails only if something goes wrong with the database.
  */
-export function validatePasswordResetLink(resetPasswordURI): Promise<PasswordResetLinkResponse> {
-    return new Promise(function(resolve, reject) {
-        User
-            .findOne({reset_password_uri: resetPasswordURI}).exec()
-            .then((user) => {
-                if (user === null) {
-                    resolve({
-                        success: false, status: 404, message: "Page Not Found"
-                    });
-                } else if (Date.now() > user.reset_password_timestamp + 2 * 3600 * 1000) {
-                    resolve({
-                        success: false, status: 200, redirect_url: `${config.BASE_URL}/reset-password`,
-                        message: "Expired link. Please submit another reset request."
-                    });
-                } else {
-                    resolve({
-                        success: true, status: 200, message: "Please submit a new password"
-                    });
-                }
-            })
-            .catch((err) => { reject(err); });
-    });
+export async function validatePasswordResetLink(resetPasswordURI: string): Promise<string> {
+    let user = await User.findOne({reset_password_uri: resetPasswordURI}).exec();
+    if (user === null) {
+        return "Invalid link";
+    }
+
+    if (Date.now() > user.reset_password_timestamp + 2 * 3600 * 1000) {
+        return `Expired link. Please submit another reset request via ${config.BASE_URL}/reset-password.`;
+    }
+
+    return "Please submit a new password";
 };
+
+type ResetPasswordParams = Pick<IUser, "reset_password_uri"> & { password: string, reset_request_time: Date };
 
 /**
  * @description Reset the user's password. We also invalidate all previously
@@ -614,52 +459,28 @@ export function validatePasswordResetLink(resetPasswordURI): Promise<PasswordRes
  * @returns {Promise} resolves with a JSON object that has the keys `success`
  * and `message`.
  */
-export function resetPassword(payload) {
-    let prevResults: {user?: IUser} = {};
-    return new Promise(function(resolve, reject) {
-        User
-            .findOne({reset_password_uri: payload.reset_password_uri}).exec()
-            .then((user) => {
-                if (user === null) {
-                    resolve({success: false, status: 404, message: "Page Not Found"});
-                    return null;
-                } else {
-                    prevResults.user = user;
-                    return getSaltAndHash(payload.password);
-                }
-            })
-            .then(({salt, hash}) => {
-                let user = prevResults.user;
-                user.salt = salt;
-                user.hash = hash;
-                user.reset_password_timestamp += -3 * 3600 * 1000; // Invalidate link
-                return user.save();
-            })
-            .then((savedUser) => {
-                return Token.deleteMany({userIDInApp: savedUser.userIDInApp}).exec();
-            })
-            .then(() => {
-                return Email.sendEmail({
-                    to: prevResults.user.email,
-                    subject: `${APP_NAME}: Your Password Has Been Reset`,
-                    text: `Your ${APP_NAME} password was reset on ${payload.reset_request_time}. ` +
-                        `If this wasn't you, please request another password reset at ` +
-                        `${config.BASE_URL}/reset-password`
-                });
-            })
-            .then((emailConfirmation) => {
-                if (emailConfirmation.success) {
-                    resolve({
-                        success: true, status: 200, redirect_url: "/",
-                        message: `Password successfully reset. Log in with your new password.`
-                    });
-                } else {
-                    resolve(emailConfirmation);
-                }
-            })
-            .catch((err) => { if (err !== "DUMMY") reject(err); });
+export async function resetPassword(payload: ResetPasswordParams): Promise<string> {
+    let user = await User.findOne({reset_password_uri: payload.reset_password_uri}).exec();
+    if (user === null) {
+        return "Invalid link";
+    }
 
+    let {salt, hash} = await getSaltAndHash(payload.password);
+    user.salt = salt;
+    user.hash = hash;
+    user.reset_password_timestamp += -3 * 3600 * 1000; // Invalidate link
+    await user.save();
+
+    await Token.deleteMany({userIDInApp: user.userIDInApp}).exec();
+    await Email.sendEmail({
+        to: user.email,
+        subject: `${APP_NAME}: Your Password Has Been Reset`,
+        text: `Your ${APP_NAME} password was reset on ${payload.reset_request_time}. ` +
+            `If this wasn't you, please request another password reset at ` +
+            `${config.BASE_URL}/reset-password`
     });
+
+    return "Password successfully reset. Log in with your new password";
 };
 
 /**
@@ -669,17 +490,8 @@ export function resetPassword(payload) {
  * `success`. If `success` is set, the `message` property will contain the `user`
  * object.
  */
-export function getAccountDetails(identifierQuery) {
-    return new Promise(function(resolve, reject) {
-        User
-            .findOne(identifierQuery)
-            .select("-salt -hash")
-            .exec()
-            .then((user) => {
-                resolve({success: true, status: 200, message: user});
-            })
-            .catch((err) => { reject(err); });
-    });
+export function getAccountDetails(identifierQuery: FilterQuery<IUser>): Promise<Partial<IUser> | null> {
+    return User.findOne(identifierQuery).select("-salt -hash").exec();
 }
 
 
@@ -689,28 +501,11 @@ export function getAccountDetails(identifierQuery) {
  * @returns {Promise} resolves with a JSON object that has the keys `success`
  * and `message`.
  */
-export function deleteAccount(userIDInApp) {
-
-    return new Promise(function(resolve, reject) {
-        User
-            .deleteMany({userIDInApp: userIDInApp}).exec()
-            .then(() => {
-                return Token.deleteMany({userIDInApp: userIDInApp}).exec();
-            })
-            .then(() => {
-                return Metadata.deleteMany({createdById: userIDInApp}).exec();
-            })
-            .then(() => {
-                return Card.deleteMany({createdById: userIDInApp}).exec();
-            })
-            .then(() => {
-                resolve({
-                    success: true, status: 200,
-                    message: "Account successfully deleted. Sayonara!"
-                })
-            })
-            .catch((err) => { reject(err); });
-    });
+export async function deleteAccount(userIDInApp: number): Promise<void> {
+    await User.deleteMany({userIDInApp: userIDInApp}).exec();
+    await Token.deleteMany({userIDInApp: userIDInApp}).exec();
+    await Metadata.deleteMany({createdById: userIDInApp}).exec();
+    await Card.deleteMany({createdById: userIDInApp}).exec();
 };
 
 /**
@@ -722,25 +517,21 @@ export function deleteAccount(userIDInApp) {
  *
  * @returns {Promise} resolves with the number of accounts that were deleted.
  */
-export function deleteAllAccounts(usernamesToSpare=[config.PUBLIC_USER_USERNAME]) {
-
+export function deleteAllAccounts(usernamesToSpare=[config.PUBLIC_USER_USERNAME]): Promise<number> {
     if (config.NODE_ENV !== "development") {
         return Promise.reject(
             `Deleting all accounts isn't allowed in the ${config.NODE_ENV} environment`
         );
     }
 
-    return new Promise(function(resolve, reject) {
-        User
-            .find({username: {$nin: usernamesToSpare}}).exec()
-            .then(async (existingUsers) => {
-                let numAccountsDeleted = 0;
-                for (let i = 0; i < existingUsers.length; i++) {
-                    await exports.deleteAccount(existingUsers[i].userIDInApp);
-                    numAccountsDeleted += 1;
-                }
-                resolve(numAccountsDeleted);
-            })
-            .catch((err) => { reject(err); });
-    });
+    return User
+        .find({username: {$nin: usernamesToSpare}}).exec()
+        .then(async (existingUsers) => {
+            let numAccountsDeleted = 0;
+            for (let user of existingUsers) {
+                await deleteAccount(user.userIDInApp);
+                numAccountsDeleted += 1;
+            }
+            return numAccountsDeleted;
+        });
 };

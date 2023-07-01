@@ -716,13 +716,11 @@ export const sampleCards = [
 
 {"title":"Longest Sequence of Alternating Min and Max Peaks in an Array","description":"> Given an array \\(nums\\), what's the longest wiggle subsequence? Use \\(O(1)\\) space and \\(O(n)\\) time.\n\n* Try it on [LeetCode](https://leetcode.com/problems/wiggle-subsequence/description/)\n\n[spoiler]\n\n```python\nN = len(nums)\nif N < 2: return N\nlen_longest_up_wiggle, len_longest_down_wiggle = 1, 1\nfor i in range(1, N):\n    if nums[i] > nums[i-1]: len_longest_up_wiggle = len_longest_down_wiggle + 1\n    elif nums[i] < nums[i-1]: len_longest_down_wiggle = len_longest_up_wiggle + 1\nreturn max(len_longest_up_wiggle, len_longest_down_wiggle)\n```\n","tags":"dynamic_programming arrays medium_programming_challenges array_search_under_constraints subsequence_algorithms","urgency":6.82,"createdAt":"2018-07-16T21:28:31.363Z"}]
 
-const N = exports.sampleCards.length;
-
 /**
  * @returns {Array} contains at most `numCards` chosen at random without replacement.
  */
-export function getRandomCards(numCards) {
-    let cardIndexes = new Array(Math.min(numCards, exports.sampleCards.length));
+export function getRandomCards(numCards: number) {
+    let cardIndexes = new Array(Math.min(numCards, sampleCards.length));
     for (let i = 0; i < cardIndexes.length; i++) cardIndexes[i] = i;
     let randomIdx, temp;
     for (let i = 0; i < cardIndexes.length; i++) {
@@ -734,7 +732,7 @@ export function getRandomCards(numCards) {
 
     let cards = new Array(cardIndexes.length);
     for (let i = 0; i < cardIndexes.length; i++) {
-        cards[i] = exports.sampleCards[cardIndexes[i]];
+        cards[i] = sampleCards[cardIndexes[i]];
     }
     return cards;
 }
