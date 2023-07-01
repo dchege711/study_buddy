@@ -1,8 +1,8 @@
 "use strict";
 
-import { Builder, until } from "selenium-webdriver";
-import { chrome } from "selenium-webdriver/chrome";
-import { firefox } from "selenium-webdriver/firefox";
+import { Builder, until, WebDriver } from "selenium-webdriver";
+import * as chrome from "selenium-webdriver/chrome";
+import * as firefox from "selenium-webdriver/firefox";
 
 import { getAccountDetails } from "../../models/LogInUtilities";
 import { DEBUG_OPERATION_TIMEOUT_MS, BASE_URL, DEBUG_EMAIL_ADDRESS, DEBUG_PASSWORD, DEBUG_USERNAME } from "../../config";
@@ -12,15 +12,12 @@ import { DEBUG_OPERATION_TIMEOUT_MS, BASE_URL, DEBUG_EMAIL_ADDRESS, DEBUG_PASSWO
  */
 export async function testLoginPage(headless=true) {
 
-    let driver;
-    if (headless) {
-        driver = await new Builder()
+    let driver: WebDriver = headless
+        ? await new Builder()
             .setChromeOptions(new chrome.Options().headless())
             .setFirefoxOptions(new firefox.Options().headless())
-            .build();
-    } else {
-        driver = await new Builder().build();
-    }
+            .build()
+        : await new Builder().build();
 
     let numTotalTests = 0, numTestsPassed = 0, testLabel = "";
 
@@ -32,7 +29,7 @@ export async function testLoginPage(headless=true) {
      *
      * @returns {Void}
      */
-    function printTestResult(result, testLabel) {
+    function printTestResult(result: boolean, testLabel: string) {
         if (result) {
             numTestsPassed += 1;
             console.log('\x1b[32m%s\x1b[0m %s', `✔`, testLabel);
@@ -53,7 +50,7 @@ export async function testLoginPage(headless=true) {
             .then(() => { return driver.findElement({id: "display_signup_form"}); })
             .then((webElement) => { return webElement.click(); })
             .then(() => { return driver.findElement({name: "email"}); })
-            .then((webElement) => { return webElement.sendKeys(DEBUG_EMAIL_ADDRESS); })
+            .then((webElement) => { return webElement.sendKeys(DEBUG_EMAIL_ADDRESS as string); })
             .then(() => { return driver.findElement({name: "username"}); })
             .then((webElement) => { return webElement.sendKeys(DEBUG_USERNAME); })
             .then(() => { return driver.findElement({id: "signup_password"})})
@@ -78,7 +75,7 @@ export async function testLoginPage(headless=true) {
             .click()
             .then(() => { return driver.wait(until.urlIs(`${BASE_URL}/`), DEBUG_OPERATION_TIMEOUT_MS); })
             .then((_) => { return driver.executeScript("return window.localStorage;"); })
-            .then((storedContent) => { printTestResult(storedContent.length === 0, testLabel); })
+            .then((storedContent: any) => { printTestResult(storedContent.length === 0, testLabel); })
             .catch((err) => { console.error(err); printTestResult(false, testLabel); });
 
         /**********************************************************************/
@@ -115,14 +112,14 @@ export async function testLoginPage(headless=true) {
 
         await driver
             .findElement({name: "username_or_email"})
-            .sendKeys(DEBUG_EMAIL_ADDRESS)
+            .sendKeys(DEBUG_EMAIL_ADDRESS as string)
             .then(() => { return driver.findElement({name: "password"}); })
             .then((webElement) => { webElement.sendKeys(DEBUG_PASSWORD); })
             .then(() => { return driver.findElement({id: "login_submit"}); })
             .then((webElement) => { return webElement.click(); })
             .then(() => { return driver.getCurrentUrl(); })
             .then((_) => { return driver.executeScript("return window.localStorage;")})
-            .then((storedContent) => {
+            .then((storedContent: any) => {
                 printTestResult(storedContent.metadata !== undefined, testLabel);
             })
             .catch((err) => { console.error(err); printTestResult(false, testLabel); });
@@ -151,17 +148,17 @@ export async function testLoginPage(headless=true) {
             .click()
             .then((_) => { return driver.get(`${BASE_URL}/send-validation-email`); })
             .then((_) => { return driver.findElement({id: "email"}); })
-            .then((webElement) => { return webElement.sendKeys(DEBUG_EMAIL_ADDRESS); })
+            .then((webElement) => { return webElement.sendKeys(DEBUG_EMAIL_ADDRESS as string); })
             .then(() => { return driver.findElement({id: "send_validation_url_button"}); })
             .then((webElement) => { return webElement.click(); })
             .then(() => { return driver.wait(until.alertIsPresent(), DEBUG_OPERATION_TIMEOUT_MS); })
             .then(() => { return driver.switchTo().alert().accept(); })
             .then(() => { return driver.wait(until.urlIs(`${BASE_URL}/`), DEBUG_OPERATION_TIMEOUT_MS); })
             .then((_) => { return getAccountDetails({email: DEBUG_EMAIL_ADDRESS}); })
-            .then((results) => {
-                if (results.success) {
+            .then((user) => {
+                if (user) {
                     return driver.get(
-                        `${BASE_URL}/verify-account/${results.message.account_validation_uri}`
+                        `${BASE_URL}/verify-account/${user.account_validation_uri}`
                     );
                 } else {
                     return Promise.reject(new Error("User wasn't found in the database"));
@@ -182,16 +179,16 @@ export async function testLoginPage(headless=true) {
             .findElement({id: "forgot_password_link"}).click()
             .then(() => { return driver.wait(until.urlIs(`${BASE_URL}/reset-password`), DEBUG_OPERATION_TIMEOUT_MS); })
             .then((_) => { return driver.findElement({name: "email"}); })
-            .then((webElement) => { return webElement.sendKeys(DEBUG_EMAIL_ADDRESS); })
+            .then((webElement) => { return webElement.sendKeys(DEBUG_EMAIL_ADDRESS as string); })
             .then(() => { return driver.findElement({id: "reset_password_req_submit"}); })
             .then((webElement) => { return webElement.click(); })
             .then(() => { return driver.wait(until.elementLocated({id: "go_back_to_login_button"}), DEBUG_OPERATION_TIMEOUT_MS); })
             .then((webElement) => { return webElement.click(); })
             .then(() => { return driver.wait(until.urlIs(`${BASE_URL}/login`), DEBUG_OPERATION_TIMEOUT_MS); })
             .then((_) => { return getAccountDetails({email: DEBUG_EMAIL_ADDRESS}); })
-            .then((results) => {
-                if (results.success) {
-                    return driver.get(`${BASE_URL}/reset-password-link/${results.message.reset_password_uri}`);
+            .then((user) => {
+                if (user) {
+                    return driver.get(`${BASE_URL}/reset-password-link/${user.reset_password_uri}`);
                 } else {
                     return Promise.reject(new Error("Unable to find the user in the database."));
                 }
@@ -206,7 +203,7 @@ export async function testLoginPage(headless=true) {
             .then(() => { return driver.wait(until.alertIsPresent(), DEBUG_OPERATION_TIMEOUT_MS); })
             .then(() => { return driver.switchTo().alert().accept(); })
             .then((_) => { return driver.findElement({name: "username_or_email"}); })
-            .then((webElement) => { return webElement.sendKeys(DEBUG_EMAIL_ADDRESS); })
+            .then((webElement) => { return webElement.sendKeys(DEBUG_EMAIL_ADDRESS as string); })
             .then(() => { return driver.findElement({id: "login_password"}); })
             .then((webElement) => { webElement.sendKeys(DEBUG_PASSWORD); })
             .then(() => { return driver.findElement({id: "login_submit"}); })
@@ -229,7 +226,7 @@ export async function testLoginPage(headless=true) {
             .then((webElement) => { return webElement.click(); })
             .then(() => { return driver.wait(until.urlIs(`${BASE_URL}/home`), DEBUG_OPERATION_TIMEOUT_MS); })
             .then(() => { return driver.executeScript("return window.localStorage;")})
-            .then((storedContent) => {
+            .then((storedContent: any) => {
                 printTestResult(storedContent.metadata !== undefined, testLabel);
             })
             .catch((err) => { console.error(err); printTestResult(false, testLabel); });

@@ -4,6 +4,8 @@
       "target": "es5",
       "skipLibCheck": true,
       "esModuleInterop": true,
+      "strict": true,
+      "sourceMap": true,
     },
     "include": ["./src/**/*"]
   }

@@ -16,49 +16,35 @@ import { PUBLIC_USER_EMAIL, PUBLIC_USER_USERNAME } from "../config";
  * @description Add a dummy user in order to make managing the browse page for
  * public cards easier
  */
-export function addPublicUser() {
-    return new Promise(function(resolve, reject) {
-        let prevResults : {savedUser?: IUser } = {};
-        User
-            .findOne({username: PUBLIC_USER_USERNAME, email: PUBLIC_USER_EMAIL}).exec()
-            .then((savedUser) => {
-                if (savedUser) {
-                    resolve("User already exists");
-                } else {
-                    return Promise.resolve("DUMMY");
-                }
-            })
-            .then((_) => {
-                return registerUserAndPassword({
-                    username: PUBLIC_USER_USERNAME,
-                    email: PUBLIC_USER_EMAIL,
-                    password: getRandomString(20) // Never meant to login
-                });
-            })
-            .then((_) => {
-                return User.findOne({username: PUBLIC_USER_USERNAME}).exec();
-            })
-            .then((savedUser) => {
-                prevResults.savedUser = savedUser;
-                return Card.find({isPublic: true}).exec();
-            })
-            .then((publicCards) => {
-                return updatePublicUserMetadata(publicCards);
-            })
-            .then((confirmation) => {
-                if (confirmation.success) resolve(`Success!`);
-                else reject(confirmation.message);
-            })
-            .catch((err) => { reject(err); });
+export async function addPublicUser(): Promise<IUser> {
+    let existingUser = await User.findOne({username: PUBLIC_USER_USERNAME, email: PUBLIC_USER_EMAIL}).exec();
+    if (existingUser) {
+        return existingUser;
+    }
+
+    await registerUserAndPassword({
+        username: PUBLIC_USER_USERNAME,
+        email: PUBLIC_USER_EMAIL as string,
+        password: getRandomString(20) // Never meant to login
     });
 
+    let user = await User
+        .findOne({username: PUBLIC_USER_USERNAME, email: PUBLIC_USER_EMAIL}).exec();
+    if (!user) {
+        return Promise.reject("Could not find the user we just created");
+    }
+
+    let publicCards = await Card.find({isPublic: true}).exec();
+    await updatePublicUserMetadata(publicCards.map((card) => ({card, previousTags: ""})));
+
+    return user;
 }
 
 if (require.main === module) {
 
     const dbConnection = require("./MongooseClient.js");
 
-    exports.addPublicUser()
+    addPublicUser()
         .then((confirmation) => {
             console.log(confirmation);
             return dbConnection.closeMongooseConnection();

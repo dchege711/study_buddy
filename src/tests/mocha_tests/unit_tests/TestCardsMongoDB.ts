@@ -8,8 +8,9 @@ import { Card, ICard } from "../../../models/mongoose_models/CardSchema";
 
 import * as CardsDB from "../../../models/CardsMongoDB";
 import * as LogInUtilities from "../../../models/LogInUtilities";
+import * as config from "../../../config";
 
-let dummyUser;
+let dummyUser: LogInUtilities.AuthenticateUser;
 
 describe("Test CardsMongoDB\n", function() {
 
@@ -37,12 +38,11 @@ describe("Test CardsMongoDB\n", function() {
         });
 
         it("should read all cards belonging to the user", function(done) {
-            let cardIDs = new Set([]);
+            let cardIDs: Set<string> = new Set([]);
 
             CardsDB
                 .read({userIDInApp: dummyUser.userIDInApp})
-                .then(function(results) {
-                    let cards = results.message;
+                .then(function(cards) {
                     for (let i = 0; i < cards.length; i++) {
                         cardIDs.add(cards[i]._id.toString());
                     }
@@ -72,45 +72,34 @@ describe("Test CardsMongoDB\n", function() {
             card.createdById = dummyUser.userIDInApp;
             CardsDB
                 .update(card)
-                .then(function(response) {
-                    if (!response.success) done();
-                    else done(response.message);
+                .then(function(updatedCard) {
+                    done(updatedCard);
                 })
                 .catch(function(err) { done(err); });
         });
 
-        it("should only update mutable attributes of existing cards", function(done) {
-            let prevResults: {originalCard?: Partial<ICard>} = {};
-            CardsDB
-                .read({userIDInApp: dummyUser.userIDInApp})
-                .then(function(results) {
-                    let cards = results.message;
-                    if (cards.length === 0) {
-                        done(new Error("Did not find any cards in the database"));
-                        return Promise.reject("BREAK");
-                    } else {
-                        return Promise.resolve(cards[0]);
-                    }
-                })
-                .then(function(existingCard) {
-                    prevResults.originalCard = existingCard;
-                    existingCard.urgency = existingCard.urgency - 2;
-                    return CardsDB.update(existingCard);
-                })
-                .then(function(results) {
-                    let savedCard = results.message;
-                    let prevCard = prevResults.originalCard;
-                    if (savedCard.urgency === prevCard.urgency) {
-                        done(new Error("The urgency attribute should have been modified, but it wasn't."));
-                    } else if (savedCard.createdById.toString() !== dummyUser.userIDInApp.toString()) {
-                        done(new Error("The createdById attribute should be treated as a constant."));
-                    } else {
-                        done();
-                    }
-                })
-                .catch(function(err) {
-                    if (err !== "BREAK") done(err);
-                });
+        it("should only update mutable attributes of existing cards", async function(done) {
+            let card = await Card.findOne({userIDInApp: dummyUser.userIDInApp}).exec();
+            if (!card) {
+                done(new Error("Did not find any cards in the database"));
+                return;
+            }
+
+            let newUrgency = card.urgency - 2;
+            card.urgency = newUrgency;
+
+            card = await CardsDB.update(card);
+            if (card.urgency !== newUrgency) {
+                done(new Error("The urgency attribute should have been modified, but it wasn't."));
+            }
+
+            card.createdById += 1;
+            card = await CardsDB.update(card);
+            if (card.createdById !== dummyUser.userIDInApp) {
+                done(new Error("The createdById attribute should be treated as a constant."));
+            }
+
+            done();
         });
 
     });
