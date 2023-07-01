@@ -5,39 +5,32 @@ import { sampleCards, getRandomCards } from "./SampleCards";
 import * as LogInUtilities from "../models/LogInUtilities";
 import * as CardsDB from "../models/CardsMongoDB";
 import { IUser } from "../models/mongoose_models/UserSchema";
+import { addPublicUser } from "../models/Miscellaneous";
+import * as config from "../config";
 
 /**
  * @returns {Promise} resolves with a JSON representation of a logged in user.
  */
-export function getDummyAccount(): Promise<LogInUtilities.AuthenticateUser> {
+export async function getDummyAccount(): Promise<LogInUtilities.AuthenticateUser> {
     let dummyAccountDetails = {
-        username: config.DEBUG_USERNAME, password: config.DEBUG_PASSWORD,
-        email: config.DEBUG_EMAIL_ADDRESS
+        username: config.DEBUG_USERNAME as string, password: config.DEBUG_PASSWORD as string,
+        email: config.DEBUG_EMAIL_ADDRESS as string
     }
 
-    return new Promise(function(resolve, reject) {
-        LogInUtilities.deleteAllAccounts([])
-            .then((_) => {
-                return misc.addPublicUser();
-            })
-            .then((_) => {
-                return LogInUtilities.registerUserAndPassword(dummyAccountDetails);
-            })
-            .then((_) => {
-                return LogInUtilities.authenticateUser({
-                    username_or_email: dummyAccountDetails.username,
-                    password: dummyAccountDetails.password
-                });
-            })
-            .then((response) => {
-                if (typeof response.message === "string") {
-                    reject(response.message);
-                    return;
-                }
-
-                resolve(response.message);
+    return LogInUtilities
+        .deleteAllAccounts([])
+        .then((_) => {
+            return addPublicUser();
+        })
+        .then((_) => {
+            return LogInUtilities.registerUserAndPassword(dummyAccountDetails);
+        })
+        .then((_) => {
+            return LogInUtilities.authenticateUser({
+                username_or_email: dummyAccountDetails.username,
+                password: dummyAccountDetails.password
             });
-    });
+        });
 };
 
 /**
@@ -68,7 +61,7 @@ if (require.main === module) {
 
     const dbConnection = require("../models/MongooseClient.js");
     let numCards = 60;
-    exports.populateDummyAccount(numCards)
+    populateDummyAccount(numCards)
         .then((user) => {
             console.log(`Created user ${user.username} and gave them ${numCards} cards`);
             return dbConnection.closeMongooseConnection();

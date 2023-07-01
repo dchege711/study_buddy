@@ -9,6 +9,7 @@
 import xss = require("xss")
 
 import { Converter } from "showdown";
+import { ICard } from "./mongoose_models/CardSchema";
 
 /*
  * The converter is used to turn the markdown in the cards into html.
@@ -52,14 +53,20 @@ const converter = new Converter({
 
 
 /**
- * @description Sanitize the card to prevent malicious input, e.g XSS attack
+ * @description Sanitize the card to prevent malicious input, e.g XSS attack.
  *
  * @param {JSON} card A card object that is about to be saved into the
  * database.
  *
  * @returns {JSON} sanitized card
  */
-export function sanitizeCard(card) {
+export function sanitizeCard(card: Partial<ICard>): Partial<ICard> {
+    /**
+     * TODO(dchege711): Ideally, I shouldn't need to call this function
+     * manually. Look into [1] for cleaner validation.
+     *
+     * [1]: https://mongoosejs.com/docs/validation.html
+     */
     if (card.title !== undefined) {
         card.title = xss(card.title);
     }
@@ -105,13 +112,8 @@ export function sanitizeCard(card) {
 /**
  * @description Prevent a NoSQL Injection in the search parameters. This is
  * achieved by deleting all query values that begin with `$`.
- *
- * @param {Object} query A mapping of query values, e.g. {username: "dchege711"}
- *
- * @returns {Object} A sanitized version of the input.
  */
-export function sanitizeQuery(query) {
-
+export function sanitizeQuery(query: any) {
     let keys = Object.keys(query);
     for (let i = 0; i < keys.length; i++) {
         if (/^\$/.test(query[keys[i]])) delete query[keys[i]];

@@ -5,7 +5,7 @@
  */
 import { model, Schema, Document } from "mongoose";
 
-interface IStreak extends Map<string, any> {
+export interface IStreak extends Map<string, any> {
     cardIDs: Array<number>;
     length: number;
     dailyTarget: number;

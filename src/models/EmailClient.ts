@@ -10,8 +10,10 @@
 
 import { createTransport } from "nodemailer";
 
+import Mail = require("nodemailer/lib/mailer");
+import SMTPPool = require("nodemailer/lib/smtp-pool");
+
 import { APP_NAME, EMAIL_ADDRESS, MAILGUN_LOGIN, MAILGUN_PASSWORD } from "../config";
-import { BaseResponse } from "../types";
 
 let transporter = createTransport({
     pool: true,
@@ -24,26 +26,18 @@ let transporter = createTransport({
     }
 });
 
-export type SendEmailConfirmation = BaseResponse & {message: string};
-
 /**
  *
- * @param {JSON} mailOptions Values are comma separated strings whose keys include:
+ * @param {Mail.Options} mailOptions Values are comma separated strings whose keys include:
  * `to`, `cc`, `bcc`, `subject`, `text`, `html`, except for `attachment`
  * which is an object with the keys `filename`, `content`, `path`, `href`,
  * `contentType`, `contentDisposition`, `cid`, `encoding`, `headers`, `raw`.
  *
  * @returns {Promise} takes a JSON with `success` and `message` as the keys
  */
-export function sendEmail(mailOptions): Promise<SendEmailConfirmation> {
+export function sendEmail(mailOptions: Mail.Options): Promise<void> {
     mailOptions.from = `${APP_NAME} <${EMAIL_ADDRESS}>`;
-    return new Promise(function(resolve, reject) {
-        transporter.sendMail(mailOptions)
-        .then((info) => {
-            resolve({success: true, status: 200, message: info});
-        })
-        .catch((err) => { reject(err); });
-    });
+    return transporter.sendMail(mailOptions).then((_) => {});
 };
 
 /**

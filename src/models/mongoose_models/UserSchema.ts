@@ -19,6 +19,8 @@ interface IUserRaw {
     account_is_valid: boolean;
     cardsAreByDefaultPrivate: boolean;
     dailyTarget: number;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 let userSchema = new Schema<IUserRaw>(

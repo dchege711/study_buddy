@@ -1,6 +1,6 @@
 "use strict";
 
-import { mongooseConnection } from "../../../models/MongooseClient";
+import { mongooseConnection, closeMongooseConnection } from "../../../models/MongooseClient";
 import * as LogInUtilities from "../../../models/LogInUtilities";
 
 
@@ -19,7 +19,7 @@ describe("Cleaning up pending actions\n", function() {
     it("close all pending actions", function() {
         LogInUtilities
             .close()
-            .then(function() { return dbConnection.closeMongooseConnection(); })
+            .then(function() { return closeMongooseConnection(); })
     });
 
 });
