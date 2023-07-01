@@ -21,7 +21,7 @@ import { IS_DEV, MONGO_URI } from "../config";
 
 // Already 5 by default, but I might need to increase it one day...
 const connectionOptions = {poolSize: 12, useNewUrlParser: true};
-let mongoServer = null;
+let mongoServer: MongoMemoryServer | null = null;
 if (IS_DEV) {
     (async () => {
         mongoServer = await MongoMemoryServer.create();
@@ -55,15 +55,14 @@ mongooseConnection.on("error", console.error.bind(console, "Connection Error:"))
   * @param {Function} callback The first parameter will be set in case of any
   * error
   */
-export async function closeMongooseConnection(callback) {
-    if (mongoServer)
-        mongoServer.stop();
+export async function closeMongooseConnection() {
+    if (mongoServer) mongoServer.stop();
 
     return disconnect();
 };
 
 process.on("SIGINT", function () {
-    exports.closeMongooseConnection()
+    closeMongooseConnection()
         .then(() => { process.exit(0); })
         .catch((err) => { console.error(err); process.exit(1); });
 });

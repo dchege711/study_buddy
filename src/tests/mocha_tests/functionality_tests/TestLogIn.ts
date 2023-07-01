@@ -25,7 +25,7 @@ describe("Test LoginUtilities\n", function() {
                     email: "c13u.study.buddygmail.com"
                 })
                 .then(function(signupResult) {
-                    done(new Error(signupResult.message));
+                    done(new Error(signupResult));
                 })
                 .catch(function(_) { done(); });
         });
@@ -34,7 +34,7 @@ describe("Test LoginUtilities\n", function() {
             return LogInUtilities
                 .registerUserAndPassword({
                     username: "test", password: "test_dummy_password",
-                    email: DEBUG_EMAIL_ADDRESS
+                    email: DEBUG_EMAIL_ADDRESS as string
                 });
         });
 
@@ -43,10 +43,10 @@ describe("Test LoginUtilities\n", function() {
             LogInUtilities
                 .registerUserAndPassword({
                     username: "test-dup", password: "test_dummy_password",
-                    email: DEBUG_EMAIL_ADDRESS
+                    email: DEBUG_EMAIL_ADDRESS as string
                 })
                 .then(function(signupResult) {
-                    if (signupResult.success) done(new Error(signupResult.message));
+                    if (signupResult) done(new Error(signupResult));
                     else done();
                 })
                 .catch(function(err) { done(err); });

@@ -1,5 +1,7 @@
 "use strict";
 
+import { Request, RequestHandler, Response } from "express";
+
 import * as CardsDB from "../models/CardsMongoDB";
 import { User } from "../models/mongoose_models/UserSchema";
 import * as MetadataDB from "../models/MetadataMongoDB";
@@ -27,35 +29,39 @@ interface TemplateVariables {
  * @return {JSON} The key-value pairs that should be provided to templates by
  * default.
  */
-function getDefaultTemplateVars(req = undefined): TemplateVariables {
+function getDefaultTemplateVars(req: Request | null = null): TemplateVariables {
     return {
         APP_NAME: config.APP_NAME, BASE_URL: config.BASE_URL,
-        LOGGED_IN: req.session.user !== undefined
+        LOGGED_IN: req?.session?.user !== undefined
     };
 }
 
-export function readCard (req, res) {
+export function readCard (req: Request, res: Response) {
     sendResponseFromPromise(CardsDB.read(req.body), res);
 };
 
-export function home (req, res) {
+export function home (req: Request, res: Response) {
     let templateVars = getDefaultTemplateVars(req);
     templateVars.SEARCH_ENDPOINT_URL = "/search-cards";
     res.render("pages/home.ejs", templateVars);
 };
 
-export function wikiPage (req, res) {
+export function wikiPage(req: Request, res: Response) {
     res.render("pages/wiki_page.ejs", getDefaultTemplateVars(req));
 };
 
-export function readPublicCard (req, res) {
+export function readPublicCard (req: Request, res: Response) {
     sendResponseFromPromise(CardsDB.readPublicCard(req.body), res);
 };
 
-export function readPublicMetadata (req, res) {
+export function readPublicMetadata (_: Request, res: Response) {
     User
         .findOne({username: config.PUBLIC_USER_USERNAME})
         .then((publicUser) => {
+            if (publicUser === null) {
+                throw new Error("Public user not found");
+            }
+
             sendResponseFromPromise(
                 MetadataDB.read({userIDInApp: publicUser.userIDInApp}), res
             );
@@ -63,15 +69,15 @@ export function readPublicMetadata (req, res) {
         .catch((err) => { convertObjectToResponse(err, null, res); });
 }
 
-export function browsePagePost(req, res) {
+export function browsePagePost(req: Request, res: Response) {
     sendResponseFromPromise(CardsDB.publicSearch(req.body), res);
 }
 
-export function browsePageGet(req, res) {
+export function browsePageGet(req: Request, res: Response) {
     let templateVars = getDefaultTemplateVars(req);
     templateVars.SEARCH_ENDPOINT_URL = "/browse";
     CardsDB
-        .publicSearch(req.query)
+        .publicSearch(req.query as unknown as CardsDB.SearchPublicCardParams)
         .then((abbreviatedCards) => {
             templateVars.abbreviatedCards = abbreviatedCards;
             res.render("pages/browse_cards_page.ejs", templateVars);
@@ -79,27 +85,27 @@ export function browsePageGet(req, res) {
         .catch((err) => {convertObjectToResponse(err, null, res); });
 };
 
-export function accountGet (req, res) {
+export function accountGet (req: Request, res: Response) {
     res.render(
         "pages/account_page.ejs", {
-            account_info: req.session.user,
+            account_info: req.session?.user,
             APP_NAME: config.APP_NAME,
-            LOGGED_IN: req.session.user !== undefined
+            LOGGED_IN: req.session?.user !== undefined
         }
     );
 };
 
-export function readMetadata (req, res) {
+export function readMetadata (req: Request, res: Response) {
     let dataObject: {success: boolean; message: {metadataDocs?: Array<IMetadata>, minicards?: Array<Partial<ICard>>}} = {success: true, message: {}};
     MetadataDB.read(req.body)
-        .then((metadataResponse) => {
-            dataObject.message.metadataDocs = metadataResponse.message;
+        .then((metadataDocs) => {
+            dataObject.message.metadataDocs = metadataDocs;
             return CardsDB.read(
                 { userIDInApp: req.body.userIDInApp }, "title tags urgency"
             );
         })
-        .then((minicardsResponse) => {
-            dataObject.message.minicards = minicardsResponse.message;
+        .then((minicards) => {
+            dataObject.message.minicards = minicards;
             res.json(dataObject);
         })
         .catch((err) => {
@@ -107,43 +113,49 @@ export function readMetadata (req, res) {
         });
 };
 
-export function readTagGroups(req, res) {
+export function readTagGroups(req: Request, res: Response) {
     sendResponseFromPromise(CardsDB.getTagGroupings(req.body), res);
 }
 
-export function addCard (req, res) {
+export function addCard (req: Request, res: Response) {
     sendResponseFromPromise(CardsDB.create(req.body), res);
 };
 
-export function searchCards (req, res) {
+export function searchCards (req: Request, res: Response) {
     let payload = req.body;
-    payload.userIDInApp = req.session.user.userIDInApp;
+    payload.userIDInApp = req.session?.user?.userIDInApp;
     sendResponseFromPromise(CardsDB.search(req.body), res);
 };
 
-export function updateCard (req, res) {
+export function updateCard (req: Request, res: Response) {
     sendResponseFromPromise(CardsDB.update(req.body), res);
 };
 
-export function updateStreak (req, res) {
+export function updateStreak (req: Request, res: Response) {
     sendResponseFromPromise(MetadataDB.updateStreak(req.body), res);
 }
 
-export function deleteCard (req, res) {
+export function deleteCard (req: Request, res: Response) {
     sendResponseFromPromise(MetadataDB.deleteCardFromTrash(req.body), res);
 };
 
-export function trashCard (req, res) {
+export function trashCard (req: Request, res: Response) {
     sendResponseFromPromise(MetadataDB.sendCardToTrash(req.body), res);
 };
 
-export function restoreCardFromTrash (req, res) {
+export function restoreCardFromTrash (req: Request, res: Response) {
     sendResponseFromPromise(MetadataDB.restoreCardFromTrash(req.body), res);
 };
 
-export function downloadUserData(req, res) {
+export function downloadUserData(req: Request, res: Response) {
+    let userIDInApp = req.session?.user?.userIDInApp;
+    if (userIDInApp === undefined) {
+        res.status(401).send("You must be logged in to download your data.");
+        return;
+    }
+
     MetadataDB
-        .writeCardsToJSONFile(req.session.user.userIDInApp)
+        .writeCardsToJSONFile(userIDInApp)
         .then((writeResult) => {
             res.download(writeResult.jsonFilePath, writeResult.jsonFileName, (err) => {
                 if (err) { console.error(err); }
@@ -153,11 +165,17 @@ export function downloadUserData(req, res) {
         .catch((err) => { convertObjectToResponse(err, null, res); });
 };
 
-export function deleteAccount(req, res) {
+export function deleteAccount(req: Request, res: Response) {
+    let userIDInApp = req.session?.user?.userIDInApp;
+    if (userIDInApp === undefined) {
+        res.status(401).send("You must be logged in to delete your account.");
+        return;
+    }
+
     loginUtilities
-        .deleteAccount(req.session.user.userIDInApp)
+        .deleteAccount(userIDInApp)
         .then((confirmation) => {
-            delete req.session.user;
+            delete req.session?.user;
             res.setHeader(
                 "Set-Cookie",
                 [`session_token=null;Expires=Thu, 01 Jan 1970 00:00:00 GMT`]
@@ -167,22 +185,27 @@ export function deleteAccount(req, res) {
         .catch((err) => { convertObjectToResponse(err, null, res); });
 };
 
-export function updateUserSettings(req, res) {
+export function updateUserSettings(req: Request, res: Response) {
     MetadataDB
         .updateUserSettings(req.body)
-        .then((confirmation) => {
-            if (confirmation.success) req.session.user = confirmation.user;
-            convertObjectToResponse(null, confirmation, res);
+        .then((user) => {
+            convertObjectToResponse(null, user, res);
         })
         .catch((err) => { convertObjectToResponse(err, null, res); });
 };
 
-export function duplicateCard(req, res) {
-    let duplicateCardArgs = req.body;
-    duplicateCardArgs.userIDInApp = req.session.user.userIDInApp;
+export function duplicateCard(req: Request, res: Response) {
+    let duplicateCardArgs = req.body as unknown as CardsDB.DuplicateCardParams;
+    let userIDInApp = req.session?.user?.userIDInApp;
+    if (userIDInApp === undefined) {
+        res.status(401).send("You must be logged in to duplicate a card.");
+        return;
+    }
+
+    duplicateCardArgs.userIDInApp = userIDInApp;
     sendResponseFromPromise(CardsDB.duplicateCard(duplicateCardArgs), res);
 };
 
-export function flagCard(req, res) {
+export function flagCard(req: Request, res: Response) {
     sendResponseFromPromise(CardsDB.flagCard(req.body), res);
 };

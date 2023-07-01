@@ -6,6 +6,8 @@
  * Passport is an overkill.
  */
 
+import { NextFunction, Request, Response } from "express";
+
 var express = require("express");
 var session = require("express-session");
 var MongoStore = require('connect-mongo');
@@ -14,10 +16,10 @@ var bodyParser = require("body-parser");
 var cookieParser = require("cookie-parser");
 var enforce = require('express-sslify');
 
-var AccountRoutes = require("./routes/AuthenticationRoutes.js");
-var InAppRoutes = require("./routes/InAppRoutes.js");
+var AccountRoutes = require("./routes/AuthenticationRoutes");
+var InAppRoutes = require("./routes/InAppRoutes");
 var config = require("./config.js");
-const misc = require("./models/Miscellaneous.js");
+const misc = require("./models/Miscellaneous");
 
 // Needed to get a Mongoose instance running for this process
 const dbConnection = require("./models/MongooseClient.js");
@@ -56,7 +58,7 @@ app.set("view engine", "ejs");
 app.use("/", AccountRoutes);
 app.use("/", InAppRoutes);
 
-app.use(function (err, req, res, next) {
+app.use(function (err: any, req: Request, res: Response, next: NextFunction) {
     console.error(err.stack)
     res.status(500).render(
         "pages/5xx_error_page.ejs",
@@ -69,7 +71,7 @@ app.use(function (err, req, res, next) {
 });
 
 // Handling 404: https://expressjs.com/en/starter/faq.html
-app.use(function (req, res, next) {
+app.use(function (req: Request, res: Response, next: NextFunction) {
     res.status(404).render(
         "pages/4xx_error_page.ejs",
         {

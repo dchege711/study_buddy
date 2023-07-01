@@ -13,7 +13,11 @@ if (!IS_DEV && !IS_PROD) {
     throw Error("Please set the NODE_ENV environment variable to either 'production' or 'development'.");
 }
 
-export const MONGO_URI = IS_PROD ? process.env.STUDY_BUDDY_MLAB_MONGO_URI : "invalid://use-memory-db";
+if (IS_PROD && !process.env.STUDY_BUDDY_MLAB_MONGO_URI) {
+    throw Error("Please set the STUDY_BUDDY_MLAB_MONGO_URI env variable");
+}
+
+export const MONGO_URI = IS_PROD ? process.env.STUDY_BUDDY_MLAB_MONGO_URI as string : "invalid://use-memory-db";
 export const BASE_URL = IS_PROD ? "https://cards.c13u.com" : `http://localhost:${PORT}`;
 
 export const EMAIL_ADDRESS = process.env.STUDY_BUDDY_DEFAULT_EMAIL_ADDRESS;
