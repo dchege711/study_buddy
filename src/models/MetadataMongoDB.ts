@@ -390,28 +390,28 @@ function updateMetadataWithCardDetails(
 
     // TODO(dchege711): Keep track of which tags have been changed. Remove ones
     // that have been removed from the card.
-    let currentTags = new Set(savedCard.tags.split(" "));
+    let currentTags = new Set(
+        savedCard.tags.split(" ").map(s => s.trim()).filter(s => s.length > 0));
     if (currentTags) {
         currentTags.forEach(tag => {
-            let strippedTag = tag.trim();
-            if (strippedTag !== "") {
-                // If we've not seen this tag before, create its node
-                if (metadataNodeInfo[strippedTag] === undefined) {
-                    metadataNodeInfo[strippedTag] = {};
-                }
-
-                // If we've not seen this card under this tag, add it
-                if (metadataNodeInfo[strippedTag][savedCard._id] === undefined) {
-                    metadataNodeInfo[strippedTag][savedCard._id] = {};
-                }
-
-                metadataNodeInfo[strippedTag][savedCard._id].urgency = sortableAttribute;
+            // If we've not seen this tag before, create its node
+            if (metadataNodeInfo[tag] === undefined) {
+                metadataNodeInfo[tag] = {};
             }
+
+            // If we've not seen this card under this tag, add it
+            if (metadataNodeInfo[tag][savedCard._id] === undefined) {
+                metadataNodeInfo[tag][savedCard._id] = {};
+            }
+
+            metadataNodeInfo[tag][savedCard._id].urgency = sortableAttribute;
         });
     }
 
     // Get rid of all tags that were deleted in the current card
-    let deletedTags = previousTags.split(" ").filter(tag => !currentTags.has(tag));
+    let deletedTags = previousTags.split(" ")
+        .map(s => s.trim())
+        .filter(tag => tag.length > 0 && !currentTags.has(tag));
     deletedTags.forEach((tag) => {
         delete metadataNodeInfo[tag][savedCard._id];
         if (Object.keys(metadataNodeInfo[tag]).length === 0) {
