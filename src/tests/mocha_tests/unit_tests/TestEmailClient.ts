@@ -4,8 +4,6 @@ import * as emailClient from "../../../models/EmailClient";
 
 import { APP_NAME, EMAIL_ADDRESS, DEBUG_EMAIL_ADDRESS } from "../../../config";
 
-const config = require("../../../config.js");
-
 describe("Test EmailClient\n", function() {
 
     describe("Sending an email...", function() {
