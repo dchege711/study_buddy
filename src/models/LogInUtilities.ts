@@ -240,8 +240,8 @@ export async function registerUserAndPassword(payload: RegisterUserAndPasswordPa
     let conflictingUser = await User.findOne({ $or: [{ username: payload.username }, { email: payload.email }]}).exec();
     if (conflictingUser !== null) {
         return conflictingUser.username === payload.username
-            ? "Username already taken."
-            : "Email already taken.";
+            ? Promise.reject("Username already taken.")
+            : Promise.reject("Email already taken.");
     }
 
     let {salt, hash} = await getSaltAndHash(payload.password);
