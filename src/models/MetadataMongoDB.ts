@@ -100,7 +100,6 @@ export async function update(
 
     let metadataDoc = await Metadata.findOne(metadataQuery).exec();
     if (metadataDoc === null) {
-        console.log(metadataQuery);
         return Promise.reject("Could not find metadata document");
     }
 

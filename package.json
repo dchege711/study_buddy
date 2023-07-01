@@ -27,7 +27,7 @@
     "start": "npm run build && node dist/server.js",
     "debug": "nodemon --inspect=127.0.0.1:9229 dist/server.js",
     "single_test": "npm run build && mocha  --no-warnings ./dist/tests/mocha_tests/unit_tests/TestGraph.js",
-    "test": "npm run build && npm run mocha_tests",
+    "test": "npm run mocha_tests",
     "mocha_tests": "npm run build && nyc mocha --no-warnings --recursive --sort './dist/tests/mocha_tests/*/*.js'",
     "selenium_tests": "npm run build && cd dist/tests/selenium_tests/ && nyc ./run_selenium_tests.sh firefox headless && cd ../../",
     "docs": "jsdoc -c ./config.jsdoc.js"
