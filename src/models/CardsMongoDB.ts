@@ -12,7 +12,7 @@ import { sanitizeCard, sanitizeQuery } from "./SanitizationAndValidation";
 import { BaseResponse } from "../types";
 import { FilterQuery } from "mongoose";
 
-type CreateCardParams = Pick<ICard, "title" | "description" | "tags" | "createdById" | "urgency" | "isPublic" | "parent">;
+export type CreateCardParams = Pick<ICard, "title" | "description" | "tags" | "createdById" | "urgency" | "isPublic" | "parent">;
 
 /**
  * Create a new card from `payload` and add it to the user's current cards.
