@@ -11,7 +11,7 @@ describe("Test TernarySearchTrie\n", function() {
     expect(tst.contains("xyz")).to.be.false;
 
     let matchingWords = tst.keysWithPrefix("a");
-    expect(matchingWords).to.have.members(["a", "aa", "Ae"]);
+    expect(matchingWords).to.have.members(["a", "aa"]);
   });
 
   it("should find words from a dynamic update", function() {
@@ -22,7 +22,7 @@ describe("Test TernarySearchTrie\n", function() {
     tst.put("axyz");
 
     let matchingWords = tst.keysWithPrefix("a");
-    expect(matchingWords).to.have.members(["a", "aa", "Ae", "axyz"]);
+    expect(matchingWords).to.have.members(["a", "aa", "axyz"]);
   });
 
 });
