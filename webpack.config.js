@@ -13,16 +13,17 @@
 const path = require("path");
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     devtool: "source-map",
     mode: "production",
     entry: {
-        CardTemplateUtilities: path.resolve(__dirname, "public", "src", "CardTemplateUtilities.js"),
-        CardsManager: path.resolve(__dirname, "public", "src", "CardsManager.js"),
-        AppUtilities: path.resolve(__dirname, "public", "src", "AppUtilities.js"),
-        TagsBarUtilities: path.resolve(__dirname, "public", "src", "TagsBarUtilities.js"),
-        // AutoComplete: path.resolve(__dirname, "public", "src", "AutoComplete.js")
+        CardTemplateUtilities: path.resolve(__dirname, "src", "public", "src", "CardTemplateUtilities.js"),
+        CardsManager: path.resolve(__dirname, "src", "public", "src", "CardsManager.js"),
+        AppUtilities: path.resolve(__dirname, "src", "public", "src", "AppUtilities.js"),
+        TagsBarUtilities: path.resolve(__dirname, "src", "public", "src", "TagsBarUtilities.js"),
+        AutoComplete: path.resolve(__dirname, "src", "public", "src", "AutoComplete.js")
     },
     plugins: [
         new CleanWebpackPlugin(),
@@ -33,10 +34,26 @@ module.exports = {
             onStart({ compilation }) {
                 console.log('circular-dependency-plugin: looking for webpack modules cycles...');
             }
-          })
+          }),
+        new CopyWebpackPlugin({
+            patterns: [
+                {
+                    from: path.resolve(__dirname, "src", "public", "css"),
+                    to: path.resolve(__dirname, "dist", "public", "css")
+                },
+                {
+                    from: path.resolve(__dirname, "src", "public", "images"),
+                    to: path.resolve(__dirname, "dist", "public", "images")
+                },
+                {
+                    from: path.resolve(__dirname, "src", "views"),
+                    to: path.resolve(__dirname, "dist", "views")
+                },
+            ]
+        }),
     ],
     output: {
-        path: path.resolve(__dirname, "public", "dist"),
+        path: path.resolve(__dirname, "dist", "public"),
         filename: "[name].bundle.min.js",
         // https://webpack.js.org/guides/author-libraries/#authoring-a-library
         library: "[name]",
@@ -50,7 +67,7 @@ module.exports = {
     // },
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
-        extensions: ["", ".webpack.js", ".web.js", ".ts", ".tsx", ".js"],
+        extensions: ["", "ejs", ".webpack.js", ".web.js", ".ts", ".tsx", ".js"],
     },
     module: {
         rules: [
