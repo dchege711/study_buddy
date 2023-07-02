@@ -29,6 +29,18 @@ describe("Test LoginUtilities\n", function() {
                 .catch(function(_: Error) { done(); });
         });
 
+        it("should reject an incorrect username", function(done) {
+            LogInUtilities
+                .registerUserAndPassword({
+                    username: "!not$alpha*numeric", password: "dummy_password",
+                    email: "c13u.study.buddygmail.com"
+                })
+                .then(function(signupResult) {
+                    done(new Error(signupResult));
+                })
+                .catch(function(_: Error) { done(); });
+        });
+
         describe("when a valid user already exists", function() {
 
             before(function() {

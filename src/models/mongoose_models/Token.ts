@@ -21,15 +21,16 @@ var tokenSchema = new Schema<ITokenRaw>(
             required: true,
             unique: [true, "This token already exists"],
         },
-        userIDInApp: Number,
-        username: String,
+        userIDInApp: {type: Number, immutable: true },
+        username: {type: String, immutable: true },
         email: {
             type: String,
             required: true,
             unique: true,
+            immutable: true,
             validate: [validator.isEmail, 'Please provide a valid email address']
         },
-        user_reg_date: String
+        user_reg_date: {type: String, immutable: true }
     },
     {
         autoIndex: false,
