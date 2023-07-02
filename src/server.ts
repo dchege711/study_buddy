@@ -18,11 +18,11 @@ var enforce = require('express-sslify');
 
 var AccountRoutes = require("./routes/AuthenticationRoutes");
 var InAppRoutes = require("./routes/InAppRoutes");
-var config = require("./config.js");
+var config = require("./config");
 const misc = require("./models/Miscellaneous");
 
 // Needed to get a Mongoose instance running for this process
-const dbConnection = require("./models/MongooseClient.js");
+const dbConnection = require("./models/MongooseClient");
 
 // Set up the default account for publicly viewable cards
 (async () => { await misc.addPublicUser(); })();
