@@ -67,23 +67,14 @@ export function read(payload: ReadCardParams, projection="title description desc
 };
 
 /**
- * TODO(dchege711): Can these be guaranteed at the database level?
- */
-const EDITABLE_ATTRIBUTES = new Set([
-    "title", "description", "descriptionHTML", "tags", "urgency", "isPublic",
-    "numTimesMarkedAsDuplicate", "numTimesMarkedForReview"
-]);
-
-/**
  * Update an existing card. Some fields of the card are treated as constants,
  * e.g. `createdById` and `createdAt`
  *
  * @returns {Promise} resolves with the updated card.
  */
 export async function update(payload: Partial<ICard>): Promise<ICard> {
-    payload = sanitizeCard(payload);
-
-    let oldCard = await Card.findByIdAndUpdate(payload._id, payload, {returnOriginal: true}).exec();
+    let oldCard = await Card.findByIdAndUpdate(
+        payload._id, payload, {returnOriginal: true, runValidators: true}).exec();
     if (oldCard === null) {
         return Promise.reject("Card not found.");
     }
