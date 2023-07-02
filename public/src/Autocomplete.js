@@ -1,22 +1,22 @@
 "use strict";
 
-const Graph = require("./Graph.js");
+const UndirectedGraph = require("./Graph.js");
 const TST = require("./TernarySearchTrie.js");
 
 /**
- * @description Provide autocomplete functionality for the card tags. This 
+ * @description Provide autocomplete functionality for the card tags. This
  * helps the user use the fewest tags possible while still being descriptive.
  * The suggestions are generated in one of 2 ways:
- * 
- * - If a partial tag is being entered, other tags that share the prefix are 
- *   provided, e.g. `pr` might generate `probability` and `primes` if the user 
+ *
+ * - If a partial tag is being entered, other tags that share the prefix are
+ *   provided, e.g. `pr` might generate `probability` and `primes` if the user
  *   has used these tags on other cards that they own.
- * 
- * - Near neighbors of the already completed tags. The graph has tags as nodes, 
+ *
+ * - Near neighbors of the already completed tags. The graph has tags as nodes,
  *   with links between tags that appear on the same card.
- * 
+ *
  * {@tutorial main.editing_cards}
- * 
+ *
  * @class
  */
 function AutoComplete() {
@@ -38,7 +38,7 @@ function AutoComplete() {
     }
 
     this.initializeGraphFromGroups = function(wordGroups) {
-        AutoComplete.graph = new Graph(false);
+        AutoComplete.graph = new UndirectedGraph();
         let words, weight;
         for (let i = 0; i < wordGroups.length; i++) {
             words = wordGroups[i];
