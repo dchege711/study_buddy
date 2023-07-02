@@ -8,7 +8,7 @@ import * as MetadataDB from "../models/MetadataMongoDB";
 import * as controllerUtils from "./ControllerUtilities";
 import * as loginUtilities from "../models/LogInUtilities";
 import * as config from "../config";
-import { ICard } from "../models/mongoose_models/CardSchema";
+import { ICard, MiniICard } from "../models/mongoose_models/CardSchema";
 import { IMetadata } from "../models/mongoose_models/MetadataCardSchema";
 
 const convertObjectToResponse = controllerUtils.convertObjectToResponse;
@@ -95,17 +95,22 @@ export function accountGet (req: Request, res: Response) {
     );
 };
 
+export interface MetadataResponse {
+    metadataDocs?: IMetadata[],
+    minicards?: MiniICard[]
+}
+
 export function readMetadata (req: Request, res: Response) {
-    let dataObject: {success: boolean; message: {metadataDocs?: Array<IMetadata>, minicards?: Array<Partial<ICard>>}} = {success: true, message: {}};
+    let dataObject: MetadataResponse = {};
     MetadataDB.read(req.body)
         .then((metadataDocs) => {
-            dataObject.message.metadataDocs = metadataDocs;
+            dataObject.metadataDocs = metadataDocs;
             return CardsDB.read(
                 { userIDInApp: req.body.userIDInApp }, "title tags urgency"
             );
         })
         .then((minicards) => {
-            dataObject.message.minicards = minicards;
+            dataObject.minicards = minicards;
             res.json(dataObject);
         })
         .catch((err) => {
