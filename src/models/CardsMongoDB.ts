@@ -208,8 +208,10 @@ export function publicSearch(payload: SearchPublicCardParams): Promise<Array<Par
         mandatoryFields.push({ _id: { $in: Array.from(payload.cardIDs.split(",")) }});
     }
 
+    let sortCriteria = {};
     if (payload.queryString) {
         mandatoryFields.push({ $text: { $search: splitTags(payload.queryString) } });
+        sortCriteria = { score: { $meta: "textScore" } };
     }
     if (payload.creationStartDate || payload.creationEndDate) {
         let dateQuery: {$gt?: Date, $lt?: Date} = {}
@@ -222,7 +224,7 @@ export function publicSearch(payload: SearchPublicCardParams): Promise<Array<Par
         filter: { $and: mandatoryFields },
         projection: "title tags",
         limit: payload.limit,
-        sortCriteria: { score: { $meta: "textScore" } },
+        sortCriteria: sortCriteria,
     };
     return collectSearchResults(queryObject);
 }
