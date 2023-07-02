@@ -96,6 +96,45 @@ describe("Test CardsMongoDB\n", function() {
                 .equals(dummyUser.userIDInApp);
         });
 
+        it("should provide correct tag groupings", async function() {
+            let userIDInApp = dummyUser.userIDInApp;
+            let sampleCards: CardsDB.CreateCardParams[] = [
+                {
+                    title: "A", description: "B", createdById: userIDInApp,
+                    urgency: 1, isPublic: true, parent: "", tags: "a b"
+                },
+                {
+                    title: "A", description: "B", createdById: userIDInApp,
+                    urgency: 1, isPublic: true, parent: "", tags: "c d"
+                },
+                {
+                    title: "A", description: "B", createdById: userIDInApp,
+                    urgency: 1, isPublic: true, parent: "", tags: "a d"
+                },
+                {
+                    title: "A", description: "B", createdById: userIDInApp,
+                    urgency: 1, isPublic: true, parent: "", tags: "x"
+                },
+                {
+                    title: "A", description: "B", createdById: userIDInApp,
+                    urgency: 1, isPublic: true, parent: "", tags: "y"
+                },
+            ];
+            await CardsDB.createMany(sampleCards);
+
+            let tagGroups = await CardsDB.getTagGroupings({userIDInApp});
+            tagGroups.sort();
+
+            let expectedTagGroups: string[][] = [];
+            for (let card of sampleCards) {
+                expectedTagGroups.push(card.tags.split(" "));
+                expectedTagGroups.push(["sample_card"]);
+            }
+            expectedTagGroups.sort();
+
+            expect(tagGroups).deep.equal(expectedTagGroups);
+        });
+
     });
 
 });

@@ -19,11 +19,11 @@ module.exports = {
     devtool: "source-map",
     mode: "production",
     entry: {
-        CardTemplateUtilities: path.resolve(__dirname, "src", "public", "src", "CardTemplateUtilities.js"),
-        CardsManager: path.resolve(__dirname, "src", "public", "src", "CardsManager.js"),
-        AppUtilities: path.resolve(__dirname, "src", "public", "src", "AppUtilities.js"),
-        TagsBarUtilities: path.resolve(__dirname, "src", "public", "src", "TagsBarUtilities.js"),
-        AutoComplete: path.resolve(__dirname, "src", "public", "src", "AutoComplete.js"),
+        CardTemplateUtilities: path.resolve(__dirname, "src", "public", "src", "CardTemplateUtilities"),
+        CardsManager: path.resolve(__dirname, "src", "public", "src", "CardsManager"),
+        AppUtilities: path.resolve(__dirname, "src", "public", "src", "AppUtilities"),
+        TagsBarUtilities: path.resolve(__dirname, "src", "public", "src", "TagsBarUtilities"),
+        AutoComplete: path.resolve(__dirname, "src", "public", "src", "AutoComplete"),
     },
     plugins: [
         new CleanWebpackPlugin(),

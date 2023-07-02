@@ -402,10 +402,12 @@ function updateMetadataWithCardDetails(
 
             // If we've not seen this card under this tag, add it
             if (metadataNodeInfo[tag][savedCard._id] === undefined) {
-                metadataNodeInfo[tag][savedCard._id] = {};
+                metadataNodeInfo[tag][savedCard._id] = {
+                    urgency: sortableAttribute,
+                };
+            } else {
+                metadataNodeInfo[tag][savedCard._id].urgency = sortableAttribute;
             }
-
-            metadataNodeInfo[tag][savedCard._id].urgency = sortableAttribute;
         });
     }
 
