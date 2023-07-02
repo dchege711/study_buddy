@@ -23,7 +23,7 @@ module.exports = {
         CardsManager: path.resolve(__dirname, "src", "public", "src", "CardsManager.js"),
         AppUtilities: path.resolve(__dirname, "src", "public", "src", "AppUtilities.js"),
         TagsBarUtilities: path.resolve(__dirname, "src", "public", "src", "TagsBarUtilities.js"),
-        AutoComplete: path.resolve(__dirname, "src", "public", "src", "AutoComplete.js")
+        AutoComplete: path.resolve(__dirname, "src", "public", "src", "AutoComplete.js"),
     },
     plugins: [
         new CleanWebpackPlugin(),
@@ -49,11 +49,15 @@ module.exports = {
                     from: path.resolve(__dirname, "src", "views"),
                     to: path.resolve(__dirname, "dist", "views")
                 },
+                {
+                    from: path.resolve(__dirname, "src", "public", "src", "lib"),
+                    to: path.resolve(__dirname, "dist", "public", "src", "lib")
+                },
             ]
         }),
     ],
     output: {
-        path: path.resolve(__dirname, "dist", "public"),
+        path: path.resolve(__dirname, "dist", "public", "src"),
         filename: "[name].bundle.min.js",
         // https://webpack.js.org/guides/author-libraries/#authoring-a-library
         library: "[name]",
