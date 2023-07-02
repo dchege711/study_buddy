@@ -29,18 +29,21 @@ let userSchema = new Schema<IUserRaw>(
             type: String,
             required: true,
             unique: [true, "This username is already taken"],
+            immutable: true,
             match: /[_\-A-Za-z0-9]+/
         },
         salt: Array,
         hash: Array,
         userIDInApp: {
             type: Number,
-            unique: true
+            unique: true,
+            immutable: true
         },
         email: {
             type: String,
             required: true,
             unique: true,
+            immutable: true,
             validate: [validator.isEmail, 'Please provide a valid email address']
         },
         reset_password_uri: String,

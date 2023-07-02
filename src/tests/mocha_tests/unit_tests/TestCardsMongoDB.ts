@@ -1,5 +1,7 @@
 "use strict";
 
+import { expect } from "chai";
+
 import { mongooseConnection } from "../../../models/MongooseClient";
 
 import { getDummyAccount } from "../../DummyAccountUtils";
@@ -75,31 +77,23 @@ describe("Test CardsMongoDB\n", function() {
                 .then(function(updatedCard) {
                     done(updatedCard);
                 })
-                .catch(function(err) { done(err); });
+                .catch(function(_) { done(); });
         });
 
-        it("should only update mutable attributes of existing cards", async function(done) {
-            let card = await Card.findOne({userIDInApp: dummyUser.userIDInApp}).exec();
-            if (!card) {
-                done(new Error("Did not find any cards in the database"));
-                return;
-            }
-
-            let newUrgency = card.urgency - 2;
-            card.urgency = newUrgency;
+        it("should only update mutable attributes of existing cards", async function() {
+            let card = await CardsDB.create({
+                title: "A", description: "B", createdById: dummyUser.userIDInApp,
+                urgency: 7, isPublic: true, parent: "", tags: "update mutable"
+            });
+            card.urgency = 9;
 
             card = await CardsDB.update(card);
-            if (card.urgency !== newUrgency) {
-                done(new Error("The urgency attribute should have been modified, but it wasn't."));
-            }
+            expect(card.urgency, "Urgency should change").equals(9);
 
             card.createdById += 1;
             card = await CardsDB.update(card);
-            if (card.createdById !== dummyUser.userIDInApp) {
-                done(new Error("The createdById attribute should be treated as a constant."));
-            }
-
-            done();
+            expect(card.createdById, "Creator ID should not change")
+                .equals(dummyUser.userIDInApp);
         });
 
     });
