@@ -99,6 +99,8 @@ cardSchema.index(
 export const Card = model<ICardRaw>('Card', cardSchema);
 export type ICard = ICardRaw & Document<any, any, ICardRaw>;
 
+export type MiniICard = Partial<Pick<ICard, "title" | "tags" | "urgency" | "_id">>;
+
 if (require.main === module) {
     // Run this script as main if you change the indexes
     // http://thecodebarbarian.com/whats-new-in-mongoose-5-2-syncindexes
