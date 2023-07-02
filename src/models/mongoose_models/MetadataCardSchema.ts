@@ -6,17 +6,29 @@
 import { model, Schema, Document } from "mongoose";
 
 export interface IStreak extends Map<string, any> {
-    cardIDs: Array<number>;
+    cardIDs: Array<string>;
     length: number;
     dailyTarget: number;
     timeStamp: number;
 }
 
+interface IMetadataNodeInformationEntry {
+    [id: string]: {urgency: number}
+}
+
+export interface IMetadataNodeInformation {
+    [tag : string]: IMetadataNodeInformationEntry;
+}
+
+export interface IMetadataTrashedCardInformation {
+    [id : string]: number;
+}
+
 interface IMetadataRaw {
     createdById: number;
     metadataIndex: number;
-    node_information: Array<any>;
-    trashed_cards: Array<any>;
+    node_information: Array<IMetadataNodeInformation>;
+    trashed_cards: Array<IMetadataTrashedCardInformation>;
     stats: Array<any>;
     streak: IStreak;
     cardsAreByDefaultPrivate: boolean;

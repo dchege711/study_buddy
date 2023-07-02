@@ -315,6 +315,7 @@ export async function flagCard(payload: FlagCardParams): Promise<ICard> {
 }
 
 type TagGroupingsParam = Pick<ReadCardParams, "userIDInApp">;
+export type TagGroupings = string[][];
 
 /**
  * @description Fetch the tags contained in the associated users cards.
@@ -325,7 +326,7 @@ type TagGroupingsParam = Pick<ReadCardParams, "userIDInApp">;
  * as its keys. If successful, the message will contain an array of arrays. Each
  * inner array will have tags that were found on a same card.
  */
-export function getTagGroupings(payload: TagGroupingsParam): Promise<Array<Array<string>>> {
+export function getTagGroupings(payload: TagGroupingsParam): Promise<TagGroupings> {
     payload = sanitizeQuery(payload);
     return Card
         .find({createdById: payload.userIDInApp})

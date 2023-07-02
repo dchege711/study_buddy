@@ -28,7 +28,7 @@
     "debug": "ts-node --files src/server.ts",
     "single_test": "npm run build && ts-mocha  --no-warnings ./dist/tests/mocha_tests/unit_tests/TestGraph.js",
     "test": "npm run mocha_tests",
-    "mocha_tests": "npm run build && nyc ts-mocha --no-warnings --recursive --sort './src/tests/mocha_tests/*/*.ts'",
+    "mocha_tests": "npm run build && nyc ts-mocha --no-warnings --recursive --sort './src/tests/mocha_tests/*/*.ts' './src/**/*.test.ts'",
     "selenium_tests": "npm run build && cd dist/tests/selenium_tests/ && nyc ./run_selenium_tests.sh firefox headless && cd ../../",
     "docs": "jsdoc -c ./config.jsdoc.js"
   },
