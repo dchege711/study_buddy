@@ -13,18 +13,20 @@
 const path = require("path");
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
+    devtool: "source-map",
     mode: "production",
     entry: {
-        CardTemplateUtilities: path.resolve(__dirname, "public", "src", "CardTemplateUtilities.js"),
-        CardsManager: path.resolve(__dirname, "public", "src", "CardsManager.js"),
-        AppUtilities: path.resolve(__dirname, "public", "src", "AppUtilities.js"),
-        TagsBarUtilities: path.resolve(__dirname, "public", "src", "TagsBarUtilities.js"),
-        // AutoComplete: path.resolve(__dirname, "public", "src", "AutoComplete.js")
+        CardTemplateUtilities: path.resolve(__dirname, "src", "public", "src", "CardTemplateUtilities"),
+        CardsManager: path.resolve(__dirname, "src", "public", "src", "CardsManager"),
+        AppUtilities: path.resolve(__dirname, "src", "public", "src", "AppUtilities"),
+        TagsBarUtilities: path.resolve(__dirname, "src", "public", "src", "TagsBarUtilities"),
+        AutoComplete: path.resolve(__dirname, "src", "public", "src", "AutoComplete"),
     },
     plugins: [
-        new CleanWebpackPlugin(['dist']),
+        new CleanWebpackPlugin(),
         new CircularDependencyPlugin({
             exclude: /a\.js|node_modules/,
             failOnError: true,
@@ -32,10 +34,30 @@ module.exports = {
             onStart({ compilation }) {
                 console.log('circular-dependency-plugin: looking for webpack modules cycles...');
             }
-          })
+          }),
+        new CopyWebpackPlugin({
+            patterns: [
+                {
+                    from: path.resolve(__dirname, "src", "public", "css"),
+                    to: path.resolve(__dirname, "dist", "public", "css")
+                },
+                {
+                    from: path.resolve(__dirname, "src", "public", "images"),
+                    to: path.resolve(__dirname, "dist", "public", "images")
+                },
+                {
+                    from: path.resolve(__dirname, "src", "views"),
+                    to: path.resolve(__dirname, "dist", "views")
+                },
+                {
+                    from: path.resolve(__dirname, "src", "public", "src", "lib"),
+                    to: path.resolve(__dirname, "dist", "public", "src", "lib")
+                },
+            ]
+        }),
     ],
     output: {
-        path: path.resolve(__dirname, "public", "dist"),
+        path: path.resolve(__dirname, "dist", "public", "src"),
         filename: "[name].bundle.min.js",
         // https://webpack.js.org/guides/author-libraries/#authoring-a-library
         library: "[name]",
@@ -47,13 +69,17 @@ module.exports = {
     //         chunks: "all"
     //     }
     // },
+    resolve: {
+        // Add '.ts' and '.tsx' as resolvable extensions.
+        extensions: ["", "ejs", ".webpack.js", ".web.js", ".ts", ".tsx", ".js"],
+    },
     module: {
         rules: [
-            {
-              test: /(\.jsx|\.js)$/,
-              loader: 'babel-loader',
-              exclude: /(node_modules|bower_components)/,
-            },
+            // All files with a '.ts' or '.tsx' extension will be handled by 'ts-loader'.
+            { test: /\.tsx?$/, loader: "ts-loader" },
+
+            // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
+            // { test: /\.js$/, loader: "source-map-loader" },
         ]
     }
 };

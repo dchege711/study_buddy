@@ -1,7 +1,7 @@
 .DS_Store
 node_modules
 
-# Ignore template for Node 
+# Ignore template for Node
 
 # Logs
 logs
@@ -79,3 +79,6 @@ typings/
 
 # FuseBox cache
 .fusebox/
+
+# Build artifacts
+dist/

@@ -5,20 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Attach",
-            "type": "node",
-            "request": "attach",
-            "port": 9229,
-            "protocol": "inspector", 
-            "address": "localhost",
-            "restart": true,
-            "sourceMaps": false,
+            "command": "npm start",
+            "name": "npm start",
+            "request": "launch",
+            "type": "node-terminal"
         },
         {
-            "type": "node",
+            "command": "npm run debug",
+            "name": "npm debug",
             "request": "launch",
-            "name": "Launch",
-            "program": "${workspaceFolder}/server.js"
-        }, 
+            "type": "node-terminal"
+        },
     ]
 }

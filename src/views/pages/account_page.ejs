@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title><%= APP_NAME %>: Account Page</title>
+        <%- include('../partials/header.ejs'); %>
+        <%- include('../partials/syntax_highlighting_and_latex.ejs'); %>
+        <script type="text/javascript" src="/src/CardsManager.bundle.min.js"></script>
+        <script type="text/javascript" src="/src/CardTemplateUtilities.bundle.min.js"></script>
+
+        <style>
+
+            #account_details {
+                margin: 1% 15% 1% 15%;
+                padding: 1% 5% 1% 5%;
+            }
+
+            .account_header {
+                border-bottom: 1px #e1e4e8 solid;
+            }
+
+            .account_section {
+                margin: 2% 0%;
+                padding: 3% 0%;
+            }
+
+            #card_container {
+                display: none;
+            }
+
+        </style>
+
+    </head>
+
+    <body onload="initializeAccountPage();">
+
+        <%- include('../partials/navbar.ejs'); %>
+
+        <div id="main_div">
+
+            <div id="account_details">
+
+                <div class="account_section">
+
+                    <h3 class="account_header">Account Info</h3>
+
+                    <p>
+                        Username: <%= account_info.username %>
+                        <br><br>
+                        Email Address: <%= account_info.email %>
+                        <br><br>
+                        <%= APP_NAME %> Birthday: <%= account_info.user_reg_date %>
+                    </p>
+
+                    <form id="accountSettingsForm" method="POST">
+
+                        <% if (account_info.cardsAreByDefaultPrivate) { %>
+                            <input type="checkbox" class="w3-check" name="cardsAreByDefaultPrivate" checked>
+                        <% } else { %>
+                            <input type="checkbox" class="w3-check" name="cardsAreByDefaultPrivate">
+                        <% } %>
+
+                        <label class="w3-label" for="cardsAreByDefaultPrivate">If checked, your cards will be private (except the ones that you explicitly set as public)</label>
+
+                        <br /><br />
+                        <label class="w3-label" for="dailyTarget">Minimum number of cards to review per day</label>
+                        <input type="number" name="dailyTarget" value="<%= account_info.dailyTarget %>">
+
+
+                        <input type="text" style="display:none" name="userIDInApp" value="<%= account_info.userIDInApp %>">
+
+                        <br><br>
+                        <input type="submit" class="w3-btn w3-round-xxlarge w3-left w3-blue" value="Save Changes" onclick="return updateAccountSettings();">
+                    </form>
+
+                </div>
+
+                <div class="account_section">
+
+                    <h3 class="account_header">Restore/Delete Cards from Trash</h3>
+
+                    <p>
+                        The trash only holds a card for 30 days, after which the
+                        card will be permanently deleted. Use this option to either
+                        delete cards permanently, or restore them to your active cards.
+
+                        <br><br>
+
+                        <button id="trash_button" class="w3-btn w3-round-xxlarge w3-left w3-blue" onClick="showCardsFromTrash();">
+                            <b id="trash_button_text">
+                                <i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> View Trashed Cards
+                            </b>
+                        </button>
+
+                        <br>
+                    </p>
+
+                    <div>
+
+                        <%- include('../partials/trashed_card_template.ejs'); %>
+
+                    </div>
+
+                </div>
+
+                <div class="account_section">
+
+                    <h3 class="account_header">Send an email to the Developer</h3>
+
+                    <p>
+                        I would love to hear your suggestions, feedback and criticism.
+                        <br><br>
+                        <a href="mailto:study.buddy@mail.c13u.com">
+                            <i class="fa fa-envelope fa-fw" aria-hidden="true"></i> study.buddy@mail.c13u.com
+                        </a>
+                    </p>
+
+                </div>
+
+                <div class="account_section">
+
+                    <h3 class="account_header">Download your cards</h3>
+
+                    <p>
+                        Download all of the cards you own.
+                        <br>
+                        <br>
+                        <button class="w3-btn w3-round-xxlarge w3-left w3-green" onClick="downloadUserData();">
+                            <b>
+                                <i class="fa fa-download fa-fw" aria-hidden="true"></i> Download My Cards
+                            </b>
+                        </button>
+
+                    </p>
+
+                </div>
+
+                <div class="account_section">
+
+                    <h3 class="account_header">Delete account</h3>
+
+                    <p>
+                        Careful now. Once you delete your account, there is no going back.
+                        Please be sure. You might want to download your data first.
+                        <br>
+                        <br>
+                        <button class="w3-btn w3-round-xxlarge w3-left w3-red" id="delete_account_button" onClick="confirmDeletion();">
+                            <b>
+                                <i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> Delete Account
+                            </b>
+                        </button>
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <%- include('../partials/footer.ejs'); %>
+
+    </body>
+
+    <script type="text/javascript">
+
+        let state, cardsManager;
+
+        function initializeAccountPage() {
+            AppUtilities.refreshMetadata()
+                .then(([metadataDoc, _]) => {
+                    state = {
+                        metadata: metadataDoc,
+                        card_container: document.getElementById("card_container"),
+                        trash_button: document.getElementById("trash_button"),
+                        trashed_card_index: 0,
+                        current_card_id: null,
+                        current_card_title: document.getElementById("card_title"),
+                        current_card_description: document.getElementById("card_description"),
+                        current_card_tags: document.getElementById("card_tags"),
+                        current_card_urgency_number: document.getElementById("card_urgency_number"),
+                        current_card_delete_button: document.getElementById("card_delete_button"),
+                        current_card_restore_button: document.getElementById("card_restore_button")
+                    }
+
+                    state.trashed_cards = state.metadata.trashed_cards[0];
+                    if (!state.trashed_cards) state.trashed_cards = {};
+
+                    cardsManager = new CardsManager(
+                        state.trashed_cards, state.metadata.createdById
+                    );
+
+                    document.getElementById("trash_button_text").innerHTML = `<i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> View ${Object.keys(state.trashed_cards).length} Trashed Cards`;
+
+                })
+                .catch((err) => { console.error(err); });
+        }
+
+        function downloadUserData() {
+            window.open("/account/download-user-data");
+        }
+
+        function confirmDeletion() {
+            if (window.confirm("Deleting your account is irreversible. Continue?")) {
+                AppUtilities
+                    .sendHTTPRequest("POST", "/account/delete-account", {})
+                    .then((response) => {
+                        localStorage.clear();
+                        window.location = "/";
+                    })
+                    .catch((err) => { console.error(err); });
+            }
+        }
+
+        function showCardsFromTrash() {
+            if (Object.keys(state.trashed_cards).length > 0) {
+
+                state.card_container.style.display = "block";
+                state.trash_button.style.display = "none";
+
+                cardsManager
+                    .initializeFromTrash(state.trashed_cards)
+                    .then(() => { return cardsManager.next(); })
+                    .then((card) => { renderTrashedCard(card); })
+                    .catch((err) => { console.error(err); });
+
+            }
+        }
+
+        function closeTrashWindow() {
+            state.trash_button.style.display = "inline";
+            state.card_container.style.display = "none";
+        }
+
+        function fetchNextCard() {
+            cardsManager.next()
+                .then((card) => { renderTrashedCard(card); })
+                .catch((err) => { console.error(err); });
+        }
+
+        function fetchPreviousCard() {
+            cardsManager.previous()
+                .then((card) => { renderTrashedCard(card); })
+                .catch((err) => { console.error(err); });
+        }
+
+        function renderTrashedCard(card) {
+            if (!card) {
+                CardTemplateUtilities.displayPopUp("Out of cards!", 1000);
+            } else {
+                state.current_card_id = card._id;
+                state.current_card_title.innerText = card.title;
+                state.current_card_description.innerHTML = card.descriptionHTML;
+                state.current_card_tags.innerText = card.tags.replace(" ", ", ");
+                state.current_card_urgency_number.innerText = card.urgency;
+
+                PrettifyCards.addSyntaxHighlighting();
+                PrettifyCards.renderLatex(["card_title", "card_description"]);
+
+            }
+
+        }
+
+        function modifyTrash(endpoint) {
+            AppUtilities
+                .sendHTTPRequest(
+                    "POST", endpoint,
+                    {
+                        cardID: state.current_card_id,
+                        createdById: state.metadata.createdById
+                    }
+                )
+                .then((confirmation) => {
+                    confirmation = JSON.parse(confirmation);
+                    CardTemplateUtilities.displayPopUp(confirmation.message, 2000);
+                    cardsManager.removeCard(state.current_card_id);
+                    fetchNextCard();
+                })
+                .catch((err) => { console.error(err); });
+
+        }
+
+        function makeInvisible(element_id) {
+            document.getElementById(element_id).style.visibility = "hidden";
+        }
+
+        function updateAccountSettings() {
+            AppUtilities
+                .sendForm("accountSettingsForm", "/account/update-settings")
+                .then((confirmation) => {
+                    confirmation = JSON.parse(confirmation);
+                    alert(confirmation.message);
+                })
+                .catch((err) => { console.error(err); });
+
+            return false;
+        }
+    </script>
+
+</html>
