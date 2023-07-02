@@ -32,7 +32,7 @@ describe("Test CardsMongoDB\n", function() {
     describe("Method sanity tests...", function() {
 
         it("should successfully create a card from a payload", function() {
-            let card = getRandomCards(1)[0];
+            let card = getRandomCards(1, dummyUser.userIDInApp)[0];
             card.createdById = dummyUser.userIDInApp;
             return CardsDB.create(card);
         });
@@ -68,7 +68,7 @@ describe("Test CardsMongoDB\n", function() {
         });
 
         it("should ignore new cards in the update() method", function(done) {
-            let card = getRandomCards(1)[0];
+            let card = getRandomCards(1, dummyUser.userIDInApp)[0];
             card.createdById = dummyUser.userIDInApp;
             CardsDB
                 .update(card)
