@@ -1,11 +1,11 @@
 "use strict";
 
-const AVLTree = require("./AVLTree.js");
+const AVLTree = require("./lib/AVLTree.js");
 var sendHTTPRequest = require("./AppUtilities.js").sendHTTPRequest;
 
 /**
  * Manage the set of cards being displayed to the user.
- * 
+ *
  * @class
  */
 function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicards={}) {
@@ -24,11 +24,11 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicard
 
     /**
      * A function for comparing the keys for the BST
-     * 
+     *
      * @param {Object} a Expected attributes: `urgency`, `_id`
      * @param {Object} b Expected attributes: `urgency`, `id`
-     * 
-     * @returns {Number} `0` if the keys are equal, `1` if `a < b` and `-1` if 
+     *
+     * @returns {Number} `0` if the keys are equal, `1` if `a < b` and `-1` if
      * `a > b`
      */
     function reverseComparator(a, b) {
@@ -72,14 +72,14 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicard
     };
 
     /**
-     * @description Initialize a card manager using an array of abbreviated 
+     * @description Initialize a card manager using an array of abbreviated
      * cards.
-     * 
-     * @param {Array} minicards Array of JSON objects having the keys `_id`, 
+     *
+     * @param {Array} minicards Array of JSON objects having the keys `_id`,
      * and `urgency`
-     * 
-     * @param {Boolean} includeTagNeighbors If set to true, enqueue cards that share 
-     * similar tags as well. Note that this expects the minicards to have a `tags` 
+     *
+     * @param {Boolean} includeTagNeighbors If set to true, enqueue cards that share
+     * similar tags as well. Note that this expects the minicards to have a `tags`
      * attribute in addition to `_id` and `urgency`.
      */
     cardsManagerObj.initializeFromMinicards = function(minicards, includeTagNeighbors=false) {
@@ -116,10 +116,10 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicard
 
     /**
      * @description Initialize a card manager using a trash object.
-     * 
-     * @param {JSON} trashed_card_ids A JSON object whose keys are card IDs and 
+     *
+     * @param {JSON} trashed_card_ids A JSON object whose keys are card IDs and
      * the value is the timestamp on which they were trashed.
-     * 
+     *
      * @param {Function} callBack Function to call once everything is complete.
      */
     cardsManagerObj.initializeFromTrash = function (trashed_card_ids) {
@@ -127,7 +127,7 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicard
             bst = new AVLTree(reverseComparator, true);
             cardsManagerObj.bst = bst;
             currentNode = null;
-            
+
             let card_ids = Object.keys(trashed_card_ids); // Synchronous
             for (let i = 0; i < card_ids.length; i++) {
                 cardsManagerObj.insertCard(card_ids[i], trashed_card_ids[card_ids[i]]);
@@ -138,7 +138,7 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicard
     };
 
     /**
-     * @description An iterator over all cards that are discoverable through 
+     * @description An iterator over all cards that are discoverable through
      * the `prev()` and `next()` methods of the `CardsManager`
      */
     cardsManagerObj.cardKeys = function* () {
@@ -151,7 +151,7 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicard
     }
 
     /**
-     * @description Set the cursor of the `CardsManager` object to the card 
+     * @description Set the cursor of the `CardsManager` object to the card
      * with the provided ID
      */
     cardsManagerObj.fetchCard = function (cardID) {
@@ -185,12 +185,12 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicard
                     .catch((err) => { reject(err); });
             } else {
                 resolve(null);
-            }           
+            }
         });
     };
 
     /**
-     * @return {Boolean} `true` if calling `next()` will produce a card. `false` 
+     * @return {Boolean} `true` if calling `next()` will produce a card. `false`
      * otherwise
      */
     cardsManagerObj.hasNext = function () {
@@ -200,7 +200,7 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicard
     };
 
     /**
-     * @return {Boolean} `true` if calling `prev()` will produce a card. `false` 
+     * @return {Boolean} `true` if calling `prev()` will produce a card. `false`
      * otherwise
      */
     cardsManagerObj.hasPrev = function () {
@@ -222,19 +222,19 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicard
                     .catch((err) => { reject(err); });
             } else {
                 resolve(null);
-            } 
+            }
         });
     };
 
     /**
-     * @description Remove the specified card from the cards that are displayed 
+     * @description Remove the specified card from the cards that are displayed
      * to the user.
-     * 
-     * @param {String} idOfCardToRemove The ID of the card to be removed from 
+     *
+     * @param {String} idOfCardToRemove The ID of the card to be removed from
      * the queue of cards.
      */
     cardsManagerObj.removeCard = function(idOfCardToRemove) {
-        // If we're removing the current card, adjust such that `next()` 
+        // If we're removing the current card, adjust such that `next()`
         // resolves to the card that followed the card that we'll remove
         if (currentNode && currentNode.key._id === idOfCardToRemove) {
             if (cardsManagerObj.hasPrev()) {
@@ -263,7 +263,7 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicard
             } else {
                 console.log(`Previous: null`);
             }
-            
+
             findCard(currentNode.key._id)
                 .then((card) => {
                     console.log(`Current: (${card.urgency}) ${card.title}`);
@@ -279,20 +279,20 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicard
                     .catch((err) => { console.error(err); });
             } else {
                 console.log(`Next: null`);
-            }      
+            }
         } else {
             console.log(`Current: null`);
         }
     }
 
     /**
-     * @description Insert a card into the set of cards that can be discovered 
-     * by the `next()` and `prev()` iterators. The card will be insrted into 
-     * its natural position in the iteration order. As such, it may not be 
+     * @description Insert a card into the set of cards that can be discovered
+     * by the `next()` and `prev()` iterators. The card will be insrted into
+     * its natural position in the iteration order. As such, it may not be
      * the card returned by the immediate call of either `prev()` or `next()`
-     * 
+     *
      * @param {String} newCardID The ID of the card to insert into the queue
-     * @param {Number} newCardUrgency The urgency of the card to be inserted. 
+     * @param {Number} newCardUrgency The urgency of the card to be inserted.
      * Used as a sorting key.
      */
     cardsManagerObj.insertCard = function(newCardID, newCardUrgency) {
@@ -302,18 +302,18 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicard
     };
 
     /**
-     * @description Sync the changes made to the card with the card manager. We 
-     * don't check whether the urgency changed. The old key is removed from the 
+     * @description Sync the changes made to the card with the card manager. We
+     * don't check whether the urgency changed. The old key is removed from the
      * BST and a new (possibly updated) key is added to the BST.
-     * 
+     *
      * @param {Object} card the new version of the card
      */
     cardsManagerObj.updateCard = function(card) {
         localStorage.removeItem(card._id);
         localStorage.setItem(card._id, JSON.stringify(card));
-        minicards[card._id] = { 
-            _id: card._id, title: card.title, 
-            tags: card.tags.trim().replace(/\s/g, ", ") 
+        minicards[card._id] = {
+            _id: card._id, title: card.title,
+            tags: card.tags.trim().replace(/\s/g, ", ")
         };
 
         let oldKey = idsToBSTKeys[card._id];
@@ -321,14 +321,14 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicard
             cardsManagerObj.removeCard(card._id);
         }
         cardsManagerObj.insertCard(card._id, card.urgency);
-        
+
     };
 
     /**
-     * @description Compute and return the 0th, 1st, 2nd, 3rd and 4th quartiles 
+     * @description Compute and return the 0th, 1st, 2nd, 3rd and 4th quartiles
      * of the urgencies of the cards on the current `CardsManager` object.
-     * 
-     * @returns {Array} A 5 element array denoting the 0th, 1st, 2nd, 3rd and 4th 
+     *
+     * @returns {Array} A 5 element array denoting the 0th, 1st, 2nd, 3rd and 4th
      * quartiles of the urgences.
      */
     cardsManagerObj.quartiles = function() {
@@ -337,13 +337,13 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicard
             return [0, 0, 0, 0, 0];
         }
         else if (N <= 4) {
-            // Recall that the BST is populated using `reverseComparator()`, thus 
+            // Recall that the BST is populated using `reverseComparator()`, thus
             // the min node on the BST has the highest urgency.
             let maxUrgency = bst.min().urgency;
             return [maxUrgency, maxUrgency, maxUrgency, maxUrgency, maxUrgency];
         } else {
             return [
-                bst.max().urgency, 
+                bst.max().urgency,
                 bst.at(Math.floor(3 * N / 4)).key.urgency,
                 bst.at(Math.floor(N / 2)).key.urgency,
                 bst.at(Math.floor(N / 4)).key.urgency,
@@ -355,7 +355,7 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicard
     /**
      * @description Search for the card with the given ID. First search in the
      * browser, then query the database if necessary.
-     * 
+     *
      * @param {String} cardID The ID of the card that's to be fetched
      * @param {Function} callback The function to be called once the card is
      * found
@@ -363,8 +363,8 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicard
     function findCard(cardID) {
         return new Promise(function(resolve, reject) {
             let card = JSON.parse(localStorage.getItem(cardID));
-            if (card) { 
-                resolve(card); 
+            if (card) {
+                resolve(card);
             } else {
                 sendHTTPRequest("POST", cardSourceURL, {userIDInApp: userID, cardID: cardID})
                     .then((results) => {
@@ -376,7 +376,7 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicard
                         reject(err);
                     });
             }
-        });  
+        });
     }
 
     cardsManagerObj.saveCard = function(card, url) {
@@ -390,7 +390,7 @@ function CardsManager(tags_and_ids, userID, cardSourceURL="/read-card", minicard
                     } else {
                         reject(results.message);
                     }
-                    
+
                 })
                 .catch((err) => { reject(err); });
         })
