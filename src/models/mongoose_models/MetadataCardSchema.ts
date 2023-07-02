@@ -27,8 +27,8 @@ interface IMetadataRaw {
 
 let metadataSchema = new Schema<IMetadataRaw>(
     {
-        createdById: Number,
-        metadataIndex: Number,
+        createdById: { type: Number, immutable: true },
+        metadataIndex: {type: Number, immutable: true },
         node_information: Array,
         trashed_cards: Array,
         stats: Array,
