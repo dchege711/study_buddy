@@ -1,6 +1,6 @@
 "use strict";
 
-import { Node, AVLTree } from "./lib/AVLTree.js";
+import AVLTree, { Node } from "avl";
 import { ICard, MiniICard } from "../../models/mongoose_models/CardSchema";
 import { IMetadataNodeInformation, IMetadataTrashedCardInformation } from "../../models/mongoose_models/MetadataCardSchema";
 import { sendHTTPRequest } from "./AppUtilities";
@@ -10,32 +10,21 @@ interface CardsManagerBSTKey {
     _id: string;
 }
 
+type CardsManagerBSTNode = Node<CardsManagerBSTKey, number>;
+
 /**
  * Manage the set of cards being displayed to the user.
  *
  * @class
  */
 export class CardsManager implements Iterable<CardsManagerBSTKey> {
-
-    /* Holds the attributes and methods of the CardsManager module */
-    // var cardsManagerObj = {};
-
-    // /* Holds the IDs of the cards that are currently being viewed */
-    // var bst = new AVLTree();
-
-    // /* A reference to the current node on the BST */
-    // var currentNode = null;
-
-    // /* A mapping of card IDs to keys in the BST */
-    // var idsToBSTKeys = {};
-
     userID: number;
     cardSourceURL: string;
     minicards: MiniICard[];
     empty_card: Partial<ICard>;
     tagsAndIds: IMetadataNodeInformation;
-    bst = new AVLTree<CardsManagerBSTKey, number>(() => 1, true);
-    currentNode: Node | null = null;
+    bst: AVLTree<CardsManagerBSTKey, number> = new AVLTree();
+    currentNode: CardsManagerBSTNode | null = null;
     idsToBSTKeys: {[id: string]: CardsManagerBSTKey} = {};
 
     constructor(tagsAndIds: IMetadataNodeInformation, userID: number,
@@ -75,7 +64,7 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
         if (tagsToUse.size === 0) {
             tagsToUse = new Set(Object.keys(this.tagsAndIds));
         }
-        this.bst = new AVLTree<CardsManagerBSTKey, number>(this.reverseComparator, true);
+        this.bst = new AVLTree(this.reverseComparator, true);
         this.currentNode = null;
         let alreadySeenIDs = new Set<string>();
         tagsToUse.forEach((tag) => {
@@ -100,7 +89,7 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
      * attribute in addition to `_id` and `urgency`.
      */
     initializeFromMinicards(minicards: MiniICard[], includeTagNeighbors: boolean = false) {
-        this.bst = new AVLTree<CardsManagerBSTKey, number>(this.reverseComparator, true);
+        this.bst = new AVLTree(this.reverseComparator, true);
         this.currentNode = null;
 
         let alreadySeenIDs: Set<string> = new Set([]);
@@ -146,7 +135,7 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
      * @param {Function} callBack Function to call once everything is complete.
      */
     initializeFromTrash (trashedCards: IMetadataTrashedCardInformation) {
-        this.bst = new AVLTree<CardsManagerBSTKey, number>(this.reverseComparator, true);
+        this.bst = new AVLTree(this.reverseComparator, true);
         this.currentNode = null;
 
         let card_ids = Object.keys(trashedCards); // Synchronous
@@ -161,13 +150,13 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
      */
     [Symbol.iterator]() {
         let bst = this.bst;
-        let node: Node | null = bst.minNode();
+        let node: CardsManagerBSTNode | null = bst.minNode();
 
         return {
           next(): IteratorResult<CardsManagerBSTKey> {
-            if (node) {
+            if (node && node.key) {
                 let value = node.key;
-                node = bst.next(node.key);
+                node = bst.next(node);
                 return {
                     done: false,
                     value: value
@@ -212,10 +201,10 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
             }
             this.currentNode = this.bst.find(min);
         } else {
-            this.currentNode = this.bst.next(this.currentNode.key);
+            this.currentNode = this.bst.next(this.currentNode);
         }
 
-        if (this.currentNode === null) {
+        if (this.currentNode === null || !this.currentNode.key) {
             return Promise.reject("No cards left, but hasNext() claims there are some");
         }
 
@@ -229,7 +218,7 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
     hasNext(): boolean {
         if (this.bst.size === 0) return false;
         if (this.currentNode === null) return true;
-        return this.bst.next(this.currentNode.key) !== null;
+        return this.bst.next(this.currentNode) !== null;
     };
 
     /**
@@ -239,7 +228,7 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
     hasPrev (): boolean {
         if (this.bst.size === 0) return false;
         if (this.currentNode === null) return true;
-        return this.bst.prev(this.currentNode.key) !== null;
+        return this.bst.prev(this.currentNode) !== null;
     };
 
     /**
@@ -252,8 +241,8 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
             return Promise.resolve(null);
         }
 
-        this.currentNode = this.bst.prev(this.currentNode.key);
-        if (this.currentNode === null) {
+        this.currentNode = this.bst.prev(this.currentNode);
+        if (this.currentNode === null || !this.currentNode.key) {
             return Promise.reject("No cards left, but hasPrev() claims there are some");
         }
 
@@ -270,11 +259,11 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
     removeCard(idOfCardToRemove: string) {
         // If we're removing the current card, adjust such that `next()`
         // resolves to the card that followed the card that we'll remove
-        if (this.currentNode && this.currentNode.key._id === idOfCardToRemove) {
+        if (this.currentNode && this.currentNode.key && this.currentNode.key._id === idOfCardToRemove) {
             if (this.hasPrev()) {
-                this.currentNode = this.bst.prev(this.currentNode.key);
+                this.currentNode = this.bst.prev(this.currentNode);
             } else if (this.hasNext()) {
-                this.currentNode = this.bst.next(this.currentNode.key);
+                this.currentNode = this.bst.next(this.currentNode);
             } else {
                 this.currentNode = null;
             }
@@ -285,9 +274,9 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
     };
 
     status() {
-        if (this.currentNode) {
-            let node = this.bst.prev(this.currentNode.key);
-            if (node) {
+        if (this.currentNode && this.currentNode.key) {
+            let node = this.bst.prev(this.currentNode);
+            if (node && node.key) {
                 this.findCard(node.key._id)
                     .then((card) => {
                         console.log(`Previous: (${card.urgency}) ${card.title}`);
@@ -303,8 +292,8 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
                 })
                 .catch((err) => { console.error(err); });
 
-            node = this.bst.next(this.currentNode.key);
-            if (node) {
+            node = this.bst.next(this.currentNode);
+            if (node && node.key) {
                 this.findCard(node.key._id)
                     .then((card) => {
                         console.log(`Next: (${card.urgency}) ${card.title}`);
@@ -381,6 +370,9 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
             let fourthQuartile = this.bst.min();
             if (zeroQuartile === null || firstQuartile === null || secondQuartile === null || thirdQuartile === null || fourthQuartile === null) {
                 throw new Error("Unexpected null value in quartiles()");
+            }
+            if (firstQuartile.key === undefined || secondQuartile.key === undefined || thirdQuartile.key === undefined) {
+                throw new Error("Unexpected null keys in quartiles()");
             }
             return [
                 zeroQuartile.urgency,
