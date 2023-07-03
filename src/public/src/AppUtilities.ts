@@ -63,11 +63,11 @@ export function sendHTTPRequest(
             headers: {"Content-Type": contentType},
         })
         .then((response) => {
-            if (contentType === "application/json") {
+            let responseContentType = response.headers.get("content-type") || "";
+            if (responseContentType.indexOf("application/json") > 0) {
                 return response.json();
-            } else {
-                return response.text();
             }
+            return response.text();
         });
 }
 
