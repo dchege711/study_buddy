@@ -9,6 +9,9 @@ export const NODE_ENV = process.env.NODE_ENV;
 export const IS_PROD = NODE_ENV === "production";
 export const IS_DEV = NODE_ENV === "development";
 
+// @ts-ignore
+export const IS_TS_NODE = process[Symbol.for("ts-node.register.instance")] || process.env.TS_NODE_DEV !== undefined;
+
 if (!IS_DEV && !IS_PROD) {
     throw Error("Please set the NODE_ENV environment variable to either 'production' or 'development'.");
 }

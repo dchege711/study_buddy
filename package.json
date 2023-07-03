@@ -25,7 +25,7 @@
     "build": "tsc && webpack --config webpack.config.js",
     "jsdoc": "jsdoc -r models",
     "start": "npm run build && node dist/server.js",
-    "debug": "ts-node --files src/server.ts",
+    "debug": "ts-node-dev --files --transpile-only src/server.ts",
     "single_test": "npm run build && ts-mocha  --no-warnings ./dist/tests/mocha_tests/unit_tests/TestGraph.js",
     "test": "npm run mocha_tests",
     "mocha_tests": "npm run build && nyc ts-mocha --no-warnings --recursive --sort './src/tests/mocha_tests/*/*.ts' './src/**/*.test.ts'",
