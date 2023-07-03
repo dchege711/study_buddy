@@ -1,3 +1,29 @@
 <link rel="stylesheet" href="/css/themes/atom-one-light.css">
-<script type="text/javascript" async src="/src/Latex.bundle.min.js"></script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 <script type="text/javascript" async src="/src/SyntaxHighlighting.bundle.min.js"></script>
+
+<script type="text/javascript" async src="/src/Latex.bundle.min.js">
+    /**
+    * @description At first we had problems getting LaTEX to render
+    * properly, but we realized that by default, MathJAX expects LaTEX to
+    * be already on the DOM. We dug through its documentation and found
+    * out that MathJAX allows manual reloads. We therefore added a
+    * function that requests MathJAX to re-render the contents of the card
+    * template every time the user loads a card.
+    *
+    * Getting MathJax to work on the server side is a bit tricky.
+    * @see {@link https://stackoverflow.com/a/71090542/7812406}
+    * So we declare the latexImplementation function in src/public/src/Latex.ts,
+    * and dynamically update its implementation on the browser side.
+    *
+    * {@tutorial main.editing_cards}
+    *
+    * @param {Array} elementIDs
+    * @returns {Void} Modifies the DOM in place
+    */
+    latexImplementation = function(elementIDs) {
+        for (let i = 0; i < elementIDs.length; i++) {
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, elementIDs[i]]);
+        }
+    }
+</script>
