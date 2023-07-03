@@ -79,6 +79,7 @@ export function loginUser (req: Request, res: Response, next: NextFunction) {
                 "Set-Cookie",
                 [`session_token=${confirmation.token_id};Expires=${expiry_date}`]
             );
+            res.redirect("/");
         })
         .catch((err) => { convertObjectToResponse(err, null, res); });
 };

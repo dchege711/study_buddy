@@ -329,7 +329,7 @@ export async function authenticateUser(payload: AuthenticateUserParam): Promise<
 
     let user = await User.findOne(identifierQuery).exec();
     if (user === null) {
-        return Promise.reject("Incorrect username/email and/or password");
+        return Promise.reject(`No user matching "${submittedIdentifier}" found.`);
     }
 
     let computedHash = getHash(password, user.salt);
