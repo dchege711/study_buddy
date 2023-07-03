@@ -12,7 +12,7 @@ if (!state.addressElement || !state.formPasswordRequest) {
 /**
 * @description Request a password reset.
 */
-function passwordResetRequest() {
+export function passwordResetRequest() {
 
   if (!state.addressElement.checkValidity()) {
       state.addressElement.reportValidity();
