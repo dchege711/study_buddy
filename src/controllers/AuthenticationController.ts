@@ -36,17 +36,22 @@ export function requireLogIn(req: Request, res: Response, next: NextFunction) {
 function logInBySessionToken(req: Request, res: Response, next: NextFunction) {
     LogInUtilities
         .authenticateByToken(req.cookies.session_token)
-        .then(function(auth_response) {
-            if (auth_response && req.session) {
-                req.session.user = auth_response;
+        .then((token) =>{
+            if (token) {
+                if (!req.session) {
+                    return Promise.reject(new Error("User has valid toke but no session"));
+                }
+
+                req.session.user = token;
                 next();
-            } else {
-                res.setHeader(
-                    "Set-Cookie",
-                    [`session_token=null;Expires=Thu, 01 Jan 1970 00:00:00 GMT`]
-                );
-                res.redirect("/login");
+                return;
             }
+
+            res.setHeader(
+                "Set-Cookie",
+                [`session_token=null;Expires=Thu, 01 Jan 1970 00:00:00 GMT`]
+            );
+            res.redirect("/login");
         })
         .catch((err) => { convertObjectToResponse(err, null, res); });
 };
@@ -115,9 +120,12 @@ export function sendValidationEmailPost (req: Request, res: Response) {
 
 export function verifyAccount (req: Request, res: Response) {
     var verification_uri = req.path.split("/verify-account/")[1];
-    sendResponseFromPromise(
-        LogInUtilities.validateAccount(verification_uri), res
-    );
+
+    LogInUtilities.validateAccount(verification_uri)
+        .then((validationResult) => {
+            res.redirect(validationResult.redirect_url);
+        })
+        .catch((err) => { convertObjectToResponse(err, null, res); });
 };
 
 export function resetPasswordGet (req: Request, res: Response) {

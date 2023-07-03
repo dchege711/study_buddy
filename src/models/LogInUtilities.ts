@@ -365,13 +365,8 @@ export async function authenticateUser(payload: AuthenticateUserParam): Promise<
  * @returns {Promise} resolves with a JSON doc w/ `success`, `status`
  *  and `message` as keys
  */
-export async function authenticateByToken(tokenID: string): Promise<IToken> {
-    let token = await Token.findOne({ token_id: tokenID }).exec();
-    if (token === null) {
-        return Promise.reject("Invalid token");
-    } else {
-        return token;
-    }
+export async function authenticateByToken(tokenID: string): Promise<IToken | null> {
+    return Token.findOne({ token_id: tokenID }).exec();
 };
 
 /**
@@ -395,7 +390,7 @@ export type ResetLinkParams = Pick<IUser, "email">;
 export async function sendResetLink(userIdentifier: ResetLinkParams): Promise<string> {
     let user = await User.findOne({email: userIdentifier.email}).exec();
     if (!user) {
-        return `If ${userIdentifier.email} has an account, we've sent a password reset link`;
+        return `No user found with the email address: ${userIdentifier.email}`;
     }
 
     let resetPasswordURI = getRandomString(50, LOWER_CASE + DIGITS);
