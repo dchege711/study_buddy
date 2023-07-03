@@ -27,36 +27,64 @@ interface HomePageState {
   card_is_public_toggle: boolean;
 };
 
+interface ElementRefs {
+  cardContainerHolderElement: HTMLElement;
+  alreadySetTagsElement: HTMLElement;
+  cardDescriptionElement: HTMLElement;
+  cardIsPublicToggleElement: HTMLInputElement;
+  cardPopupElement: HTMLElement;
+  cardSearchInputElement: HTMLElement;
+  cardSearchResultsElement: HTMLElement;
+  abbreviatedCardsElement: HTMLElement;
+  cardTagInputElement: HTMLInputElement;
+  cardTitleElement: HTMLInputElement;
+  cardUrgencyElement: HTMLInputElement;
+  cardUrgencyNumberElement: HTMLElement;
+  filterListElement: HTMLElement;
+  sideBarContentsElement: HTMLElement;
+  spoilerElement: HTMLElement;
+  spoilerBoxElement: HTMLElement;
+  spoilerEndElement: HTMLElement;
+  tagsAutocompleteResultsElement:  HTMLElement;
+  shareableLinkElement: HTMLElement;
+  reviewModeToggleElement: HTMLInputElement;
+};
+
 /* If a user is logged in, there'll be some metadata about them in
  * Local Storage.
  */
-let state: HomePageState | null, autocomplete: AutoComplete | null, cardsManager: CardsManager | null;
+let state: HomePageState | null, autocomplete: AutoComplete | null, cardsManager: CardsManager | null, elementRefs: ElementRefs | null;
 
-// Maintain references to elements that get searched for often
-const elementRefs = {
-  cardContainerHolderElement: document.getElementById("card_modal") as HTMLElement,
-  alreadySetTagsElement: document.getElementById("already_set_card_tags") as HTMLElement,
-  cardDescriptionElement: document.getElementById("card_description") as HTMLElement,
-  cardIsPublicToggleElement: document.getElementById("card_is_public_toggle") as HTMLInputElement,
-  cardPopupElement: document.getElementById("card_popup_element") as HTMLElement,
-  cardSearchInputElement: document.getElementById("card_search_input") as HTMLElement,
-  cardSearchResultsElement: document.getElementById("card_search_results") as HTMLElement,
-  abbreviatedCardsElement: document.getElementById("minicards_search_results") as HTMLElement,
-  cardTagInputElement: document.getElementById("card_tag_input") as HTMLInputElement,
-  cardTitleElement: document.getElementById("card_title") as HTMLInputElement,
-  cardUrgencyElement: document.getElementById("card_urgency") as HTMLInputElement,
-  cardUrgencyNumberElement: document.getElementById("card_urgency_number") as HTMLElement,
-  filterListElement: document.getElementById("filter_list") as HTMLElement,
-  sideBarContentsElement: document.getElementById("side_bar_contents") as HTMLElement,
-  spoilerElement: document.getElementById("spoiler") as HTMLElement,
-  spoilerBoxElement: document.getElementById("spoiler_box") as HTMLElement,
-  spoilerEndElement: document.getElementById("spoiler_end") as HTMLElement,
-  tagsAutocompleteResultsElement: document.getElementById(
-    "tags_autocomplete_results"
-  ) as HTMLElement,
-  shareableLinkElement: document.getElementById("shareable_link") as HTMLElement,
-  reviewModeToggleElement: document.getElementById("reviewModeToggle") as HTMLInputElement,
-};
+document.addEventListener("DOMContentLoaded", () => {
+  // Maintain references to elements that get searched for often
+  elementRefs = {
+    cardContainerHolderElement: document.getElementById("card_modal") as HTMLElement,
+    alreadySetTagsElement: document.getElementById("already_set_card_tags") as HTMLElement,
+    cardDescriptionElement: document.getElementById("card_description") as HTMLElement,
+    cardIsPublicToggleElement: document.getElementById("card_is_public_toggle") as HTMLInputElement,
+    cardPopupElement: document.getElementById("card_popup_element") as HTMLElement,
+    cardSearchInputElement: document.getElementById("card_search_input") as HTMLElement,
+    cardSearchResultsElement: document.getElementById("card_search_results") as HTMLElement,
+    abbreviatedCardsElement: document.getElementById("minicards_search_results") as HTMLElement,
+    cardTagInputElement: document.getElementById("card_tag_input") as HTMLInputElement,
+    cardTitleElement: document.getElementById("card_title") as HTMLInputElement,
+    cardUrgencyElement: document.getElementById("card_urgency") as HTMLInputElement,
+    cardUrgencyNumberElement: document.getElementById("card_urgency_number") as HTMLElement,
+    filterListElement: document.getElementById("filter_list") as HTMLElement,
+    sideBarContentsElement: document.getElementById("side_bar_contents") as HTMLElement,
+    spoilerElement: document.getElementById("spoiler") as HTMLElement,
+    spoilerBoxElement: document.getElementById("spoiler_box") as HTMLElement,
+    spoilerEndElement: document.getElementById("spoiler_end") as HTMLElement,
+    tagsAutocompleteResultsElement: document.getElementById(
+      "tags_autocomplete_results"
+    ) as HTMLElement,
+    shareableLinkElement: document.getElementById("shareable_link") as HTMLElement,
+    reviewModeToggleElement: document.getElementById("reviewModeToggle") as HTMLInputElement,
+  };
+
+  initializeHomepage();
+});
+
 
 function updateStreakBar(streakObj: IStreak) {
   let streakBarElement = document.getElementById("streak_bar");
@@ -126,7 +154,7 @@ function initializeHomepage() {
 }
 
 async function refreshMinicards() {
-  if (!cardsManager || !state) {
+  if (!cardsManager || !state || !elementRefs) {
     throw new Error("Cards manager not initialized.");
   }
 
@@ -210,7 +238,7 @@ function fetchNextCard() {
 }
 
 function toggleOption(element_id: "reviewModeToggle" | "card_is_public_toggle") {
-  if (!state) {
+  if (!state || !elementRefs) {
     throw new Error("State not initialized.");
   }
 
@@ -229,6 +257,9 @@ function makeInvisible(element_id: string) {
 }
 
 function filterCards() {
+  if (!elementRefs) {
+    throw new Error("Element references not initialized.");
+  }
   // I apologize for this embarassing line. :-(
   let tagsToUse = getSelectedTags();
 
@@ -291,6 +322,9 @@ function colorUrgencyQuartiles(quartiles: number[]) {
 }
 
 function renderCard(card: Partial<ICard> | null) {
+  if (!elementRefs) {
+    throw new Error("Element references not initialized.");
+  }
   if (!card) {
     displayPopUp("Out of cards!", 1500);
     elementRefs.cardContainerHolderElement.style.display = "block";
@@ -360,7 +394,7 @@ function renderCard(card: Partial<ICard> | null) {
 }
 
 function displayRawCardDescription() {
-  if (!state) {
+  if (!state || !elementRefs) {
     throw new Error("State not initialized.");
   }
   elementRefs.cardDescriptionElement.innerText = state.rawDescription as string;
@@ -368,7 +402,7 @@ function displayRawCardDescription() {
 }
 
 function displayNewCard() {
-  if (!state) {
+  if (!state || !elementRefs) {
     throw new Error("State not initialized.");
   }
 
@@ -404,7 +438,7 @@ function handleInputChange(element_id: string) {
 }
 
 function handleTagsInputChange(event: KeyboardEvent) {
-  if (!autocomplete) {
+  if (!autocomplete || !elementRefs) {
     throw new Error("Autocomplete not initialized.");
   }
 
@@ -444,10 +478,17 @@ function suggestNewTags(tagInputElement: HTMLInputElement) {
   for (let i = 0; i < suggestedTags.length; i++) {
     autocompleteHTML += `<button class="autocomplete_suggestion_button" onclick="updateTagsButtons('${suggestedTags[i]}');">${suggestedTags[i]}</button>`;
   }
+
+  if (!elementRefs) {
+    throw new Error("Element refs not initialized.");
+  }
   elementRefs.tagsAutocompleteResultsElement.innerHTML = autocompleteHTML;
 }
 
 function removeTagSuggestions() {
+  if (!elementRefs) {
+    throw new Error("Element refs not initialized.");
+  }
   elementRefs.tagsAutocompleteResultsElement.innerHTML = "";
 }
 
@@ -461,6 +502,10 @@ function updateTagsButtons(new_tag: string) {
   }
 
   state.currentCardTags.add(new_tag);
+
+  if (!elementRefs) {
+    throw new Error("Element refs not initialized.");
+  }
   elementRefs.tagsAutocompleteResultsElement.innerHTML = "";
   elementRefs.alreadySetTagsElement.insertAdjacentHTML(
     "beforeend",
@@ -515,6 +560,9 @@ function handleCardUrgencyChange() {
     saveCard(false);
     fetchNextCard();
   } else {
+    if (!elementRefs) {
+      throw new Error("Element refs not initialized.");
+    }
     elementRefs.cardUrgencyNumberElement.innerText =
       elementRefs.cardUrgencyElement.value;
   }
@@ -527,6 +575,10 @@ function saveCard(renderSavedCard = true) {
 
   if (!cardsManager) {
     throw new Error("Cards manager not initialized.");
+  }
+
+  if (!elementRefs) {
+    throw new Error("Element refs not initialized.");
   }
 
   let payload: Partial<ICard> = {
@@ -651,6 +703,10 @@ function restoreCardFromTrash(card_to_restore_id: string, card_to_restore_urgenc
 export function reInitializeCards(abbreviated_cards: MiniICard[]) {
   if (!cardsManager) {
     throw new Error("Cards manager not initialized.");
+  }
+
+  if (!elementRefs) {
+    throw new Error("Element refs not initialized.");
   }
 
   elementRefs.cardSearchResultsElement.innerHTML = "";
