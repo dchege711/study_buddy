@@ -37,20 +37,7 @@
 
         <%- include('../partials/footer.ejs'); %>
 
-        <script type="text/javascript">
-            function sendValidationURL() {
-                AppUtilities
-                    .sendForm("send_validation_url_form", location.href)
-                    .then((response) => {
-                        response = JSON.parse(response);
-                        alert(response.message);
-                        if (response.success) window.location = "/";
-                    })
-                    .catch((err) => { console.error(err); });
-
-                return false;
-            }
-        </script>
+        <script type="text/javascript" src="/src/SendValidationURL.bundle.min.js"></script>
 
 </body>
 

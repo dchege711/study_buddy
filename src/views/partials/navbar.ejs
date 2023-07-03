@@ -1,4 +1,4 @@
-<script type="text/javascript" src="/src/AppUtilities.bundle.min.js"></script>
+<script type="text/javascript" src="/src/NavBar.ejs.bundle.min.js"></script>
 
 <div class="topnav">
     <div id="topnav-banner">
@@ -49,18 +49,3 @@
     </ul>
 
 </div>
-
-<script type="text/javascript">
-    /**
-     * @description Log out the currently logged in user.
-     */
-    function logOut() {
-        AppUtilities.sendHTTPRequest("POST", "/logout", {})
-            .then((response) => {
-                localStorage.clear();
-                window.location = "/";
-            })
-            .catch((err) => { console.error(err); });
-    }
-
-</script>

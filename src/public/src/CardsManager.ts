@@ -39,7 +39,7 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
     idsToBSTKeys: {[id: string]: CardsManagerBSTKey} = {};
 
     constructor(tagsAndIds: IMetadataNodeInformation, userID: number,
-                cardSourceURL="/read-card", minicards: MiniICard[]) {
+                cardSourceURL: string = "/read-card", minicards: MiniICard[] = []) {
         this.tagsAndIds = tagsAndIds;
         this.userID = userID;
         this.cardSourceURL = cardSourceURL;
