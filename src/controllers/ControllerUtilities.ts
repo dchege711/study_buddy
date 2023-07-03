@@ -23,29 +23,30 @@ export function convertObjectToResponse (err: Error | null, result_JSON: any, re
             return;
         }
 
+        console.error(err);
         res.type(".html");
         res.status(500);
         res.render(
             "pages/5xx_error_page.ejs",
             { response_JSON: generic_500_msg, APP_NAME: APP_NAME, LOGGED_IN: false }
         );
+        return;
+    }
+
+    let status = result_JSON.status || 200;
+    res.status(status);
+    if (status >= 200 && status < 300) {
+        res.type("application/json");
+        res.json(result_JSON);
+    } else if (status >= 300 && status < 400) {
+        res.type('html');
+        res.redirect(status, result_JSON.redirect_url + "?msg=" + encodeURIComponent(result_JSON.message));
+    } else if (status >= 400 && status < 500) {
+        res.type('html');
+        res.render("pages/4xx_error_page.ejs", { response_JSON: result_JSON, APP_NAME: APP_NAME });
     } else {
-        console.error(err);
-        let status = result_JSON.status || 200;
-        res.status(status);
-        if (status >= 200 && status < 300) {
-            res.type("application/json");
-            res.json(result_JSON);
-        } else if (status >= 300 && status < 400) {
-            res.type('html');
-            res.redirect(status, result_JSON.redirect_url + "?msg=" + encodeURIComponent(result_JSON.message));
-        } else if (status >= 400 && status < 500) {
-            res.type('html');
-            res.render("pages/4xx_error_page.ejs", { response_JSON: result_JSON, APP_NAME: APP_NAME });
-        } else {
-            res.type('html');
-            res.render("pages/5xx_error_page.ejs", { response_JSON: result_JSON, APP_NAME: APP_NAME });
-        }
+        res.type('html');
+        res.render("pages/5xx_error_page.ejs", { response_JSON: result_JSON, APP_NAME: APP_NAME });
     }
 };
 
