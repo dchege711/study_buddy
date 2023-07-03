@@ -18,7 +18,11 @@ const generic_500_msg = {
  */
 export function convertObjectToResponse (err: Error | null, result_JSON: any, res: Response) {
     if (err) {
-        console.error(err);
+        if (typeof err === "string") {
+            res.type("text").status(200).send(err);
+            return;
+        }
+
         res.type(".html");
         res.status(500);
         res.render(
@@ -26,6 +30,7 @@ export function convertObjectToResponse (err: Error | null, result_JSON: any, re
             { response_JSON: generic_500_msg, APP_NAME: APP_NAME, LOGGED_IN: false }
         );
     } else {
+        console.error(err);
         let status = result_JSON.status || 200;
         res.status(status);
         if (status >= 200 && status < 300) {
