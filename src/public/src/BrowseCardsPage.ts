@@ -11,9 +11,6 @@ import { syncSpoilerBox } from "./CardTemplateUtilities";
 import { addSyntaxHighlighting } from "./SyntaxHighlighting";
 import { renderLatex } from "./Latex";
 
-let cardsManager: CardsManager | null = null;
-let autocomplete: AutoComplete | null = null;
-
 interface BrowseCardsPageState {
     currentCardID: string | null,
     currentTagSelectionElement: HTMLElement,
@@ -22,53 +19,80 @@ interface BrowseCardsPageState {
     queryString: string,
 }
 
-let state: BrowseCardsPageState = {
-    currentCardID: null,
-    currentTagSelectionElement: document.getElementById("current_tag_selection") as HTMLElement,
-    searchResultsElement: document.getElementById("minicards_search_results") as HTMLElement,
-    tagsAndIDs: null,
-    queryString: "",
-};
-if (!state.currentTagSelectionElement || !state.searchResultsElement) {
-    throw new Error("Could not find the current tag selection element or the search results element.");
+interface ElementRefs {
+    searchInputElement: HTMLInputElement,
+    cardContainerHolderElement: HTMLElement,
+    cardTitleElement: HTMLElement,
+    cardDescriptionElement: HTMLElement,
+    cardTagsElement: HTMLElement,
+    cardPopularityElement: HTMLElement
 }
 
-const USER_INFO = getAccountInfo() as AuthenticateUser;
-if (!USER_INFO) {
-    throw new Error("Could not find user info.");
-}
+let cardsManager: CardsManager | null = null;
+let autocomplete: AutoComplete | null = null;
+let state: BrowseCardsPageState | null = null;
+let elementRefs: ElementRefs | null = null;
+const USER_INFO: AuthenticateUser | null = null;
 
-const elementRefs = {
-    searchInputElement: document.getElementById("search_input") as HTMLInputElement,
-    cardContainerHolderElement: document.getElementById("card_modal") as HTMLElement,
-    cardTitleElement: document.getElementById("card_title") as HTMLElement,
-    cardDescriptionElement: document.getElementById("card_description") as HTMLElement,
-    cardTagsElement: document.getElementById("card_tags") as HTMLElement,
-    cardPopularityElement: document.getElementById("card_popularity") as HTMLElement
-};
-for (let val in Object.values(elementRefs)) {
-    if (!val) throw new Error(`Could not find some element references.`);
-}
+document.addEventListener("DOMContentLoaded", () => {
+    state = {
+        currentCardID: null,
+        currentTagSelectionElement: document.getElementById("current_tag_selection") as HTMLElement,
+        searchResultsElement: document.getElementById("minicards_search_results") as HTMLElement,
+        tagsAndIDs: null,
+        queryString: "",
+    };
+    if (!state.currentTagSelectionElement || !state.searchResultsElement) {
+        throw new Error("Could not find the current tag selection element or the search results element.");
+    }
 
-sendHTTPRequest("POST", "/read-public-metadata", {})
-    .then((metadataDocs: IMetadata[]) => {
-        if (metadataDocs.length === 0) {
-            return Promise.reject("No metadata found.");
-        }
+    const USER_INFO = getAccountInfo() as AuthenticateUser;
+    if (!USER_INFO) {
+        throw new Error("Could not find user info.");
+    }
 
-        state.tagsAndIDs = metadataDocs[0].node_information[0];
-        cardsManager = new CardsManager(state.tagsAndIDs, metadataDocs[0].createdById, "/read-public-card");
-        initializeTagsBar("side_bar_contents", state.tagsAndIDs);
-        autocomplete = new AutoComplete();
-        autocomplete.initializePrefixTree(Object.keys(state.tagsAndIDs));
-    })
-    .catch((err) => { console.error(err); });
+    elementRefs = {
+        searchInputElement: document.getElementById("search_input") as HTMLInputElement,
+        cardContainerHolderElement: document.getElementById("card_modal") as HTMLElement,
+        cardTitleElement: document.getElementById("card_title") as HTMLElement,
+        cardDescriptionElement: document.getElementById("card_description") as HTMLElement,
+        cardTagsElement: document.getElementById("card_tags") as HTMLElement,
+        cardPopularityElement: document.getElementById("card_popularity") as HTMLElement
+    };
+    for (let val in Object.values(elementRefs)) {
+        if (!val) throw new Error(`Could not find some element references.`);
+    }
+
+    sendHTTPRequest("POST", "/read-public-metadata", {})
+        .then((metadataDocs: IMetadata[]) => {
+            if (metadataDocs.length === 0) {
+                return Promise.reject("No metadata found.");
+            }
+            if (!state) {
+                throw new Error("State not initialized.");
+            }
+
+            state.tagsAndIDs = metadataDocs[0].node_information[0];
+            cardsManager = new CardsManager(state.tagsAndIDs, metadataDocs[0].createdById, "/read-public-card");
+            initializeTagsBar("side_bar_contents", state.tagsAndIDs);
+            autocomplete = new AutoComplete();
+            autocomplete.initializePrefixTree(Object.keys(state.tagsAndIDs));
+        })
+        .catch((err) => { console.error(err); });
+});
 
 function handleSearchInputChange() {
+    if (!state || !elementRefs) {
+        throw new Error("State and/or element refs not initialized.");
+    }
     state.queryString = elementRefs.searchInputElement.value || "";
 }
 
 function filterCards() {
+    if (!state) {
+        throw new Error("State not initialized.");
+    }
+
     let selectedTags = getSelectedTags();
     let selectedIDs = getIDsOfSelectedTags();
 
@@ -82,6 +106,10 @@ function filterCards() {
 
     sendHTTPRequest("POST", "/browse", payload)
         .then((cards: Partial<ICard>[]) => {
+            if (!state) {
+                throw new Error("State went out of scope.");
+            }
+
             let currentTagsString = (selectedTags === null) ? "all" : Array.from(selectedTags).join(", ");
             state.currentTagSelectionElement.innerHTML = `Current Tags: ${currentTagsString}`;
             displayAllSearchResults(cards);
@@ -90,6 +118,10 @@ function filterCards() {
 }
 
 export function displayAllSearchResults(abbreviatedCards: Partial<ICard>[]) {
+    if (!state) {
+        throw new Error("State not initialized.");
+    }
+
     let searchResultsHTML = ``;
     for (let card of abbreviatedCards) {
         searchResultsHTML += `
@@ -117,6 +149,10 @@ function displayFullCard(cardID: string) {
 
     cardsManager.next()
         .then((card) => {
+            if (!elementRefs) {
+                throw new Error("Element refs not initialized.");
+            }
+
             if (card === null) {
                 throw new Error("No card found.");
             }
@@ -149,6 +185,10 @@ function fetchNextCard() {
 }
 
 function flagCard(reason: "markedForReview" | "markedAsDuplicate") {
+    if (!state) {
+        throw new Error("State not initialized.");
+    }
+
     if (USER_INFO === null) {
         if (window.confirm("Please login/signup first. May I take you to the login page?")) {
             window.location.href = "/login";
@@ -175,6 +215,10 @@ function copyCardToOwnCollection() {
         return;
     }
 
+    if (!state) {
+        throw new Error("State not initialized.");
+    }
+
     let payload: DuplicateCardParams = {
         cardID: state.currentCardID as string,
         userIDInApp: USER_INFO.userIDInApp as number,
@@ -190,10 +234,13 @@ function copyCardToOwnCollection() {
 }
 
 function renderCard(card: Partial<ICard> | null) {
-
     if (!card) {
         displayPopUp("Out of cards!", 1500);
         return;
+    }
+
+    if (!state || !elementRefs) {
+        throw new Error("State and/or element refs not initialized.");
     }
 
     elementRefs.cardTitleElement.innerHTML = card.title as string;
