@@ -4,7 +4,7 @@ import { RestoreCardFromTrashParams, SendCardToTrashParams, UpdateStreakParams }
 import { ICard, MiniICard } from "../../models/mongoose_models/CardSchema";
 import { IMetadata, IMetadataNodeInformation, IStreak } from "../../models/mongoose_models/MetadataCardSchema";
 import { RefreshMetadataResponseMiniCards, getAccountInfo, refreshMetadata, sendHTTPRequest } from "./AppUtilities";
-import { AutoComplete } from "./Autocomplete";
+import { AutoComplete } from "./AutoComplete";
 import { displayPopUp, syncSpoilerBox } from "./CardTemplateUtilities";
 import { CardsManager } from "./CardsManager";
 import { renderLatex } from "./Latex";
