@@ -1,4 +1,4 @@
-import { AutoComplete } from "./Autocomplete";
+import { AutoComplete } from "./AutoComplete";
 
 const tagsBarTemplateState = {
   tagSearchResultsElement: document.getElementById("tags_search_results") as HTMLElement,
