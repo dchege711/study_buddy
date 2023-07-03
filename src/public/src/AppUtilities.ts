@@ -2,7 +2,8 @@
 
 import { MetadataResponse } from "../../controllers/InAppController";
 import { AuthenticateUser } from "../../models/LogInUtilities";
-import { ICard } from "../../models/mongoose_models/CardSchema";
+import { ICard, MiniICard } from "../../models/mongoose_models/CardSchema";
+import { IMetadata } from "../../models/mongoose_models/MetadataCardSchema";
 
 /**
  * A collection of functions that tend to be used in different pages on the
@@ -19,8 +20,12 @@ import { ICard } from "../../models/mongoose_models/CardSchema";
  *
  * @return {Promise} Should take in a JSON argument.
  */
-export async function sendForm(form_id: number, url: string) {
-    let form = document.forms[form_id];
+export async function sendForm(form_id: number | string, url: string) {
+    let form = (typeof form_id === "string")
+        ? document.forms.namedItem(form_id) : document.forms[form_id];
+    if (!form) {
+        return Promise.reject("Form not found.");
+    }
 
     if (!form.checkValidity()) {
         form.reportValidity();
@@ -93,16 +98,23 @@ export function getAccountInfo(): AuthenticateUser | null {
     else return JSON.parse(retrievedAccountInfo);
 }
 
+export type RefreshMetadataResponseMiniCards = Map<string, MiniICard>;
+
+export interface RefreshMetadataResponse {
+    metadata: IMetadata;
+    minicards: RefreshMetadataResponseMiniCards;
+};
+
 /**
  * @description Reload the metadata document from the server. Useful if more
  * cards have been added, e.g. from the `/browse` page.
  *
  * @returns {Promise} resolves with the new metadata.
  */
-export function refreshMetadata() {
+export function refreshMetadata(): Promise<RefreshMetadataResponse> {
     let accountInfo = getAccountInfo();
     if (!accountInfo) {
-        return Promise.resolve(null);
+        return Promise.reject("No account information found.");
     }
 
     return sendHTTPRequest("POST", "/read-metadata", {userIDInApp: accountInfo.userIDInApp})
@@ -114,16 +126,16 @@ export function refreshMetadata() {
                 return Promise.reject("No minicards found.");
             }
 
-            let minicards: {[k: string]: Partial<ICard>} = {};
+            let minicards = new Map<string, MiniICard>();
             for (let minicard of metadata.minicards) {
-                minicards[minicard._id] = {
+                minicards.set(minicard._id, {
                     _id: minicard._id, title: minicard.title,
                     tags: minicard.tags?.trim().replace(/\s/g, ", ")
-                };
+                });
             }
 
             localStorage.setItem("metadata", JSON.stringify(metadata.metadataDocs));
             localStorage.setItem("minicards", JSON.stringify(minicards));
-            return Promise.resolve([metadata.metadataDocs[0], minicards]);
+            return Promise.resolve({metadata: metadata.metadataDocs[0], minicards});
         });
 }

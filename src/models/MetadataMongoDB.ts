@@ -175,7 +175,7 @@ export function deleteAllMetadata(payload: Pick<IUser, "userIDInApp">): Promise<
     return Metadata.deleteMany({createdById: payload.userIDInApp}).exec();
 };
 
-type SendCardToTrashParams = Pick<ICard, "_id" | "createdById">;
+export type SendCardToTrashParams = Pick<ICard, "_id" | "createdById">;
 
 /**
  * @param {JSON} payload Must contain `cardID` that has the id of the card
@@ -239,7 +239,7 @@ export async function sendCardToTrash(payload: SendCardToTrashParams): Promise<s
     return `Card moved to the trash. <span class="underline_bold_text clickable" onclick="restoreCardFromTrash('${card._id}', '${card.urgency}')">Undo Action</span>`;
 };
 
-type RestoreCardFromTrashParams = SendCardToTrashParams;
+export type RestoreCardFromTrashParams = SendCardToTrashParams;
 
 /**
  * @description Restore a card from the trash, back into the user's list of
@@ -470,7 +470,7 @@ export async function updateUserSettings(newUserSettings: UpdateUserSettingsPara
     return user.save();
 };
 
-type UpdateStreakParams = Pick<IStreak, "cardIDs"> & Pick<IUser, "userIDInApp">;
+export type UpdateStreakParams = Pick<IStreak, "cardIDs"> & Pick<IUser, "userIDInApp">;
 
 /**
  * @description Update the streak object for the current user. Assumes that the

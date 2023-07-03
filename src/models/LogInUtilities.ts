@@ -293,7 +293,7 @@ export async function registerUserAndPassword(payload: RegisterUserAndPasswordPa
 
 export type AuthenticateUser = Pick<IUser & IToken, "token_id" | "userIDInApp" | "username" | "email" | "cardsAreByDefaultPrivate" | "user_reg_date">;
 
-interface AuthenticateUserParam {
+export interface AuthenticateUserParam {
     username_or_email: string;
     password: string;
 }
@@ -385,7 +385,7 @@ export async function deleteSessionToken(sessionTokenID: string): Promise<void> 
     await Token.findOneAndRemove({token_id: sessionTokenID}).exec();
 };
 
-type ResetLinkParams = Pick<IUser, "email">;
+export type ResetLinkParams = Pick<IUser, "email">;
 
 /**
  * @param {JSON} userIdentifier Expected key: `email_address`
@@ -446,7 +446,7 @@ export async function validatePasswordResetLink(resetPasswordURI: string): Promi
     return "Please submit a new password";
 };
 
-type ResetPasswordParams = Pick<IUser, "reset_password_uri"> & { password: string, reset_request_time: Date };
+export type ResetPasswordParams = Pick<IUser, "reset_password_uri"> & { password: string, reset_request_time: Date };
 
 /**
  * @description Reset the user's password. We also invalidate all previously

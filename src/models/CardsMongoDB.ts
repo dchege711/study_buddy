@@ -182,7 +182,7 @@ let collectSearchResults = function(queryObject: CardQuery): Promise<Partial<ICa
  * TODO(dchege711): Unify this with SearchCardParams above?
  */
 export interface SearchPublicCardParams {
-    queryString: string; cardIDs: string; limit: number;
+    queryString?: string; cardIDs?: string; limit?: number;
     creationStartDate?: Date; creationEndDate?: Date};
 
 /**
@@ -223,7 +223,7 @@ export function publicSearch(payload: SearchPublicCardParams): Promise<Array<Par
     let queryObject : CardQuery = {
         filter: { $and: mandatoryFields },
         projection: "title tags",
-        limit: payload.limit,
+        limit: payload.limit || 100,
         sortCriteria: sortCriteria,
     };
     return collectSearchResults(queryObject);
@@ -283,7 +283,7 @@ export async function duplicateCard(payload: DuplicateCardParams): Promise<ICard
     });
 };
 
-interface FlagCardParams {cardID: string; markedForReview?: boolean; markedAsDuplicate?: boolean};
+export interface FlagCardParams {cardID: string; markedForReview?: boolean; markedAsDuplicate?: boolean};
 
 /**
  * @description With public cards, it's possible that some malicious users may
@@ -314,7 +314,7 @@ export async function flagCard(payload: FlagCardParams): Promise<ICard> {
     return card;
 }
 
-type TagGroupingsParam = Pick<ReadCardParams, "userIDInApp">;
+export type TagGroupingsParam = Pick<ReadCardParams, "userIDInApp">;
 export type TagGroupings = string[][];
 
 /**

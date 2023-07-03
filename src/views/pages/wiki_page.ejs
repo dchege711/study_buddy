@@ -20,12 +20,7 @@
             });
           </script>
         <%- include('../partials/header.ejs'); %>
-
-            <style>
-                #study_buddy_details {
-                    margin: 1% 15% 1% 15%;
-                    padding: 1% 5% 1% 5%;
-                }
+        <style>
 
                 .details_header {
                     border-bottom: 1px #e1e4e8 solid;
@@ -49,7 +44,11 @@
 
 <body onload="markupPage()">
 
-    <%- include('../partials/navbar.ejs'); %>
+    </head>
+
+    <body onload="addSyntaxHighlighting()">
+
+        <%- include('../partials/navbar.ejs'); %>
 
         <div id="main_div">
 
@@ -370,25 +369,5 @@
 
         <%- include('../partials/footer.ejs'); %>
 
-</body>
-
-<script>
-
-    function markupPage() {
-        PrettifyCards.addSyntaxHighlighting();
-
-        /*
-        let domElements = document.getElementsByClassName("convert_to_html");
-        for (let i = 0; i < domElements.length; i++) {
-            domElements[i].innerHTML = converter.makeHtml(
-                String.raw`${domElements[i].textContent.replace(/\\/g, "\\\\")}`
-            );
-        }
-        */
-
-
-    }
-
-</script>
-
+    </body>
 </html>

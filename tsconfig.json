@@ -6,6 +6,7 @@
       "esModuleInterop": true,
       "strict": true,
       "sourceMap": true,
+      "downlevelIteration": true,
     },
     "include": ["./src/**/*"]
   }
