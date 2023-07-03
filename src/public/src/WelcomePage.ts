@@ -23,8 +23,8 @@ export function displayForm(form_id: string) {
  */
 export function logInUser(formID: string, url: string) {
   sendForm(formID, url)
-      .then((confirmation) => {
-          setupInitializationData();
+      .then((message: string) => {
+        alert(message);
       })
       .catch((err) => { console.error(err); });
 
