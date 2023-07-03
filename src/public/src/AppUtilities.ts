@@ -58,26 +58,17 @@ export async function sendForm(form_id: number | string, url: string) {
 export function sendHTTPRequest(
         method: "GET" | "POST", url: string, payload: any,
         contentType="application/json"): Promise<any> {
-    return new Promise(function(resolve, reject) {
-        let xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function () {
-            if (this.readyState == 4) {
-                let status = this.status;
-                if (status < 300) {
-                    resolve(this.response);
-                } else if (status >= 300 && status < 400) {
-                    reject(new Error(`Request was redirected to ${this.responseURL}.`));
-                    window.location = this.responseURL as unknown as Location;
-                } else {
-                    reject(new Error(`Request returned a response status (${status})`));
-                    document.write(this.response);
-                }
+    return fetch(url, {
+            method, body: JSON.stringify(payload), credentials: "same-origin",
+            headers: {"Content-Type": contentType},
+        })
+        .then((response) => {
+            if (contentType === "application/json") {
+                return response.json();
+            } else {
+                return response.text();
             }
-        };
-        xhttp.open(method, url, true);
-        xhttp.setRequestHeader("Content-Type", contentType);
-        xhttp.send(JSON.stringify(payload));
-    });
+        });
 }
 
 /**
