@@ -2,7 +2,7 @@ import { IMetadata, IMetadataNodeInformation } from "../../models/mongoose_model
 import { getAccountInfo, sendHTTPRequest } from "./AppUtilities";
 import { CardsManager } from "./CardsManager";
 import { initializeTagsBar, getIDsOfSelectedTags, getSelectedTags } from "./TagsBarUtilities";
-import { AutoComplete } from "./Autocomplete";
+import { AutoComplete } from "./AutoComplete";
 import { DuplicateCardParams, FlagCardParams, SearchPublicCardParams } from "../../models/CardsMongoDB";
 import { ICard } from "../../models/mongoose_models/CardSchema";
 import { displayPopUp } from "./CardTemplateUtilities";
