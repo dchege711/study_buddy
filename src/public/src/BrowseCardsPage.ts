@@ -125,7 +125,7 @@ export function displayAllSearchResults(abbreviatedCards: Partial<ICard>[]) {
     let searchResultsHTML = ``;
     for (let card of abbreviatedCards) {
         searchResultsHTML += `
-            <div class="w3-card-4 w3-padding-small w3-margin search-result" onclick="displayFullCard('${card._id}')">
+            <div class="w3-card-4 w3-padding-small w3-margin search-result" onclick="BrowseCardsPage.displayFullCard('${card._id}')">
             <header class="w3-container w3-pale-green"><h4>${card.title}</h4></header>
             <div class="w3-container"><p><strong>Tags: </strong><span id="tags${card._id}">${card.tags?.split(/\s/).join(", ")}</span></p></div>
             </div>
@@ -164,7 +164,7 @@ function displayFullCard(cardID: string) {
         .catch((err) => { console.error(err); });
 }
 
-function fetchPreviousCard() {
+export function fetchPreviousCard() {
     if (cardsManager === null) {
         throw new Error("CardsManager not initialized.");
     }
@@ -174,7 +174,7 @@ function fetchPreviousCard() {
         .catch((err) => { console.error(err); });
 }
 
-function fetchNextCard() {
+export function fetchNextCard() {
     if (cardsManager === null) {
         throw new Error("CardsManager not initialized.");
     }

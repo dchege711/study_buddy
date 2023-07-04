@@ -159,12 +159,12 @@ async function refreshMinicards() {
   }
 
   let minicardsHTML = `
-                    <div class="w3-card-4 w3-padding-small w3-margin minicard_search_result" onclick="displayNewCard()">
+                    <div class="w3-card-4 w3-padding-small w3-margin minicard_search_result" onclick="HomePage.displayNewCard()">
                         <header class="w3-container w3-pale-blue"><h4><i class="fa fa-plus-square-o fa-fw" aria-hidden="true"></i> Create a New Card</h4></header>
                     </div>`;
   for (let cardKey of cardsManager) {
     minicardsHTML += `
-                    <div class="w3-card-4 w3-padding-small w3-margin minicard_search_result" onclick="displayFullCard('${
+                    <div class="w3-card-4 w3-padding-small w3-margin minicard_search_result" onclick="HomePage.displayFullCard('${
                       cardKey._id
                     }')">
                         <header class="w3-container w3-pale-green"><h4>${
@@ -178,7 +178,7 @@ async function refreshMinicards() {
   elementRefs.abbreviatedCardsElement.innerHTML = minicardsHTML;
 }
 
-async function displayFullCard(cardID: string) {
+export async function displayFullCard(cardID: string) {
   if (cardsManager === null) {
     throw new Error("Cards manager not initialized.");
   }
@@ -221,7 +221,7 @@ function fetchCard(cardCaller: () => Promise<Partial<ICard> | null>) {
     });
 }
 
-function fetchPreviousCard() {
+export function fetchPreviousCard() {
   if (!cardsManager) {
     throw new Error("Cards manager not initialized.");
   }
@@ -229,7 +229,7 @@ function fetchPreviousCard() {
   fetchCard(cardsManager.previous);
 }
 
-function fetchNextCard() {
+export function fetchNextCard() {
   if (!cardsManager) {
     throw new Error("Cards manager not initialized.");
   }
@@ -237,7 +237,7 @@ function fetchNextCard() {
   fetchCard(cardsManager.next);
 }
 
-function toggleOption(element_id: "reviewModeToggle" | "card_is_public_toggle") {
+export function toggleOption(element_id: "reviewModeToggle" | "card_is_public_toggle") {
   if (!state || !elementRefs) {
     throw new Error("State not initialized.");
   }
@@ -393,7 +393,7 @@ function renderCard(card: Partial<ICard> | null) {
     });
 }
 
-function displayRawCardDescription() {
+export function displayRawCardDescription() {
   if (!state || !elementRefs) {
     throw new Error("State not initialized.");
   }
@@ -401,7 +401,7 @@ function displayRawCardDescription() {
   elementRefs.cardDescriptionElement.setAttribute("contenteditable", "true");
 }
 
-function displayNewCard() {
+export function displayNewCard() {
   if (!state || !elementRefs) {
     throw new Error("State not initialized.");
   }
@@ -430,7 +430,7 @@ function displayNewCard() {
   elementRefs.cardContainerHolderElement.style.display = "block";
 }
 
-function handleInputChange(element_id: string) {
+export function handleInputChange(element_id: string) {
   if (!state) {
     throw new Error("State not initialized.");
   }
@@ -460,7 +460,7 @@ function handleTagsInputChange(event: KeyboardEvent) {
   }
 }
 
-function suggestNewTags(tagInputElement: HTMLInputElement) {
+export function suggestNewTags(tagInputElement: HTMLInputElement) {
   if (!state) {
     throw new Error("State not initialized.");
   }
@@ -485,7 +485,7 @@ function suggestNewTags(tagInputElement: HTMLInputElement) {
   elementRefs.tagsAutocompleteResultsElement.innerHTML = autocompleteHTML;
 }
 
-function removeTagSuggestions() {
+export function removeTagSuggestions() {
   if (!elementRefs) {
     throw new Error("Element refs not initialized.");
   }
@@ -543,14 +543,14 @@ function removeTagFromCard(tag: string) {
  *
  * {@tutorial main.editing_cards}
  */
-function insertTabsIfNecessary(event: KeyboardEvent) {
+export function insertTabsIfNecessary(event: KeyboardEvent) {
   if (event.key == "Tab") {
     document.execCommand("insertHTML", false, "&nbsp;&nbsp;&nbsp;&nbsp;");
     event.preventDefault();
   }
 }
 
-function handleCardUrgencyChange() {
+export function handleCardUrgencyChange() {
   if (!state) {
     throw new Error("State not initialized.");
   }
@@ -568,7 +568,7 @@ function handleCardUrgencyChange() {
   }
 }
 
-function saveCard(renderSavedCard = true) {
+export function saveCard(renderSavedCard = true) {
   if (!state) {
     throw new Error("State not initialized.");
   }
@@ -638,7 +638,7 @@ function saveCard(renderSavedCard = true) {
     });
 }
 
-function moveCardToTrash() {
+export function moveCardToTrash() {
   if (!state) {
     throw new Error("State not initialized.");
   }

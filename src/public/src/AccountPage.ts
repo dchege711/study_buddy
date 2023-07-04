@@ -93,7 +93,7 @@ function closeTrashWindow() {
   state.card_container.style.display = "none";
 }
 
-function fetchNextCard() {
+export function fetchNextCard() {
   if (!cardsManager) {
     throw new Error("Account page not initialized.");
   }
@@ -102,7 +102,7 @@ function fetchNextCard() {
       .catch((err) => { console.error(err); });
 }
 
-function fetchPreviousCard() {
+export function fetchPreviousCard() {
   if (!cardsManager) {
     throw new Error("Account page not initialized.");
   }

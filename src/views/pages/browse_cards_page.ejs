@@ -38,7 +38,7 @@
                             </div>
                         <% } else { %>
                             <% for (let i = 0; i < abbreviatedCards.length; i++) { %>
-                                <div class="w3-card-4 w3-padding-small w3-margin minicard_search_result" onclick="displayFullCard('<%= abbreviatedCards[i]._id %>')">
+                                <div class="w3-card-4 w3-padding-small w3-margin minicard_search_result" onclick="BrowserCardsPage.displayFullCard('<%= abbreviatedCards[i]._id %>')">
                                     <header class="w3-container w3-pale-green"><h4><%= abbreviatedCards[i].title %></h4></header>
                                     <div class="w3-container"><p><strong>Tags: </strong><span id='tags<%= abbreviatedCards[i]._id %>'><%= abbreviatedCards[i].tags.split(/\s/).join(", ") %></span></p></div>
                                 </div>
