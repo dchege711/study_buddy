@@ -15,14 +15,14 @@
         <label class="input-area-padded padding-small w3-twothird w3-left">
             <input type="text" id="card_title" name="title"
                 class="w3-input" style="font-weight:bolder"
-                onkeydown="handleInputChange('card_title')"/>
+                onkeydown="HomePage.handleInputChange('card_title')"/>
         </label>
 
-        <button class="w3-btn w3-hover-white w3-right" onclick="displayNewCard()">
+        <button class="w3-btn w3-hover-white w3-right" onclick="HomePage.displayNewCard()">
             <b><i class="fa fa-plus-square-o fa-fw" aria-hidden="true"></i> Create a New Card</b>
         </button>
 
-        <button class="w3-btn w3-hover-white w3-right" onClick="displayRawCardDescription()">
+        <button class="w3-btn w3-hover-white w3-right" onClick="HomePage.displayRawCardDescription()">
             <b><i class="w3-right fa fa-pencil fa-fw" aria-hidden="true"></i> Edit Card</b>
         </button>
     </div>
@@ -30,7 +30,7 @@
     <div class="w3-container">
 
         <div class="w3-container" id="card_description"
-            onkeydown="insertTabsIfNecessary(event); handleInputChange('card_description')">
+            onkeydown="HomePage.insertTabsIfNecessary(event); HomePage.handleInputChange('card_description')">
         </div>
         <p class="w3-right tooltip">
             <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> Formatting Help
@@ -47,7 +47,9 @@
             <span id="already_set_card_tags"></span>
             <div class="dropdown">
                 <input type="text" id="card_tag_input" placeholder="Add a new tag..."
-                onkeyup="handleTagsInputChange(event);" onfocus="suggestNewTags(this);" onblur="window.setTimeout(removeTagSuggestions, 300);"
+                onkeyup="HomePage.handleTagsInputChange(event);"
+                onfocus="HomePage.suggestNewTags(this);"
+                onblur="window.setTimeout(HomePage.removeTagSuggestions, 300);"
                 class="w3-input dropbtn" />
                 <div class="dropdown-content" id="tags_autocomplete_results"></div>
             </div>
@@ -70,7 +72,7 @@
                     <strong>Urgency</strong>
                     <input id="card_urgency" type="range" name="urgency"
                         class="w3-input" min="0" max="10" step="0.01"
-                        onChange="handleCardUrgencyChange();"
+                        onChange="HomePage.handleCardUrgencyChange();"
                     />
                 </label>
             </div>
@@ -78,7 +80,7 @@
             <div class="w3-quarter w3-right">
                 <span id="card_urgency_number"><strong></strong></span>
                 <label class="w3-right switch tooltip">
-                    <input type="checkbox" id="card_is_public_toggle" onchange="toggleOption('card_is_public_toggle');">
+                    <input type="checkbox" id="card_is_public_toggle" onchange="HomePage.toggleOption('card_is_public_toggle');">
                     <span class="slider round" id="card_is_public_label"></span>
                     <span class="tooltiptext" id="card_is_public_tooltip">
                         <a href="/wiki#public_cards" target="_blank">More about public cards</a>
@@ -113,10 +115,10 @@
 
     <div class="w3-bar" style="padding:2%;">
         <div class="w3-third w3-left">
-            <button class="w3-btn w3-round-xxlarge w3-left w3-red" onClick="moveCardToTrash()">
+            <button class="w3-btn w3-round-xxlarge w3-left w3-red" onClick="HomePage.moveCardToTrash()">
                 <b><i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> Delete Card</b>
             </button>
-            <button class="w3-right w3-btn w3-round-xxlarge w3-blue" onClick="fetchPreviousCard()">
+            <button class="w3-right w3-btn w3-round-xxlarge w3-blue" onClick="HomePage.fetchPreviousCard()">
                 <b><i class="fa fa-chevron-left"></i> Previous</b>
             </button>
         </div>
@@ -129,11 +131,11 @@
         </div>
 
         <div class="w3-right w3-third">
-            <button class="w3-left w3-btn w3-round-xxlarge w3-blue" onClick="fetchNextCard()">
+            <button class="w3-left w3-btn w3-round-xxlarge w3-blue" onClick="HomePage.fetchNextCard()">
                 <b><i class="fa fa-chevron-right"></i> Next</b>
             </button>
 
-            <button class="w3-btn w3-round-xxlarge w3-right w3-green" onClick="saveCard()">
+            <button class="w3-btn w3-round-xxlarge w3-right w3-green" onClick="HomePage.saveCard()">
                 <b><i class="fa fa-floppy-o fa-fw" aria-hidden="true"></i> Save Card</b>
             </button>
         </div>
