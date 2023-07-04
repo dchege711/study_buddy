@@ -75,6 +75,8 @@
     "@types/mocha": "^10.0.1",
     "@types/mongoose": "^5.11.97",
     "@types/nodemailer": "^6.4.8",
+    "@types/react": "^18.2.14",
+    "@types/react-dom": "^18.2.6",
     "@types/selenium-webdriver": "^4.1.15",
     "@types/showdown": "^2.0.1",
     "@types/sjcl": "^1.0.30",

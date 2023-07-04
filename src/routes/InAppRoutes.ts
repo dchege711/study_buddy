@@ -24,6 +24,7 @@ import {
   downloadUserData,
   deleteAccount,
   updateUserSettings,
+  reactVersion
 } from "../controllers/InAppController";
 
 const router = Router();
@@ -71,5 +72,7 @@ router.get("/account/download-user-data", requireLogIn, downloadUserData);
 router.post("/account/delete-account", requireLogIn, deleteAccount);
 
 router.post("/account/update-settings", requireLogIn, updateUserSettings);
+
+router.get("/react-version", reactVersion);
 
 module.exports = router;

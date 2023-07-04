@@ -17,9 +17,10 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     devtool: "source-map",
-    mode: "production",
+    mode: (process.env.NODE_ENV === "development") ? "development" : "production",
     entry: {
         AccountPage: path.resolve(__dirname, "src", "public", "src", "AccountPage"),
+        App: path.resolve(__dirname, "src", "public", "src", "App"),
         AppUtilities: path.resolve(__dirname, "src", "public", "src", "AppUtilities"),
         AutoComplete: path.resolve(__dirname, "src", "public", "src", "AutoComplete"),
         BrowseCardsPage: path.resolve(__dirname, "src", "public", "src", "BrowseCardsPage"),

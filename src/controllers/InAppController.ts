@@ -214,3 +214,7 @@ export function duplicateCard(req: Request, res: Response) {
 export function flagCard(req: Request, res: Response) {
     sendResponseFromPromise(CardsDB.flagCard(req.body), res);
 };
+
+export function reactVersion(req: Request, res: Response) {
+    res.render("pages/react_version.ejs", getDefaultTemplateVars(req));
+};

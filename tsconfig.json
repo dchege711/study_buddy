@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+      "jsx": "react",
       "outDir": "./dist",
       "target": "es5",
       "skipLibCheck": true,
