@@ -19,24 +19,25 @@ module.exports = {
     devtool: "source-map",
     mode: (process.env.NODE_ENV === "development") ? "development" : "production",
     entry: {
-        AccountPage: path.resolve(__dirname, "src", "public", "src", "AccountPage"),
-        App: path.resolve(__dirname, "src", "public", "src", "App"),
-        AppUtilities: path.resolve(__dirname, "src", "public", "src", "AppUtilities"),
-        AutoComplete: path.resolve(__dirname, "src", "public", "src", "AutoComplete"),
-        BrowseCardsPage: path.resolve(__dirname, "src", "public", "src", "BrowseCardsPage"),
-        CardsManager: path.resolve(__dirname, "src", "public", "src", "CardsManager"),
-        CardTemplateUtilities: path.resolve(__dirname, "src", "public", "src", "CardTemplateUtilities"),
-        HomePage: path.resolve(__dirname, "src", "public", "src", "HomePage"),
-        Latex: path.resolve(__dirname, "src", "public", "src", "Latex"),
-        NavBar: path.resolve(__dirname, "src", "public", "src", "NavBar"),
-        PasswordResetPage: path.resolve(__dirname, "src", "public", "src", "PasswordResetPage"),
-        PasswordResetRequestPage: path.resolve(__dirname, "src", "public", "src", "PasswordResetRequestPage"),
-        SearchBarDropDown: path.resolve(__dirname, "src", "public", "src", "SearchBarDropDown"),
-        SendValidationURL: path.resolve(__dirname, "src", "public", "src", "SendValidationURL"),
-        SyntaxHighlighting: path.resolve(__dirname, "src", "public", "src", "SyntaxHighlighting"),
-        TagsBarTemplate: path.resolve(__dirname, "src", "public", "src", "TagsBarTemplate"),
-        TagsBarUtilities: path.resolve(__dirname, "src", "public", "src", "TagsBarUtilities"),
-        WelcomePage: path.resolve(__dirname, "src", "public", "src", "WelcomePage"),
+        // AccountPage: path.resolve(__dirname, "src", "public", "src", "AccountPage"),
+        // App: path.resolve(__dirname, "src", "public", "src", "App"),
+        // AppUtilities: path.resolve(__dirname, "src", "public", "src", "AppUtilities"),
+        // AutoComplete: path.resolve(__dirname, "src", "public", "src", "AutoComplete"),
+        // BrowseCardsPage: path.resolve(__dirname, "src", "public", "src", "BrowseCardsPage"),
+        // CardsManager: path.resolve(__dirname, "src", "public", "src", "CardsManager"),
+        // CardTemplateUtilities: path.resolve(__dirname, "src", "public", "src", "CardTemplateUtilities"),
+        // HomePage: path.resolve(__dirname, "src", "public", "src", "HomePage"),
+        // Latex: path.resolve(__dirname, "src", "public", "src", "Latex"),
+        // NavBar: path.resolve(__dirname, "src", "public", "src", "NavBar"),
+        // PasswordResetPage: path.resolve(__dirname, "src", "public", "src", "PasswordResetPage"),
+        // PasswordResetRequestPage: path.resolve(__dirname, "src", "public", "src", "PasswordResetRequestPage"),
+        // SearchBarDropDown: path.resolve(__dirname, "src", "public", "src", "SearchBarDropDown"),
+        // SendValidationURL: path.resolve(__dirname, "src", "public", "src", "SendValidationURL"),
+        // SyntaxHighlighting: path.resolve(__dirname, "src", "public", "src", "SyntaxHighlighting"),
+        // TagsBarTemplate: path.resolve(__dirname, "src", "public", "src", "TagsBarTemplate"),
+        // TagsBarUtilities: path.resolve(__dirname, "src", "public", "src", "TagsBarUtilities"),
+        // WelcomePage: path.resolve(__dirname, "src", "public", "src", "WelcomePage"),
+        // index: path.resolve(__dirname, "src", "public", "src", "index"),
     },
     plugins: [
         new CleanWebpackPlugin(),
@@ -51,11 +52,11 @@ module.exports = {
         new CopyWebpackPlugin({
             patterns: [
                 {
-                    from: path.resolve(__dirname, "src", "public", "css"),
+                    from: path.resolve(__dirname, "public", "css"),
                     to: path.resolve(__dirname, "dist", "public", "css")
                 },
                 {
-                    from: path.resolve(__dirname, "src", "public", "images"),
+                    from: path.resolve(__dirname, "public", "images"),
                     to: path.resolve(__dirname, "dist", "public", "images")
                 },
                 {
@@ -63,7 +64,7 @@ module.exports = {
                     to: path.resolve(__dirname, "dist", "views")
                 },
                 {
-                    from: path.resolve(__dirname, "src", "public", "src", "lib"),
+                    from: path.resolve(__dirname, "public", "src", "lib"),
                     to: path.resolve(__dirname, "dist", "public", "src", "lib")
                 },
             ]

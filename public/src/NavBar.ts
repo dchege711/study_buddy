@@ -1,4 +1,4 @@
-import { sendHTTPRequest } from "./AppUtilities";
+import { sendHTTPRequest } from "../../src/app/lib/AppUtilities";
 
 /**
  * @description Log out the currently logged in user.
