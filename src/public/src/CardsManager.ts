@@ -3,7 +3,7 @@
 import AVLTree, { Node } from "avl";
 import { ICard, MiniICard } from "../../models/mongoose_models/CardSchema";
 import { IMetadataNodeInformation, IMetadataTrashedCardInformation } from "../../models/mongoose_models/MetadataCardSchema";
-import { sendHTTPRequest } from "../../src/app/lib/AppUtilities";
+import { sendHTTPRequest } from "./AppUtilities";
 
 interface CardsManagerBSTKey {
     urgency: number;

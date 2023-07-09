@@ -29,52 +29,50 @@ import {
 
 const router = Router();
 
-// router.get("/", reactVersion);
+router.post("/read-card", requireLogIn, readCard);
 
-// router.post("/read-card", requireLogIn, readCard);
+router.post("/read-public-card", readPublicCard);
 
-// router.post("/read-public-card", readPublicCard);
+router.get("/home", requireLogIn, home);
 
-// // router.get("/home", requireLogIn, home);
+router.get("/wiki", wikiPage);
 
-// // router.get("/wiki", wikiPage);
+router.get("/browse", browsePageGet);
 
-// // router.get("/browse", browsePageGet);
+router.post("/browse", browsePagePost);
 
-// router.post("/browse", browsePagePost);
+router.get("/account", requireLogIn, accountGet);
 
-// // router.get("/account", requireLogIn, accountGet);
+router.post("/read-metadata", requireLogIn, readMetadata);
 
-// router.post("/read-metadata", requireLogIn, readMetadata);
+router.post("/read-tag-groups", requireLogIn, readTagGroups);
 
-// router.post("/read-tag-groups", requireLogIn, readTagGroups);
+router.post("/read-public-metadata", readPublicMetadata);
 
-// router.post("/read-public-metadata", readPublicMetadata);
+router.post("/add-card", requireLogIn, addCard);
 
-// router.post("/add-card", requireLogIn, addCard);
+router.post("/search-cards", requireLogIn, searchCards);
 
-// router.post("/search-cards", requireLogIn, searchCards);
+router.post("/update-card", requireLogIn, updateCard);
 
-// router.post("/update-card", requireLogIn, updateCard);
+router.post("/update-streak", requireLogIn, updateStreak);
 
-// router.post("/update-streak", requireLogIn, updateStreak);
+router.post("/delete-card", requireLogIn, deleteCard);
 
-// router.post("/delete-card", requireLogIn, deleteCard);
+router.post("/trash-card", requireLogIn, trashCard);
 
-// router.post("/trash-card", requireLogIn, trashCard);
+router.post("/duplicate-card", requireLogIn, duplicateCard);
 
-// router.post("/duplicate-card", requireLogIn, duplicateCard);
+router.post("/flag-card", flagCard);
 
-// router.post("/flag-card", flagCard);
+router.post("/restore-from-trash", requireLogIn, restoreCardFromTrash);
 
-// router.post("/restore-from-trash", requireLogIn, restoreCardFromTrash);
+router.get("/account/download-user-data", requireLogIn, downloadUserData);
 
-// // router.get("/account/download-user-data", requireLogIn, downloadUserData);
+router.post("/account/delete-account", requireLogIn, deleteAccount);
 
-// router.post("/account/delete-account", requireLogIn, deleteAccount);
+router.post("/account/update-settings", requireLogIn, updateUserSettings);
 
-// router.post("/account/update-settings", requireLogIn, updateUserSettings);
-
-// // router.get("/react-version", reactVersion);
+router.get("/react-version", reactVersion);
 
 module.exports = router;

@@ -16,26 +16,28 @@ import {
 
 const router = Router();
 
-// router.get("/login", handleLogIn);
+router.get("/", handleLogIn);
 
-// router.post("/register-user", registerUser);
+router.get("/login", handleLogIn);
 
-// router.post("/login", loginUser);
+router.post("/register-user", registerUser);
 
-// router.post("/logout", logoutUser);
+router.post("/login", loginUser);
 
-// // router.get("/send-validation-email", sendValidationEmailGet);
+router.post("/logout", logoutUser);
 
-// router.post("/send-validation-email", sendValidationEmailPost);
+router.get("/send-validation-email", sendValidationEmailGet);
 
-// // router.get("/verify-account/*", verifyAccount);
+router.post("/send-validation-email", sendValidationEmailPost);
 
-// // router.get("/reset-password", resetPasswordGet);
+router.get("/verify-account/*", verifyAccount);
 
-// router.post("/reset-password", resetPasswordPost);
+router.get("/reset-password", resetPasswordGet);
 
-// // router.get("/reset-password-link/*", resetPasswordLinkGet);
+router.post("/reset-password", resetPasswordPost);
 
-// router.post("/reset-password-link/*", resetPasswordLinkPost);
+router.get("/reset-password-link/*", resetPasswordLinkGet);
+
+router.post("/reset-password-link/*", resetPasswordLinkPost);
 
 export = router;

@@ -53,8 +53,7 @@ if (!PUBLIC_USER_EMAIL) {
     throw Error("Please set the STUDY_BUDDY_DEFAULT_EMAIL_ADDRESS env variable");
 }
 
-const sessionSecret = process.env.STUDY_BUDDY_SESSION_SECRET_1;
-if (!sessionSecret) {
+export const STUDY_BUDDY_SESSION_SECRET_1 = process.env.STUDY_BUDDY_SESSION_SECRET_1;
+if (!STUDY_BUDDY_SESSION_SECRET_1) {
     throw Error("Please set the STUDY_BUDDY_SESSION_SECRET_1 env variable");
 }
-export const STUDY_BUDDY_SESSION_SECRET_1 = sessionSecret;

@@ -1,6 +1,6 @@
 import { MetadataResponse } from "../../controllers/InAppController";
 import { AuthenticateUser, AuthenticateUserParam } from "../../models/LogInUtilities";
-import { sendForm, sendHTTPRequest } from "../../src/app/lib/AppUtilities";
+import { sendForm, sendHTTPRequest } from "./AppUtilities";
 
 /**
  * @description Toggle the form being displayed.
