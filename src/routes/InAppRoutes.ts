@@ -33,15 +33,15 @@ router.post("/read-card", requireLogIn, readCard);
 
 router.post("/read-public-card", readPublicCard);
 
-router.get("/home", requireLogIn, home);
+// router.get("/home", requireLogIn, home);
 
-router.get("/wiki", wikiPage);
+// router.get("/wiki", wikiPage);
 
-router.get("/browse", browsePageGet);
+// router.get("/browse", browsePageGet);
 
 router.post("/browse", browsePagePost);
 
-router.get("/account", requireLogIn, accountGet);
+// router.get("/account", requireLogIn, accountGet);
 
 router.post("/read-metadata", requireLogIn, readMetadata);
 
@@ -67,12 +67,12 @@ router.post("/flag-card", flagCard);
 
 router.post("/restore-from-trash", requireLogIn, restoreCardFromTrash);
 
-router.get("/account/download-user-data", requireLogIn, downloadUserData);
+// router.get("/account/download-user-data", requireLogIn, downloadUserData);
 
 router.post("/account/delete-account", requireLogIn, deleteAccount);
 
 router.post("/account/update-settings", requireLogIn, updateUserSettings);
 
-router.get("/react-version", reactVersion);
+router.get("/", reactVersion);
 
 module.exports = router;
