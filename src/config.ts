@@ -2,7 +2,8 @@
  * @description Access point for sensitive/central information.
  */
 
-export const APP_NAME = "Flashcards by c13u";
+export { APP_NAME } from "./public/src/constants";
+
 export const PORT = process.env.PORT || 5000;
 
 export const NODE_ENV = process.env.NODE_ENV;
