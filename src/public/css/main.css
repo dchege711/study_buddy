@@ -44,7 +44,7 @@ ul.link, .link {
     color: black;
     text-decoration: none;
     cursor: pointer;
-    border:none; 
+    border:none;
 }
 
 ul.link.chosen {
@@ -73,7 +73,7 @@ body {
     margin-bottom: 5em;
     font-family: 'Montserrat', sans-serif;
     font-size: smaller;
-    background-color: rgb(245, 245, 245);          
+    background-color: rgb(245, 245, 245);
 }
 
 #main_div {
@@ -426,4 +426,28 @@ div.minicard_search_result {
 
 .w3-modal-content {
     width: 80% !important;
+}
+
+/************************ Wiki Page *******************************************/
+
+#study_buddy_details {
+    margin: 1% 15% 1% 15%;
+    padding: 1% 5% 1% 5%;
+}
+
+.details_header {
+    border-bottom: 1px #e1e4e8 solid;
+}
+
+.details_section {
+    margin: 2% 0%;
+    padding: 3% 0%;
+}
+
+#card_container {
+    display: none;
+}
+
+sup a {
+    font: 200;
 }
