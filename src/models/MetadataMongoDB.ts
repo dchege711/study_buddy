@@ -41,6 +41,8 @@ export async function create(payload: MetadataCreateParams): Promise<IMetadata> 
     });
 };
 
+export type MetadataReadParams = Pick<IUser, "userIDInApp">;
+
 /**
  * @description Read all the metadata associated with a user's cards.
  *
@@ -48,7 +50,7 @@ export async function create(payload: MetadataCreateParams): Promise<IMetadata> 
  * @returns {Promise} If successful, the `message` attribute is an array of
  * JSON `Metadata` objects
  */
-export function read(payload: Pick<IUser, "userIDInApp">): Promise<IMetadata[]> {
+export function read(payload: MetadataReadParams): Promise<IMetadata[]> {
     payload = sanitizeQuery(payload);
     return Metadata.find({createdById: payload.userIDInApp}).exec();
 };

@@ -10,6 +10,7 @@ import {
 import Wiki from "./routes/Wiki";
 import NavBar from "./partials/NavBar";
 import Footer from "./partials/Footer";
+import Browse from "./routes/Browse";
 
 function App() {
   return (
@@ -56,7 +57,10 @@ const router = createBrowserRouter([
     path: "/",
     element: <App />,
     errorElement: <ErrorPage />,
-    children: [{ path: "/wiki/", element: <Wiki /> }],
+    children: [
+      { path: "/wiki/", element: <Wiki /> },
+      { path: "/browse/", element: <Browse /> },
+    ],
   },
 ]);
 

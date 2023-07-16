@@ -39,7 +39,7 @@ ul.topnav li {
     text-decoration: none;
 }
 
-ul.link, .link {
+li.link, .link {
     background:none;
     color: black;
     text-decoration: none;
@@ -47,13 +47,17 @@ ul.link, .link {
     border:none;
 }
 
-ul.link.chosen {
+li.link {
+    list-style-type: none;
+}
+
+li.link.chosen {
     background: black;
     color: white;
     text-decoration: none;
 }
 
-ul.link:hover {
+li.link:hover {
     text-decoration: underline;
 }
 
@@ -134,6 +138,17 @@ footer {
 
 .hidden {
     display: none;
+}
+
+#side_bar {
+    overflow: scroll;
+    min-height: 100vh;
+    display: inline-block;
+}
+
+#side_bar_contents {
+    overflow: scroll;
+    height: 90vh;
 }
 
 /************************ In-app Card Viewer **********************************/
