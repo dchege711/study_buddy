@@ -466,3 +466,43 @@ div.minicard_search_result {
 sup a {
     font: 200;
 }
+
+/************************ Search Bar ******************************************/
+
+input#card_search_input {
+    border: none;
+    border-bottom: 0.2px solid black;
+    width: 100%;
+    min-height: 40px;
+    padding: 1%;
+    margin-right: 10%;
+}
+
+div#card_search_results {
+    text-overflow: ellipsis;
+    width: 49%;
+    position: absolute;
+    background: white;
+    z-index: 10;
+}
+
+div#card_search_results ul {
+    padding: 2%;
+    margin: 0;
+}
+
+div#card_search_results ul > li {
+    border-bottom: 1px solid lightgray;
+    padding: 4px;
+    list-style-type: none;
+}
+
+div#card_search_results ul > li:hover {
+    color: white;
+    background: black;
+    cursor: pointer;
+}
+
+.gray-text {
+    color: gray;
+}
