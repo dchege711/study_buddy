@@ -35,7 +35,7 @@ export async function getDummyAccount(): Promise<LogInUtilities.AuthenticateUser
 
 if (require.main === module) {
 
-    const dbConnection = require("../models/MongooseClient.js");
+    const dbConnection = require("../models/MongooseClient");
     getDummyAccount()
         .then((user) => {
             return getRandomCards(60, user.userIDInApp)
