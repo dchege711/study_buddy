@@ -21,22 +21,17 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
     userID: number;
     cardSourceURL: string;
     minicards: MiniICard[];
-    empty_card: Partial<ICard>;
-    tagsAndIds: IMetadataNodeInformation;
+    metadataNodeInformation: IMetadataNodeInformation;
     bst: AVLTree<CardsManagerBSTKey, number> = new AVLTree();
     currentNode: CardsManagerBSTNode | null = null;
     idsToBSTKeys: {[id: string]: CardsManagerBSTKey} = {};
 
-    constructor(tagsAndIds: IMetadataNodeInformation, userID: number,
+    constructor(metadataNodeInformation: IMetadataNodeInformation, userID: number,
                 cardSourceURL: string = "/read-card", minicards: MiniICard[] = []) {
-        this.tagsAndIds = tagsAndIds;
+        this.metadataNodeInformation = metadataNodeInformation;
         this.userID = userID;
         this.cardSourceURL = cardSourceURL;
         this.minicards = minicards;
-        this.empty_card = {
-            title: "", description: "", tags: "", createdById: userID,
-            urgency: 0, metadataIndex: 0
-        };
     }
 
     /**
@@ -62,19 +57,19 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
      */
     initializeFromTags(tagsToUse: Set<string>): void {
         if (tagsToUse.size === 0) {
-            tagsToUse = new Set(Object.keys(this.tagsAndIds));
+            tagsToUse = new Set(Object.keys(this.metadataNodeInformation));
         }
         this.bst = new AVLTree(this.reverseComparator, true);
-        this.currentNode = null;
         let alreadySeenIDs = new Set<string>();
         tagsToUse.forEach((tag) => {
-            for (let cardID in this.tagsAndIds[tag]) {
+            for (let cardID in this.metadataNodeInformation[tag]) {
                 if (alreadySeenIDs.has(cardID) === false) {
-                    this.insertCard(cardID, this.tagsAndIds[tag][cardID].urgency);
+                    this.insertCard(cardID, this.metadataNodeInformation[tag][cardID].urgency);
                     alreadySeenIDs.add(cardID);
                 }
             }
         });
+        this.currentNode = this.bst.minNode();
     };
 
     /**
@@ -90,7 +85,6 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
      */
     initializeFromMinicards(minicards: MiniICard[], includeTagNeighbors: boolean = false) {
         this.bst = new AVLTree(this.reverseComparator, true);
-        this.currentNode = null;
 
         let alreadySeenIDs: Set<string> = new Set([]);
         minicards.forEach((minicard) => {
@@ -101,6 +95,7 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
             alreadySeenIDs.add(minicard._id);
             this.insertCard(minicard._id, minicard.urgency);
         });
+        this.currentNode = this.bst.minNode();
 
         if (!includeTagNeighbors) {
             return;
@@ -117,13 +112,14 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
         });
 
         tagsToUse.forEach((tag) => {
-            for (let cardID in this.tagsAndIds[tag]) {
+            for (let cardID in this.metadataNodeInformation[tag]) {
                 if (!alreadySeenIDs.has(cardID)) {
-                    this.insertCard(cardID, this.tagsAndIds[tag][cardID].urgency);
+                    this.insertCard(cardID, this.metadataNodeInformation[tag][cardID].urgency);
                     alreadySeenIDs.add(cardID);
                 }
             }
         });
+        this.currentNode = this.bst.minNode();
     };
 
     /**
@@ -136,12 +132,12 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
      */
     initializeFromTrash (trashedCards: IMetadataTrashedCardInformation) {
         this.bst = new AVLTree(this.reverseComparator, true);
-        this.currentNode = null;
 
         let card_ids = Object.keys(trashedCards); // Synchronous
         for (let i = 0; i < card_ids.length; i++) {
             this.insertCard(card_ids[i], trashedCards[card_ids[i]]);
         }
+        this.currentNode = this.bst.minNode();
     };
 
     /**
@@ -183,6 +179,19 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
 
         return this.findCard(cardID);
     };
+
+    /** @description Return the card that should currently be on display. */
+    current(): Promise<Partial<ICard> | null> {
+        if (this.currentNode === null || !this.currentNode.key) {
+            return Promise.resolve(null);
+        }
+
+        return this.findCard(this.currentNode.key._id);
+    }
+
+    empty(): boolean {
+        return this.bst.size === 0;
+    }
 
     /**
      * @description Return the next card on the queue.
@@ -399,13 +408,9 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
         }
 
         return sendHTTPRequest("POST", this.cardSourceURL, {userIDInApp: this.userID, cardID: cardID})
-            .then((cards: Partial<ICard>[]) => {
-                if (cards.length !== 1) {
-                    return Promise.reject(`Expected 1 card, got ${cards.length}`);
-                } else {
-                    localStorage.setItem(cardID, JSON.stringify(cards[0]));
-                    return Promise.resolve(cards[0]);
-                }
+            .then((card: Partial<ICard>) => {
+                localStorage.setItem(cardID, JSON.stringify(card));
+                return Promise.resolve(card);
             });
     }
 
