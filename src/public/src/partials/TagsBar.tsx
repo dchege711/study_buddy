@@ -1,18 +1,15 @@
 import React, {
   createContext,
-  useEffect,
   useState,
   useContext,
   useRef,
 } from "react";
 import {
   IMetadataNodeInformation,
-  IMetadataRaw,
   IMetadataNodeInformationEntry,
 } from "../../../models/mongoose_models/MetadataCardSchema";
-import { sendHTTPRequest } from "../AppUtilities";
-import { MetadataReadParams } from "../../../models/MetadataMongoDB";
 import { AutoComplete } from "../AutoComplete";
+import { useMetadata } from "./MetadataHook";
 
 function defaultIsSelectedTag(_: string) {
   return false;
@@ -163,14 +160,8 @@ function Tags({ tagsAndIDs }: { tagsAndIDs: IMetadataNodeInformation }) {
   );
 }
 
-export default function TagsBar({
-  endpoint,
-  payload,
-}: {
-  endpoint: string;
-  payload: MetadataReadParams | {};
-}) {
-  const [metadata, setMetadata] = useState<IMetadataRaw>();
+export default function TagsBar() {
+  const { metadata } = useMetadata();
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
 
   function isSelectedTag(tag: string) {
@@ -188,18 +179,6 @@ export default function TagsBar({
   function resetTagSelection() {
     setSelectedTags(new Set());
   }
-
-  // Load the metadata once (note empty dependency array) after the initial
-  // render.
-  useEffect(() => {
-    sendHTTPRequest("POST", endpoint, payload).then(
-      (metadataDocs: IMetadataRaw[]) => {
-        if (metadataDocs.length > 0) {
-          setMetadata(metadataDocs[0]);
-        }
-      }
-    );
-  }, []);
 
   function filterCards() {}
 

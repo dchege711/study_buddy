@@ -1,0 +1,72 @@
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { ICard, MiniICard } from "../../../models/mongoose_models/CardSchema";
+import { CardsManager } from "../CardsManager";
+import { useMetadata } from "./MetadataHook";
+
+const CardsContext = createContext({
+  /** Holds the cards for the current context. */
+  cardsManager: new CardsManager({}, -1),
+
+  /** Clear all of the cards held by the provider. */
+  resetCards: () => {},
+
+  /** Set the cards availed by this provider. */
+  setCards: (_: Array<Partial<ICard>>) => {},
+
+  getCard: (_: string) => Promise.reject() as Promise<Partial<ICard>>,
+});
+
+export const useCards = () => useContext(CardsContext);
+
+export default function CardsProvider({
+  children,
+  endpoint,
+}: {
+  children: React.ReactNode;
+  endpoint: string;
+}) {
+  const [miniCards, setMiniCards] = useState<MiniICard[]>([]);
+
+  const { metadata } = useMetadata();
+  const metadataNodeInformation = metadata?.node_information ?? {};
+  const userID = metadata?.createdById ?? -1;
+
+  const [cardsManager, setCardsManager] = useState(
+    new CardsManager(metadataNodeInformation, userID, endpoint)
+  );
+
+  // Exposing useState mutators to the context is not desirable because it
+  // allows undocumented downstream modifications, which can lead to bugs and
+  // hard debuggability. Instead, expose functions that internally call state
+  // mutators. These functions can be documented and debugged.
+
+  const resetCards = () => {
+    setCards([]);
+  };
+
+  const setCards = (cards: Array<Partial<ICard>>) => {
+    setMiniCards(cards);
+  };
+
+  const getCard = (cardID: string) => {
+    return cardsManager.findCard(cardID);
+  };
+
+  useEffect(() => {
+    let newCardsManager = new CardsManager(
+      metadataNodeInformation,
+      userID,
+      endpoint
+    );
+    newCardsManager.initializeFromMinicards(miniCards);
+    setCardsManager(newCardsManager);
+  }, [miniCards]);
+
+  return (
+    <CardsContext.Provider
+      value={{ resetCards, setCards, getCard, cardsManager }}
+    >
+      {children}
+    </CardsContext.Provider>
+  );
+}

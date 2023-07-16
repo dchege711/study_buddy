@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { ICard } from "../../../models/mongoose_models/CardSchema";
 import { SearchPublicCardParams } from "../../../models/CardsMongoDB";
 import { sendHTTPRequest } from "../AppUtilities";
-import { useCards } from "./cards/CardsHook";
+import { useCards } from "./CardsHook";
 
 interface SearchBarState {
   isStillTyping: boolean;
