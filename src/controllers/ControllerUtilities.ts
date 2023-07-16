@@ -33,7 +33,7 @@ export function convertObjectToResponse (err: Error | null, result_JSON: any, re
         return;
     }
 
-    let status = result_JSON.status || 200;
+    let status = result_JSON?.status || 200;
     res.status(status);
     if (status >= 200 && status < 300) {
         res.type("application/json");
