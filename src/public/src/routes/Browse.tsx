@@ -4,6 +4,7 @@ import SearchBar from "../partials/SearchBar";
 import CardsProvider from "../partials/CardsHook";
 import SearchResults from "../partials/SearchResults";
 import MetadataProvider from "../partials/MetadataHook";
+import CardSearchResult from "../partials/CardSearchResult";
 
 export default function Browse() {
   return (
@@ -25,11 +26,7 @@ export default function Browse() {
               </div>
             </div>
           </div>
-          <div id="card_modal" className="w3-modal">
-            <div id="card_container_holder" className="w3-modal-content">
-              ../partials/search_result_card_template.ejs
-            </div>
-          </div>
+          <CardSearchResult />
         </div>
       </CardsProvider>
     </MetadataProvider>

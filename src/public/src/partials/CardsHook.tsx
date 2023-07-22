@@ -11,9 +11,14 @@ const CardsContext = createContext({
   resetCards: () => {},
 
   /** Set the cards availed by this provider. */
-  setCards: (_: Array<Partial<ICard>>) => {},
+  setCards: (cards: Array<Partial<ICard>>) => {},
 
-  getCard: (_: string) => Promise.reject() as Promise<Partial<ICard>>,
+  getCard: (id: string) => Promise.reject() as Promise<Partial<ICard>>,
+
+  /** The card that is currently being interacted with. */
+  activeCard: null as Partial<ICard> | null,
+
+  setActiveCard: (id: string) => {},
 });
 
 export const useCards = () => useContext(CardsContext);
@@ -28,12 +33,14 @@ export default function CardsProvider({
   const [miniCards, setMiniCards] = useState<MiniICard[]>([]);
 
   const { metadata } = useMetadata();
-  const metadataNodeInformation = metadata?.node_information ?? {};
+  const metadataNodeInformation = metadata?.node_information[0] ?? {};
   const userID = metadata?.createdById ?? -1;
 
   const [cardsManager, setCardsManager] = useState(
     new CardsManager(metadataNodeInformation, userID, endpoint)
   );
+
+  const [activeCard, setActiveCard] = useState<Partial<ICard> | null>(null);
 
   // Exposing useState mutators to the context is not desirable because it
   // allows undocumented downstream modifications, which can lead to bugs and
@@ -52,19 +59,38 @@ export default function CardsProvider({
     return cardsManager.findCard(cardID);
   };
 
+  const _setActiveCard = (cardID: string) => {
+    getCard(cardID)?.then((card) => {
+      setActiveCard(card);
+    });
+  };
+
   useEffect(() => {
     let newCardsManager = new CardsManager(
       metadataNodeInformation,
       userID,
       endpoint
     );
-    newCardsManager.initializeFromMinicards(miniCards);
+    // Prefer initialization from minicards if available. Minicards are used to
+    // filter the set of cards being shown to the user.
+    if (miniCards.length > 0) {
+      newCardsManager.initializeFromMinicards(miniCards);
+    } else {
+      newCardsManager.initialize();
+    }
     setCardsManager(newCardsManager);
-  }, [miniCards]);
+  }, [miniCards, metadata]);
 
   return (
     <CardsContext.Provider
-      value={{ resetCards, setCards, getCard, cardsManager }}
+      value={{
+        resetCards,
+        setCards,
+        getCard,
+        cardsManager,
+        activeCard,
+        setActiveCard: _setActiveCard,
+      }}
     >
       {children}
     </CardsContext.Provider>

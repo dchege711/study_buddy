@@ -3,7 +3,7 @@ import { useCards } from "./CardsHook";
 import { ICard } from "../../../models/mongoose_models/CardSchema";
 
 export default function SearchResults() {
-  const { cardsManager } = useCards();
+  const { cardsManager, setActiveCard } = useCards();
 
   const [ cards, setCards ] = useState<Partial<ICard>[]>([]);
 
@@ -30,7 +30,7 @@ export default function SearchResults() {
   }
 
   function displayFullCard(cardID: string) {
-    throw new Error("Not implemented");
+    setActiveCard(cardID);
   }
 
   return cards.map((result) => (

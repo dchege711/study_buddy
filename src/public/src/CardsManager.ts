@@ -52,13 +52,19 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
     }
 
     /**
+     * @description Initialize Card Manager by preparing a queue of cards. Use
+     * the metadata object provided in the constructor.
+     */
+    initialize() {
+        let tagsToUse = new Set<string>(Object.keys(this.metadataNodeInformation));
+        this.initializeFromTags(tagsToUse);
+    }
+
+    /**
      * @description Initialize Card Manager by preparing a queue of cards.
      * @param {Array} tagsToUse The tags that should appear in the PQ.
      */
     initializeFromTags(tagsToUse: Set<string>): void {
-        if (tagsToUse.size === 0) {
-            tagsToUse = new Set(Object.keys(this.metadataNodeInformation));
-        }
         this.bst = new AVLTree(this.reverseComparator, true);
         let alreadySeenIDs = new Set<string>();
         tagsToUse.forEach((tag) => {
