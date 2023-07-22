@@ -8,7 +8,7 @@ import CardSearchResult from "../partials/CardSearchResult";
 
 export default function Browse() {
   return (
-    <MetadataProvider endpoint="/read-public-metadata" payload={{}}>
+    <MetadataProvider endpoint="/read-public-metadata">
       <CardsProvider endpoint="/read-public-card">
         <div className="w3-container">
           <div id="card_search_container" className="w3-half">

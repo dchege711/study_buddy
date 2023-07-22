@@ -11,16 +11,17 @@ import Wiki from "./routes/Wiki";
 import NavBar from "./partials/NavBar";
 import Footer from "./partials/Footer";
 import Browse from "./routes/Browse";
+import MetadataProvider from "./partials/MetadataHook";
 
 function App() {
   return (
-    <>
+    <MetadataProvider endpoint="/read-metadata">
       <NavBar />
       <div id="main_div">
         <Outlet />
       </div>
       <Footer />
-    </>
+    </MetadataProvider>
   );
 }
 
