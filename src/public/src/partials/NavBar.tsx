@@ -1,12 +1,12 @@
 import React from "react";
 
 import { APP_NAME } from "../constants";
-import { Link } from "react-router-dom";
-import { useUser } from "./UserHook";
+import { Link, useRouteLoaderData } from "react-router-dom";
+import { AuthenticateUser } from "../../../models/LogInUtilities";
 
 export default function NavBar() {
-  const { user } = useUser();
-  const isLoggedIn = user !== null;
+  const user = useRouteLoaderData("root") as AuthenticateUser | null | undefined;
+  const isLoggedIn = user !== null && user !== undefined;
 
   return (
     <div>

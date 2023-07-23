@@ -6,6 +6,7 @@ import {
   useRouteError,
   isRouteErrorResponse,
   Outlet,
+  LoaderFunction,
 } from "react-router-dom";
 import Wiki from "./routes/Wiki";
 import NavBar from "./partials/NavBar";
@@ -13,6 +14,16 @@ import Footer from "./partials/Footer";
 import Browse from "./routes/Browse";
 import MetadataProvider from "./partials/MetadataHook";
 import LogInOrSignUp, { handleLogin, handleSignUp } from "./routes/LogInOrSignUp";
+import { AuthenticateUser } from "../../models/LogInUtilities";
+
+const appLoader: LoaderFunction = () => {
+  let retrievedAccountInfo = localStorage.getItem("session_info");
+  if (retrievedAccountInfo === null) return null;
+
+  // TODO: What if this is stale?
+  let authenticatedUser = JSON.parse(retrievedAccountInfo) as AuthenticateUser;
+  return authenticatedUser;
+}
 
 function App() {
   return (
@@ -59,6 +70,8 @@ const router = createBrowserRouter([
     path: "/",
     element: <App />,
     errorElement: <ErrorPage />,
+    id: "root",
+    loader: appLoader,
     children: [
       { path: "wiki/", element: <Wiki /> },
       { path: "browse/", element: <Browse /> },
