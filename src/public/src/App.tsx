@@ -12,7 +12,7 @@ import NavBar from "./partials/NavBar";
 import Footer from "./partials/Footer";
 import Browse from "./routes/Browse";
 import MetadataProvider from "./partials/MetadataHook";
-import LogInOrSignUp, { handleLogin } from "./routes/LogInOrSignUp";
+import LogInOrSignUp, { handleLogin, handleSignUp } from "./routes/LogInOrSignUp";
 
 function App() {
   return (
@@ -63,7 +63,8 @@ const router = createBrowserRouter([
       { path: "wiki/", element: <Wiki /> },
       { path: "browse/", element: <Browse /> },
       { path: "login-or-sign-up/", element: <LogInOrSignUp />, children: [
-        { path: "login", element: null, action: handleLogin}
+        { path: "login", element: null, action: handleLogin },
+        { path: "register-user", element: null, action: handleSignUp }
       ] },
     ],
   },
