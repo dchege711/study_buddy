@@ -18,7 +18,7 @@ export default function NavBar() {
         </li>
         {isLoggedIn && (
           <li className="left">
-            <Link to="/home" className="link_button">
+            <Link to="/my-cards" className="link_button">
               My Cards
             </Link>
           </li>
