@@ -21,8 +21,13 @@ export default function MyCards() {
         </div>
 
         <div>
-        <p className="w3-left w3-quarter w3-container tooltip">The Tagging and Urgency System</p>
-        <p id="filter_list" className="w3-right w3-threequarter w3-container"></p>
+          <p className="w3-left w3-quarter w3-container tooltip">
+            The Tagging and Urgency System
+          </p>
+          <p
+            id="filter_list"
+            className="w3-right w3-threequarter w3-container"
+          ></p>
         </div>
 
         <div className="w3-container">
