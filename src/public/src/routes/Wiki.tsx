@@ -2,6 +2,7 @@ import React from "react";
 
 import { APP_NAME } from "../constants";
 import { Link } from "react-router-dom";
+import { QuartilesBar } from "../components/cards/EditableCard";
 
 function BackToTheTop() {
   return (
@@ -254,13 +255,8 @@ function UrgencyBars() {
         6, 7, 8, 8, 8, 8, 9]. The urgencies of the 3rd, 6th, 9th and 12th cards
         are 3, 6, 8 and 9 respectively. The urgency bars will therefore be:
       </p>
-      <div className="quartile_bar">
-        <ul>
-          <li style={{ backgroundColor: "green", width: "30%" }}></li>
-          <li style={{ backgroundColor: "orange", width: "30%" }}></li>
-          <li style={{ backgroundColor: "blue", width: "20%" }}></li>
-          <li style={{ backgroundColor: "red", width: "10%" }}></li>
-        </ul>
+      <div>
+        <QuartilesBar quartiles={[0, 3, 6, 8, 9]} />
       </div>
       <br />
       <p>
@@ -269,13 +265,8 @@ function UrgencyBars() {
       </p>
       <br />
       <br />
-      <div className="quartile_bar">
-        <ul>
-          <li style={{ backgroundColor: "green", width: "20%" }}></li>
-          <li style={{ backgroundColor: "orange", width: "5%" }}></li>
-          <li style={{ backgroundColor: "blue", width: "2%" }}></li>
-          <li style={{ backgroundColor: "red", width: "2%" }}></li>
-        </ul>
+      <div>
+        <QuartilesBar quartiles={[1, 3, 3.4, 3.8, 4]} />
       </div>
       <br />
       <p>... a few conclusions can be made:</p>

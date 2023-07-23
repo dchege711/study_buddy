@@ -386,21 +386,21 @@ input:checked + .slider:before {
     padding: 10% 0 0 0;
 }
 
-.quartile_bar {
+div > ul.quartile_bar {
     height: 12px;
     border-bottom: 1px solid black;
     border-left: 1px solid black;
     border-right: 1px solid black;
 }
 
-.quartile_bar ul {
+ul.quartile_bar {
     list-style-type: none;
     padding: 0;
     margin: 0;
     display: flex;
 }
 
-.quartile_bar ul li {
+ul.quartile_bar li {
     height: 10px;
 }
 
