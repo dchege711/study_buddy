@@ -87,7 +87,7 @@ export const handleLogin: ActionFunction = async ({ request }) => {
 };
 
 function LogInForm() {
-  const error = useActionData() as string | null;
+  const validationMessage = useActionData() as string | null;
   return (
     <Form
       className="w3-padding-large tab_content"
@@ -133,20 +133,20 @@ function LogInForm() {
       <br />
       <br />
 
-      {error && <p className="w3-text-red">{error}</p>}
+      {validationMessage && <p className="w3-text">{validationMessage}</p>}
     </Form>
   );
 }
 
 export const handleSignUp: ActionFunction = async ({ request }) => {
   let formData = await request.formData();
-  return sendForm("POST", "/register-user", formData).then((res) => {
-    console.log(res);
-    return null;
+  return sendForm("POST", "/register-user", formData).then((res: string) => {
+    return res;
   });
 };
 
 function SignUpForm() {
+  const validationMessage = useActionData() as string | null;
   return (
     <Form
       className="w3-padding-large tab_content"
@@ -198,6 +198,7 @@ function SignUpForm() {
 
       <br />
       <br />
+      {validationMessage && <p className="w3-text">{validationMessage}</p>}
     </Form>
   );
 }
