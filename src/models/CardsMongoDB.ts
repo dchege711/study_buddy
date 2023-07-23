@@ -48,6 +48,13 @@ export async function createMany(unsavedCards: CreateCardParams[]): Promise<ICar
 
 interface ReadCardParams { userIDInApp: number; cardID?: string};
 
+export function readOne(payload: ReadCardParams, projection="title description descriptionHTML tags urgency createdById isPublic") : Promise<Partial<ICard> | null> {
+    payload = sanitizeQuery(payload);
+    let query : Partial<ICard> = {createdById: payload.userIDInApp};
+    if (payload.cardID) query._id = payload.cardID;
+    return Card.findOne(query).select(projection).exec();
+};
+
 /**
  * Read cards from the database that match `payload`.
  *
@@ -59,11 +66,11 @@ interface ReadCardParams { userIDInApp: number; cardID?: string};
  *
  * @returns {Promise} resolves with an array of all matching cards.
  */
-export function read(payload: ReadCardParams, projection="title description descriptionHTML tags urgency createdById isPublic") : Promise<Partial<ICard> | null> {
+export function read(payload: ReadCardParams, projection="title description descriptionHTML tags urgency createdById isPublic") : Promise<Partial<ICard>[]> {
     payload = sanitizeQuery(payload);
     let query : Partial<ICard> = {createdById: payload.userIDInApp};
     if (payload.cardID) query._id = payload.cardID;
-    return Card.findOne(query).select(projection).exec();
+    return Card.find(query).select(projection).exec();
 };
 
 /**
