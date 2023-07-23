@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
-import { useCards } from "./CardsHook";
-import { ICard } from "../../../models/mongoose_models/CardSchema";
-import { FlagCardParams } from "../../../models/CardsMongoDB";
-import { sendHTTPRequest } from "../AppUtilities";
+import { useCards } from "../../partials/CardsHook";
+import { ICard } from "../../../../models/mongoose_models/CardSchema";
+import { FlagCardParams } from "../../../../models/CardsMongoDB";
+import { sendHTTPRequest } from "../../AppUtilities";
 
-export default function CardSearchResult() {
+export default function PublicCard() {
   const { cardsManager, activeCard, setActiveCard } = useCards();
   const [popupText, setPopupText] = React.useState("");
   const [shouldDisplay, setShouldDisplay] = React.useState(true);

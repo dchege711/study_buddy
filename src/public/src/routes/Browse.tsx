@@ -4,7 +4,7 @@ import SearchBar from "../partials/SearchBar";
 import CardsProvider from "../partials/CardsHook";
 import SearchResults from "../partials/SearchResults";
 import MetadataProvider from "../partials/MetadataHook";
-import CardSearchResult from "../partials/CardSearchResult";
+import PublicCard from "../components/cards/PublicCard";
 
 export default function Browse() {
   return (
@@ -26,7 +26,7 @@ export default function Browse() {
               </div>
             </div>
           </div>
-          <CardSearchResult />
+          <PublicCard />
         </div>
       </CardsProvider>
     </MetadataProvider>

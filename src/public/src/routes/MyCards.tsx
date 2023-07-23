@@ -4,7 +4,7 @@ import SearchBar from "../partials/SearchBar";
 import CardsProvider from "../partials/CardsHook";
 import SearchResults from "../partials/SearchResults";
 import MetadataProvider from "../partials/MetadataHook";
-import CardSearchResult from "../partials/CardSearchResult";
+import EditableCard from "../components/cards/EditableCard";
 
 export default function MyCards() {
   return (
@@ -38,7 +38,7 @@ export default function MyCards() {
               </div>
             </div>
           </div>
-          <CardSearchResult />
+          <EditableCard />
         </div>
       </CardsProvider>
     </MetadataProvider>
