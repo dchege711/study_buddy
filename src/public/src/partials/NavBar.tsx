@@ -49,8 +49,8 @@ export default function NavBar() {
         )}
         {!isLoggedIn && (
           <li className="right">
-            <Link to="/login" className="link_button">
-              Log In
+            <Link to="/login-or-sign-up" className="link_button">
+              Log In / Sign Up
             </Link>
           </li>
         )}

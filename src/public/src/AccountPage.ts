@@ -151,7 +151,7 @@ function modifyTrash(endpoint: "/delete-card" | "/restore-from-trash") {
 }
 
 function updateAccountSettings() {
-    sendForm("accountSettingsForm", "/account/update-settings")
+    sendForm("POST", "/account/update-settings", new FormData(document.getElementById("account_settings_form") as HTMLFormElement))
         .then((user: IUser) => {
             alert(`Account settings updated at ${user.updatedAt}}`);
         })

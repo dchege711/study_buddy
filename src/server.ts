@@ -15,6 +15,7 @@ var path = require("path");
 var bodyParser = require("body-parser");
 var cookieParser = require("cookie-parser");
 var enforce = require('express-sslify');
+var multer = require('multer');
 
 var AccountRoutes = require("./routes/AuthenticationRoutes");
 var InAppRoutes = require("./routes/InAppRoutes");
@@ -51,6 +52,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser());
+app.use(multer().none());
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");

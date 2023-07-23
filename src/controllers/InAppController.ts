@@ -100,22 +100,15 @@ export interface MetadataResponse {
     minicards?: MiniICard[]
 }
 
-export function readMetadata (req: Request, res: Response) {
-    let dataObject: MetadataResponse = {};
-    MetadataDB.read(req.body)
-        .then((metadataDocs) => {
-            dataObject.metadataDocs = metadataDocs;
-            return CardsDB.read(
-                { userIDInApp: req.body.userIDInApp }, "title tags urgency"
-            );
-        })
-        .then((minicards) => {
-            dataObject.minicards = minicards;
-            res.json(dataObject);
-        })
-        .catch((err) => {
-            convertObjectToResponse(err, null, res);
-        });
+export async function readMetadata (req: Request, res: Response) {
+    let userIDInApp = req.session?.user?.userIDInApp;
+    if (userIDInApp === undefined) {
+        res.json(null).send();
+        return;
+    }
+
+    let metadataDocs = await MetadataDB.read({userIDInApp});
+    res.json(metadataDocs).send();
 };
 
 export function readTagGroups(req: Request, res: Response) {

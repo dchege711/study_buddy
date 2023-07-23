@@ -43,7 +43,7 @@ router.post("/browse", browsePagePost);
 
 // router.get("/account", requireLogIn, accountGet);
 
-router.post("/read-metadata", requireLogIn, readMetadata);
+router.post("/read-metadata", readMetadata);
 
 router.post("/read-tag-groups", requireLogIn, readTagGroups);
 

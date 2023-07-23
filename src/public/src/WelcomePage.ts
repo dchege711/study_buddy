@@ -22,7 +22,7 @@ export function displayForm(form_id: string) {
  * @param {string} url The URL at which the form will be processed
  */
 export function logInUser(formID: string, url: string) {
-  sendForm(formID, url)
+  sendForm("POST", url, new FormData(document.getElementById(formID) as HTMLFormElement))
       .then((message: string) => {
         alert(message);
       })
@@ -68,7 +68,7 @@ export function signUpUser(formID: string, url: string) {
     return false;
   }
 
-  sendForm(formID, url)
+  sendForm("POST", url, new FormData(document.getElementById(formID) as HTMLFormElement))
       .then((confirmation: string) => {
           alert(confirmation);
           let payload: AuthenticateUserParam = {username_or_email, password};

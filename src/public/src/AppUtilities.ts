@@ -13,38 +13,12 @@ import { IMetadata } from "../../models/mongoose_models/MetadataCardSchema";
  */
 
 /**
- * @description Prepare a JSON document from the form's inputs.
- *
- * @param {string} form_id The ID of the form
- * @param {string} url The url at which the form will be processed
- *
- * @return {Promise} Should take in a JSON argument.
+ * @description Send @param {formData} to @param {url} using the specified
+ * @param {method}.
  */
-export async function sendForm(form_id: number | string, url: string) {
-    let form = (typeof form_id === "string")
-        ? document.forms.namedItem(form_id) : document.forms[form_id];
-    if (!form) {
-        return Promise.reject("Form not found.");
-    }
-
-    if (!form.checkValidity()) {
-        form.reportValidity();
-        return Promise.reject("Please fill in the form with valid inputs.");
-    }
-
-    // Send the form to the server for further processing.
-    let payload: {[s: string]: boolean | number | string} = {};
-    for (let i = 0; i < form.elements.length; i++) {
-        let element = form.elements[i] as HTMLInputElement;
-        if (element.type == "checkbox") {
-            payload[element.name] = element.checked;
-        } else {
-            payload[element.name] = element.value;
-        }
-    }
-    delete payload[""];
-
-    return sendHTTPRequest("POST", url, payload);
+export async function sendForm(
+        method: "GET" | "POST", url: string, formData: FormData) {
+    return sendFetchRequest(method, url, formData);
 }
 
 /**
@@ -56,12 +30,20 @@ export async function sendForm(form_id: number | string, url: string) {
  * @return {Promise}
  */
 export function sendHTTPRequest(
-        method: "GET" | "POST", url: string, payload: any,
-        contentType="application/json"): Promise<any> {
-    return fetch(url, {
-            method, body: JSON.stringify(payload), credentials: "same-origin",
-            headers: {"Content-Type": contentType},
-        })
+        method: "GET" | "POST", url: string, payload: any): Promise<any> {
+    return sendFetchRequest(method, url, JSON.stringify(payload));
+}
+
+function sendFetchRequest(
+        method: "GET" | "POST", url: string, body: string | FormData): Promise<any> {
+    let requestInit: RequestInit = {
+        method, body,
+        credentials: "same-origin",
+    };
+    if (typeof body === "string") {
+        requestInit.headers = {"Content-Type": "application/json"};
+    }
+    return fetch(url, requestInit)
         .then((response) => {
             let responseContentType = response.headers.get("content-type") || "";
             if (responseContentType.indexOf("application/json") !== -1) {
