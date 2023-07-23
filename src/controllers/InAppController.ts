@@ -37,7 +37,7 @@ function getDefaultTemplateVars(req: Request | null = null): TemplateVariables {
 }
 
 export function readCard (req: Request, res: Response) {
-    sendResponseFromPromise(CardsDB.read(req.body), res);
+    sendResponseFromPromise(CardsDB.readOne(req.body), res);
 };
 
 export function home (req: Request, res: Response) {
