@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 
 import { useCards } from "../../partials/CardsHook";
 import { ICard } from "../../../../models/mongoose_models/CardSchema";
@@ -8,12 +8,11 @@ import CardContainer from "./CardContainer";
 
 export default function PublicCard() {
   const { activeCard } = useCards();
+  const [statusText, setStatusText] = useState("");
 
   if (!activeCard) {
     return <></>;
   }
-
-  const [statusText, setStatusText] = React.useState("");
 
   function flagCard(reason: "markedForReview" | "markedAsDuplicate") {
     let payload: FlagCardParams = {
@@ -45,7 +44,6 @@ export default function PublicCard() {
           id="card_description"
           dangerouslySetInnerHTML={{ __html: activeCard.descriptionHTML! }}
         >
-          {}
         </div>
 
         <br />
