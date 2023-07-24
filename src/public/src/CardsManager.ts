@@ -414,9 +414,14 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
         }
 
         return sendHTTPRequest("POST", this.cardSourceURL, {userIDInApp: this.userID, cardID: cardID})
-            .then((card: Partial<ICard>) => {
-                localStorage.setItem(cardID, JSON.stringify(card));
-                return Promise.resolve(card);
+            .then((card: Partial<ICard> | null) => {
+                if (card) {
+                    localStorage.setItem(cardID, JSON.stringify(card));
+                    return Promise.resolve(card);
+                }
+
+                localStorage.removeItem(cardID);
+                return Promise.reject(`Card with ID ${cardID} not found on server`);
             });
     }
 
