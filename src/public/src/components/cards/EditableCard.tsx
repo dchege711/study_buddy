@@ -1,9 +1,31 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
+
 import { useCards } from "../../partials/CardsHook";
-import { ICard } from "../../../../models/mongoose_models/CardSchema";
-import { FlagCardParams } from "../../../../models/CardsMongoDB";
-import { sendHTTPRequest } from "../../AppUtilities";
 import CardContainer from "./CardContainer";
+import { useTags } from "../../partials/TagsBar";
+
+function TitleInput({
+  title,
+  setTitle,
+}: {
+  title: string;
+  setTitle: (title: string) => void;
+}): React.JSX.Element {
+  return (
+    <label className="input-area-padded padding-small w3-twothird w3-left">
+      <input
+        type="text"
+        id="card_title"
+        name="title"
+        className="w3-input"
+        style={{ fontWeight: "bolder" }}
+        placeholder="Add a title to your card"
+        defaultValue={title}
+        onChange={(event) => setTitle(event.target.value)}
+      />
+    </label>
+  );
+}
 
 export function QuartilesBar({ quartiles }: { quartiles: number[] }) {
   if (quartiles.length !== 5) {
@@ -80,189 +102,384 @@ function UrgencyQuartilesBar() {
   );
 }
 
-export default function EditableCard() {
-  const { activeCard } = useCards();
-  const [statusText, setStatusText] = React.useState("");
-  const [shouldDisplay, setShouldDisplay] = React.useState(true);
+function SetTag({
+  tag,
+  removeTag,
+}: {
+  tag: string;
+  removeTag: (tag: string) => void;
+}): React.JSX.Element {
+  return (
+    <>
+      <button className="card_tag_button_text">{tag}</button>
+      <button
+        id="card_tag_remove_${new_tag}"
+        className="card_tag_button_remove"
+        onClick={() => removeTag(tag)}
+      >
+        <i className="fa fa-times fa-fw" aria-hidden="true"></i>
+      </button>
+    </>
+  );
+}
 
-  if (!activeCard) {
-    return <></>;
-  }
+function SuggestedTag({
+  tag,
+  addTag,
+}: {
+  tag: string;
+  addTag: (tag: string) => void;
+}): React.JSX.Element {
+  return (
+    <button
+      className="autocomplete_suggestion_button"
+      onClick={() => addTag(tag)}
+    >
+      {tag}
+    </button>
+  );
+}
 
-  function copyCardToOwnCollection() {
-    throw new Error("Not implemented");
-  }
+function EditableTags({
+  tags,
+  addTag,
+  removeTag,
+}: {
+  tags: Set<string>;
+  addTag: (tag: string) => void;
+  removeTag: (tag: string) => void;
+}): React.JSX.Element {
+  const { tagsAutoComplete } = useTags();
 
-  function displayNewCard() {
-    throw new Error("Not implemented");
-  }
-
-  function displayRawCardDescription() {
-    throw new Error("Not implemented");
-  }
-
-  function insertTabsIfNecessary(event: React.KeyboardEvent<HTMLDivElement>) {
-    throw new Error("Not implemented");
-  }
+  const [suggestedTags, setSuggestedTags] = useState([] as string[]);
 
   function suggestNewTags() {
-    throw new Error("Not implemented");
+    let suggestedTags = tagsAutoComplete.kNeighbors(Array.from(tags), 5);
+    setSuggestedTags(suggestedTags);
   }
 
   function removeTagSuggestions() {
-    throw new Error("Not implemented");
+    setSuggestedTags([]);
+  }
+
+  return (
+    <div>
+      <strong>Tags: </strong>
+      <span id="already_set_card_tags">
+        {Array.from(tags).map((tag) => (
+          <SetTag tag={tag} key={tag} removeTag={removeTag} />
+        ))}
+      </span>
+      <div className="dropdown">
+        <input
+          type="text"
+          id="card_tag_input"
+          placeholder="Add a new tag..."
+          onFocus={() => suggestNewTags()}
+          onBlur={() => window.setTimeout(removeTagSuggestions, 300)}
+          className="w3-input dropbtn"
+        />
+        <div className="dropdown-content" id="tags_autocomplete_results">
+          {suggestedTags.map((tag) => (
+            <SuggestedTag tag={tag} key={tag} addTag={addTag} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CreateNewCardButton({
+  onClick,
+}: {
+  onClick: () => void;
+}): React.JSX.Element {
+  return (
+    <button className="w3-btn w3-hover-white w3-right" onClick={onClick}>
+      <b>
+        <i className="fa fa-plus-square-o fa-fw" aria-hidden="true"></i> Create
+        a New Card
+      </b>
+    </button>
+  );
+}
+
+function EditCardButton({
+  onClick,
+}: {
+  onClick: () => void;
+}): React.JSX.Element {
+  return (
+    <button className="w3-btn w3-hover-white w3-right" onClick={onClick}>
+      <b>
+        <i className="w3-right fa fa-pencil fa-fw" aria-hidden="true"></i> Edit
+        Card
+      </b>
+    </button>
+  );
+}
+
+function Description({
+  displayRawDescription,
+  description,
+  setDescription,
+  descriptionHTML,
+}: {
+  displayRawDescription: boolean;
+  description: string;
+  setDescription: (description: string) => void;
+  descriptionHTML: string;
+}): React.JSX.Element {
+  function insertTabsIfNecessary(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (event.key === "Tab") {
+      event.preventDefault();
+      document.execCommand("insertText", false, "&nbsp;&nbsp;&nbsp;&nbsp;");
+    }
+  }
+
+  function RawDescription(): React.JSX.Element {
+    return (
+      <div
+        className="w3-container"
+        id="card_description"
+        onKeyDown={(event) => {
+          insertTabsIfNecessary(event);
+        }}
+        contentEditable={true}
+        onChange={(event) => {
+          setDescription(event.currentTarget.innerText);
+        }}
+      >
+        {description}
+      </div>
+    );
+  }
+
+  function ReadOnlyDescription(): React.JSX.Element {
+    return (
+      <div
+        className="w3-container"
+        id="card_description"
+        dangerouslySetInnerHTML={{ __html: descriptionHTML }}
+      ></div>
+    );
+  }
+
+  return (
+    <>
+      {displayRawDescription ? <RawDescription /> : <ReadOnlyDescription />}
+      <p className="w3-right tooltip">
+        <i className="fa fa-fw fa-info-circle" aria-hidden="true"></i>
+        Formatting Help
+        <span className="tooltiptext" id="formatting_help_tooltip">
+          You can use HTML, Markdown and LaTeX within your card's contents.
+          <a href="/wiki/#formatting" target="_blank">
+            Read more
+          </a>
+        </span>
+      </p>
+    </>
+  );
+}
+
+function UrgencySlider({
+  urgency,
+  setUrgency,
+}: {
+  urgency: number;
+  setUrgency: (urgency: number) => void;
+}): React.JSX.Element {
+  return (
+    <label className="input-area-padded w3-padding-small">
+      <strong>Urgency</strong>
+      <input
+        id="card_urgency"
+        type="range"
+        name="urgency"
+        className="w3-input"
+        min="0"
+        max="10"
+        value={urgency}
+        onChange={(event) => setUrgency(Number(event.target.value))}
+        step="0.01"
+      />
+    </label>
+  );
+}
+
+function IsPublicToggle({
+  isPublic,
+  setIsPublic,
+}: {
+  isPublic: boolean;
+  setIsPublic: (isPublic: boolean) => void;
+}): React.JSX.Element {
+  return (
+    <label className="w3-right switch tooltip">
+      <input
+        type="checkbox"
+        id="card_is_public_toggle"
+        checked={isPublic}
+        onChange={() => {
+          setIsPublic(!isPublic);
+        }}
+      ></input>
+      <span className="slider round" id="card_is_public_label"></span>
+      <span className="tooltiptext" id="card_is_public_tooltip">
+        <a href="/wiki#public_cards" target="_blank">
+          More about public cards
+        </a>
+      </span>
+    </label>
+  );
+}
+
+function SaveCardButton({
+  onClick,
+}: {
+  onClick: () => void;
+}): React.JSX.Element {
+  return (
+    <div className="w3-right w3-third">
+      <button
+        className="w3-btn w3-round-xxlarge w3-right w3-green"
+        onClick={onClick}
+      >
+        <b>
+          <i className="fa fa-floppy-o fa-fw" aria-hidden="true"></i>
+          Save Card
+        </b>
+      </button>
+    </div>
+  );
+}
+
+function MoveCardToTrashButton({
+  onClick,
+}: {
+  onClick: () => void;
+}): React.JSX.Element {
+  return (
+    <div className="w3-third w3-left">
+      <button
+        className="w3-btn w3-round-xxlarge w3-left w3-red"
+        onClick={onClick}
+      >
+        <b>
+          <i className="fa fa-trash-o fa-fw" aria-hidden="true"></i> Delete Card
+        </b>
+      </button>
+    </div>
+  );
+}
+
+export default function EditableCard() {
+  const { activeCard, setActiveCard, setEmptyCard, cardsManager } = useCards();
+  const [statusText, setStatusText] = useState("");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [descriptionHTML, setDescriptionHTML] = useState("");
+  const [urgency, setUrgency] = useState(10);
+  const [displayRawDescription, setDisplayRawDescription] = useState(false);
+  const [isPublic, setIsPublic] = useState(false);
+  const [tags, setTags] = useState<Set<string>>(new Set());
+  const [postURL, setPostURL] = useState<"/add-card" | "/update-card">(
+    "/add-card"
+  );
+
+  useEffect(() => {
+    setTitle(activeCard?.title || "");
+    setDescription(activeCard?.description || "");
+    setDescriptionHTML(activeCard?.descriptionHTML || "");
+    setUrgency(activeCard?.urgency || 10);
+    setIsPublic(activeCard?.isPublic || false);
+    setTags(
+      new Set(
+        (activeCard?.tags?.split(",") || [])
+          .map((tag) => tag.trim())
+          .filter((tag) => tag !== "")
+      )
+    );
+    setPostURL(activeCard?._id === null ? "/add-card" : "/update-card");
+  }, [activeCard]);
+
+  function _setEmptyCard() {
+    setEmptyCard();
+    setPostURL("/add-card");
+  }
+
+  function addTag(tag: string) {
+    setTags(new Set(tags.add(tag)));
+  }
+  function removeTag(tag: string) {
+    let newSet = new Set(tags);
+    newSet.delete(tag);
+    setTags(newSet);
   }
 
   function moveCardToTrash() {
-    throw new Error("Not implemented");
+    cardsManager.removeCard(activeCard!._id);
+    if (cardsManager.hasNext()) {
+      cardsManager.next().then((card) => setActiveCard(card!.id));
+    } else if (cardsManager.hasPrev()) {
+      cardsManager.previous().then((card) => setActiveCard(card!.id));
+    } else {
+      setStatusText("No cards left");
+    }
   }
 
   function saveCard() {
-    throw new Error("Not implemented");
+    cardsManager.saveCard(
+      {
+        title: title,
+        description: description,
+        urgency: urgency,
+        isPublic: isPublic,
+        tags: Array.from(tags).join(","),
+        createdById: cardsManager.userID,
+      },
+      postURL
+    );
   }
 
-  if (!activeCard || !shouldDisplay) {
+  if (activeCard === null) {
     return <></>;
   }
 
   return (
     <CardContainer statusText={statusText}>
       <div className="card-header w3-center w3-container">
-        <label className="input-area-padded padding-small w3-twothird w3-left">
-          <input
-            type="text"
-            id="card_title"
-            name="title"
-            className="w3-input"
-            style={{ fontWeight: "bolder" }}
-            defaultValue={activeCard.title}
-          />
-        </label>
-
-        <button
-          className="w3-btn w3-hover-white w3-right"
-          onClick={() => displayNewCard()}
-        >
-          <b>
-            <i className="fa fa-plus-square-o fa-fw" aria-hidden="true"></i>{" "}
-            Create a New Card
-          </b>
-        </button>
-
-        <button
-          className="w3-btn w3-hover-white w3-right"
-          onClick={() => displayRawCardDescription()}
-        >
-          <b>
-            <i className="w3-right fa fa-pencil fa-fw" aria-hidden="true"></i>{" "}
-            Edit Card
-          </b>
-        </button>
+        <TitleInput title={title} setTitle={setTitle} />
+        <CreateNewCardButton onClick={_setEmptyCard} />
+        <EditCardButton onClick={() => setDisplayRawDescription(true)} />
       </div>
-
       <div className="w3-container">
-        <div
-          className="w3-container"
-          id="card_description"
-          onKeyDown={(event) => {
-            insertTabsIfNecessary(event);
-          }}
-        ></div>
-        <p className="w3-right tooltip">
-          <i className="fa fa-fw fa-info-circle" aria-hidden="true"></i>{" "}
-          Formatting Help
-          <span className="tooltiptext" id="formatting_help_tooltip">
-            You can use HTML, Markdown and LaTeX within your card's contents.
-            <a href="/wiki/#formatting" target="_blank">
-              Read more
-            </a>
-          </span>
-        </p>
-
+        <Description
+          displayRawDescription={displayRawDescription}
+          description={description}
+          setDescription={setDescription}
+          descriptionHTML={descriptionHTML}
+        />
         <br />
-
-        <div>
-          <strong>Tags: </strong>
-          <span id="already_set_card_tags"></span>
-          <div className="dropdown">
-            <input
-              type="text"
-              id="card_tag_input"
-              placeholder="Add a new tag..."
-              onFocus={() => suggestNewTags()}
-              onBlur={() => window.setTimeout(removeTagSuggestions, 300)}
-              className="w3-input dropbtn"
-            />
-            <div
-              className="dropdown-content"
-              id="tags_autocomplete_results"
-            ></div>
-          </div>
-        </div>
-
+        <EditableTags tags={tags} addTag={addTag} removeTag={removeTag} />
         <br />
-
         <div>
           <div className="w3-threequarter w3-left">
-            <label className="input-area-padded w3-padding-small">
-              <strong>Urgency</strong>
-              <input
-                id="card_urgency"
-                type="range"
-                name="urgency"
-                className="w3-input"
-                min="0"
-                max="10"
-                step="0.01"
-              />
-            </label>
+            <UrgencySlider urgency={urgency} setUrgency={setUrgency} />
           </div>
-
           <div className="w3-quarter w3-right">
             <span id="card_urgency_number">
-              <strong></strong>
+              <strong>{urgency}</strong>
             </span>
-            <label className="w3-right switch tooltip">
-              <input type="checkbox" id="card_is_public_toggle"></input>
-              <span className="slider round" id="card_is_public_label"></span>
-              <span className="tooltiptext" id="card_is_public_tooltip">
-                <a href="/wiki#public_cards" target="_blank">
-                  More about public cards
-                </a>
-              </span>
-            </label>
+            <IsPublicToggle isPublic={isPublic} setIsPublic={setIsPublic} />
           </div>
         </div>
-
         <UrgencyQuartilesBar />
-
         <br />
       </div>
-
       <div className="w3-bar" style={{ padding: "2%" }}>
-        <div className="w3-third w3-left">
-          <button
-            className="w3-btn w3-round-xxlarge w3-left w3-red"
-            onClick={() => moveCardToTrash()}
-          >
-            <b>
-              <i className="fa fa-trash-o fa-fw" aria-hidden="true"></i> Delete
-              Card
-            </b>
-          </button>
-        </div>
-
-        <div className="w3-right w3-third">
-          <button
-            className="w3-btn w3-round-xxlarge w3-right w3-green"
-            onClick={() => saveCard()}
-          >
-            <b>
-              <i className="fa fa-floppy-o fa-fw" aria-hidden="true"></i>
-              Save Card
-            </b>
-          </button>
-        </div>
+        <MoveCardToTrashButton onClick={moveCardToTrash} />
+        <SaveCardButton onClick={saveCard} />
       </div>
     </CardContainer>
   );
