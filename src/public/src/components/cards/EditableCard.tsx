@@ -442,7 +442,10 @@ export default function EditableCard() {
     if (activeCard?._id !== null) {
       card._id = activeCard!._id;
     }
-    cardsManager.saveCard(card, postURL);
+    cardsManager.saveCard(card, postURL).then((card) => {
+      setDisplayRawDescription(false);
+      setActiveCard(card._id);
+    });
   }
 
   if (activeCard === null) {
