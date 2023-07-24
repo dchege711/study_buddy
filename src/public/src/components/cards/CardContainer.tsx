@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import { useCards } from "../../partials/CardsHook";
 
@@ -22,8 +22,8 @@ export default function CardContainer({
   statusText: string;
 }): React.JSX.Element {
   const { cardsManager, activeCard, setActiveCard } = useCards();
-  const [_statusText, setStatusText] = React.useState(statusText);
-  const [shouldDisplay, setShouldDisplay] = React.useState(true);
+  const [_statusText, setStatusText] = useState(statusText);
+  const [shouldDisplay, setShouldDisplay] = useState(true);
 
   async function fetchPreviousCard() {
     let card = await cardsManager.previous();
