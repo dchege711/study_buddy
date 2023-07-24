@@ -19,6 +19,8 @@ const CardsContext = createContext({
   activeCard: null as Partial<ICard> | null,
 
   setActiveCard: (id: string) => {},
+
+  setEmptyCard: () => {},
 });
 
 export const useCards = () => useContext(CardsContext);
@@ -65,6 +67,19 @@ export default function CardsProvider({
     });
   };
 
+  const setEmptyCard = () => {
+    let emptyCard: Partial<ICard> = {
+      _id: null,
+      title: "",
+      description: "",
+      tags: "",
+      createdById: userID,
+      urgency: 10,
+      isPublic: !metadata?.cardsAreByDefaultPrivate ?? false,
+    }
+    setActiveCard(emptyCard);
+  };
+
   useEffect(() => {
     let newCardsManager = new CardsManager(
       metadataNodeInformation,
@@ -90,6 +105,7 @@ export default function CardsProvider({
         cardsManager,
         activeCard,
         setActiveCard: _setActiveCard,
+        setEmptyCard,
       }}
     >
       {children}
