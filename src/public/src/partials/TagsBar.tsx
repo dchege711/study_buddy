@@ -1,5 +1,6 @@
 import React, {
   createContext,
+  useEffect,
   useState,
   useContext,
   useRef,
@@ -18,7 +19,10 @@ function defaultIsSelectedTag(_: string) {
 const TagsContext = createContext({
   selectTag: (tag: string) => {},
   isSelectedTag: defaultIsSelectedTag,
+  tagsAutoComplete: new AutoComplete(),
 });
+
+export const useTags = () => useContext(TagsContext);
 
 function TagsFilterButton({ filterCards }: { filterCards: () => void }) {
   return (
@@ -164,6 +168,10 @@ export default function TagsBar() {
   const { metadata } = useMetadata();
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
 
+  const [tagsAutoComplete, setTagsAutoComplete] = useState(
+    new AutoComplete()
+  );
+
   function isSelectedTag(tag: string) {
     return selectedTags.has(tag);
   }
@@ -182,10 +190,18 @@ export default function TagsBar() {
 
   function filterCards() {}
 
+  useEffect(() => {
+    let newAutoComplete = new AutoComplete();
+    if (metadata) {
+      newAutoComplete.initializePrefixTree(Object.keys(metadata.node_information[0]));
+      setTagsAutoComplete(newAutoComplete);
+    }
+  }, [metadata]);
+
   const showTags = metadata && metadata.node_information.length > 0;
 
   return (
-    <TagsContext.Provider value={{ selectTag, isSelectedTag }}>
+    <TagsContext.Provider value={{ selectTag, isSelectedTag, tagsAutoComplete }}>
       <div className="w3-container w3-left w3-quarter w3-padding">
         <div className="w3-container w3-padding-small">
           <TagsFilterButton filterCards={filterCards} />
