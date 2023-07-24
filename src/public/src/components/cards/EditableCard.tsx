@@ -249,6 +249,7 @@ function Description({
         onChange={(event) => {
           setDescription(event.currentTarget.innerText);
         }}
+        suppressContentEditableWarning={true}
       >
         {description}
       </div>
