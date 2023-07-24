@@ -229,7 +229,7 @@ export function publicSearch(payload: SearchPublicCardParams): Promise<Array<Par
 
     let queryObject : CardQuery = {
         filter: { $and: mandatoryFields },
-        projection: "title tags",
+        projection: "title tags urgency",
         limit: payload.limit || 100,
         sortCriteria: sortCriteria,
     };
