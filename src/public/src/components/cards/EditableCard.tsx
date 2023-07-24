@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useCards } from "../../partials/CardsHook";
 import CardContainer from "./CardContainer";
 import { useTags } from "../../partials/TagsBar";
+import { ICard } from "../../../../models/mongoose_models/CardSchema";
 
 function TitleInput({
   title,
@@ -430,17 +431,18 @@ export default function EditableCard() {
   }
 
   function saveCard() {
-    cardsManager.saveCard(
-      {
-        title: title,
-        description: description,
-        urgency: urgency,
-        isPublic: isPublic,
-        tags: Array.from(tags).join(","),
-        createdById: cardsManager.userID,
-      },
-      postURL
-    );
+    let card: Partial<ICard> = {
+      title: title,
+      description: description,
+      urgency: urgency,
+      isPublic: isPublic,
+      tags: Array.from(tags).join(","),
+      createdById: cardsManager.userID,
+    };
+    if (activeCard?._id !== null) {
+      card._id = activeCard!._id;
+    }
+    cardsManager.saveCard(card, postURL);
   }
 
   if (activeCard === null) {
