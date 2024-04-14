@@ -5,8 +5,7 @@ import { addPublicUser } from "../../../models/Miscellaneous";
 import * as LogInUtilities from "../../../models/LogInUtilities";
 
 describe("Test LoginUtilities\n", function() {
-
-    describe("when signing up new users", function() {
+    describe("when signing up new users", function(this: Mocha.Context) {
         this.timeout(5000); // These tests may run slower than 2s in CI.
 
         before(function() {
