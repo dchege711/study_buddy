@@ -4,13 +4,6 @@ html {
 
 /************************ Navbar **********************************************/
 
-.topnav {
-    position: absolute;
-    padding: 10px;
-    width: 100%;
-    top: 0;
-}
-
 div#topnav-banner {
     display: flex;
     justify-content: center;
@@ -19,11 +12,13 @@ div#topnav-banner {
     background-color: #ddffdd;
 }
 
-ul#topnav {
+ul#topnavitems {
     list-style-type: none;
     margin: 0;
     padding: 0;
     overflow: hidden;
+    display: flex;
+    justify-content: space-between;
 }
 
 .link_button {
@@ -39,7 +34,7 @@ ul#topnav {
 }
 
 ul#topnavitems li {
-    display: block;
+    display: inline;
     font-family: "Lobster";
     font-size: 24px;
     text-align: center;
@@ -67,17 +62,12 @@ ul.link:hover {
 
 ul#topnavitems li a:hover:not(.active) {background-color: #121;}
 
-ul#topnavitems li.right {float: right;}
-
-ul#topnavitems li.left {float: left;}
-
 /************************ General rules ***************************************/
 
 body {
     display: flex;
     min-height: 100vh;
     flex-direction: column;
-    padding: 40px 0 0;
     margin-bottom: 5em;
     font-family: 'Montserrat', sans-serif;
     font-size: smaller;
