@@ -1,10 +1,20 @@
 <script type="text/javascript" src="/dist/AppUtilities.bundle.min.js"></script>
 
-<div>
+<div class="topnav">
+    <div id="topnav-banner">
+        <p>
+            Starting <time datetime="2024-05-14">May 14th</time>, <%= APP_NAME %>
+            will be available only at
+            <a href="https://cards.curiosities.dev/">cards.curiosities.dev</a>.
+            <a href="/wiki/#migration">Learn more</a>.
+        </p>
+    </div>
 
-    <ul class="topnav" id="topnavitems">
+    <ul id="topnavitems">
         <li class="left">
-            <a href="/" class="link_button"><strong><%= APP_NAME %></strong></a>
+            <a href="/" class="link_button"><strong>
+                    <%= APP_NAME %>
+                </strong></a>
         </li>
 
         <li class="left">
