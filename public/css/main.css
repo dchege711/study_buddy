@@ -11,7 +11,15 @@ html {
     top: 0;
 }
 
-ul.topnav {
+div#topnav-banner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: larger;
+    background-color: #ddffdd;
+}
+
+ul#topnav {
     list-style-type: none;
     margin: 0;
     padding: 0;
@@ -30,7 +38,7 @@ ul.topnav {
     border-bottom: #2196F3 thick solid;
 }
 
-ul.topnav li {
+ul#topnavitems li {
     display: block;
     font-family: "Lobster";
     font-size: 24px;
@@ -44,7 +52,7 @@ ul.link, .link {
     color: black;
     text-decoration: none;
     cursor: pointer;
-    border:none; 
+    border:none;
 }
 
 ul.link.chosen {
@@ -57,11 +65,11 @@ ul.link:hover {
     text-decoration: underline;
 }
 
-ul.topnav li a:hover:not(.active) {background-color: #121;}
+ul#topnavitems li a:hover:not(.active) {background-color: #121;}
 
-ul.topnav li.right {float: right;}
+ul#topnavitems li.right {float: right;}
 
-ul.topnav li.left {float: left;}
+ul#topnavitems li.left {float: left;}
 
 /************************ General rules ***************************************/
 
@@ -73,7 +81,7 @@ body {
     margin-bottom: 5em;
     font-family: 'Montserrat', sans-serif;
     font-size: smaller;
-    background-color: rgb(245, 245, 245);          
+    background-color: rgb(245, 245, 245);
 }
 
 #main_div {
