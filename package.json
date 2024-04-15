@@ -22,7 +22,8 @@
     ]
   },
   "scripts": {
-    "build": "tsc && webpack --config webpack.config.js",
+    "build-webpack": "webpack --config webpack.config.js",
+    "build": "tsc && npm run build-webpack",
     "jsdoc": "jsdoc -r models",
     "start": "npm run build && node dist/server.js",
     "debug": "ts-node-dev --files --transpile-only src/server.ts",
