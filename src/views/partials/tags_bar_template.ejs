@@ -15,18 +15,18 @@
 <div class="w3-container w3-left w3-quarter w3-padding">
 
     <div class="w3-container w3-padding-small">
-        <button class="w3-button w3-blue w3-round-xxlarge w3-left" onclick="filterCards();">
+        <button class="w3-button w3-blue w3-round-xxlarge w3-left" onclick="App.filterCards();">
             <b><i class="fa fa-refresh fa-fw" aria-hidden="true"></i> Filter By Tags</b>
         </button>
 
-        <button class="w3-button w3-blue w3-round-xxlarge w3-right" onclick="TagsBarUtilities.resetTagSelection(); filterCards();">
+        <button class="w3-button w3-blue w3-round-xxlarge w3-right" onclick="App.resetTagSelection(); filterCards();">
             <b>Clear Selection</b>
         </button>
     </div>
 
     <div class="dropdown" class="w3-container">
         <input type="text" placeholder="Search for tag..."
-        onkeyup="searchTags(this.value);" onblur="window.setTimeout(removeTagSearchResults, 200);"
+        onkeyup="App.searchTags(this.value);" onblur="window.setTimeout(App.removeTagSearchResults, 200);"
         class="w3-input dropbtn" />
         <div class="dropdown-content" id="tags_search_results"></div>
     </div>
@@ -35,5 +35,3 @@
         <div id="side_bar_contents"></div>
     </div>
 </div>
-
-<script type="text/javascript" src="/src/TagsBarTemplate.bundle.min.js"></script>

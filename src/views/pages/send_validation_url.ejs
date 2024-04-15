@@ -6,7 +6,7 @@
     <%- include('../partials/header.ejs'); %>
 </head>
 
-<body onload="AppUtilities.processParams();">
+<body onload="App.processParams();">
 
     <%- include('../partials/navbar.ejs'); %>
 
@@ -28,7 +28,7 @@
                     <br />
 
                     <button class="w3-button w3-center w3-green" type="submit" id="send_validation_url_button"
-                    onclick="return sendValidationURL();">Send Validation URL</button>
+                    onclick="return App.sendValidationURL();">Send Validation URL</button>
 
                 </form>
             </div>
@@ -36,9 +36,6 @@
 
 
         <%- include('../partials/footer.ejs'); %>
-
-        <script type="text/javascript" src="/src/SendValidationURL.bundle.min.js"></script>
-
 </body>
 
 </html>
