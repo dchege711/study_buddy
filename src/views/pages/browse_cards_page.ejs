@@ -3,10 +3,14 @@
     <head>
         <%- include('../partials/header.ejs'); %>
         <title><%= APP_NAME %>: Browse/Search</title>
+        <script type="text/javascript" src="/src/CardsManager.bundle.min.js"></script>
+        <script type="text/javascript" src="/src/CardTemplateUtilities.bundle.min.js"></script>
+        <script type="text/javascript" src="/src/TagsBarUtilities.bundle.min.js"></script>
+        <script type="text/javascript" src="/src/AutoComplete.bundle.min.js"></script>
         <%- include('../partials/syntax_highlighting_and_latex.ejs'); %>
     </head>
 
-    <body onload="App.initializeBrowsePage();">
+    <body>
         <%- include('../partials/navbar.ejs'); %>
 
         <div id="main_div">
@@ -54,5 +58,7 @@
         </div>
 
     </body>
+
+    <script type="text/javascript" src="/src/BrowseCardsPage.bundle.min.js" onload="BrowseCardsPage.initializeBrowsePage()"></script>
 
 </html>
