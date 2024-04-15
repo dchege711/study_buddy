@@ -5,6 +5,9 @@
         <title><%= APP_NAME %>: Account Page</title>
         <%- include('../partials/header.ejs'); %>
         <%- include('../partials/syntax_highlighting_and_latex.ejs'); %>
+        <script type="text/javascript" src="/src/CardsManager.bundle.min.js"></script>
+        <script type="text/javascript" src="/src/CardTemplateUtilities.bundle.min.js"></script>
+
         <style>
 
             #account_details {
@@ -83,7 +86,7 @@
 
                         <br><br>
 
-                        <button id="trash_button" class="w3-btn w3-round-xxlarge w3-left w3-blue" onClick="App.showCardsFromTrash();">
+                        <button id="trash_button" class="w3-btn w3-round-xxlarge w3-left w3-blue" onClick="AccountPage.showCardsFromTrash();">
                             <b id="trash_button_text">
                                 <i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> View Trashed Cards
                             </b>
@@ -122,7 +125,7 @@
                         Download all of the cards you own.
                         <br>
                         <br>
-                        <button class="w3-btn w3-round-xxlarge w3-left w3-green" onClick="App.downloadUserData();">
+                        <button class="w3-btn w3-round-xxlarge w3-left w3-green" onClick="AccountPage.downloadUserData();">
                             <b>
                                 <i class="fa fa-download fa-fw" aria-hidden="true"></i> Download My Cards
                             </b>
@@ -141,7 +144,7 @@
                         Please be sure. You might want to download your data first.
                         <br>
                         <br>
-                        <button class="w3-btn w3-round-xxlarge w3-left w3-red" id="delete_account_button" onClick="App.confirmDeletion();">
+                        <button class="w3-btn w3-round-xxlarge w3-left w3-red" id="delete_account_button" onClick="AccountPage.confirmDeletion();">
                             <b>
                                 <i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> Delete Account
                             </b>
