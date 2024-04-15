@@ -33,21 +33,27 @@ export async function getDummyAccount(): Promise<LogInUtilities.AuthenticateUser
         });
 };
 
+export function populateDummyAccountWithCards(): Promise<number> {
+  return getDummyAccount()
+    .then((user) => {
+        return getRandomCards(60, user.userIDInApp)
+    })
+    .then((cards) => {
+        return CardsDB.createMany(cards)
+    })
+    .then((cards) => {
+        console.log(`Created ${cards.length} cards for sample user`);
+        return cards.length;
+    });
+}
+
 if (require.main === module) {
-
     const dbConnection = require("../models/MongooseClient.js");
-    getDummyAccount()
-        .then((user) => {
-            return getRandomCards(60, user.userIDInApp)
-        })
-        .then((cards) => {
-            return CardsDB.createMany(cards)
-        })
-        .then((cards) => {
-            console.log(`Created ${cards.length} cards for sample user`);
-            return dbConnection.closeMongooseConnection();
-        })
-        .catch((err) => { console.error(err); });
-
+    populateDummyAccountWithCards()
+      .then((numCards) => {
+          console.log(`Created ${numCards} cards for sample user`);
+          return dbConnection.closeMongooseConnection();
+      })
+      .catch((err) => { console.error(err); });
 }
 
