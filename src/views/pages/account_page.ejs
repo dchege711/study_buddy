@@ -32,7 +32,7 @@
 
     </head>
 
-    <body onload="initializeAccountPage();">
+    <body>
 
         <%- include('../partials/navbar.ejs'); %>
 
@@ -86,7 +86,7 @@
 
                         <br><br>
 
-                        <button id="trash_button" class="w3-btn w3-round-xxlarge w3-left w3-blue" onClick="showCardsFromTrash();">
+                        <button id="trash_button" class="w3-btn w3-round-xxlarge w3-left w3-blue" onClick="AccountPage.showCardsFromTrash();">
                             <b id="trash_button_text">
                                 <i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> View Trashed Cards
                             </b>
@@ -125,7 +125,7 @@
                         Download all of the cards you own.
                         <br>
                         <br>
-                        <button class="w3-btn w3-round-xxlarge w3-left w3-green" onClick="downloadUserData();">
+                        <button class="w3-btn w3-round-xxlarge w3-left w3-green" onClick="AccountPage.downloadUserData();">
                             <b>
                                 <i class="fa fa-download fa-fw" aria-hidden="true"></i> Download My Cards
                             </b>
@@ -144,7 +144,7 @@
                         Please be sure. You might want to download your data first.
                         <br>
                         <br>
-                        <button class="w3-btn w3-round-xxlarge w3-left w3-red" id="delete_account_button" onClick="confirmDeletion();">
+                        <button class="w3-btn w3-round-xxlarge w3-left w3-red" id="delete_account_button" onClick="AccountPage.confirmDeletion();">
                             <b>
                                 <i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> Delete Account
                             </b>
@@ -163,6 +163,6 @@
 
     </body>
 
-    <script type="text/javascript" src="/src/AccountPage.bundle.min.js"></script>
+    <script type="text/javascript" src="/src/AccountPage.bundle.min.js"  onload="AccountPage.initializeAccountPage();"></script>
 
 </html>
