@@ -47,8 +47,7 @@
 <div class="dropdown">
     <input type="text" id="card_search_input"
         placeholder="Search card descriptions and titles. Press [Enter] to view all results"
-        onkeydown="SearchBarDropDown.searchCards(event)" class="dropbtn"
-        onblur="window.setTimeout(SearchBarDropDown.clearSearchResults, 300);" />
+        onkeydown="App.searchCards(event)" class="dropbtn"
+        onblur="window.setTimeout(App.clearSearchResults, 300);" />
     <div class="dropdown-content" id="card_search_results"></div>
 </div>
-<script type="text/javascript" src="src/SearchBarDropDown.bundle.min.js"></script>

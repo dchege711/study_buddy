@@ -3,7 +3,6 @@
     <head>
         <title><%= APP_NAME %>: Login</title>
         <%- include('../partials/header.ejs'); %>
-        <script src="/src/AppUtilities.bundle.min.js"></script>
     </head>
 
     <style>
@@ -13,7 +12,7 @@
         }
     </style>
 
-    <body onload="AppUtilities.processParams();">
+    <body onload="App.processParams();">
 
         <%- include('../partials/navbar.ejs'); %>
 
@@ -37,13 +36,13 @@
                     <br />
 
                     <button class="w3-button w3-center w3-green" type="submit"
-                        id="login_submit" onclick="return WelcomePage.logInUser('login_form', '/login')">Log In</button>
+                        id="login_submit" onclick="return App.logInUser('login_form', '/login')">Log In</button>
 
                     <br />
                     <br />
 
                     <button class="w3-button w3-center w3-blue"
-                        id="display_signup_form" onclick="return WelcomePage.displayForm('signup_form')">
+                        id="display_signup_form" onclick="return App.displayForm('signup_form')">
                         ... or Sign Up for a New Account</button>
 
                     <p class="link" id="forgot_password_link" onclick="window.location = '/reset-password';" style="text-decoration: underline">
@@ -76,13 +75,13 @@
                     <br />
 
                     <button class="w3-button w3-center w3-green" type="submit"
-                        id="signup_submit" onclick="return WelcomePage.signUpUser('signup_form', '/register-user')">Sign Up</button>
+                        id="signup_submit" onclick="return App.signUpUser('signup_form', '/register-user')">Sign Up</button>
 
                     <br />
                     <br />
 
                     <button class="w3-button w3-center w3-blue"
-                        id="display_login_form" onclick="return AppUtilities.displayForm('login_form')">
+                        id="display_login_form" onclick="return App.displayForm('login_form')">
                         ... or go back to LogIn</button>
                 </form>
 
@@ -94,8 +93,6 @@
 
 
         <%- include('../partials/footer.ejs'); %>
-
-        <script type="text/javascript" src="/src/WelcomePage.bundle.min.js"></script>
 
     </body>
 
