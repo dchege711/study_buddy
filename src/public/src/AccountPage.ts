@@ -24,7 +24,7 @@ interface AccountPageState {
 
 let state: AccountPageState | null, cardsManager: CardsManager | null;
 
-function initializeAccountPage() {
+export function initializeAccountPage() {
     refreshMetadata()
         .then(({metadata, minicards}) => {
             state = {
