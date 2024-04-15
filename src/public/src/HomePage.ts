@@ -55,7 +55,29 @@ interface ElementRefs {
  */
 let state: HomePageState | null, autocomplete: AutoComplete | null, cardsManager: CardsManager | null, elementRefs: ElementRefs | null;
 
-document.addEventListener("DOMContentLoaded", () => {
+function updateStreakBar(streakObj: IStreak) {
+  let streakBarElement = document.getElementById("streak_bar");
+  if (!streakBarElement) {
+    throw new Error("Could not find streak bar element.");
+  }
+
+  let streakWidth = Math.min(
+    100,
+    (streakObj.cardIDs.length * 100.0) / streakObj.dailyTarget
+  );
+  streakBarElement.style.width = `${streakWidth}%`;
+  streakBarElement.style.backgroundImage =
+    `linear-gradient(45deg, #ffc719 20% ${100 - streakWidth}%, #bf033b 100%)`;
+
+  let streakTextElement = document.getElementById("streak_text");
+  if (!streakTextElement) {
+    throw new Error("Could not find streak text element.");
+  }
+
+  streakTextElement.innerText = `Daily Target: ${streakObj.cardIDs.length} / ${streakObj.dailyTarget} (Streak ${streakObj.length})`;
+}
+
+export function initializeHomepage() {
   // Maintain references to elements that get searched for often
   elementRefs = {
     cardContainerHolderElement: document.getElementById("card_modal") as HTMLElement,
@@ -82,33 +104,6 @@ document.addEventListener("DOMContentLoaded", () => {
     reviewModeToggleElement: document.getElementById("reviewModeToggle") as HTMLInputElement,
   };
 
-  initializeHomepage();
-});
-
-
-function updateStreakBar(streakObj: IStreak) {
-  let streakBarElement = document.getElementById("streak_bar");
-  if (!streakBarElement) {
-    throw new Error("Could not find streak bar element.");
-  }
-
-  let streakWidth = Math.min(
-    100,
-    (streakObj.cardIDs.length * 100.0) / streakObj.dailyTarget
-  );
-  streakBarElement.style.width = `${streakWidth}%`;
-  streakBarElement.style.backgroundImage =
-    `linear-gradient(45deg, #ffc719 20% ${100 - streakWidth}%, #bf033b 100%)`;
-
-  let streakTextElement = document.getElementById("streak_text");
-  if (!streakTextElement) {
-    throw new Error("Could not find streak text element.");
-  }
-
-  streakTextElement.innerText = `Daily Target: ${streakObj.cardIDs.length} / ${streakObj.dailyTarget} (Streak ${streakObj.length})`;
-}
-
-function initializeHomepage() {
   refreshMetadata()
     .then(({metadata, minicards}) => {
       state = {

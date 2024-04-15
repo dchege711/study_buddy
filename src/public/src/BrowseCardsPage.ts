@@ -32,54 +32,51 @@ let cardsManager: CardsManager | null = null;
 let autocomplete: AutoComplete | null = null;
 let state: BrowseCardsPageState | null = null;
 let elementRefs: ElementRefs | null = null;
-const USER_INFO: AuthenticateUser | null = null;
+let USER_INFO: AuthenticateUser | null = null;
 
-document.addEventListener("DOMContentLoaded", () => {
-    state = {
-        currentCardID: null,
-        currentTagSelectionElement: document.getElementById("current_tag_selection") as HTMLElement,
-        searchResultsElement: document.getElementById("minicards_search_results") as HTMLElement,
-        tagsAndIDs: null,
-        queryString: "",
-    };
-    if (!state.currentTagSelectionElement || !state.searchResultsElement) {
-        throw new Error("Could not find the current tag selection element or the search results element.");
-    }
+export function initializeBrowsePage() {
+  state = {
+      currentCardID: null,
+      currentTagSelectionElement: document.getElementById("current_tag_selection") as HTMLElement,
+      searchResultsElement: document.getElementById("minicards_search_results") as HTMLElement,
+      tagsAndIDs: null,
+      queryString: "",
+  };
+  if (!state.currentTagSelectionElement || !state.searchResultsElement) {
+      throw new Error("Could not find the current tag selection element or the search results element.");
+  }
 
-    const USER_INFO = getAccountInfo() as AuthenticateUser;
-    if (!USER_INFO) {
-        throw new Error("Could not find user info.");
-    }
+  USER_INFO = getAccountInfo();
 
-    elementRefs = {
-        searchInputElement: document.getElementById("search_input") as HTMLInputElement,
-        cardContainerHolderElement: document.getElementById("card_modal") as HTMLElement,
-        cardTitleElement: document.getElementById("card_title") as HTMLElement,
-        cardDescriptionElement: document.getElementById("card_description") as HTMLElement,
-        cardTagsElement: document.getElementById("card_tags") as HTMLElement,
-        cardPopularityElement: document.getElementById("card_popularity") as HTMLElement
-    };
-    for (let val in Object.values(elementRefs)) {
-        if (!val) throw new Error(`Could not find some element references.`);
-    }
+  elementRefs = {
+      searchInputElement: document.getElementById("search_input") as HTMLInputElement,
+      cardContainerHolderElement: document.getElementById("card_modal") as HTMLElement,
+      cardTitleElement: document.getElementById("card_title") as HTMLElement,
+      cardDescriptionElement: document.getElementById("card_description") as HTMLElement,
+      cardTagsElement: document.getElementById("card_tags") as HTMLElement,
+      cardPopularityElement: document.getElementById("card_popularity") as HTMLElement
+  };
+  for (let val in Object.values(elementRefs)) {
+      if (!val) throw new Error(`Could not find some element references.`);
+  }
 
-    sendHTTPRequest("POST", "/read-public-metadata", {})
-        .then((metadataDocs: IMetadata[]) => {
-            if (metadataDocs.length === 0) {
-                return Promise.reject("No metadata found.");
-            }
-            if (!state) {
-                throw new Error("State not initialized.");
-            }
+  sendHTTPRequest("POST", "/read-public-metadata", {})
+      .then((metadataDocs: IMetadata[]) => {
+          if (metadataDocs.length === 0) {
+              return Promise.reject("No metadata found.");
+          }
+          if (!state) {
+              throw new Error("State not initialized.");
+          }
 
-            state.tagsAndIDs = metadataDocs[0].node_information[0];
-            cardsManager = new CardsManager(state.tagsAndIDs, metadataDocs[0].createdById, "/read-public-card");
-            initializeTagsBar("side_bar_contents", state.tagsAndIDs);
-            autocomplete = new AutoComplete();
-            autocomplete.initializePrefixTree(Object.keys(state.tagsAndIDs));
-        })
-        .catch((err) => { console.error(err); });
-});
+          state.tagsAndIDs = metadataDocs[0].node_information[0];
+          cardsManager = new CardsManager(state.tagsAndIDs, metadataDocs[0].createdById, "/read-public-card");
+          initializeTagsBar("side_bar_contents", state.tagsAndIDs);
+          autocomplete = new AutoComplete();
+          autocomplete.initializePrefixTree(Object.keys(state.tagsAndIDs));
+      })
+      .catch((err) => { console.error(err); });
+}
 
 function handleSearchInputChange() {
     if (!state || !elementRefs) {
