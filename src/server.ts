@@ -7,6 +7,8 @@
  */
 
 import { NextFunction, Request, Response } from "express";
+import { IS_DEV } from "./config";
+import { populateDummyAccountWithCards } from "./tests/DummyAccountUtils";
 
 var express = require("express");
 var session = require("express-session");
@@ -91,3 +93,7 @@ app.use(function (req: Request, res: Response, next: NextFunction) {
 app.listen(port, function() {
     console.log(`App is running on port ${port}`);
 });
+
+if (IS_DEV) {
+  populateDummyAccountWithCards();
+}
