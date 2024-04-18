@@ -48,6 +48,7 @@
   },
   "homepage": "https://github.com/dchege711/study_buddy#readme",
   "dependencies": {
+    "@lit/context": "^1.1.1",
     "avl": "^1.5.3",
     "body-parser": "^1.20.2",
     "connect-mongo": "^4.6.0",
