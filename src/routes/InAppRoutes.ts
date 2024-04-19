@@ -68,7 +68,7 @@ router.post("/restore-from-trash", requireLogIn, restoreCardFromTrash);
 
 router.get("/account/download-user-data", requireLogIn, downloadUserData);
 
-router.post("/account/delete-account", requireLogIn, deleteAccount);
+router.get("/account/delete-account", requireLogIn, deleteAccount);
 
 router.post("/account/update-settings", requireLogIn, updateUserSettings);
 

@@ -105,7 +105,7 @@ export async function logoutUser (req: Request, res: Response) {
         "Set-Cookie",
         [`session_token=null;Expires=Thu, 01 Jan 1970 00:00:00 GMT`]
     );
-    convertObjectToResponse(null, {}, res);
+    res.redirect("/browse");
 };
 
 export function sendValidationEmailGet (req: Request, res: Response) {

@@ -80,15 +80,6 @@ export function processParams() {
     if (params.has("msg")) alert(params.get("msg"));
 }
 
-/**
- * @description Fetch information about the user from Local Storage
- */
-export function getAccountInfo(): AuthenticateUser | null {
-    let retrievedAccountInfo = localStorage.getItem("session_info");
-    if (retrievedAccountInfo === null) return retrievedAccountInfo;
-    else return JSON.parse(retrievedAccountInfo);
-}
-
 export type RefreshMetadataResponseMiniCards = Map<string, MiniICard>;
 
 export interface RefreshMetadataResponse {
@@ -103,12 +94,7 @@ export interface RefreshMetadataResponse {
  * @returns {Promise} resolves with the new metadata.
  */
 export function refreshMetadata(): Promise<RefreshMetadataResponse> {
-    let accountInfo = getAccountInfo();
-    if (!accountInfo) {
-        return Promise.reject("No account information found.");
-    }
-
-    return sendHTTPRequest("POST", "/read-metadata", {userIDInApp: accountInfo.userIDInApp})
+    return sendHTTPRequest("POST", "/read-metadata", {})
         .then((metadata: MetadataResponse) => {
             if (!metadata.metadataDocs || metadata.metadataDocs.length == 0) {
                 return Promise.reject("No metadata found.");
@@ -125,8 +111,6 @@ export function refreshMetadata(): Promise<RefreshMetadataResponse> {
                 });
             }
 
-            localStorage.setItem("metadata", JSON.stringify(metadata.metadataDocs));
-            localStorage.setItem("minicards", JSON.stringify(minicards));
             return Promise.resolve({metadata: metadata.metadataDocs[0], minicards});
         });
 }

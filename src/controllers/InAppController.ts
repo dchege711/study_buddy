@@ -102,11 +102,18 @@ export interface MetadataResponse {
 
 export function readMetadata (req: Request, res: Response) {
     let dataObject: MetadataResponse = {};
-    MetadataDB.read(req.body)
+    let userIDInApp = req.session?.user?.userIDInApp;
+
+    if (userIDInApp === undefined) {
+        res.status(401).send("You must be logged in to read metadata.");
+        return;
+    }
+
+    MetadataDB.read({userIDInApp})
         .then((metadataDocs) => {
             dataObject.metadataDocs = metadataDocs;
             return CardsDB.read(
-                { userIDInApp: req.body.userIDInApp }, "title tags urgency"
+                { userIDInApp }, "title tags urgency"
             );
         })
         .then((minicards) => {
@@ -179,13 +186,13 @@ export function deleteAccount(req: Request, res: Response) {
 
     loginUtilities
         .deleteAccount(userIDInApp)
-        .then((confirmation) => {
+        .then((_) => {
             delete req.session?.user;
             res.setHeader(
                 "Set-Cookie",
                 [`session_token=null;Expires=Thu, 01 Jan 1970 00:00:00 GMT`]
             );
-            convertObjectToResponse(null, confirmation, res);
+            res.redirect("/browse");
         })
         .catch((err) => { convertObjectToResponse(err, null, res); });
 };
@@ -200,15 +207,17 @@ export function updateUserSettings(req: Request, res: Response) {
 };
 
 export function duplicateCard(req: Request, res: Response) {
-    let duplicateCardArgs = req.body as unknown as CardsDB.DuplicateCardParams;
-    let userIDInApp = req.session?.user?.userIDInApp;
-    if (userIDInApp === undefined) {
+    if (!req.session?.user) {
         res.status(401).send("You must be logged in to duplicate a card.");
         return;
     }
 
-    duplicateCardArgs.userIDInApp = userIDInApp;
-    sendResponseFromPromise(CardsDB.duplicateCard(duplicateCardArgs), res);
+    let payload : CardsDB.DuplicateCardParams = {
+        cardID: req.body?.cardID,
+        userIDInApp: req.session.user.userIDInApp,
+        cardsAreByDefaultPrivate: req.session.user.cardsAreByDefaultPrivate,
+    }
+    sendResponseFromPromise(CardsDB.duplicateCard(payload), res);
 };
 
 export function flagCard(req: Request, res: Response) {

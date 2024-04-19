@@ -365,8 +365,27 @@ export async function authenticateUser(payload: AuthenticateUserParam): Promise<
  * @returns {Promise} resolves with a JSON doc w/ `success`, `status`
  *  and `message` as keys
  */
-export async function authenticateByToken(tokenID: string): Promise<IToken | null> {
-    return Token.findOne({ token_id: tokenID }).exec();
+export async function authenticateByToken(tokenID: string): Promise<AuthenticateUser | null> {
+    return Token.findOne({ token_id: tokenID }).exec()
+      .then(async (token) => {
+        if (!token) {
+          return Promise.resolve(null);
+        }
+
+        let user = await User.findOne({ userIDInApp: token.userIDInApp }).exec();
+        if (!user) {
+          return Promise.resolve(null);
+        }
+
+        return {
+          token_id: token.id,
+          userIDInApp: user.userIDInApp,
+          username: user.username,
+          email: user.email,
+          cardsAreByDefaultPrivate: user.cardsAreByDefaultPrivate,
+          user_reg_date: token.user_reg_date
+        };
+      });
 };
 
 /**

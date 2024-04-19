@@ -24,7 +24,7 @@ router.post("/register-user", registerUser);
 
 router.post("/login", loginUser);
 
-router.post("/logout", logoutUser);
+router.get("/logout", logoutUser);
 
 router.get("/send-validation-email", sendValidationEmailGet);
 

@@ -331,8 +331,8 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
      * @param {Object} card the new version of the card
      */
     updateCard(card: Partial<ICard>) {
-        localStorage.removeItem(card._id);
-        localStorage.setItem(card._id, JSON.stringify(card));
+        sessionStorage.removeItem(card._id);
+        sessionStorage.setItem(card._id, JSON.stringify(card));
         this.minicards[card._id] = {
             _id: card._id, title: card.title,
             tags: card.tags?.trim().replace(/\s/g, ", ")
@@ -393,7 +393,7 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
      * found
      */
     findCard(cardID: string): Promise<Partial<ICard>> {
-        let cachedCard = localStorage.getItem(cardID);
+        let cachedCard = sessionStorage.getItem(cardID);
         if (cachedCard) {
             return Promise.resolve(JSON.parse(cachedCard) as ICard);
         }
@@ -403,7 +403,7 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
                 if (cards.length !== 1) {
                     return Promise.reject(`Expected 1 card, got ${cards.length}`);
                 } else {
-                    localStorage.setItem(cardID, JSON.stringify(cards[0]));
+                    sessionStorage.setItem(cardID, JSON.stringify(cards[0]));
                     return Promise.resolve(cards[0]);
                 }
             });
