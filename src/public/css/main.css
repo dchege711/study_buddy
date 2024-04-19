@@ -40,8 +40,13 @@ body {
     flex-direction: column;
     margin-bottom: 5em;
     font-family: 'Montserrat', sans-serif;
-    font-size: smaller;
     background-color: rgb(245, 245, 245);
+}
+
+div#app-container {
+    display: flex;
+    flex-direction: column;
+    padding: 5px 25px;
 }
 
 #main_div {
