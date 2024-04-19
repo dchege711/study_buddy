@@ -113,7 +113,7 @@ export function readMetadata (req: Request, res: Response) {
         .then((metadataDocs) => {
             dataObject.metadataDocs = metadataDocs;
             return CardsDB.read(
-                { userIDInApp }, "title tags urgency"
+                { userIDInApp: userIDInApp! }, "title tags urgency"
             );
         })
         .then((minicards) => {
