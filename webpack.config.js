@@ -27,7 +27,6 @@ module.exports = {
         CardTemplateUtilities: path.resolve(__dirname, "src", "public", "src", "CardTemplateUtilities"),
         HomePage: path.resolve(__dirname, "src", "public", "src", "HomePage"),
         Latex: path.resolve(__dirname, "src", "public", "src", "Latex"),
-        NavBar: path.resolve(__dirname, "src", "public", "src", "NavBar"),
         PasswordResetPage: path.resolve(__dirname, "src", "public", "src", "PasswordResetPage"),
         PasswordResetRequestPage: path.resolve(__dirname, "src", "public", "src", "PasswordResetRequestPage"),
         SearchBarDropDown: path.resolve(__dirname, "src", "public", "src", "SearchBarDropDown"),

@@ -4,14 +4,14 @@
  * https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation
  */
 
-import { IToken } from "./models/mongoose_models/Token";
+import { AuthenticateUser } from "./models/LogInUtilities";
 import { IUser } from "./models/mongoose_models/UserSchema";
 import { NextFunction, Request, Response } from "express";
 
 declare module "express" {
   interface Request {
     session?: {
-      user?: Pick<IToken, "token_id" | "userIDInApp">;
+      user?: AuthenticateUser;
     };
   }
 

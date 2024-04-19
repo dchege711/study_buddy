@@ -1,5 +1,4 @@
-import { MetadataResponse } from "../../controllers/InAppController";
-import { AuthenticateUser, AuthenticateUserParam } from "../../models/LogInUtilities";
+import { AuthenticateUserParam } from "../../models/LogInUtilities";
 import { sendForm, sendHTTPRequest } from "./AppUtilities";
 
 /**
@@ -31,28 +30,6 @@ export function logInUser(formID: string, url: string) {
   return false;
 }
 
-/**
- * @description Populate Local Storage with the necessary data to
- * display the users cards.
- *
- * @param {JSON} `sessionInfoObject` A JSON document that identifies
- * this session on the server.
- *
- */
-function setupInitializationData() {
-  sendHTTPRequest("POST", "/read-metadata", {})
-      .then((metadataResponse: MetadataResponse) => {
-          localStorage.setItem(
-              "metadata", JSON.stringify(metadataResponse.metadataDocs)
-          );
-          window.location.href = "/home";
-      })
-      .catch((err) => { console.error(err); });
-
-  return false;
-
-}
-
 /*
  * @description Sign up a new user and log them in.
  *
@@ -73,9 +50,6 @@ export function signUpUser(formID: string, url: string) {
           alert(confirmation);
           let payload: AuthenticateUserParam = {username_or_email, password};
           return sendHTTPRequest("POST", "/login", payload);
-      })
-      .then((_: AuthenticateUser) => {
-          setupInitializationData();
       })
       .catch((err) => { console.error(err); })
 

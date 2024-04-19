@@ -57,12 +57,7 @@ function downloadUserData() {
 
 function confirmDeletion() {
     if (window.confirm("Deleting your account is irreversible. Continue?")) {
-      sendHTTPRequest("POST", "/account/delete-account", {})
-            .then((_) => {
-                localStorage.clear();
-                window.location.href = "/";
-            })
-            .catch((err) => { console.error(err); });
+      window.location.href = "/account/delete-account";
     }
 }
 

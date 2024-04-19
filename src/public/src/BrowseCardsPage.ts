@@ -1,5 +1,5 @@
 import { IMetadata, IMetadataNodeInformation } from "../../models/mongoose_models/MetadataCardSchema";
-import { getAccountInfo, sendHTTPRequest } from "./AppUtilities";
+import { sendHTTPRequest } from "./AppUtilities";
 import { CardsManager } from "./CardsManager";
 import { initializeTagsBar, getIDsOfSelectedTags, getSelectedTags } from "./TagsBarUtilities";
 import { AutoComplete } from "./AutoComplete";
@@ -32,7 +32,6 @@ let cardsManager: CardsManager | null = null;
 let autocomplete: AutoComplete | null = null;
 let state: BrowseCardsPageState | null = null;
 let elementRefs: ElementRefs | null = null;
-let USER_INFO: AuthenticateUser | null = null;
 
 export function initializeBrowsePage() {
   state = {
@@ -45,8 +44,6 @@ export function initializeBrowsePage() {
   if (!state.currentTagSelectionElement || !state.searchResultsElement) {
       throw new Error("Could not find the current tag selection element or the search results element.");
   }
-
-  USER_INFO = getAccountInfo();
 
   elementRefs = {
       searchInputElement: document.getElementById("search_input") as HTMLInputElement,
@@ -186,13 +183,6 @@ function flagCard(reason: "markedForReview" | "markedAsDuplicate") {
         throw new Error("State not initialized.");
     }
 
-    if (USER_INFO === null) {
-        if (window.confirm("Please login/signup first. May I take you to the login page?")) {
-            window.location.href = "/login";
-        }
-        return;
-    }
-
     let payload: FlagCardParams = {
         cardID: state.currentCardID as string,
     };
@@ -205,27 +195,18 @@ function flagCard(reason: "markedForReview" | "markedAsDuplicate") {
 }
 
 function copyCardToOwnCollection() {
-    if (USER_INFO === null) {
-        if (window.confirm("Please login/signup first. May I take you to the login page?")) {
-            window.location.href = "/login";
-        }
-        return;
-    }
-
     if (!state) {
         throw new Error("State not initialized.");
     }
 
-    let payload: DuplicateCardParams = {
-        cardID: state.currentCardID as string,
-        userIDInApp: USER_INFO.userIDInApp as number,
-        cardsAreByDefaultPrivate: USER_INFO.cardsAreByDefaultPrivate
+    let payload = {
+        cardID: state.currentCardID as string
     };
 
     sendHTTPRequest("POST", "/duplicate-card", payload)
         .then((card: ICard) => {
             displayPopUp(`Added ${card.title} to your collection!`, 1000);
-            localStorage.setItem(card._id, JSON.stringify(card));
+            sessionStorage.setItem(card._id, JSON.stringify(card));
         })
         .catch((err) => { console.error(err); });
 }
