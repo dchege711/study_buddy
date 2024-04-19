@@ -50,6 +50,27 @@ div#app-container {
     padding: 5px 25px;
 }
 
+div#main_div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+
+    &.narrow {
+        padding: 0% 10%;
+    }
+
+    .form-container {
+        background-color: white;
+        border-radius: 2%;
+        display: flex;
+        flex-direction: column;
+        padding: 15px;
+        gap: 10px;
+    }
+}
+
 .underline_bold_text {
     text-decoration: underline !important;
     font-weight: bold !important;

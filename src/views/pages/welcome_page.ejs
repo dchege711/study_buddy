@@ -6,13 +6,6 @@
         <script src="/src/AppUtilities.bundle.min.js"></script>
     </head>
 
-    <style>
-        #welcome_page_content {
-            background-color: white;
-            border-radius: 2%;
-        }
-    </style>
-
     <body onload="AppUtilities.processParams();">
         <%- include('../partials/app_banner.ejs'); %>
 
@@ -20,11 +13,11 @@
 
         <%- include('../partials/navbar.ejs'); %>
 
-        <div id="main_div" class="w3-display-container">
+        <div id="main_div">
 
-            <div id="welcome_page_content" class="w3-container w3-display-middle w3-third w3-center w3-padding-large">
+            <div id="welcome_page_content" class="form-container">
 
-                <form class="w3-padding-large tab_content" id="login_form" method="post">
+                <form class="tab_content" id="login_form" method="post">
 
                     <label for="username"> Username or Email Address: </label>
                     <input class="w3-input" type="text" name="username_or_email" required/>
@@ -55,7 +48,7 @@
 
                 </form>
 
-                <form class="w3-padding-large hidden tab_content" id="signup_form" method="post">
+                <form class="hidden tab_content" id="signup_form" method="post">
 
                     <label for="email">Email Address: </label>
                     <input class="w3-input" type="email" name="email"
