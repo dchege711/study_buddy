@@ -8,7 +8,7 @@ exports.NODE_ENV = process.env.NODE_ENV;
 
 if (exports.NODE_ENV === "production") {
     exports.MONGO_URI = process.env.STUDY_BUDDY_MLAB_MONGO_URI;
-    exports.BASE_URL = "https://cards.c13u.com";
+    exports.BASE_URL = "https://cards.curiosities.dev";
 } else if (exports.NODE_ENV === "development") {
     exports.MONGO_URI = "invalid://use-memory-db";
     exports.BASE_URL = `http://localhost:${exports.PORT}`;

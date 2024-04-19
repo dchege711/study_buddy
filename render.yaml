@@ -10,7 +10,7 @@ services:
     numInstances: 1
     domains: # custom domains
       - 'cards.c13u.com'
-      - 'notes.c13u.com'
+      - 'cards.curiosities.dev'
     envVars:
       - key: LIBRATO_USER # Imported from Heroku app
         value: app88358134@heroku.com
