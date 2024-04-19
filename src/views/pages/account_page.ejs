@@ -10,22 +10,8 @@
 
         <style>
 
-            #account_details {
-                margin: 1% 15% 1% 15%;
-                padding: 1% 5% 1% 5%;
-            }
-
-            .account_header {
-                border-bottom: 1px #e1e4e8 solid;
-            }
-
-            .account_section {
-                margin: 2% 0%;
-                padding: 3% 0%;
-            }
-
-            #card_container {
-                display: none;
+            div#main_div {
+                align-items: start;
             }
 
         </style>
@@ -39,9 +25,7 @@
 
         <%- include('../partials/navbar.ejs'); %>
 
-        <div id="main_div">
-
-            <div id="account_details">
+        <div id="main_div" class="narrow">
 
                 <div class="account_section">
 
@@ -156,8 +140,6 @@
                     </p>
 
                 </div>
-
-            </div>
 
         </div>
 

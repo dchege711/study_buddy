@@ -22,23 +22,18 @@
         <%- include('../partials/header.ejs'); %>
         <style>
 
-                .details_header {
-                    border-bottom: 1px #e1e4e8 solid;
-                }
+            .details_header {
+                border-bottom: 1px #e1e4e8 solid;
+            }
 
-                .details_section {
-                    margin: 2% 0%;
-                    padding: 3% 0%;
-                }
+            sup a {
+                font: 200;
+            }
 
-                #card_container {
-                    display: none;
-                }
-
-                sup a {
-                    font: 200;
-                }
-            </style>
+            div#main_div {
+                align-items: start;
+            }
+        </style>
 
 </head>
 
@@ -53,9 +48,7 @@
 
         <%- include('../partials/navbar.ejs'); %>
 
-        <div id="main_div">
-
-            <div id="study_buddy_details">
+        <div id="main_div" class="narrow">
 
                 <div class="details_section">
 
@@ -364,8 +357,6 @@
                     </p>
 
                 </div>
-
-            </div>
 
         </div>
 
