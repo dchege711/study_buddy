@@ -46,12 +46,8 @@ body {
 div#app-container {
     display: flex;
     flex-direction: column;
+    gap: 10px;
     padding: 5px 25px;
-}
-
-#main_div {
-    flex: 1;
-    padding: 40px 0 0;
 }
 
 .underline_bold_text {
