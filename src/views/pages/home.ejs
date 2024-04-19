@@ -21,6 +21,8 @@
 
     <body>
         <%- include('../partials/app_banner.ejs'); %>
+        <div role="presentation" id="app-container">
+
         <%- include('../partials/navbar.ejs'); %>
 
         <div id="main_div">
@@ -86,6 +88,7 @@
 
         <%- include('../partials/footer.ejs'); %>
 
+        </div>
 
         <script type="text/javascript" src="/src/HomePage.bundle.min.js" onload="HomePage.initializeHomepage()"></script>
 

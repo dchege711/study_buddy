@@ -8,6 +8,9 @@
 
 <body onload="AppUtilities.processParams();">
     <%- include('../partials/app_banner.ejs'); %>
+
+    <div role="presentation" id="app-container">
+
     <%- include('../partials/navbar.ejs'); %>
 
         <div id="main_div">
@@ -38,6 +41,8 @@
         <%- include('../partials/footer.ejs'); %>
 
         <script type="text/javascript" src="/src/SendValidationURL.bundle.min.js"></script>
+
+    </div>
 
 </body>
 
