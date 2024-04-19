@@ -2,17 +2,6 @@ html {
     zoom: 0.9; /* Find a workaround for Firefox... Setting the viewport doesn't work */
 }
 
-/************************ Navbar **********************************************/
-
-ul#topnavitems {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    display: flex;
-    justify-content: space-between;
-}
-
 .link_button {
     text-decoration: none;
     color: black;
@@ -23,15 +12,6 @@ ul#topnavitems {
     cursor: pointer;
     background-color: inherit !important;
     border-bottom: #2196F3 thick solid;
-}
-
-ul#topnavitems li {
-    display: inline;
-    font-family: "Lobster";
-    font-size: 24px;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
 }
 
 ul.link, .link {
@@ -51,8 +31,6 @@ ul.link.chosen {
 ul.link:hover {
     text-decoration: underline;
 }
-
-ul#topnavitems li a:hover:not(.active) {background-color: #121;}
 
 /************************ General rules ***************************************/
 

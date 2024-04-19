@@ -1,4 +1,40 @@
-<div class="topnav">
+<nav>
+<template shadowrootmode="closed">
+    <style>
+        ul#topnavitems {
+          list-style-type: none;
+          margin: 0;
+          padding: 0;
+          overflow: hidden;
+          display: flex;
+          justify-content: space-between;
+
+          li {
+            display: inline;
+            font-family: "Lobster";
+            font-size: 24px;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+
+            a:hover:not(.active) {
+              background-color: #121;
+            }
+          }
+        }
+
+        .link_button {
+          text-decoration: none;
+          color: black;
+          border-bottom: thin black solid;
+
+          &:hover {
+            cursor: pointer;
+            background-color: inherit !important;
+            border-bottom: #2196F3 thick solid;
+          }
+        }
+    </style>
     <ul id="topnavitems">
         <span role="presentation">
             <li>
@@ -37,4 +73,6 @@
 
     </ul>
 
-</div>
+    </div>
+</template>
+</nav>
