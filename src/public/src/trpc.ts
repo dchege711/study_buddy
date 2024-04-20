@@ -21,3 +21,4 @@ trpc.publicCard.query({cardID: '66240a488f79d475ec0fd68a'}).then((x) => logResul
 trpc.publicCards.query({queryString: 'C++'}).then((x) => logResult(x));
 trpc.publicMetadata.query().then((x) => logResult(x));
 trpc.flagCard.mutate({cardID: '66240a488f79d475ec0fd68a'}).then((x) => logResult(x));
+trpc.sendValidationEmail.mutate({email: 'd.chege711@gmail.com'}).then((x) => logResult(x));

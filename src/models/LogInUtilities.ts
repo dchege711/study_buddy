@@ -159,12 +159,14 @@ let sendAccountValidationURLToEmail = function(userDetails: Pick<IUser, "email" 
     });
 };
 
+export type SendAccountValidationLinkParams = Pick<IUser, "email">;
+
 /**
  * @param {JSON} payload Expected keys: `email`
  * @returns {Promise} resolves with a JSON object keyed by `success`, `status`
  * and `message`
  */
-export async function sendAccountValidationLink(payload: Pick<IUser, "email">): Promise<string> {
+export async function sendAccountValidationLink(payload: SendAccountValidationLinkParams): Promise<string> {
     let user = await User.findOne({email: payload.email}).exec();
     if (user === null) {
         return `If ${payload.email} has an account, we've sent a validation URL`;
@@ -219,7 +221,7 @@ export async function validateAccount(validationURI: string): Promise<ValidateAc
     };
 };
 
-type RegisterUserAndPasswordParams = Pick<IUser, "username" | "email"> & {password: string};
+export type RegisterUserAndPasswordParams = Pick<IUser, "username" | "email"> & {password: string};
 
 /**
  * @description Register a new user using the provided password, username and email.
