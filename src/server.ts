@@ -7,6 +7,9 @@
  */
 
 import { NextFunction, Request, Response } from "express";
+import { publicProcedure, router } from "./trpc";
+import * as trpcExpress from '@trpc/server/adapters/express';
+
 import { IS_DEV } from "./config";
 import { populateDummyAccountWithCards } from "./tests/DummyAccountUtils";
 
@@ -38,6 +41,14 @@ if (process.env.NODE_ENV === "production") {
     app.use(enforce.HTTPS({ trustProtoHeader: true}));
 }
 
+const appRouter = router({
+  greeting: publicProcedure.query(() => 'hello tRPC v11!'),
+});
+
+// Export only the type of the router to prevent us from importing server code
+// on the client.
+export type AppRouter = typeof appRouter;
+
 app.use(session({
     secret: [config.STUDY_BUDDY_SESSION_SECRET_1],
     httpOnly: false,
@@ -56,6 +67,13 @@ app.use(cookieParser());
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
+
+app.use(
+  '/trpc',
+  trpcExpress.createExpressMiddleware({
+    router: appRouter,
+  }),
+);
 
 app.use("/", AccountRoutes);
 app.use("/", InAppRoutes);
