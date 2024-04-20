@@ -34,6 +34,7 @@ module.exports = {
         SyntaxHighlighting: path.resolve(__dirname, "src", "public", "src", "SyntaxHighlighting"),
         TagsBarTemplate: path.resolve(__dirname, "src", "public", "src", "TagsBarTemplate"),
         TagsBarUtilities: path.resolve(__dirname, "src", "public", "src", "TagsBarUtilities"),
+        trpc: path.resolve(__dirname, "src", "public", "src", "trpc"),
         WelcomePage: path.resolve(__dirname, "src", "public", "src", "WelcomePage"),
     },
     plugins: [
