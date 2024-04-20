@@ -12,6 +12,12 @@ export const trpc = createTRPCClient<AppRouter>({
   ],
 });
 
-trpc.authRouterName.query().then((s) => console.log(s));
-trpc.inAppRouterName.query().then((s) => console.log(s));
+// Example usage:
+function logResult(result: any) {
+  console.log(result);
+}
 
+trpc.publicCard.query({cardID: '66240a488f79d475ec0fd68a'}).then((x) => logResult(x?.title));
+trpc.publicCards.query({queryString: 'C++'}).then((x) => logResult(x));
+trpc.publicMetadata.query().then((x) => logResult(x));
+trpc.flagCard.mutate({cardID: '66240a488f79d475ec0fd68a'}).then((x) => logResult(x));

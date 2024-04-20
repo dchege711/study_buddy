@@ -27,7 +27,7 @@ import { model, Schema, Types, Document } from "mongoose";
  *  If `false`, then the card is private. A private flashcard is only visible
  *  to its owner. It will not appear in the search results at the `/browse` page. In contrast, a public card will appear in the search results as a read-only card. Any user that adds the card to their own collection will get a separate copy of the card.
  */
-interface ICardRaw {
+export interface ICardRaw {
     _id: Types.ObjectId,
     title: string;
     description: string;

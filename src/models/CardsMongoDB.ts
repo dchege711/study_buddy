@@ -6,7 +6,7 @@
  * @module
  */
 
-import { Card, ICard } from "./mongoose_models/CardSchema";
+import { Card, ICard, ICardRaw } from "./mongoose_models/CardSchema";
 import * as MetadataDB from "./MetadataMongoDB";
 import { sanitizeCard, sanitizeQuery } from "./SanitizationAndValidation";
 import { BaseResponse } from "../types";
@@ -200,7 +200,7 @@ export interface SearchPublicCardParams {
  * @returns {Promise} resolves with a JSON object. If `success` is set, then
  * the `message` attribute will be an array of matching cards.
  */
-export function publicSearch(payload: SearchPublicCardParams): Promise<Array<Partial<ICard>>> {
+export function publicSearch(payload: SearchPublicCardParams): Promise<Array<Partial<ICardRaw>>> {
     payload = sanitizeQuery(payload);
 
     let mandatoryFields : Array<any> = [{isPublic: true}];
@@ -229,7 +229,7 @@ export function publicSearch(payload: SearchPublicCardParams): Promise<Array<Par
     return collectSearchResults(queryObject);
 }
 
-type ReadPublicCardParams = Omit<ReadCardParams, "userIDInApp">;
+export type ReadPublicCardParams = Omit<ReadCardParams, "userIDInApp">;
 
 /**
  * @description Read a card that has been set to 'public'
@@ -238,12 +238,25 @@ type ReadPublicCardParams = Omit<ReadCardParams, "userIDInApp">;
  * the `message` attribute will contain a single-element array containing the
  * matching card if any.
  */
-export function readPublicCard(payload: ReadPublicCardParams): Promise<ICard | null> {
-    payload = sanitizeQuery(payload);
-    if (payload.cardID === undefined) {
-        return Promise.reject("cardID is undefined");
-    }
-    return Card.findOne({isPublic: true, _id: payload.cardID}).exec();
+export function readPublicCard(payload: ReadPublicCardParams): Promise<ICardRaw | null> {
+  return _readPublicCard(payload);
+}
+
+/**
+ * Similar signature to `readPublicCard` but types the result to `ICard`. This
+ * is necessary for other functions in this file that call this function.
+ *
+ * `readPublicCard` is a public function that is exposed to the client, and thus
+ * the need for a safer return type. [1]
+ *
+ * [1]: https://github.com/trpc/trpc/discussions/3661
+ */
+function _readPublicCard(payload: ReadPublicCardParams): Promise<ICard | null> {
+  payload = sanitizeQuery(payload);
+  if (payload.cardID === undefined) {
+      return Promise.reject("cardID is undefined");
+  }
+  return Card.findOne({isPublic: true, _id: payload.cardID}).exec();
 }
 
 export interface DuplicateCardParams {
@@ -262,7 +275,7 @@ export interface DuplicateCardParams {
  */
 export async function duplicateCard(payload: DuplicateCardParams): Promise<ICard> {
     payload = sanitizeQuery(payload);
-    let originalCard = await readPublicCard({cardID: payload.cardID});
+    let originalCard = await _readPublicCard({cardID: payload.cardID});
     if (originalCard === null) {
         return Promise.reject("Card not found!");
     }
@@ -299,7 +312,7 @@ export interface FlagCardParams {cardID: string; markedForReview?: boolean; mark
  * @returns {Promise} takes a JSON object with `success`, `status` and `message`
  * as its keys. If successful, the message will contain the saved card.
  */
-export async function flagCard(payload: FlagCardParams): Promise<ICard> {
+export async function flagCard(payload: FlagCardParams): Promise<ICardRaw> {
     payload = sanitizeQuery(payload);
     let flagsToUpdate : Partial<Pick<ICard, "numTimesMarkedAsDuplicate" | "numTimesMarkedForReview">> = {};
     if (payload.markedForReview) flagsToUpdate.numTimesMarkedForReview = 1;
