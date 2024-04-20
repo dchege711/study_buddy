@@ -2,6 +2,7 @@ import { SendCardToTrashParams } from "../../models/MetadataMongoDB";
 import { ICard } from "../../models/mongoose_models/CardSchema";
 import { IMetadata } from "../../models/mongoose_models/MetadataCardSchema";
 import { IUser } from "../../models/mongoose_models/UserSchema";
+import { DELETE_ACCOUNT, DOWNLOAD_USER_DATA, UPDATE_USER_SETTINGS } from "../../paths";
 import { refreshMetadata, sendHTTPRequest, sendForm } from "./AppUtilities";
 import { displayPopUp } from "./CardTemplateUtilities";
 import { CardsManager } from "./CardsManager";
@@ -52,12 +53,12 @@ export function initializeAccountPage() {
 }
 
 function downloadUserData() {
-    window.open("/account/download-user-data");
+    window.open(DOWNLOAD_USER_DATA);
 }
 
 function confirmDeletion() {
     if (window.confirm("Deleting your account is irreversible. Continue?")) {
-      window.location.href = "/account/delete-account";
+      window.location.href = DELETE_ACCOUNT;
     }
 }
 
@@ -146,7 +147,7 @@ function modifyTrash(endpoint: "/delete-card" | "/restore-from-trash") {
 }
 
 function updateAccountSettings() {
-    sendForm("accountSettingsForm", "/account/update-settings")
+    sendForm("accountSettingsForm", UPDATE_USER_SETTINGS)
         .then((user: IUser) => {
             alert(`Account settings updated at ${user.updatedAt}}`);
         })

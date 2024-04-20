@@ -3,6 +3,7 @@ import { AuthenticateUser } from "../../models/LogInUtilities";
 import { RestoreCardFromTrashParams, SendCardToTrashParams, UpdateStreakParams } from "../../models/MetadataMongoDB";
 import { ICard, MiniICard } from "../../models/mongoose_models/CardSchema";
 import { IMetadata, IMetadataNodeInformation, IStreak } from "../../models/mongoose_models/MetadataCardSchema";
+import { ADD_CARD, READ_CARD, READ_TAG_GROUPS, RESTORE_CARD_FROM_TRASH, TRASH_CARD, UPDATE_CARD, UPDATE_STREAK } from "../../paths";
 import { RefreshMetadataResponseMiniCards, refreshMetadata, sendHTTPRequest } from "./AppUtilities";
 import { AutoComplete } from "./AutoComplete";
 import { displayPopUp, syncSpoilerBox } from "./CardTemplateUtilities";
@@ -117,7 +118,7 @@ export function initializeHomepage() {
         tagsAndIDs: metadata.node_information[0],
         currentCardTags: new Set([]),
         currentCardTagsHaveChanged: false,
-        cardPostURL: "/add-card",
+        cardPostURL: ADD_CARD,
         reviewModeToggle: false,
         card_is_public_toggle: metadata.cardsAreByDefaultPrivate,
       };
@@ -127,7 +128,7 @@ export function initializeHomepage() {
       cardsManager = new CardsManager(
         state.tagsAndIDs,
         state.currentUserID,
-        "/read-card",
+        READ_CARD,
         Array.from(minicards.values())
       );
 
@@ -138,7 +139,7 @@ export function initializeHomepage() {
       let payload: TagGroupingsParam = {
         userIDInApp: state.currentUserID,
       }
-      return sendHTTPRequest("POST", "/read-tag-groups", payload);
+      return sendHTTPRequest("POST", READ_TAG_GROUPS, payload);
     })
     .then((tagGroupings: TagGroupings) => {
       (autocomplete as AutoComplete).initializeGraphFromGroups(tagGroupings);
@@ -365,7 +366,7 @@ function renderCard(card: Partial<ICard> | null) {
 
   // Reset the contents of the current_card variable
   state.currentCardID = card._id;
-  state.cardPostURL = "/update-card";
+  state.cardPostURL = UPDATE_CARD;
   state.rawDescription = card.description;
 
   addSyntaxHighlighting();
@@ -379,7 +380,7 @@ function renderCard(card: Partial<ICard> | null) {
     userIDInApp: state.currentUserID,
     cardIDs: [state.currentCardID as string],
   };
-  sendHTTPRequest("POST", "/update-streak", payload)
+  sendHTTPRequest("POST", UPDATE_STREAK, payload)
     .then((streak: IStreak) => {
       updateStreakBar(streak);
     })
@@ -420,7 +421,7 @@ export function displayNewCard() {
   state.currentCardTags.clear();
   state.currentCardID = null;
   state.rawDescription = "";
-  state.cardPostURL = "/add-card";
+  state.cardPostURL = ADD_CARD;
 
   elementRefs.cardContainerHolderElement.style.display = "block";
 }
@@ -660,7 +661,7 @@ export function moveCardToTrash() {
     _id: state.currentCardID,
     createdById: state.currentUserID as number,
   }
-  sendHTTPRequest("POST", "/trash-card", payload)
+  sendHTTPRequest("POST", TRASH_CARD, payload)
     .then((trash_confirmation) => {
       displayPopUp(trash_confirmation, 5000);
     })
@@ -679,7 +680,7 @@ function restoreCardFromTrash(card_to_restore_id: string, card_to_restore_urgenc
     _id: card_to_restore_id,
   };
 
-  sendHTTPRequest("POST", "/restore-from-trash", payload)
+  sendHTTPRequest("POST", RESTORE_CARD_FROM_TRASH, payload)
     .then((confirmation) => {
       (cardsManager as CardsManager).insertCard(card_to_restore_id, card_to_restore_urgency);
       fetchPreviousCard();

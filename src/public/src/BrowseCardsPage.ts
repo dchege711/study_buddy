@@ -10,6 +10,7 @@ import { AuthenticateUser } from "../../models/LogInUtilities";
 import { syncSpoilerBox } from "./CardTemplateUtilities";
 import { addSyntaxHighlighting } from "./SyntaxHighlighting";
 import { renderLatex } from "./Latex";
+import { BROWSE, DUPLICATE_CARD, FLAG_CARD, READ_PUBLIC_METADATA } from "../../paths";
 
 interface BrowseCardsPageState {
     currentCardID: string | null,
@@ -57,7 +58,7 @@ export function initializeBrowsePage() {
       if (!val) throw new Error(`Could not find some element references.`);
   }
 
-  sendHTTPRequest("POST", "/read-public-metadata", {})
+  sendHTTPRequest("POST", READ_PUBLIC_METADATA, {})
       .then((metadataDocs: IMetadata[]) => {
           if (metadataDocs.length === 0) {
               return Promise.reject("No metadata found.");
@@ -98,7 +99,7 @@ function filterCards() {
         payload.queryString = state.queryString;
     }
 
-    sendHTTPRequest("POST", "/browse", payload)
+    sendHTTPRequest("POST", BROWSE, payload)
         .then((cards: Partial<ICard>[]) => {
             if (!state) {
                 throw new Error("State went out of scope.");
@@ -187,7 +188,7 @@ function flagCard(reason: "markedForReview" | "markedAsDuplicate") {
         cardID: state.currentCardID as string,
     };
     payload[reason] = true;
-    sendHTTPRequest("POST", "/flag-card", payload)
+    sendHTTPRequest("POST", FLAG_CARD, payload)
         .then((card: ICard) => {
             displayPopUp(`${card.title} flagged successfully.`, 1000);
         })
@@ -203,7 +204,7 @@ function copyCardToOwnCollection() {
         cardID: state.currentCardID as string
     };
 
-    sendHTTPRequest("POST", "/duplicate-card", payload)
+    sendHTTPRequest("POST", DUPLICATE_CARD, payload)
         .then((card: ICard) => {
             displayPopUp(`Added ${card.title} to your collection!`, 1000);
             sessionStorage.setItem(card._id, JSON.stringify(card));

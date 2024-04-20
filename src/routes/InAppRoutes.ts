@@ -25,51 +25,52 @@ import {
   deleteAccount,
   updateUserSettings,
 } from "../controllers/InAppController";
+import { ACCOUNT, ADD_CARD, BROWSE, DELETE_ACCOUNT, DELETE_CARD, DOWNLOAD_USER_DATA, DUPLICATE_CARD, FLAG_CARD, HOME, READ_CARD, READ_METADATA, READ_PUBLIC_CARD, READ_PUBLIC_METADATA, READ_TAG_GROUPS, RESTORE_CARD_FROM_TRASH, SEARCH_CARDS, TRASH_CARD, UPDATE_CARD, UPDATE_STREAK, UPDATE_USER_SETTINGS, WIKI } from "../paths";
 
 const router = Router();
 
-router.post("/read-card", requireLogIn, readCard);
+router.post(READ_CARD, requireLogIn, readCard);
 
-router.post("/read-public-card", readPublicCard);
+router.post(READ_PUBLIC_CARD, readPublicCard);
 
-router.get("/home", requireLogIn, home);
+router.get(HOME, requireLogIn, home);
 
-router.get("/wiki", wikiPage);
+router.get(WIKI, wikiPage);
 
-router.get("/browse", browsePageGet);
+router.get(BROWSE, browsePageGet);
 
-router.post("/browse", browsePagePost);
+router.post(BROWSE, browsePagePost);
 
-router.get("/account", requireLogIn, accountGet);
+router.get(ACCOUNT, requireLogIn, accountGet);
 
-router.post("/read-metadata", requireLogIn, readMetadata);
+router.post(READ_METADATA, requireLogIn, readMetadata);
 
-router.post("/read-tag-groups", requireLogIn, readTagGroups);
+router.post(READ_TAG_GROUPS, requireLogIn, readTagGroups);
 
-router.post("/read-public-metadata", readPublicMetadata);
+router.post(READ_PUBLIC_METADATA, readPublicMetadata);
 
-router.post("/add-card", requireLogIn, addCard);
+router.post(ADD_CARD, requireLogIn, addCard);
 
-router.post("/search-cards", requireLogIn, searchCards);
+router.post(SEARCH_CARDS, requireLogIn, searchCards);
 
-router.post("/update-card", requireLogIn, updateCard);
+router.post(UPDATE_CARD, requireLogIn, updateCard);
 
-router.post("/update-streak", requireLogIn, updateStreak);
+router.post(UPDATE_STREAK, requireLogIn, updateStreak);
 
-router.post("/delete-card", requireLogIn, deleteCard);
+router.post(DELETE_CARD, requireLogIn, deleteCard);
 
-router.post("/trash-card", requireLogIn, trashCard);
+router.post(TRASH_CARD, requireLogIn, trashCard);
 
-router.post("/duplicate-card", requireLogIn, duplicateCard);
+router.post(DUPLICATE_CARD, requireLogIn, duplicateCard);
 
-router.post("/flag-card", flagCard);
+router.post(FLAG_CARD, flagCard);
 
-router.post("/restore-from-trash", requireLogIn, restoreCardFromTrash);
+router.post(RESTORE_CARD_FROM_TRASH, requireLogIn, restoreCardFromTrash);
 
-router.get("/account/download-user-data", requireLogIn, downloadUserData);
+router.get(DOWNLOAD_USER_DATA, requireLogIn, downloadUserData);
 
-router.get("/account/delete-account", requireLogIn, deleteAccount);
+router.get(DELETE_ACCOUNT, requireLogIn, deleteAccount);
 
-router.post("/account/update-settings", requireLogIn, updateUserSettings);
+router.post(UPDATE_USER_SETTINGS, requireLogIn, updateUserSettings);
 
 module.exports = router;
