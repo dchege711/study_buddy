@@ -1,6 +1,7 @@
 "use strict";
 
 import { Request, RequestHandler, Response } from "express";
+import { StatusCodes } from "http-status-codes";
 
 import * as CardsDB from "../models/CardsMongoDB";
 import { User } from "../models/mongoose_models/UserSchema";
@@ -192,7 +193,7 @@ export function deleteAccount(req: Request, res: Response) {
                 "Set-Cookie",
                 [`session_token=null;Expires=Thu, 01 Jan 1970 00:00:00 GMT`]
             );
-            res.redirect("/browse");
+            res.redirect(StatusCodes.SEE_OTHER, "/browse");
         })
         .catch((err) => { convertObjectToResponse(err, null, res); });
 };

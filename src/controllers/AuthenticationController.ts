@@ -1,6 +1,7 @@
 "use strict";
 
 import { NextFunction, Request, Response } from "express";
+import { StatusCodes } from "http-status-codes";
 
 import * as LogInUtilities from "../models/LogInUtilities";
 import { convertObjectToResponse, sendResponseFromPromise } from "./ControllerUtilities";
@@ -16,7 +17,7 @@ const defaultTemplateObject = {
  */
 export function requireLogIn(req: Request, res: Response, next: NextFunction) {
     if (!req.session?.user) {
-        res.redirect("/login");
+        res.redirect(StatusCodes.SEE_OTHER, "/login");
     } else if (req.session?.user) {
         if (req.body && req.body.userIDInApp) {
             // I expect these to be the same, but just in case...
@@ -51,16 +52,16 @@ function logInBySessionToken(req: Request, res: Response, next: NextFunction) {
                 "Set-Cookie",
                 [`session_token=null;Expires=Thu, 01 Jan 1970 00:00:00 GMT`]
             );
-            res.redirect("/login");
+            res.redirect(StatusCodes.SEE_OTHER, "/login");
         })
         .catch((err) => { convertObjectToResponse(err, null, res); });
 };
 
 export function handleLogIn(req: Request, res: Response) {
     if (req.session?.user) {
-        res.redirect("/home");
+        res.redirect(StatusCodes.SEE_OTHER, "/home");
     } else if (req.cookies.session_token) {
-        logInBySessionToken(req, res, function () { res.redirect("/home"); });
+        logInBySessionToken(req, res, function () { res.redirect(StatusCodes.SEE_OTHER, "/home"); });
     } else {
         res.render("pages/welcome_page", defaultTemplateObject);
     }
@@ -84,7 +85,7 @@ export function loginUser (req: Request, res: Response, next: NextFunction) {
                 "Set-Cookie",
                 [`session_token=${confirmation.token_id};Expires=${expiry_date}`]
             );
-            res.redirect("/");
+            res.redirect(StatusCodes.SEE_OTHER, "/home");
         })
         .catch((err) => { convertObjectToResponse(err, null, res); });
 };
@@ -105,7 +106,7 @@ export async function logoutUser (req: Request, res: Response) {
         "Set-Cookie",
         [`session_token=null;Expires=Thu, 01 Jan 1970 00:00:00 GMT`]
     );
-    res.redirect("/browse");
+    res.redirect(StatusCodes.SEE_OTHER, "/browse");
 };
 
 export function sendValidationEmailGet (req: Request, res: Response) {
@@ -123,7 +124,7 @@ export function verifyAccount (req: Request, res: Response) {
 
     LogInUtilities.validateAccount(verification_uri)
         .then((validationResult) => {
-            res.redirect(validationResult.redirect_url);
+            res.redirect(StatusCodes.SEE_OTHER, validationResult.redirect_url);
         })
         .catch((err) => { convertObjectToResponse(err, null, res); });
 };
