@@ -49,6 +49,8 @@
   "homepage": "https://github.com/dchege711/study_buddy#readme",
   "dependencies": {
     "@lit/context": "^1.1.1",
+    "@trpc/client": "^11.0.0-rc.342",
+    "@trpc/server": "^11.0.0-rc.342",
     "avl": "^1.5.3",
     "body-parser": "^1.20.2",
     "connect-mongo": "^4.6.0",
