@@ -10,6 +10,7 @@ import { NextFunction, Request, Response } from "express";
 import * as trpcExpress from '@trpc/server/adapters/express';
 
 import { publicProcedure, router, mergeRouters } from "./trpc";
+import { createContext } from "./context";
 import { inAppRouter } from "./routes/InAppRouter";
 import { authRouter } from "./routes/AuthenticationRouter";
 import { IS_DEV } from "./config";
@@ -74,6 +75,7 @@ app.use(
   '/trpc',
   trpcExpress.createExpressMiddleware({
     router: appRouter,
+    createContext,
   }),
 );
 
