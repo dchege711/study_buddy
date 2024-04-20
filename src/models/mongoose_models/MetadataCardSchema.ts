@@ -24,7 +24,7 @@ export interface IMetadataTrashedCardInformation {
     [id : string]: number;
 }
 
-interface IMetadataRaw {
+export interface IMetadataRaw {
     createdById: number;
     metadataIndex: number;
     node_information: Array<IMetadataNodeInformation>;

@@ -58,18 +58,7 @@ export function readPublicCard (req: Request, res: Response) {
 };
 
 export function readPublicMetadata (_: Request, res: Response) {
-    User
-        .findOne({username: config.PUBLIC_USER_USERNAME})
-        .then((publicUser) => {
-            if (publicUser === null) {
-                throw new Error("Public user not found");
-            }
-
-            sendResponseFromPromise(
-                MetadataDB.read({userIDInApp: publicUser.userIDInApp}), res
-            );
-        })
-        .catch((err) => { convertObjectToResponse(err, null, res); });
+  sendResponseFromPromise(MetadataDB.readPublicMetadata(), res);
 }
 
 export function browsePagePost(req: Request, res: Response) {

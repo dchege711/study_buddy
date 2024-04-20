@@ -9,7 +9,7 @@
 import * as fs from "fs/promises";
 
 import { IUser, User } from "./mongoose_models/UserSchema";
-import { Metadata, IMetadata, IStreak } from "./mongoose_models/MetadataCardSchema";
+import { Metadata, IMetadata, IStreak, IMetadataRaw } from "./mongoose_models/MetadataCardSchema";
 import { Card, ICard } from "./mongoose_models/CardSchema";
 import { sanitizeQuery } from "./SanitizationAndValidation";
 import { PUBLIC_USER_USERNAME } from "../config";
@@ -502,3 +502,17 @@ export function updateStreak(streakUpdateObj: UpdateStreakParams): Promise<IStre
             return metadataDoc.streak;
         });
 };
+
+/**
+ * Read metadata for the public user.
+ */
+export function readPublicMetadata(): Promise<IMetadataRaw[]> {
+  return User.findOne({username: PUBLIC_USER_USERNAME})
+      .then((publicUser) => {
+          if (publicUser === null) {
+              throw new Error("Public user not found");
+          }
+
+          return read({userIDInApp: publicUser.userIDInApp});
+      });
+}
