@@ -12,5 +12,6 @@ export const trpc = createTRPCClient<AppRouter>({
   ],
 });
 
-trpc.greeting.query().then((s) => console.log(s));
+trpc.authRouterName.query().then((s) => console.log(s));
+trpc.inAppRouterName.query().then((s) => console.log(s));
 
