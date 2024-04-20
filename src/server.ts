@@ -7,9 +7,11 @@
  */
 
 import { NextFunction, Request, Response } from "express";
-import { publicProcedure, router } from "./trpc";
 import * as trpcExpress from '@trpc/server/adapters/express';
 
+import { publicProcedure, router, mergeRouters } from "./trpc";
+import { inAppRouter } from "./routes/InAppRouter";
+import { authRouter } from "./routes/AuthenticationRouter";
 import { IS_DEV } from "./config";
 import { populateDummyAccountWithCards } from "./tests/DummyAccountUtils";
 
@@ -41,9 +43,9 @@ if (process.env.NODE_ENV === "production") {
     app.use(enforce.HTTPS({ trustProtoHeader: true}));
 }
 
-const appRouter = router({
-  greeting: publicProcedure.query(() => 'hello tRPC v11!'),
-});
+const appRouter = mergeRouters(
+  authRouter, inAppRouter
+);
 
 // Export only the type of the router to prevent us from importing server code
 // on the client.
