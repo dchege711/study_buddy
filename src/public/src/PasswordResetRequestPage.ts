@@ -1,4 +1,5 @@
 import { ResetLinkParams } from "../../models/LogInUtilities";
+import { RESET_PASSWORD } from "../../paths";
 import { sendHTTPRequest } from "./AppUtilities";
 
 let state = {
@@ -23,7 +24,7 @@ export function passwordResetRequest() {
       email: state.addressElement.value
   }
 
-  sendHTTPRequest("POST", "/reset-password", payload)
+  sendHTTPRequest("POST", RESET_PASSWORD, payload)
     .then((confirmation) => {
       state.formPasswordRequest.innerHTML = `
             <p>${confirmation}</p>

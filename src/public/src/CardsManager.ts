@@ -4,6 +4,7 @@ import AVLTree, { Node } from "avl";
 import { ICard, MiniICard } from "../../models/mongoose_models/CardSchema";
 import { IMetadataNodeInformation, IMetadataTrashedCardInformation } from "../../models/mongoose_models/MetadataCardSchema";
 import { sendHTTPRequest } from "./AppUtilities";
+import { READ_CARD } from "../../paths";
 
 interface CardsManagerBSTKey {
     urgency: number;
@@ -28,7 +29,7 @@ export class CardsManager implements Iterable<CardsManagerBSTKey> {
     idsToBSTKeys: {[id: string]: CardsManagerBSTKey} = {};
 
     constructor(tagsAndIds: IMetadataNodeInformation, userID: number,
-                cardSourceURL: string = "/read-card", minicards: MiniICard[] = []) {
+                cardSourceURL: string = READ_CARD, minicards: MiniICard[] = []) {
         this.tagsAndIds = tagsAndIds;
         this.userID = userID;
         this.cardSourceURL = cardSourceURL;

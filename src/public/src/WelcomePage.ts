@@ -1,4 +1,5 @@
 import { AuthenticateUserParam } from "../../models/LogInUtilities";
+import { LOGIN } from "../../paths";
 import { sendForm, sendHTTPRequest } from "./AppUtilities";
 
 /**
@@ -49,7 +50,7 @@ export function signUpUser(formID: string, url: string) {
       .then((confirmation: string) => {
           alert(confirmation);
           let payload: AuthenticateUserParam = {username_or_email, password};
-          return sendHTTPRequest("POST", "/login", payload);
+          return sendHTTPRequest("POST", LOGIN, payload);
       })
       .catch((err) => { console.error(err); })
 

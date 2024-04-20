@@ -13,31 +13,32 @@ import {
   resetPasswordLinkGet,
   resetPasswordLinkPost,
 } from "../controllers/AuthenticationController";
+import { LOGIN, LOGOUT, REGISTER_USER, RESET_PASSWORD, RESET_PASSWORD_LINK, ROOT, SEND_VALIDATION_EMAIL, VERIFY_ACCOUNT } from "../paths";
 
 const router = Router();
 
-router.get("/", handleLogIn);
+router.get(ROOT, handleLogIn);
 
-router.get("/login", handleLogIn);
+router.get(LOGIN, handleLogIn);
 
-router.post("/register-user", registerUser);
+router.post(REGISTER_USER, registerUser);
 
-router.post("/login", loginUser);
+router.post(LOGIN, loginUser);
 
-router.get("/logout", logoutUser);
+router.get(LOGOUT, logoutUser);
 
-router.get("/send-validation-email", sendValidationEmailGet);
+router.get(SEND_VALIDATION_EMAIL, sendValidationEmailGet);
 
-router.post("/send-validation-email", sendValidationEmailPost);
+router.post(SEND_VALIDATION_EMAIL, sendValidationEmailPost);
 
-router.get("/verify-account/*", verifyAccount);
+router.get(`${VERIFY_ACCOUNT}/*`, verifyAccount);
 
-router.get("/reset-password", resetPasswordGet);
+router.get(RESET_PASSWORD, resetPasswordGet);
 
-router.post("/reset-password", resetPasswordPost);
+router.post(RESET_PASSWORD, resetPasswordPost);
 
-router.get("/reset-password-link/*", resetPasswordLinkGet);
+router.get(`${RESET_PASSWORD_LINK}/*`, resetPasswordLinkGet);
 
-router.post("/reset-password-link/*", resetPasswordLinkPost);
+router.post(`${RESET_PASSWORD_LINK}/*`, resetPasswordLinkPost);
 
 export = router;

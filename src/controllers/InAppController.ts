@@ -11,6 +11,7 @@ import * as loginUtilities from "../models/LogInUtilities";
 import * as config from "../config";
 import { ICard, MiniICard } from "../models/mongoose_models/CardSchema";
 import { IMetadata } from "../models/mongoose_models/MetadataCardSchema";
+import * as allPaths from "../paths";
 
 const convertObjectToResponse = controllerUtils.convertObjectToResponse;
 const deleteTempFile = controllerUtils.deleteTempFile;
@@ -33,7 +34,8 @@ interface TemplateVariables {
 function getDefaultTemplateVars(req: Request | null = null): TemplateVariables {
     return {
         APP_NAME: config.APP_NAME, BASE_URL: config.BASE_URL,
-        LOGGED_IN: req?.session?.user !== undefined
+        LOGGED_IN: req?.session?.user !== undefined,
+        ...allPaths
     };
 }
 

@@ -1,4 +1,5 @@
 import { ICard } from "../../models/mongoose_models/CardSchema";
+import { BROWSE, SEARCH_CARDS } from "../../paths";
 import { sendHTTPRequest } from "./AppUtilities";
 import { displayAllSearchResults } from "./BrowseCardsPage";
 import { reInitializeCards } from "./HomePage"
@@ -64,9 +65,9 @@ export async function searchCards(event: KeyboardEvent) {
       CARD_SEARCH_RESULTS_ELEMENT.innerHTML = search_results_html;
   } else {
       CARD_SEARCH_RESULTS_ELEMENT.innerHTML = "";
-      if (searchEndpointURL == "/search-cards") {
+      if (searchEndpointURL == SEARCH_CARDS) {
           reInitializeCards(cards);
-      } else if (searchEndpointURL == "/browse") {
+      } else if (searchEndpointURL == BROWSE) {
           displayAllSearchResults(cards);
       }
   }

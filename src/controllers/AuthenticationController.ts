@@ -6,9 +6,10 @@ import { StatusCodes } from "http-status-codes";
 import * as LogInUtilities from "../models/LogInUtilities";
 import { convertObjectToResponse, sendResponseFromPromise } from "./ControllerUtilities";
 import { APP_NAME } from "../config";
+import * as allPaths from "../paths";
 
 const defaultTemplateObject = {
-    APP_NAME: APP_NAME, LOGGED_IN: false
+    APP_NAME: APP_NAME, LOGGED_IN: false, ...allPaths
 };
 
 /**

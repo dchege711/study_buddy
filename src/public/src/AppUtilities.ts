@@ -4,6 +4,7 @@ import { MetadataResponse } from "../../controllers/InAppController";
 import { AuthenticateUser } from "../../models/LogInUtilities";
 import { ICard, MiniICard } from "../../models/mongoose_models/CardSchema";
 import { IMetadata } from "../../models/mongoose_models/MetadataCardSchema";
+import { READ_METADATA } from "../../paths";
 
 /**
  * A collection of functions that tend to be used in different pages on the
@@ -94,7 +95,7 @@ export interface RefreshMetadataResponse {
  * @returns {Promise} resolves with the new metadata.
  */
 export function refreshMetadata(): Promise<RefreshMetadataResponse> {
-    return sendHTTPRequest("POST", "/read-metadata", {})
+    return sendHTTPRequest("POST", READ_METADATA, {})
         .then((metadata: MetadataResponse) => {
             if (!metadata.metadataDocs || metadata.metadataDocs.length == 0) {
                 return Promise.reject("No metadata found.");
