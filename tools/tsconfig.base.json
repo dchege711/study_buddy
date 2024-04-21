@@ -5,6 +5,8 @@
         "module": "NodeNext",
         // Resolve modules like Node.js
         "moduleResolution": "NodeNext",
+        // Avoid having incomplete outputs. Fix all compiler errors first.
+        "noEmitOnError": true,
         // Target ES6, the latest version of ECMAScript.
         "target": "ESNext",
         // Skip type checking of declaration files.
