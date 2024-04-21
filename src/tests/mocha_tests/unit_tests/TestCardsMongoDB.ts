@@ -41,14 +41,15 @@ describe("Test CardsMongoDB\n", function() {
         let cardIDs: Set<string> = new Set([]);
 
         CardsDB
-            .read({userIDInApp: dummyUser.userIDInApp})
-            .then(function(cards) {
-                for (let i = 0; i < cards.length; i++) {
-                    cardIDs.add(cards[i]._id.toString());
-                }
-                return Card.find({createdById: dummyUser.userIDInApp}).exec();
-            })
-            .then(function(cards) {
+          .read({userIDInApp: dummyUser.userIDInApp})
+          .then(function(cards) {
+            for (let i = 0; i < cards.length; i++) {
+              let card = cards[i] as ICard;
+              cardIDs.add(card._id.toString());
+            }
+            return Card.find({createdById: dummyUser.userIDInApp}).exec();
+          })
+          .then(function(cards) {
                 for (let i = 0; i < cards.length; i++) {
                     if (!cardIDs.delete(cards[i]._id.toString())) {
                         done(new Error("CardsMongoDB.read() is skipping some cards."));
