@@ -7,6 +7,8 @@ const baseConfig = require('../../tools/webpack.esloader.config.cjs');
 module.exports = (env, args) => {
     args.context = __dirname;
 
+    // The static files are referenced by HTML files produced by the server.
+    // Copy over the static files to the server dist folder.
     const serverDistPath = path.resolve(__dirname, '..', '..', 'dist', 'public');
     const copyWebpackPlugin = new CopyWebpackPlugin({
         patterns: [
@@ -20,7 +22,7 @@ module.exports = (env, args) => {
             },
             {
                 from: path.resolve(__dirname, 'src', 'lib'),
-                to: path.resolve(__dirname, 'src', 'lib')
+                to: path.resolve(serverDistPath, 'src', 'lib')
             },
         ]
     });
@@ -29,6 +31,11 @@ module.exports = (env, args) => {
         baseConfig(env, args),
         {
             devtool: 'source-map',
+            output: {
+                path: path.resolve(serverDistPath, 'src'),
+                filename: '[name].js',
+                clean: true,
+            },
             entry: {
                 'search-bar': './src/components/search-bar/search-bar.ts',
             },
