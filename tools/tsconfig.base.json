@@ -18,12 +18,6 @@
         // Generate corresponding '.map' file for debugging.
         "sourceMap": true,
         // For faster compilation.
-        "incremental": true,
-        // Experimental support for ES7 decorators. Needed by
-        // https://lit.dev/docs/components/decorators/#decorators-typescript
-        "experimentalDecorators": true,
-        // Use Define instead of Set semantics for class fields. Needed by
-        // https://lit.dev/docs/components/decorators/#decorators-typescript
-        "useDefineForClassFields": true
+        "incremental": true
     }
 }

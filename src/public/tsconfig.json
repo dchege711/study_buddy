@@ -9,6 +9,12 @@
         "outDir": "./dist",
         // Root directory of source files
         "rootDir": "./src",
+        // Needed by [1]. Decorators are ES7 syntax that are not yet formal.
+        // https://lit.dev/docs/components/decorators/#decorators-typescript
+        "experimentalDecorators": true,
+        // Needed by [1]. Otherwise, reactive properties need more boilerplate.
+        // https://lit.dev/docs/components/decorators/#decorators-typescript
+        "useDefineForClassFields": false
     },
 
     // Files to be included in compilation
