@@ -82,3 +82,7 @@ typings/
 
 # Build artifacts
 dist/
+
+# Stores incremental compilation information as part of composite projects.
+# https://www.typescriptlang.org/tsconfig#tsBuildInfoFile
+tsconfig.tsbuildinfo
