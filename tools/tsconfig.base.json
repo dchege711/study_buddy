@@ -1,0 +1,27 @@
+{
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "compilerOptions": {
+        // Use ES6 module system
+        "module": "NodeNext",
+        // Resolve modules like Node.js
+        "moduleResolution": "NodeNext",
+        // Target ES6, the latest version of ECMAScript.
+        "target": "ESNext",
+        // Skip type checking of declaration files.
+        "skipLibCheck": true,
+        // Enable all strict type-checking options.
+        "strict": true,
+        // Disallow inconsistently-cased references to the same file.
+        "forceConsistentCasingInFileNames": true,
+        // Generate corresponding '.map' file for debugging.
+        "sourceMap": true,
+        // For faster compilation.
+        "incremental": true,
+        // Experimental support for ES7 decorators. Needed by
+        // https://lit.dev/docs/components/decorators/#decorators-typescript
+        "experimentalDecorators": true,
+        // Use Define instead of Set semantics for class fields. Needed by
+        // https://lit.dev/docs/components/decorators/#decorators-typescript
+        "useDefineForClassFields": true
+    }
+}

@@ -1,12 +1,20 @@
 {
+    "extends": "./tools/tsconfig.base.json",
     "compilerOptions": {
-      "outDir": "./dist",
-      "target": "es5",
-      "skipLibCheck": true,
-      "esModuleInterop": true,
-      "strict": true,
-      "sourceMap": true,
-      "downlevelIteration": true,
+        // Output directory for compiled files
+        "outDir": "./dist",
+        // Root directory of source files
+        "rootDir": "./src",
+        // Needed so that the client-side tsconfig can reference this.
+        "composite": true,
     },
-    "include": ["./src/**/*"]
-  }
+    // Files to be included in compilation
+    "include": [
+        "./src/**/*"
+    ],
+    // Files to be excluded from compilation
+    "exclude": [
+        "node_modules",
+        "src/public/**/*",
+    ]
+}
