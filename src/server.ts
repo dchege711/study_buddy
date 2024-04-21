@@ -15,6 +15,7 @@ import { inAppRouter } from "./routes/InAppRouter";
 import { authRouter } from "./routes/AuthenticationRouter";
 import { IS_DEV } from "./config";
 import { populateDummyAccountWithCards } from "./tests/DummyAccountUtils";
+import * as allPaths from "./paths";
 
 var express = require("express");
 var session = require("express-session");
@@ -96,6 +97,7 @@ app.use(function (err: any, req: Request, res: Response, next: NextFunction) {
             response_JSON: {status: 500, message: "Internal Server Error"},
             APP_NAME: config.APP_NAME,
             LOGGED_IN: false,
+            ...allPaths,
         }
     );
 });
@@ -108,6 +110,7 @@ app.use(function (req: Request, res: Response, next: NextFunction) {
             response_JSON: {status: 404, message: "Page Not Found"},
             APP_NAME: config.APP_NAME,
             LOGGED_IN: false,
+            ...allPaths,
         }
     );
 });
