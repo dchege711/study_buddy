@@ -1,6 +1,9 @@
 import { RegisterUserAndPasswordParams, registerUserAndPassword, sendAccountValidationLink, SendAccountValidationLinkParams, sendResetLink, ResetLinkParams, resetPassword } from '../models/LogInUtilities';
 import { router, publicProcedure } from '../trpc';
 
+/**
+ * @description This router handles all authentication-related FETCH requests.
+ */
 export const authRouter = router({
   registerUser: publicProcedure
     .input((params: unknown) => params as RegisterUserAndPasswordParams)
@@ -14,7 +17,7 @@ export const authRouter = router({
       return sendAccountValidationLink(input);
     }),
 
-   resetPasswordLink: publicProcedure
+   sendResetPasswordLink: publicProcedure
     .input((params: unknown) => params as ResetLinkParams)
     .mutation(({ input }) => {
       return sendResetLink(input);
