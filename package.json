@@ -1,5 +1,5 @@
 {
-  "name": "flashcards_by_c13u",
+  "name": "flashcards_server",
   "version": "1.0.0",
   "description": "A web application that helps me review content",
   "main": "server.js",
@@ -22,7 +22,7 @@
     ]
   },
   "scripts": {
-    "build-webpack": "webpack --config webpack.config.js",
+    "build-webpack": "webpack --config webpack.config.cjs",
     "build": "tsc && npm run build-webpack",
     "jsdoc": "jsdoc -r models",
     "start": "npm run build && node dist/server.js",
