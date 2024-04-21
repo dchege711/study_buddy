@@ -68,12 +68,6 @@ export function handleLogIn(req: Request, res: Response) {
     }
 };
 
-export function registerUser (req: Request, res: Response) {
-    sendResponseFromPromise(
-        LogInUtilities.registerUserAndPassword(req.body), res
-    );
-};
-
 export function loginUser (req: Request, res: Response, next: NextFunction) {
     LogInUtilities
         .authenticateUser(req.body)
@@ -114,12 +108,6 @@ export function sendValidationEmailGet (req: Request, res: Response) {
     res.render("pages/send_validation_url.ejs", defaultTemplateObject);
 };
 
-export function sendValidationEmailPost (req: Request, res: Response) {
-    sendResponseFromPromise(
-        LogInUtilities.sendAccountValidationLink(req.body), res
-    );
-};
-
 export function verifyAccount (req: Request, res: Response) {
     var verification_uri = req.path.split("/verify-account/")[1];
 
@@ -132,12 +120,6 @@ export function verifyAccount (req: Request, res: Response) {
 
 export function resetPasswordGet (req: Request, res: Response) {
     res.render("pages/reset_password_request.ejs", defaultTemplateObject);
-};
-
-export function resetPasswordPost (req: Request, res: Response) {
-    sendResponseFromPromise(
-        LogInUtilities.sendResetLink(req.body), res
-    );
 };
 
 export function resetPasswordLinkGet (req: Request, res: Response) {
