@@ -46,7 +46,7 @@ export async function createMany(unsavedCards: CreateCardParams[]): Promise<ICar
     ]).then(() => cards);
 }
 
-interface ReadCardParams { userIDInApp: number; cardID?: string};
+export interface ReadCardParams { userIDInApp: number; cardID?: string};
 
 /**
  * Read cards from the database that match `payload`.
@@ -59,7 +59,7 @@ interface ReadCardParams { userIDInApp: number; cardID?: string};
  *
  * @returns {Promise} resolves with an array of all matching cards.
  */
-export function read(payload: ReadCardParams, projection="title description descriptionHTML tags urgency createdById isPublic") : Promise<Partial<ICard>[]> {
+export function read(payload: ReadCardParams, projection="title description descriptionHTML tags urgency createdById isPublic") : Promise<Partial<ICardRaw>[]> {
     payload = sanitizeQuery(payload);
     let query : Partial<ICard> = {createdById: payload.userIDInApp};
     if (payload.cardID) query._id = payload.cardID;
@@ -94,7 +94,7 @@ export async function update(payload: Partial<ICard>): Promise<ICard> {
     ]).then(() => newCard as ICard);
 };
 
-interface SearchCardParams {queryString: string; userIDInApp: number; limit: number};
+export interface SearchCardParams {queryString: string; userIDInApp: number; limit: number};
 
 interface CardQuery {
     filter: FilterQuery<ICard>;

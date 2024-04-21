@@ -426,7 +426,7 @@ function updateMetadataWithCardDetails(
     return Promise.resolve(metadataDoc);
 }
 
-type UpdateUserSettingsParams = Pick<IUser, "cardsAreByDefaultPrivate" | "dailyTarget" | "userIDInApp">;
+export type UpdateUserSettingsParams = Pick<IUser, "cardsAreByDefaultPrivate" | "dailyTarget" | "userIDInApp">;
 
 /**
  * @description Update the settings of the given user.
