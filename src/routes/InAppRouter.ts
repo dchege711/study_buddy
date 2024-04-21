@@ -5,13 +5,13 @@ import * as MetadataDB from "../models/MetadataMongoDB";
 import { ICardRaw } from '../models/mongoose_models/CardSchema';
 
 export const inAppRouter = router({
-  publicCard: publicProcedure
+  fetchPublicCard: publicProcedure
     .input((params: unknown) => params as ReadPublicCardParams)
     .query(({ input }) => {
       return CardsDB.readPublicCard(input);
     }),
 
-  publicCards: publicProcedure
+  searchPublicCards: publicProcedure
     .input((params: unknown) => params as SearchPublicCardParams)
     .query(({ input }) => {
       return CardsDB.publicSearch(input);
@@ -28,7 +28,7 @@ export const inAppRouter = router({
       return CardsDB.flagCard(input);
     }),
 
-  card: authedProcedure
+  fetchCard: authedProcedure
     .input((params: unknown) => params as Omit<CardsDB.ReadCardParams, "userIDInApp">)
     .query(({ input, ctx }) => {
       return CardsDB.read({ ...input, userIDInApp: ctx.user.userIDInApp });
@@ -58,7 +58,12 @@ export const inAppRouter = router({
       return MetadataDB.deleteCardFromTrash({ ...input, createdById: ctx.user.userIDInApp });
     }),
 
-  cards: authedProcedure
+  /**
+   * TODO: The difference between this and `searchPublicCards` should
+   * only be that the server enforces restrictions, e.g. userID in the former
+   * and isPublic in the latter.
+   */
+  searchCards: authedProcedure
     .input((params: unknown) => params as Omit<CardsDB.SearchCardParams, "userIDInApp">)
     .query(({ input, ctx }) => {
       return CardsDB.search({ ...input, userIDInApp: ctx.user.userIDInApp });
