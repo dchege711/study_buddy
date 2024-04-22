@@ -3,6 +3,21 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { createRef, ref, Ref } from 'lit/directives/ref.js';
 import { trpc, CardSearchResult } from '../../trpc.js';
 
+enum InputState {
+  PressedSpace = 1,
+  PressedEnter = 2,
+  InWord = 3,
+}
+
+export class CardSearchResultsEvent extends Event {
+  results: CardSearchResult[];
+
+  constructor(results: CardSearchResult[]) {
+    super('search-results', { bubbles: true, composed: true });
+    this.results = results;
+  }
+}
+
 @customElement('search-bar')
 export class SearchBar extends LitElement {
   @property({ type: Boolean }) privateSearch = false;
@@ -26,9 +41,6 @@ export class SearchBar extends LitElement {
   }
 
   private renderSearchResults() {
-    //
-    //
-    // [1]: https://developer.mozilla.org/en-US/docs/Web/CSS/position#absolute
     return html`
       <div role='presentation' id='search-results-anchor'>
         <ul>
@@ -61,19 +73,33 @@ export class SearchBar extends LitElement {
    * card, i.e. first check if the card is in the cache, otherwise, fetch the
    * full card from the database.
    */
-  private searchCards(event: KeyboardEvent) {
+  private async searchCards(event: KeyboardEvent) {
+    const inputState = this.getInputState(event.key);
+    if (inputState === InputState.InWord) {
+      return;
+    }
+
     const queryString = this.inputRef.value?.value.trim() || '';
     if (queryString.length === 0) {
       return;
     }
 
+    const stillTyping = inputState === InputState.PressedSpace;
+
     const cardFetcher = this.privateSearch ? trpc.searchCards : trpc.searchPublicCards;
-    cardFetcher
-      .query({ queryString, limit: 7 })
-      .then((cards) => {
-        this.searchResults = cards;
-        this.receivedNoResults = cards.length === 0;
-      });
+    const cards = await cardFetcher.query({
+      limit: stillTyping ? 7 : Infinity,
+      queryString,
+    });
+
+    if (stillTyping) {
+      this.searchResults = cards;
+      this.receivedNoResults = cards.length === 0;
+    } else {
+      // Report the search results up the tree, and clear the results.
+      this.dispatchSearchResults(cards);
+      this.clearResults();
+    }
   }
 
   private clearResultsAfterTimeout() {
@@ -81,6 +107,23 @@ export class SearchBar extends LitElement {
   }
 
   private clearResults() {
+    this.searchResults = [];
+    this.receivedNoResults = false;
+  }
+
+  private dispatchSearchResults(results: CardSearchResult[]) {
+    this.dispatchEvent(new CardSearchResultsEvent(results));
+  }
+
+  private getInputState(keyPress: string): InputState {
+    switch(keyPress) {
+      case ' ':
+        return InputState.PressedSpace;
+      case 'Enter':
+        return InputState.PressedEnter;
+      default:
+        return InputState.InWord;
+    }
   }
 
   static styles = css`
