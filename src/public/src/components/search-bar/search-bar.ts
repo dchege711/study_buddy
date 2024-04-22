@@ -1,4 +1,4 @@
-import { LitElement, css, html } from 'lit';
+import { LitElement, css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { createRef, ref, Ref } from 'lit/directives/ref.js';
 import { trpc, CardSearchResult } from '../../trpc.js';
@@ -13,6 +13,7 @@ export class SearchBar extends LitElement {
   inputRef: Ref<HTMLInputElement> = createRef();
 
   render() {
+    const showResults = this.searchResults.length > 0 || this.receivedNoResults;
     return html`
       <input
           id='card_search_input'
@@ -20,14 +21,25 @@ export class SearchBar extends LitElement {
           @keydown=${this.searchCards}
           @blur=${this.clearResultsAfterTimeout}
           ${ref(this.inputRef)}>
-      <ul id='card_search_results'>
-        ${this.searchResults.map((card) => html`
-          <li @click=${() => this.clearResults()}>${card.title}</li>
-        `)}
-        ${this.receivedNoResults
-        ? html`<li class='gray-text'><em>No cards found</em></li>`
-        : html`<li class='gray-text'><em>Press [Enter] to view all matches</em></li>`}
-      </ul>
+      ${showResults ? this.renderSearchResults() : nothing}
+    `;
+  }
+
+  private renderSearchResults() {
+    //
+    //
+    // [1]: https://developer.mozilla.org/en-US/docs/Web/CSS/position#absolute
+    return html`
+      <div role='presentation' id='search-results-anchor'>
+        <ul>
+          ${this.searchResults.map((card) => html`
+            <li @click=${() => this.clearResults()}>${card.title}</li>
+          `)}
+          ${this.receivedNoResults
+          ? html`<li class='gray-text'><em>No cards found</em></li>`
+          : html`<li class='gray-text'><em>Press [Enter] to view all matches</em></li>`}
+        </ul>
+      </div>
     `;
   }
 
@@ -72,39 +84,53 @@ export class SearchBar extends LitElement {
   }
 
   static styles = css`
+    :host {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
     input {
       border: none;
       border-bottom: 0.2px solid black;
-      width: 100%;
-      min-height: 40px;
       padding: 1%;
-      margin-right: 10%;
     }
 
-    ul {
-      text-overflow: ellipsis;
-      width: 49%;
-      position: absolute;
-      background: white;
-      z-index: 10;
-      padding: 2%;
-      margin: 0;
-    }
+    div#search-results-anchor {
+      /**
+       * We want the <ul> to float in the page above everything else (position:
+       * absolute). Wrap it in a <div> which will be its closest positioned
+       * ancestor.
+       */
+      position: relative;
 
-    ul > li {
-      border-bottom: 1px solid lightgray;
-      padding: 4px;
-      list-style-type: none;
-    }
+      ul {
+        text-overflow: ellipsis;
+        position: absolute;
+        background: white;
+        z-index: 10;
+        width: 100%;
 
-    ul > li:hover {
-      color: white;
-      background: black;
-      cursor: pointer;
-    }
+        /** Need it flush with the search box; user agent comes with spacing. */
+        margin: 0;
+        padding: 0;
 
-    .gray-text {
-      color: gray;
+        li {
+          border-bottom: 1px solid lightgray;
+          padding: 1%;
+          list-style-type: none;
+
+          &:hover {
+            color: white;
+            background: black;
+            cursor: pointer;
+          }
+
+          &.gray-text {
+            color: gray;
+          }
+        }
+      }
     }
   `;
 }
