@@ -13,7 +13,7 @@ enum InputState {
 
 @customElement('search-bar')
 export class SearchBar extends LitElement {
-  @property({ type: Boolean }) privateSearch = false;
+  @property({ type: Boolean }) isPrivateSearch = false;
 
   @state()
   private searchResults: CardSearchResult[] = [];
@@ -81,7 +81,7 @@ export class SearchBar extends LitElement {
 
     const stillTyping = inputState === InputState.PressedSpace;
 
-    const cardFetcher = this.privateSearch ? trpc.searchCards : trpc.searchPublicCards;
+    const cardFetcher = this.isPrivateSearch ? trpc.searchCards : trpc.searchPublicCards;
     const cards = await cardFetcher.query({
       limit: stillTyping ? 7 : Infinity,
       queryString,
