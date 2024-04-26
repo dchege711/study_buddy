@@ -49,7 +49,8 @@ export class SearchResult extends LitElement {
       border-radius: 6px;
       background-color: var(--card-bg-color);
       box-shadow: 0 4px 10px 0 var(--box-shadow-color);
-      flex: 200px;
+      flex: none;
+      width: 200px;
       padding: 4px;
     }
 
@@ -101,6 +102,7 @@ export class SearchResults extends LitElement {
       flex-direction: row;
       flex-wrap: wrap;
       gap: 10px;
+      justify-content: center;
     }
   `;
 }

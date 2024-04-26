@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, css } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { provide } from '@lit/context';
 
@@ -32,4 +32,12 @@ export class BrowsePage extends LitElement {
       this.searchResults = (e as SearchResultsChangedEvent).results;
     });
   }
+
+  static styles = css`
+    :host {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+  `;
 }
