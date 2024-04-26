@@ -1,7 +1,9 @@
 import { LitElement, css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { createRef, ref, Ref } from 'lit/directives/ref.js';
+
 import { trpc, CardSearchResult } from '../../trpc.js';
+import { SearchResultsChangedEvent } from '../../context/search-results-context.js';
 
 enum InputState {
   PressedSpace = 1,
@@ -9,20 +11,13 @@ enum InputState {
   InWord = 3,
 }
 
-export class CardSearchResultsEvent extends Event {
-  results: CardSearchResult[];
-
-  constructor(results: CardSearchResult[]) {
-    super('search-results', { bubbles: true, composed: true });
-    this.results = results;
-  }
-}
-
 @customElement('search-bar')
 export class SearchBar extends LitElement {
   @property({ type: Boolean }) privateSearch = false;
 
-  @state() private searchResults: CardSearchResult[] = [];
+  @state()
+  private searchResults: CardSearchResult[] = [];
+
   @state() private receivedNoResults = false;
 
   inputRef: Ref<HTMLInputElement> = createRef();
@@ -112,7 +107,7 @@ export class SearchBar extends LitElement {
   }
 
   private dispatchSearchResults(results: CardSearchResult[]) {
-    this.dispatchEvent(new CardSearchResultsEvent(results));
+    this.dispatchEvent(new SearchResultsChangedEvent(results));
   }
 
   private getInputState(keyPress: string): InputState {

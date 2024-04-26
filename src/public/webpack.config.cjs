@@ -37,8 +37,7 @@ module.exports = (env, args) => {
                 clean: true,
             },
             entry: {
-                'search-bar': './src/components/search-bar/search-bar.ts',
-                'search-results': './src/components/search-results/search-results.ts',
+                'browse-page': './src/pages/browse-page.ts',
             },
             plugins: [
                 copyWebpackPlugin
