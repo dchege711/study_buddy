@@ -2,7 +2,7 @@ import { LitElement, css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { consume } from '@lit/context';
 
-import { CardSearchResult } from '../../trpc.js';
+import { trpc, CardSearchResult } from '../../trpc.js';
 import { searchResultsContext } from '../../context/search-results-context.js';
 
 @customElement('search-result-tag')
@@ -68,6 +68,13 @@ export class SearchResults extends LitElement {
   @property({ type: Array })
   results: CardSearchResult[] = [];
 
+  @property({ type: Boolean }) isPrivateSearch = false;
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    this.maybeFetchInitialResults();
+  }
+
   render() {
     return html`
       ${this.results.map(
@@ -75,6 +82,17 @@ export class SearchResults extends LitElement {
             <search-result .result=${result}></search-result>`
         )}
     `;
+  }
+
+  private maybeFetchInitialResults() {
+    if (this.results.length !== 0) {
+      return;
+    }
+
+    const cardFetcher = this.isPrivateSearch ? trpc.searchCards : trpc.searchPublicCards;
+    cardFetcher.query({ limit: Infinity, queryString: '' }).then((cards) => {
+      this.results = cards;
+    });
   }
 
   static styles = css`
