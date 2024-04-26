@@ -1,7 +1,9 @@
 import { LitElement, css, html } from 'lit';
-import { customElement, property } from "lit/decorators.js";
+import { customElement, property } from 'lit/decorators.js';
+import { consume } from '@lit/context';
 
 import { CardSearchResult } from '../../trpc.js';
+import { searchResultsContext } from '../../context/search-results-context.js';
 
 @customElement('search-result-tag')
 export class SearchResultTag extends LitElement {
@@ -21,17 +23,6 @@ export class SearchResultTag extends LitElement {
       padding: 2px;
     }
   `;
-}
-
-function variableLengthTags() {
-  let numTags = Math.floor(Math.random() * 10);
-  let tags = ['dynamic_programming', 'greedy', 'graph_theory'];
-
-  let result: string[] = [];
-  for (let i = 0; i < numTags; i++) {
-    result.push(tags[Math.floor(Math.random() * tags.length)]);
-  }
-  return result.join(' ');
 }
 
 @customElement('search-result')
@@ -73,18 +64,13 @@ export class SearchResult extends LitElement {
 
 @customElement('search-results')
 export class SearchResults extends LitElement {
-  private searchResults: CardSearchResult[] = Array.from(Array(25).keys()).map(
-    (i) => ({
-      _id: i.toString(),
-      title: `What is contained in card number ${i}? We won't know until we click on it.`,
-      tags: variableLengthTags(),
-      urgency: i % 3
-    })
-  );
+  @consume({ context: searchResultsContext, subscribe: true })
+  @property({ type: Array })
+  results: CardSearchResult[] = [];
 
   render() {
     return html`
-      ${this.searchResults.map(
+      ${this.results.map(
           (result) => html`
             <search-result .result=${result}></search-result>`
         )}
