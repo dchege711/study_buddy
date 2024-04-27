@@ -3,10 +3,6 @@
     <head>
         <%- include('../partials/header.ejs'); %>
         <title><%= APP_NAME %>: Browse/Search</title>
-        <script type="text/javascript" src="/src/CardsManager.bundle.min.js"></script>
-        <script type="text/javascript" src="/src/CardTemplateUtilities.bundle.min.js"></script>
-        <script type="text/javascript" src="/src/TagsBarUtilities.bundle.min.js"></script>
-        <script type="text/javascript" src="/src/AutoComplete.bundle.min.js"></script>
         <%- include('../partials/syntax_highlighting_and_latex.ejs'); %>
     </head>
 
@@ -18,50 +14,11 @@
         <%- include('../partials/navbar.ejs'); %>
 
         <div id="main_div">
-            <div class="w3-container" id="search_div">
-
-                <div id="card_search_container" class="w3-half">
-                    <search-bar></search-bar>
-                </div>
-
-
-            </div>
-
-            <div class="w3-container" id="temp_container">
-
-                <div class="w3-container">
-
-                    <%- include('../partials/tags_bar_template.ejs'); %>
-
-                    <p id="current_tag_selection" class="w3-right"></p>
-
-                    <div class="w3-threequarter w3-right flexbox" id="minicards_search_results">
-                        <% if (abbreviatedCards.length === 0) { %>
-                            <div class="w3-container">
-                                <p>No cards found.</p>
-                            </div>
-                        <% } else { %>
-                            <% for (let i = 0; i < abbreviatedCards.length; i++) { %>
-                                <div class="w3-card-4 w3-padding-small w3-margin minicard_search_result" onclick="BrowserCardsPage.displayFullCard('<%= abbreviatedCards[i]._id %>')">
-                                    <header class="w3-container w3-pale-green"><h4><%= abbreviatedCards[i].title %></h4></header>
-                                    <div class="w3-container"><p><strong>Tags: </strong><span id='tags<%= abbreviatedCards[i]._id %>'><%= abbreviatedCards[i].tags.split(/\s/).join(", ") %></span></p></div>
-                                </div>
-                            <% } %>
-                        <% } %>
-                    </div>
-                </div>
-
-                <div id="card_modal" class="w3-modal">
-                    <div id="card_container_holder" class="w3-modal-content">
-                        <%- include('../partials/search_result_card_template.ejs'); %>
-                    </div>
-                </div>
-
-            </div>
-
+            <browse-page>
+            </browse-page>
         </div>
         </div>
 
     </body>
-    <script type="module" src="/src/search-bar.js"></script>
+    <script type="module" src="/src/browse-page.js"></script>
 </html>
