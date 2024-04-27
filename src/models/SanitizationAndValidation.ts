@@ -8,6 +8,9 @@
 
 import xss = require("xss")
 
+import { JSDOM } from 'jsdom';
+import hljs from 'highlight.js';
+
 import { Converter } from "showdown";
 import { ICard } from "./mongoose_models/CardSchema";
 
@@ -48,7 +51,8 @@ const converter = new Converter({
     emoji: true, backslashEscapesHTMLTags: false, tables: true,
     parseImgDimensions: true, simplifiedAutoLink: true,
     strikethrough: true, tasklists: true, openLinksInNewWindow: true,
-    disableForced4SpacesIndentedSublists: true
+    disableForced4SpacesIndentedSublists: true,
+    omitExtraWLInCodeBlocks: true, ghCodeBlocks: true,
 });
 
 
@@ -84,6 +88,18 @@ export function sanitizeCard(card: Partial<ICard>): Partial<ICard> {
                 /\[spoiler\]/i, "<span id='spoiler'>[spoiler]</span>"
             );
             outputHTML += `<span id="spoiler_end"></span>`;
+        }
+
+        // Add syntax highlighting to code blocks if needed. Constructing JSDOM
+        // objects is expensive, so we only do it if we need to.
+        if (outputHTML.includes('<pre><code>')) {
+          // For easier serialization, we add a parent element so that the
+          // fragment has one element.
+          let fragment = JSDOM.fragment(`<temp-elem>${outputHTML}</temp-elem>`);
+          for (let preCodeBlock of fragment.querySelectorAll("pre > code")) {
+            hljs.highlightElement(preCodeBlock as HTMLElement);
+          }
+          outputHTML = fragment.firstElementChild!.innerHTML;
         }
 
         card.descriptionHTML = outputHTML;
