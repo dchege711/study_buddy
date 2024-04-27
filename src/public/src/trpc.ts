@@ -16,3 +16,4 @@ export const trpc = createTRPCClient<AppRouter>({
 type RouterInput = inferRouterOutputs<AppRouter>;
 
 export type CardSearchResult = RouterInput['searchPublicCards'][0];
+export type PublicCard = RouterInput['fetchPublicCard'];
