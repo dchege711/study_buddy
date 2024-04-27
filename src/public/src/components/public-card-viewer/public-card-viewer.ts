@@ -1,6 +1,7 @@
 import { LitElement, css, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { createRef, ref, Ref } from 'lit/directives/ref.js';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
 import { FlagCardParams, PublicCard, trpc } from '../../trpc.js';
 
@@ -61,7 +62,9 @@ export class PublicCardViewer extends LitElement {
 
       <h3>${this.card.title}</h3>
 
-      <p>${this.card.description}</p>
+      <div>
+        ${unsafeHTML(this.card.descriptionHTML)}
+      </div>
       <p><em>Tags: </em> ${this.card.tags}</p>
       <p><em>Num Copies: </em>${this.card.numChildren}</p>
 
