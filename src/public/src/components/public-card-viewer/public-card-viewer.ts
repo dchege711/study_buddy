@@ -22,7 +22,11 @@ export class PublicCardViewer extends LitElement {
   }
 
   private flagCard(reason: FlagReason) {
-    let flagCardParams : FlagCardParams = { cardID: this.card?._id as string };
+    if (!this.card) {
+      throw new Error('No card to flag');
+    }
+
+    let flagCardParams : FlagCardParams = { cardID: this.card._id };
     switch (reason) {
       case FlagReason.Inappropriate:
         flagCardParams.markedForReview = true;

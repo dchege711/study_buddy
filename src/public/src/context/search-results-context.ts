@@ -27,3 +27,10 @@ export class SearchResultSelectedEvent extends Event {
 
 export const searchResultsContext = createContext<CardSearchResult[]>(
   Symbol('search-results-context'));
+
+declare global {
+  interface GlobalEventHandlersEventMap {
+    'search-results': SearchResultsChangedEvent;
+    'search-result-selected': SearchResultSelectedEvent;
+  }
+}

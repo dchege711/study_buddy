@@ -28,7 +28,7 @@ import { model, Schema, Types, Document } from "mongoose";
  *  to its owner. It will not appear in the search results at the `/browse` page. In contrast, a public card will appear in the search results as a read-only card. Any user that adds the card to their own collection will get a separate copy of the card.
  */
 export interface ICardRaw {
-    _id: Types.ObjectId,
+    _id: string,
     title: string;
     description: string;
     descriptionHTML: string;

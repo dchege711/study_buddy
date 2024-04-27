@@ -31,12 +31,12 @@ export class BrowsePage extends LitElement {
   }
 
   private addEventListeners() {
-    this.addEventListener(kSearchResultsChangedEventName, (e) => {
-      this.searchResults = (e as SearchResultsChangedEvent).results;
+    this.addEventListener(kSearchResultsChangedEventName, (ev) => {
+      this.searchResults = ev.results;
     });
 
-    this.addEventListener(kSearchResultSelectedEventName, (e) => {
-      let cardID = (e as SearchResultSelectedEvent).result._id as string | undefined;
+    this.addEventListener(kSearchResultSelectedEventName, (ev) => {
+      let cardID = ev.result._id;
       if (!cardID) {
         return;
       }
