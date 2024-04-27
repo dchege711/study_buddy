@@ -1,5 +1,5 @@
 import { createTRPCClient, httpBatchLink } from '@trpc/client';
-import { inferRouterOutputs } from '@trpc/server';
+import { inferRouterInputs, inferRouterOutputs } from '@trpc/server';
 
 import type { AppRouter } from '../../server.js';
  
@@ -13,7 +13,9 @@ export const trpc = createTRPCClient<AppRouter>({
   ],
 });
 
-type RouterInput = inferRouterOutputs<AppRouter>;
+type RouterInput = inferRouterInputs<AppRouter>;
+type RouterOutput = inferRouterOutputs<AppRouter>;
 
-export type CardSearchResult = RouterInput['searchPublicCards'][0];
-export type PublicCard = RouterInput['fetchPublicCard'];
+export type CardSearchResult = RouterOutput['searchPublicCards'][0];
+export type PublicCard = RouterOutput['fetchPublicCard'];
+export type FlagCardParams = RouterInput['flagCard'];
