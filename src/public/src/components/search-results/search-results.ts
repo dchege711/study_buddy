@@ -3,7 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { consume } from '@lit/context';
 
 import { trpc, CardSearchResult } from '../../trpc.js';
-import { searchResultsContext } from '../../context/search-results-context.js';
+import { searchResultsContext, SearchResultSelectedEvent } from '../../context/search-results-context.js';
 
 @customElement('search-result-tag')
 export class SearchResultTag extends LitElement {
@@ -29,9 +29,13 @@ export class SearchResultTag extends LitElement {
 export class SearchResult extends LitElement {
   @property({ type: Object }) result!: CardSearchResult;
 
+  private dispatchSearchResultSelected() {
+    this.dispatchEvent(new SearchResultSelectedEvent(this.result));
+  }
+
   render() {
     return html`
-      <article>
+      <article @click=${this.dispatchSearchResultSelected}>
         <p><em>${this.result.title}</em></p>
         <p class='tags-holder'>
           ${this.result.tags?.split(' ').filter(Boolean).map(

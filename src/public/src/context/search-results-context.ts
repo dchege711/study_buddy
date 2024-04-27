@@ -13,5 +13,17 @@ export class SearchResultsChangedEvent extends Event {
   }
 }
 
+export const kSearchResultSelectedEventName = 'search-result-selected';
+
+export class SearchResultSelectedEvent extends Event {
+  result: CardSearchResult;
+
+  constructor(result: CardSearchResult) {
+    super(kSearchResultSelectedEventName, { bubbles: true, composed: true });
+    this.result = result;
+  }
+
+}
+
 export const searchResultsContext = createContext<CardSearchResult[]>(
   Symbol('search-results-context'));
