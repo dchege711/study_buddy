@@ -67,7 +67,6 @@ export class PublicCardViewer extends LitElement {
         ${unsafeHTML(this.card.descriptionHTML)}
       </div>
       <p><em>Tags: </em> ${this.card.tags}</p>
-      <p><em>Num Copies: </em>${this.card.numChildren}</p>
 
       <div id='action-row'>
         <button @click=${() => this.flagCard(FlagReason.Inappropriate)}>
