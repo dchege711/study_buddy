@@ -11,14 +11,7 @@
     <title>
         <%= APP_NAME %>: Wiki
     </title>
-    <%- include('../partials/syntax_highlighting_and_latex.ejs'); %>
-        <script type="text/x-mathjax-config">
-            MathJax.Hub.Config({
-              tex2jax: {
-                ignoreClass: "escape_latex"
-              }
-            });
-          </script>
+        <%- include('../partials/syntax_highlighting_and_latex.ejs'); %>
         <%- include('../partials/header.ejs'); %>
         <style>
 
@@ -37,7 +30,7 @@
 
 </head>
 
-<body onload="addSyntaxHighlighting()">
+<body>
 
     </head>
 
@@ -86,7 +79,7 @@
 
                                 <tr>
                                     <td class="escape_latex">\(y = \frac{x^2}{\sqrt{2}} \)</td>
-                                    <td>\(y = \frac{x^2}{\sqrt{2}}\)</td>
+                                    <td><p><eq><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>y</mi><mo>=</mo><mfrac><msup><mi>x</mi><mn>2</mn></msup><msqrt><mn>2</mn></msqrt></mfrac></mrow><annotation encoding="application/x-tex"> y = \frac{x^2}{\sqrt{2}} </annotation></semantics></math></span></eq></p></td>
                                 </tr>
 
                                 <tr>
@@ -99,16 +92,14 @@
 
                                 <tr>
                                     <td>
-                                        <pre>
-                                        <code class="markdown">```python<br>def hello_world():<br>  print("Hello, World!")<br>```</code>
-                                    </pre>
-
+<pre><code class="markdown">
+```python<br>def hello_world():<br>  print("Hello, World!")<br>```
+</code></pre>
                                     </td>
                                     <td>
-                                        <pre>
-                                        <code>def hello_world():<br>    print("Hello, World!")
-                                        </code>
-                                    </pre>
+<pre><code class="hljs"><span class="hljs-keyword">def</span> <span class="hljs-title function_">hello_world</span>():
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Hello, World!&quot;</span>)
+</code></pre>
                                     </td>
                                 </tr>
 
