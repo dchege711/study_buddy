@@ -6,7 +6,7 @@ import { mongooseConnection } from "../../../models/MongooseClient";
 
 import { getDummyAccount } from "../../DummyAccountUtils";
 import { getRandomCards } from "../../SampleCards";
-import { Card, ICard } from "../../../models/mongoose_models/CardSchema";
+import { Card, ICard, ICardRaw } from "../../../models/mongoose_models/CardSchema";
 
 import * as CardsDB from "../../../models/CardsMongoDB";
 import * as LogInUtilities from "../../../models/LogInUtilities";
@@ -80,7 +80,7 @@ describe("Test CardsMongoDB\n", function() {
     });
 
     it("should only update mutable attributes of existing cards", async function() {
-        let card = await CardsDB.create({
+        let card: ICardRaw = await CardsDB.create({
             title: "A", description: "B", createdById: dummyUser.userIDInApp,
             urgency: 7, isPublic: true, parent: "", tags: "update mutable"
         });
