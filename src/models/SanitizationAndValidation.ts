@@ -8,53 +8,38 @@
 
 import xss = require("xss")
 
-import { JSDOM } from 'jsdom';
 import hljs from 'highlight.js';
+import markdownit from 'markdown-it';
+import katex from 'katex';
+import type { KatexOptions } from 'katex';
+import texMath from 'markdown-it-texmath';
 
-import { Converter } from "showdown";
 import { ICard } from "./mongoose_models/CardSchema";
 
-/*
- * The converter is used to turn the markdown in the cards into html.
- *
- * Since we're targeting users that store somewhat detailed flashcards,
- * Markdown (in addition to LaTEX and syntax highlighting) will prove useful.
- * Manually converting markdown to HTML is a project by itself. Since it's not
- * the main purpose of the app, we were happy to import
- * [Showdown]{@link https://github.com/showdownjs/showdown}. The library looks
- * mature and the documentation is sound.
- *
- * Previously, users had to escape the LaTEX delimiter themselves and also
- * escape underscores within inline LaTEX. This meant lines like `\(p_i = 2\)`
- * had to be written as `\\(p\_i = 2\\)`. ~~With some regular expressions, we
- * were able to support the former approach. We traded computational efficiency
- * *(more code to automatically escape backslashes and replace automatically
- * inserted `<em>, </em>` tags)* for convenience *(users entering normal
- * LaTEX)*. We choose to make this correction on the client side since we can't
- * afford that much storage capacity on the server side.~~
+function syntaxHighlight(code: string, lang: string): string {
+  if (lang && hljs.getLanguage(lang)) {
+    const { value } = hljs.highlight(code, { language: lang, ignoreIllegals: true });
+    return `<pre><code class="hljs">${value}</code></pre>`;
+  }
+  return `<pre><code class="hljs">${hljs.highlightAuto(code).value}</code></pre>`;
+}
 
- * We configured `showdown.converter` to escape underscores and asterisks when
- * converting markdown to HTML. Although we had activated these options before,
- * `showdown.converter` wasn't applying them. The bug was fixed on Github. We
- * downloaded the version of `showdown.min.js` available during commit
- * `039dd66256e771716c20a807a2941974ac7c5873`. Since that version works fine,
- * we use my downloaded copy instead of using the version hosted on the CDN
- * since that might change over time. Later versions of the file insert extra
- * whitespace in my code blocks, so we prefer maintaining the version from the
- * above commit.
- *
- * {@tutorial main.editing_cards}
- */
-const converter = new Converter({
-    headerLevelStart: 4, literalMidWordUnderscores: true,
-    literalMidWordAsterisks: true, simpleLineBreaks: true,
-    emoji: true, backslashEscapesHTMLTags: false, tables: true,
-    parseImgDimensions: true, simplifiedAutoLink: true,
-    strikethrough: true, tasklists: true, openLinksInNewWindow: true,
-    disableForced4SpacesIndentedSublists: true,
-    omitExtraWLInCodeBlocks: true, ghCodeBlocks: true,
+const katexOptions: KatexOptions = {
+  output: 'mathml',
+  throwOnError: false,
+};
+
+const md: markdownit = markdownit({
+  linkify: true,
+  html: true,
+  langPrefix: 'hljs language-',
+  highlight: syntaxHighlight
 });
-
+md.use(texMath, {
+  engine: katex,
+  delimiters: ['dollars', 'brackets', 'beg_end'],
+  katexOptions
+});
 
 /**
  * @description Sanitize the card to prevent malicious input, e.g XSS attack.
@@ -76,30 +61,16 @@ export function sanitizeCard(card: Partial<ICard>): Partial<ICard> {
     }
 
     if (card.description !== undefined) {
-        let outputHTML = converter.makeHtml(
-            String.raw`${card.description.replace(/\\/g, "\\\\")}`
-        );
+        let outputHTML = md.render(String.raw`${card.description}`);
 
         // Otherwise, the HTML renders with '&nbsp;' literals instead of spaces
-        outputHTML = xss(outputHTML).replace(/&amp;nbsp;/g, "&nbsp;");
+        // outputHTML = xss(outputHTML).replace(/&amp;nbsp;/g, "&nbsp;");
 
         if (outputHTML.match(/\[spoiler\]/i)) {
             outputHTML = outputHTML.replace(
                 /\[spoiler\]/i, "<span id='spoiler'>[spoiler]</span>"
             );
             outputHTML += `<span id="spoiler_end"></span>`;
-        }
-
-        // Add syntax highlighting to code blocks if needed. Constructing JSDOM
-        // objects is expensive, so we only do it if we need to.
-        if (outputHTML.includes('<pre><code>')) {
-          // For easier serialization, we add a parent element so that the
-          // fragment has one element.
-          let fragment = JSDOM.fragment(`<temp-elem>${outputHTML}</temp-elem>`);
-          for (let preCodeBlock of fragment.querySelectorAll("pre > code")) {
-            hljs.highlightElement(preCodeBlock as HTMLElement);
-          }
-          outputHTML = fragment.firstElementChild!.innerHTML;
         }
 
         card.descriptionHTML = outputHTML;
