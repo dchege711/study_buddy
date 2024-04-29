@@ -89,7 +89,7 @@
     "@types/selenium-webdriver": "^4.1.15",
     "@types/showdown": "^2.0.1",
     "@types/sjcl": "^1.0.30",
-    "@types/validator": "^13.7.17",
+    "@types/validator": "^13.11.9",
     "babel": "^6.23.0",
     "babel-loader": "^8.0.4",
     "chai": "^4.3.7",
