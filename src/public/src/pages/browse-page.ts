@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { provide } from '@lit/context';
 
 import { kSearchResultsChangedEventName, searchResultsContext, SearchResultsChangedEvent, kSearchResultSelectedEventName, SearchResultSelectedEvent } from '../context/search-results-context.js';
-import { trpc, CardSearchResult, PublicCard } from '../trpc.js';
+import { trpc, CardSearchResult, PublicCardResult } from '../trpc.js';
 
 import '../components/search-bar/search-bar.js';
 import '../components/search-results/search-results.js';
@@ -13,7 +13,7 @@ import '../components/public-card-viewer/public-card-viewer.js';
 export class BrowsePage extends LitElement {
   @provide({ context: searchResultsContext })
   @state() private searchResults: CardSearchResult[] = [];
-  @state() private selectedResult: PublicCard | null = null;
+  @state() private selectedResult: PublicCardResult = null;
 
   @property({ type: Boolean }) isPrivateSearch = false;
 

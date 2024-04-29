@@ -3,7 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { createRef, ref, Ref } from 'lit/directives/ref.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
-import { FlagCardParams, PublicCard, trpc } from '../../trpc.js';
+import { FlagCardParams, PublicCardResult, trpc } from '../../trpc.js';
 import { atomOneLight } from '../syntax-highlighting.styles.js';
 
 enum FlagReason {
@@ -13,7 +13,7 @@ enum FlagReason {
 
 @customElement('public-card-viewer')
 export class PublicCardViewer extends LitElement {
-  @property({ type: Object}) card: PublicCard | null = null;
+  @property({ type: Object}) card: PublicCardResult = null;
 
   private cardDialogRef: Ref<HTMLDialogElement> = createRef();
 
