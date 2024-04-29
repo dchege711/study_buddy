@@ -2,7 +2,7 @@ import { unlink } from "fs";
 
 import { Response } from "express";
 
-import { APP_NAME } from "../config";
+import { APP_NAME } from "../config.js";
 
 const generic_500_msg = {
     success: false, status: 500, message: "Internal Server Error"

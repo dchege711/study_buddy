@@ -7,10 +7,10 @@
  */
 
 import * as mongoDB from "mongodb";
-
-import { IMetadata, Metadata } from "./mongoose_models/MetadataCardSchema";
-import { closeMongooseConnection } from "./MongooseClient";
 import { FilterQuery, UpdateQuery } from "mongoose";
+
+import { IMetadata, Metadata } from "./mongoose_models/MetadataCardSchema.js";
+import { closeMongooseConnection } from "./MongooseClient.js";
 
 /**
  * @description Reset the daily card review streaks.

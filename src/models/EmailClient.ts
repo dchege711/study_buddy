@@ -9,11 +9,10 @@
  */
 
 import { createTransport } from "nodemailer";
+import Mail from "nodemailer/lib/mailer";
+import SMTPPool from "nodemailer/lib/smtp-pool";
 
-import Mail = require("nodemailer/lib/mailer");
-import SMTPPool = require("nodemailer/lib/smtp-pool");
-
-import { APP_NAME, EMAIL_ADDRESS, MAILGUN_LOGIN, MAILGUN_PASSWORD } from "../config";
+import { APP_NAME, EMAIL_ADDRESS, MAILGUN_LOGIN, MAILGUN_PASSWORD } from "../config.js";
 
 let transporter = createTransport({
     pool: true,
