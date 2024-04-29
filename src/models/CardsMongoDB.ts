@@ -72,7 +72,7 @@ export function read(payload: ReadCardParams, projection="title description desc
  *
  * @returns {Promise} resolves with the updated card.
  */
-export async function update(payload: Partial<ICard>): Promise<ICard> {
+export async function update(payload: Partial<ICard>): Promise<ICardRaw> {
     let oldCard = await Card.findByIdAndUpdate(
         payload._id, payload, {returnOriginal: true, runValidators: true}).exec();
     if (oldCard === null) {
