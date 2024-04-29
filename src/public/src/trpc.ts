@@ -17,5 +17,11 @@ type RouterInput = inferRouterInputs<AppRouter>;
 type RouterOutput = inferRouterOutputs<AppRouter>;
 
 export type CardSearchResult = RouterOutput['searchPublicCards'][0];
-export type PublicCard = RouterOutput['fetchPublicCard'];
+export type PublicCardResult = RouterOutput['fetchPublicCard'];
+export type PrivateCardResult = RouterOutput['fetchCard'][0];
+export type CardResult = PublicCardResult | PrivateCardResult;
 export type FlagCardParams = RouterInput['flagCard'];
+export type AddCardParams = RouterInput['addCard'];
+export type MetadataNodeInformation = RouterOutput['publicMetadata'][0]['node_information'];
+
+export type FetchCardEndpoint = (params: RouterInput['fetchCard'] | RouterInput['fetchPublicCard']) => Promise<RouterOutput['fetchCard'] | RouterOutput['fetchPublicCard']>;
