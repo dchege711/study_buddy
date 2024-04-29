@@ -1,5 +1,5 @@
-import { RegisterUserAndPasswordParams, registerUserAndPassword, sendAccountValidationLink, SendAccountValidationLinkParams, sendResetLink, ResetLinkParams, resetPassword } from '../models/LogInUtilities';
-import { router, publicProcedure } from '../trpc';
+import { RegisterUserAndPasswordParams, registerUserAndPassword, sendAccountValidationLink, SendAccountValidationLinkParams, sendResetLink, ResetLinkParams, resetPassword } from '../models/LogInUtilities.js';
+import { router, publicProcedure } from '../trpc.js';
 
 /**
  * @description This router handles all authentication-related FETCH requests.

@@ -6,11 +6,11 @@
  * @module
  */
 
-import { IUser, User } from "./mongoose_models/UserSchema";
-import { Card } from "./mongoose_models/CardSchema";
-import { updatePublicUserMetadata } from "./MetadataMongoDB";
-import { registerUserAndPassword, getRandomString } from "./LogInUtilities";
-import { PUBLIC_USER_EMAIL, PUBLIC_USER_USERNAME } from "../config";
+import { IUser, User } from "./mongoose_models/UserSchema.js";
+import { Card } from "./mongoose_models/CardSchema.js";
+import { updatePublicUserMetadata } from "./MetadataMongoDB.js";
+import { registerUserAndPassword, getRandomString } from "./LogInUtilities.js";
+import { PUBLIC_USER_EMAIL, PUBLIC_USER_USERNAME } from "../config.js";
 
 /**
  * @description Add a dummy user in order to make managing the browse page for

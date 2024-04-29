@@ -1,4 +1,4 @@
-import { CreateCardParams } from "../models/CardsMongoDB";
+import { CreateCardParams } from "../models/CardsMongoDB.js";
 
 type SampleCard = Omit<CreateCardParams, "createdById" | "isPublic"> & Partial<Pick<CreateCardParams, "createdById" | "isPublic">>;
 

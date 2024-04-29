@@ -1,12 +1,12 @@
 "use strict";
 
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response, RequestHandler } from "express";
 import { StatusCodes } from "http-status-codes";
 
-import * as LogInUtilities from "../models/LogInUtilities";
-import { convertObjectToResponse, sendResponseFromPromise } from "./ControllerUtilities";
-import { APP_NAME } from "../config";
-import * as allPaths from "../paths";
+import * as LogInUtilities from "../models/LogInUtilities.js";
+import { convertObjectToResponse, sendResponseFromPromise } from "./ControllerUtilities.js";
+import { APP_NAME } from "../config.js";
+import * as allPaths from "../paths.js";
 
 const defaultTemplateObject = {
     APP_NAME: APP_NAME, LOGGED_IN: false, ...allPaths
@@ -16,7 +16,7 @@ const defaultTemplateObject = {
  * @description Middleware designed to ensure that users are logged in before
  * using certain URLs
  */
-export function requireLogIn(req: Request, res: Response, next: NextFunction) {
+export const requireLogIn: RequestHandler = (req, res, next) => {
     if (!req.session?.user) {
         res.redirect(StatusCodes.SEE_OTHER, "/login");
     } else if (req.session?.user) {
