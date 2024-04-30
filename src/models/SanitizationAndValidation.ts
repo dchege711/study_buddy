@@ -6,7 +6,7 @@
  * @module
  */
 
-import xss from "xss";
+import xss = require("xss")
 
 import hljs from 'highlight.js';
 import markdownit from 'markdown-it';
@@ -14,7 +14,7 @@ import katex from 'katex';
 import type { KatexOptions } from 'katex';
 import texMath from 'markdown-it-texmath';
 
-import { ICard } from "./mongoose_models/CardSchema.js";
+import { ICard } from "./mongoose_models/CardSchema";
 
 function syntaxHighlight(code: string, lang: string): string {
   if (lang && hljs.getLanguage(lang)) {

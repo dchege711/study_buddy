@@ -9,10 +9,10 @@ import {
   resetPasswordGet,
   resetPasswordLinkGet,
   resetPasswordLinkPost,
-} from "../controllers/AuthenticationController.js";
-import { LOGIN, LOGOUT, REGISTER_USER, RESET_PASSWORD, RESET_PASSWORD_LINK, ROOT, SEND_VALIDATION_EMAIL, VERIFY_ACCOUNT } from "../paths.js";
+} from "../controllers/AuthenticationController";
+import { LOGIN, LOGOUT, REGISTER_USER, RESET_PASSWORD, RESET_PASSWORD_LINK, ROOT, SEND_VALIDATION_EMAIL, VERIFY_ACCOUNT } from "../paths";
 
-export const router = Router();
+const router = Router();
 
 router.get(ROOT, handleLogIn);
 
@@ -31,3 +31,5 @@ router.get(RESET_PASSWORD, resetPasswordGet);
 router.get(`${RESET_PASSWORD_LINK}/*`, resetPasswordLinkGet);
 
 router.post(`${RESET_PASSWORD_LINK}/*`, resetPasswordLinkPost);
+
+export = router;

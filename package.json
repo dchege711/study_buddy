@@ -1,6 +1,5 @@
 {
   "name": "flashcards_server",
-  "type": "module",
   "version": "1.0.0",
   "description": "A web application that helps me review content",
   "main": "server.js",

@@ -1,12 +1,12 @@
 "use strict";
 
-import { getRandomCards } from "./SampleCards.js";
+import { getRandomCards } from "./SampleCards";
 
-import * as LogInUtilities from "../models/LogInUtilities.js";
-import * as CardsDB from "../models/CardsMongoDB.js";
-import { IUser } from "../models/mongoose_models/UserSchema.js";
-import { addPublicUser } from "../models/Miscellaneous.js";
-import * as config from "../config.js";
+import * as LogInUtilities from "../models/LogInUtilities";
+import * as CardsDB from "../models/CardsMongoDB";
+import { IUser } from "../models/mongoose_models/UserSchema";
+import { addPublicUser } from "../models/Miscellaneous";
+import * as config from "../config";
 
 /**
  * @returns {Promise} resolves with a JSON representation of a logged in user.

@@ -9,26 +9,26 @@
 import { NextFunction, Request, Response } from "express";
 import * as trpcExpress from '@trpc/server/adapters/express';
 
-import express from "express";
-import session from "express-session";
-import MongoStore from 'connect-mongo';
-import path from "path";
-import bodyParser from "body-parser";
-import cookieParser from "cookie-parser";
-import enforce from 'express-sslify';
+import { publicProcedure, router, mergeRouters } from "./trpc";
+import { createContext } from "./context";
+import { inAppRouter } from "./routes/InAppRouter";
+import { authRouter } from "./routes/AuthenticationRouter";
+import { IS_DEV } from "./config";
+import { populateDummyAccountWithCards } from "./tests/DummyAccountUtils";
+import * as allPaths from "./paths";
 
-import { publicProcedure, router, mergeRouters } from "./trpc.js";
-import { createContext } from "./context.js";
-import { inAppRouter } from "./routes/InAppRouter.js";
-import { authRouter } from "./routes/AuthenticationRouter.js";
-import { IS_DEV } from "./config.js";
-import { populateDummyAccountWithCards } from "./tests/DummyAccountUtils.js";
-import * as allPaths from "./paths.js";
+var express = require("express");
+var session = require("express-session");
+var MongoStore = require('connect-mongo');
+var path = require("path");
+var bodyParser = require("body-parser");
+var cookieParser = require("cookie-parser");
+var enforce = require('express-sslify');
 
-import { router as AccountRoutes } from "./routes/AuthenticationRoutes.js";
-import { router as InAppRoutes } from "./routes/InAppRoutes.js";
-import * as config from "./config.js";
-import * as misc from "./models/Miscellaneous.js";
+var AccountRoutes = require("./routes/AuthenticationRoutes");
+var InAppRoutes = require("./routes/InAppRoutes");
+var config = require("./config");
+const misc = require("./models/Miscellaneous");
 
 // Needed to get a Mongoose instance running for this process
 const dbConnection = require("./models/MongooseClient");
@@ -55,12 +55,10 @@ export type AppRouter = typeof appRouter;
 
 app.use(session({
     secret: [config.STUDY_BUDDY_SESSION_SECRET_1],
-    cookie: {
-      httpOnly: false,
-    },
+    httpOnly: false,
     resave: false,
     name: "c13u-study-buddy",
-    store: config.IS_DEV ? new session.MemoryStore() : MongoStore.create({
+    store: config.IS_DEV ? session.MemoryStore() : MongoStore.create({
         mongoUrl: config.MONGO_URI,
         touchAfter: 24 * 3600
     }),
@@ -91,35 +89,31 @@ if (config.IS_TS_NODE) {
     app.use(express.static(newStaticsPath));
 }
 
-const app5XXHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
-  console.error(err.stack)
-  res.status(500).render(
-      "pages/5xx_error_page.ejs",
-      {
-          response_JSON: {status: 500, message: "Internal Server Error"},
-          APP_NAME: config.APP_NAME,
-          LOGGED_IN: false,
-          ...allPaths,
-      }
-  );
-};
-
-app.use(app5XXHandler);
-
-const app4XXHandler = (req: Request, res: Response, next: NextFunction) => {
-  res.status(404).render(
-      "pages/4xx_error_page.ejs",
-      {
-          response_JSON: {status: 404, message: "Page Not Found"},
-          APP_NAME: config.APP_NAME,
-          LOGGED_IN: false,
-          ...allPaths,
-      }
-  );
-};
+app.use(function (err: any, req: Request, res: Response, next: NextFunction) {
+    console.error(err.stack)
+    res.status(500).render(
+        "pages/5xx_error_page.ejs",
+        {
+            response_JSON: {status: 500, message: "Internal Server Error"},
+            APP_NAME: config.APP_NAME,
+            LOGGED_IN: false,
+            ...allPaths,
+        }
+    );
+});
 
 // Handling 404: https://expressjs.com/en/starter/faq.html
-app.use(app4XXHandler);
+app.use(function (req: Request, res: Response, next: NextFunction) {
+    res.status(404).render(
+        "pages/4xx_error_page.ejs",
+        {
+            response_JSON: {status: 404, message: "Page Not Found"},
+            APP_NAME: config.APP_NAME,
+            LOGGED_IN: false,
+            ...allPaths,
+        }
+    );
+});
 
 app.listen(port, function() {
     console.log(`App is running on port ${port}`);

@@ -6,12 +6,11 @@
  * @module
  */
 
+import { Card, ICard, ICardRaw } from "./mongoose_models/CardSchema";
+import * as MetadataDB from "./MetadataMongoDB";
+import { sanitizeCard, sanitizeQuery } from "./SanitizationAndValidation";
+import { BaseResponse } from "../types";
 import { FilterQuery } from "mongoose";
-
-import { Card, ICard, ICardRaw } from "./mongoose_models/CardSchema.js";
-import * as MetadataDB from "./MetadataMongoDB.js";
-import { sanitizeCard, sanitizeQuery } from "./SanitizationAndValidation.js";
-import { BaseResponse } from "../types.js";
 
 export type CreateCardParams = Pick<ICard, "title" | "description" | "tags" | "createdById" | "urgency" | "isPublic" | "parent">;
 

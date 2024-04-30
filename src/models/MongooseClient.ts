@@ -17,8 +17,7 @@
 
 import { connect, connection, disconnect } from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
-
-import { IS_DEV, MONGO_URI } from "../config.js";
+import { IS_DEV, MONGO_URI } from "../config";
 
 // Already 5 by default, but I might need to increase it one day...
 const connectionOptions = {poolSize: 12, useNewUrlParser: true};

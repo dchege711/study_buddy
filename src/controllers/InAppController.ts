@@ -3,15 +3,15 @@
 import { Request, RequestHandler, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 
-import * as CardsDB from "../models/CardsMongoDB.js";
-import { User } from "../models/mongoose_models/UserSchema.js";
-import * as MetadataDB from "../models/MetadataMongoDB.js";
-import * as controllerUtils from "./ControllerUtilities.js";
-import * as loginUtilities from "../models/LogInUtilities.js";
-import * as config from "../config.js";
-import { ICard, MiniICard } from "../models/mongoose_models/CardSchema.js";
-import { IMetadata } from "../models/mongoose_models/MetadataCardSchema.js";
-import * as allPaths from "../paths.js";
+import * as CardsDB from "../models/CardsMongoDB";
+import { User } from "../models/mongoose_models/UserSchema";
+import * as MetadataDB from "../models/MetadataMongoDB";
+import * as controllerUtils from "./ControllerUtilities";
+import * as loginUtilities from "../models/LogInUtilities";
+import * as config from "../config";
+import { ICard, MiniICard } from "../models/mongoose_models/CardSchema";
+import { IMetadata } from "../models/mongoose_models/MetadataCardSchema";
+import * as allPaths from "../paths";
 
 const convertObjectToResponse = controllerUtils.convertObjectToResponse;
 const deleteTempFile = controllerUtils.deleteTempFile;

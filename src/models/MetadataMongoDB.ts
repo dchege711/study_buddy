@@ -8,12 +8,12 @@
 
 import * as fs from "fs/promises";
 
-import { IUser, User } from "./mongoose_models/UserSchema.js";
-import { Metadata, IMetadata, IStreak, IMetadataRaw } from "./mongoose_models/MetadataCardSchema.js";
-import { Card, ICard } from "./mongoose_models/CardSchema.js";
-import { sanitizeQuery } from "./SanitizationAndValidation.js";
-import { PUBLIC_USER_USERNAME } from "../config.js";
-import { BaseResponse } from "../types.js";
+import { IUser, User } from "./mongoose_models/UserSchema";
+import { Metadata, IMetadata, IStreak, IMetadataRaw } from "./mongoose_models/MetadataCardSchema";
+import { Card, ICard } from "./mongoose_models/CardSchema";
+import { sanitizeQuery } from "./SanitizationAndValidation";
+import { PUBLIC_USER_USERNAME } from "../config";
+import { BaseResponse } from "../types";
 
 type MetadataCreateParams = Pick<IMetadata, "metadataIndex"> & Pick<IUser, "userIDInApp">;
 

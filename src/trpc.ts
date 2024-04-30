@@ -1,6 +1,5 @@
 import { TRPCError, initTRPC } from '@trpc/server';
-
-import { Context } from './context.js';
+import { Context } from './context';
  
 // Initialize tRPC exactly once per application. Multiple instances of tRPC will
 // cause issues.
