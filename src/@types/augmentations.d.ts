@@ -4,9 +4,10 @@
  * https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation
  */
 
-import { AuthenticateUser } from "./models/LogInUtilities";
-import { IUser } from "./models/mongoose_models/UserSchema";
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
+
+import type { AuthenticateUser } from "../models/LogInUtilities.js";
+import type { IUser } from "../models/mongoose_models/UserSchema.js";
 
 declare module "express" {
   interface Request {
@@ -20,9 +21,10 @@ declare module "express" {
       userIDInApp?: Pick<IUser, "userIDInApp">;
     };
   }
+}
 
-  interface RequestHandler {
-    (req: Request, res: Response, next: NextFunction): void;
-    (req: Request, res: Response, next: NextFunction): void;
+declare module 'express-session' {
+  export interface SessionData {
+    user: AuthenticateUser;
   }
 }

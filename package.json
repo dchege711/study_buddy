@@ -1,6 +1,7 @@
 {
   "name": "flashcards_server",
   "version": "1.0.0",
+  "type": "commonjs",
   "description": "A web application that helps me review content",
   "main": "server.js",
   "nyc": {
