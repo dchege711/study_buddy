@@ -18,7 +18,7 @@ enum FlagReason {
 export class PublicCardViewer extends LitElement {
   @property({ type: Object}) card: PublicCardResult = null;
 
-  @consume({ context: cardsCarouselContext })
+  @consume({ context: cardsCarouselContext, subscribe: true})
   public cardsCarousel?: CardsCarousel;
 
   private cardDialogRef: Ref<HTMLDialogElement> = createRef();
@@ -96,14 +96,14 @@ export class PublicCardViewer extends LitElement {
       </div>
 
       <div class='action-row'>
-      <button
+        <button
             @click=${() => this.updateCarouselCursor(CardsCarouselUpdateCursorDirection.Previous)}
-            ?disabled=${this.cardsCarousel?.hasPrevious()}>
+            ?disabled=${!this.cardsCarousel?.hasPrevious()}>
           View Similar Card
         </button>
         <button
             @click=${() => this.updateCarouselCursor(CardsCarouselUpdateCursorDirection.Next)}
-            ?disabled=${this.cardsCarousel?.hasNext()}>
+            ?disabled=${!this.cardsCarousel?.hasNext()}>
           View Similar Card
         </button>
       </div>
