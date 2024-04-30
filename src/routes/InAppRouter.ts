@@ -1,8 +1,8 @@
-import type { ReadPublicCardParams, SearchPublicCardParams } from '../models/CardsMongoDB.js';
-import { router, publicProcedure, authedProcedure } from '../trpc.js';
-import * as CardsDB from "../models/CardsMongoDB.js";
-import * as MetadataDB from "../models/MetadataMongoDB.js";
-import { ICardRaw } from '../models/mongoose_models/CardSchema.js';
+import type { ReadPublicCardParams, SearchPublicCardParams } from '../models/CardsMongoDB';
+import { router, publicProcedure, authedProcedure } from '../trpc';
+import * as CardsDB from "../models/CardsMongoDB";
+import * as MetadataDB from "../models/MetadataMongoDB";
+import { ICardRaw } from '../models/mongoose_models/CardSchema';
 
 export const inAppRouter = router({
   fetchPublicCard: publicProcedure

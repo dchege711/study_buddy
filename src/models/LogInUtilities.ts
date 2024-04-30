@@ -8,18 +8,17 @@
  */
 
 import * as stanfordCrypto from "sjcl";
+import { IUser, User } from "./mongoose_models/UserSchema";
+import { Metadata } from "./mongoose_models/MetadataCardSchema";
+import { Card } from "./mongoose_models/CardSchema";
+import { createMany } from "./CardsMongoDB";
+import { IToken, Token } from "./mongoose_models/Token";
+import * as Email from "./EmailClient";
+import * as config from "../config";
+import { APP_NAME } from "../config";
+import { BaseResponse } from "../types";
+import { sanitizeQuery } from "./SanitizationAndValidation";
 import { FilterQuery } from "mongoose";
-
-import { IUser, User } from "./mongoose_models/UserSchema.js";
-import { Metadata } from "./mongoose_models/MetadataCardSchema.js";
-import { Card } from "./mongoose_models/CardSchema.js";
-import { createMany } from "./CardsMongoDB.js";
-import { IToken, Token } from "./mongoose_models/Token.js";
-import * as Email from "./EmailClient.js";
-import * as config from "../config.js";
-import { APP_NAME } from "../config.js";
-import { BaseResponse } from "../types.js";
-import { sanitizeQuery } from "./SanitizationAndValidation.js";
 
 const DIGITS = "0123456789";
 const LOWER_CASE = "abcdefghijklmnopqrstuvwxyz";

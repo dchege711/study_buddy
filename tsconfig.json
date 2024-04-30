@@ -7,23 +7,15 @@
         "rootDir": "./src",
         // Needed so that the client-side tsconfig can reference this.
         "composite": true,
-        // By default all visible "@types" packages are included in your
-        // compilation. Packages in node_modules/@types of any enclosing folder
-        // are considered visible. For example, that means packages within
-        // ./node_modules/@types/, ../node_modules/@types/,
-        // ../../node_modules/@types/, and so on. If typeRoots is specified,
-        // only packages under typeRoots will be included.
-        "typeRoots": ["./node_modules/@types", "./src/@types"]
     },
     // Files to be included in compilation
     "include": [
-        "src/**/*",
+        "./src/**/*"
     ],
     // Files to be excluded from compilation
     "exclude": [
         "node_modules",
         "src/public/**/*",
-        "src/tests/mocha_tests/**/*",
-        "src/tests/selenium_tests/**/*",
+        "src/tests/**/*",
     ]
 }
