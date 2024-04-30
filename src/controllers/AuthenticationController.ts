@@ -1,6 +1,6 @@
 "use strict";
 
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response, RequestHandler } from "express";
 import { StatusCodes } from "http-status-codes";
 
 import * as LogInUtilities from "../models/LogInUtilities";
@@ -16,18 +16,18 @@ const defaultTemplateObject = {
  * @description Middleware designed to ensure that users are logged in before
  * using certain URLs
  */
-export function requireLogIn(req: Request, res: Response, next: NextFunction) {
-    if (!req.session?.user) {
-        res.redirect(StatusCodes.SEE_OTHER, "/login");
-    } else if (req.session?.user) {
-        if (req.body && req.body.userIDInApp) {
-            // I expect these to be the same, but just in case...
-            req.body.userIDInApp = req.session?.user.userIDInApp;
-        }
-        next();
-    } else if (req.cookies.session_token) {
-        logInBySessionToken(req.cookies.session_token, res, next);
-    }
+export const requireLogIn: RequestHandler = (req, res, next) => {
+  if (!req.session?.user) {
+      res.redirect(StatusCodes.SEE_OTHER, "/login");
+  } else if (req.session?.user) {
+      if (req.body && req.body.userIDInApp) {
+          // I expect these to be the same, but just in case...
+          req.body.userIDInApp = req.session?.user.userIDInApp;
+      }
+      next();
+  } else if (req.cookies.session_token) {
+      logInBySessionToken(req.cookies.session_token, res, next);
+  }
 };
 
 /**
