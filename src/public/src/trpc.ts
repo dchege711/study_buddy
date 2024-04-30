@@ -16,6 +16,11 @@ export const trpc = createTRPCClient<AppRouter>({
 type RouterInput = inferRouterInputs<AppRouter>;
 type RouterOutput = inferRouterOutputs<AppRouter>;
 
+// TODO: Assert PublicCardSearchQuery and PrivateCardSearchQuery are the same?
+type PublicCardSearchQuery = RouterInput['searchPublicCards'];
+type PrivateCardSearchQuery = RouterInput['searchCards'];
+export type CardSearchQuery = PublicCardSearchQuery | PrivateCardSearchQuery;
+
 export type CardSearchResult = RouterOutput['searchPublicCards'][0];
 export type PublicCardResult = RouterOutput['fetchPublicCard'];
 export type PrivateCardResult = RouterOutput['fetchCard'][0];

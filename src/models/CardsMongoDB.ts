@@ -94,7 +94,19 @@ export async function update(payload: Partial<ICard>): Promise<ICardRaw> {
     ]).then(() => newCard as ICard);
 };
 
-export interface SearchCardParams {queryString: string; userIDInApp: number; limit: number};
+export interface SearchCardParams {
+  queryString: string;
+  limit: number;
+  creationStartDate?: Date;
+  creationEndDate?: Date;
+  // TODO: Change this to Array<Pick<ICardRaw, "_id">>?
+  cardIDs?: string;
+};
+
+interface ServerAddedSearchCardParams {
+  createdById?: number;
+  isPublic?: Boolean;
+}
 
 interface CardQuery {
     filter: FilterQuery<ICard>;
@@ -102,6 +114,9 @@ interface CardQuery {
     limit: number;
     sortCriteria: object;
 };
+
+const kCardsSearchProjection = "title tags urgency";
+type CardsSearchResult = Pick<ICardRaw, "_id" | "title" | "tags" | "urgency">;
 
 /**
  * @description Search for cards with associated key words. Search should be
@@ -118,28 +133,15 @@ interface CardQuery {
  * as keys. If successful `message` will contain abbreviated cards that only
  * the `id`, `urgency` and `title` fields.
  */
-export function search(payload: SearchCardParams): Promise<Partial<ICard>[]> {
+export function search(payload: SearchCardParams, createdById: number): Promise<CardsSearchResult[]> {
     /**
      * $expr is faster than $where because it does not execute JavaScript
      * and should be preferred where possible. Note that the JS expression
      * is processed for EACH document in the collection. Yikes!
      */
-
-    payload = sanitizeQuery(payload);
-    payload.queryString = splitTags(payload.queryString);
-    let queryObject = {
-        filter: {
-            $and: [
-                { createdById: payload.userIDInApp },
-                { $text: { $search: payload.queryString } }
-            ]
-        },
-        projection: "title tags urgency",
-        limit: payload.limit,
-        sortCriteria: { score: { $meta: "textScore" } }
-
-    };
-    return collectSearchResults(queryObject);
+    return collectSearchResults(
+      computeInternalQueryFromClientQuery(
+        sanitizeQuery(payload), { createdById }));
 };
 
 /**
@@ -164,6 +166,44 @@ let splitTags = function(s:string): string {
     return s;
 }
 
+function computeInternalQueryFromClientQuery(clientQuery: SearchCardParams, serverAddedParams: ServerAddedSearchCardParams): CardQuery {
+  const mandatoryFields: FilterQuery<ICard>[] = [];
+  if (clientQuery.queryString) {
+      mandatoryFields.push({ $text: { $search: splitTags(clientQuery.queryString) }});
+  }
+  if (serverAddedParams.createdById) {
+    mandatoryFields.push({ createdById: serverAddedParams.createdById });
+  }
+
+  if (serverAddedParams.isPublic) {
+    mandatoryFields.push({ isPublic: serverAddedParams.isPublic });
+  }
+
+  if (clientQuery.cardIDs) {
+    mandatoryFields.push({ _id: { $in: Array.from(clientQuery.cardIDs.split(",")) }});
+}
+
+  if (clientQuery.creationStartDate || clientQuery.creationEndDate) {
+    let dateQuery: {$gt?: Date, $lt?: Date} = {}
+    if (clientQuery.creationStartDate) {
+      dateQuery["$gt"] = clientQuery.creationStartDate;
+    }
+    if (clientQuery.creationEndDate) {
+      dateQuery["$lt"] = clientQuery.creationEndDate;
+    }
+    mandatoryFields.push({createdAt: dateQuery});
+  }
+
+  const sortCriteria = clientQuery.queryString ? { score: { $meta: "textScore" } } : {};
+
+  return {
+      filter: { $and: mandatoryFields },
+      projection: kCardsSearchProjection,
+      limit: clientQuery.limit || 100,
+      sortCriteria: sortCriteria,
+  };
+}
+
 /**
  * @description Search the database for cards matching the specified schema.
  * Return the results to the callback function that was passed in.
@@ -171,19 +211,12 @@ let splitTags = function(s:string): string {
  * @returns {Promise} resolves with a JSON object. If `success` is set, then
  * the `message` attribute will be an array of matching cards.
  */
-let collectSearchResults = function(queryObject: CardQuery): Promise<Partial<ICard>[]> {
-    return Card.find(queryObject.filter, queryObject.projection)
+let collectSearchResults = function(queryObject: CardQuery): Promise<CardsSearchResult[]> {
+    return Card.find(queryObject.filter, kCardsSearchProjection)
         .sort(queryObject.sortCriteria)
         .limit(queryObject.limit)
         .exec();
 }
-
-/**
- * TODO(dchege711): Unify this with SearchCardParams above?
- */
-export interface SearchPublicCardParams {
-    queryString?: string; cardIDs?: string; limit?: number;
-    creationStartDate?: Date; creationEndDate?: Date};
 
 /**
  * @description Find cards that satisfy the given criteria and are publicly
@@ -200,33 +233,10 @@ export interface SearchPublicCardParams {
  * @returns {Promise} resolves with a JSON object. If `success` is set, then
  * the `message` attribute will be an array of matching cards.
  */
-export function publicSearch(payload: SearchPublicCardParams): Promise<Array<Partial<ICardRaw>>> {
-    payload = sanitizeQuery(payload);
-
-    let mandatoryFields : Array<any> = [{isPublic: true}];
-    if (payload.cardIDs) {
-        mandatoryFields.push({ _id: { $in: Array.from(payload.cardIDs.split(",")) }});
-    }
-
-    let sortCriteria = {};
-    if (payload.queryString) {
-        mandatoryFields.push({ $text: { $search: splitTags(payload.queryString) } });
-        sortCriteria = { score: { $meta: "textScore" } };
-    }
-    if (payload.creationStartDate || payload.creationEndDate) {
-        let dateQuery: {$gt?: Date, $lt?: Date} = {}
-        if (payload.creationStartDate) dateQuery["$gt"] = payload.creationStartDate;
-        if (payload.creationEndDate) dateQuery["$lt"] = payload.creationEndDate;
-        mandatoryFields.push({createdAt: dateQuery});
-    }
-
-    let queryObject : CardQuery = {
-        filter: { $and: mandatoryFields },
-        projection: "title tags",
-        limit: payload.limit || 100,
-        sortCriteria: sortCriteria,
-    };
-    return collectSearchResults(queryObject);
+export function publicSearch(payload: SearchCardParams): Promise<CardsSearchResult[]> {
+    return collectSearchResults(
+      computeInternalQueryFromClientQuery(
+        sanitizeQuery(payload), {isPublic: true}));
 }
 
 export type ReadPublicCardParams = Omit<ReadCardParams, "userIDInApp">;
