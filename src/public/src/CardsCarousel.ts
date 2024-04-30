@@ -239,4 +239,18 @@ export class CardsCarousel implements Iterable<CardsCarouselBSTKey> {
             ];
         }
     }
+
+    get state() {
+      const current = this.currentNode;
+      const next = current ? this.bst.next(current) : null;
+      const previous = current ? this.bst.prev(current) : null;
+      return {
+        current: current?.key || null,
+        next: next?.key || null,
+        previous: previous?.key || null,
+        hasNext: this.hasNext(),
+        hasPrevious: this.hasPrevious(),
+        size: this.bst.size
+      };
+    }
 }

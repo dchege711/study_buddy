@@ -152,4 +152,51 @@ describe('CardsCarousel', function () {
     expect(success).to.be.false;
     expect(carousel.current()?._id).to.eql(currentId);
   });
+
+  it('should populate state correctly', function() {
+    const carousel = new CardsCarousel([
+      { _id: '1', urgency: 1 },
+      { _id: '2', urgency: 2 },
+      { _id: '3', urgency: 3 },
+    ]);
+
+    expect(carousel.state).deep.eq({
+      current: { _id: '3', urgency: 3 },
+      next: { _id: '2', urgency: 2 },
+      previous: null,
+      hasNext: true,
+      hasPrevious: false,
+      size: 3,
+    });
+
+    carousel.next();
+    expect(carousel.state).deep.eq({
+      current: { _id: '2', urgency: 2 },
+      next: { _id: '1', urgency: 1 },
+      previous: { _id: '3', urgency: 3 },
+      hasNext: true,
+      hasPrevious: true,
+      size: 3,
+    });
+
+    carousel.next();
+    expect(carousel.state).deep.eq({
+      current: { _id: '1', urgency: 1 },
+      next: null,
+      previous: { _id: '2', urgency: 2 },
+      hasNext: false,
+      hasPrevious: true,
+      size: 3,
+    });
+
+    carousel.removeCard({ _id: '1', urgency: 1 });
+    expect(carousel.state).deep.eq({
+      current: { _id: '2', urgency: 2 },
+      next: null,
+      previous: { _id: '3', urgency: 3 },
+      hasNext: false,
+      hasPrevious: true,
+      size: 2,
+    });
+  })
 });
