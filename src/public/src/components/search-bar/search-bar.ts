@@ -2,7 +2,7 @@ import { LitElement, css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { createRef, ref, Ref } from 'lit/directives/ref.js';
 
-import { trpc, CardSearchResult } from '../../trpc.js';
+import { trpc, CardSearchResult, CardSearchQuery } from '../../trpc.js';
 import { SearchResultsChangedEvent } from '../../context/search-results-context.js';
 
 enum InputState {
@@ -21,6 +21,11 @@ export class SearchBar extends LitElement {
   @state() private receivedNoResults = false;
 
   inputRef: Ref<HTMLInputElement> = createRef();
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    this.maybeFetchInitialResults();
+  }
 
   render() {
     const showResults = this.searchResults.length > 0 || this.receivedNoResults;
@@ -81,8 +86,7 @@ export class SearchBar extends LitElement {
 
     const stillTyping = inputState === InputState.PressedSpace;
 
-    const cardFetcher = this.isPrivateSearch ? trpc.searchCards : trpc.searchPublicCards;
-    const cards = await cardFetcher.query({
+    const cards = await this.fetchResults({
       limit: stillTyping ? 7 : Infinity,
       queryString,
     });
@@ -118,6 +122,24 @@ export class SearchBar extends LitElement {
         return InputState.PressedEnter;
       default:
         return InputState.InWord;
+    }
+  }
+
+  private maybeFetchInitialResults() {
+    if (this.searchResults.length !== 0) {
+      return;
+    }
+
+    this.fetchResults({ limit: Infinity, queryString: '' }).then((results) => {
+      this.dispatchSearchResults(results);
+    });
+  }
+
+  private fetchResults(searchQuery: CardSearchQuery) {
+    if (this.isPrivateSearch) {
+      return trpc.searchCards.query(searchQuery);
+    } else {
+      return trpc.searchPublicCards.query(searchQuery);
     }
   }
 
