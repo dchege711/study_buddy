@@ -166,6 +166,15 @@ export class CardsCarousel implements Iterable<CardsCarouselBSTKey> {
         }
     };
 
+    setCurrentCard(key: CardsCarouselBSTKey): Boolean {
+      let node = this.bst.find(key);
+      if (node === null) {
+          return false;
+      }
+      this.currentNode = node;
+      return true;
+    }
+
     /**
      * @description Insert a card into the set of cards that can be discovered
      * by the `next()` and `prev()` iterators. The card will be insrted into
