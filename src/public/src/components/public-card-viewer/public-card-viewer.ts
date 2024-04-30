@@ -2,9 +2,12 @@ import { LitElement, css, html, nothing } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { createRef, ref, Ref } from 'lit/directives/ref.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import { consume } from '@lit/context';
 
 import { FlagCardParams, PublicCardResult, trpc } from '../../trpc.js';
 import { atomOneLight } from '../syntax-highlighting.styles.js';
+import { CardsCarouselUpdateCursorDirection, CardsCarouselUpdateCursorEvent, cardsCarouselContext } from '../../context/cards-carousel-context.js';
+import { CardsCarousel } from '../../CardsCarousel.js';
 
 enum FlagReason {
   Inappropriate = 1,
@@ -14,6 +17,9 @@ enum FlagReason {
 @customElement('public-card-viewer')
 export class PublicCardViewer extends LitElement {
   @property({ type: Object}) card: PublicCardResult = null;
+
+  @consume({ context: cardsCarouselContext })
+  public cardsCarousel?: CardsCarousel;
 
   private cardDialogRef: Ref<HTMLDialogElement> = createRef();
 
@@ -39,6 +45,15 @@ export class PublicCardViewer extends LitElement {
     }
 
     trpc.flagCard.mutate(flagCardParams);
+  }
+
+  private updateCarouselCursor(direction: CardsCarouselUpdateCursorDirection) {
+    if (!this.cardsCarousel) {
+      return;
+    }
+
+    let event = new CardsCarouselUpdateCursorEvent(direction);
+    this.dispatchEvent(event);
   }
 
   render() {
@@ -68,7 +83,7 @@ export class PublicCardViewer extends LitElement {
       </div>
       <p><em>Tags: </em> ${this.card.tags}</p>
 
-      <div id='action-row'>
+      <div class='action-row'>
         <button @click=${() => this.flagCard(FlagReason.Inappropriate)}>
           Flag as Inappropriate
         </button>
@@ -77,6 +92,19 @@ export class PublicCardViewer extends LitElement {
         </button>
         <button disabled>
           Copy to My Collection
+        </button>
+      </div>
+
+      <div class='action-row'>
+      <button
+            @click=${() => this.updateCarouselCursor(CardsCarouselUpdateCursorDirection.Previous)}
+            ?disabled=${this.cardsCarousel?.hasPrevious()}>
+          View Similar Card
+        </button>
+        <button
+            @click=${() => this.updateCarouselCursor(CardsCarouselUpdateCursorDirection.Next)}
+            ?disabled=${this.cardsCarousel?.hasNext()}>
+          View Similar Card
         </button>
       </div>
     `;
@@ -98,7 +126,7 @@ export class PublicCardViewer extends LitElement {
           justify-content: flex-end;
         }
 
-        div#action-row {
+        div.action-row {
           display: flex;
           justify-content: space-between;
         }
