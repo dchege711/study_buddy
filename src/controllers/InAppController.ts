@@ -52,7 +52,7 @@ export function browsePageGet(req: Request, res: Response) {
     let templateVars = getDefaultTemplateVars(req);
     templateVars.SEARCH_ENDPOINT_URL = "/browse";
     CardsDB
-        .publicSearch(req.query as unknown as CardsDB.SearchPublicCardParams)
+        .publicSearch(req.query as unknown as CardsDB.SearchCardParams)
         .then((abbreviatedCards) => {
             templateVars.abbreviatedCards = abbreviatedCards;
             res.render("pages/browse_cards_page.ejs", templateVars);

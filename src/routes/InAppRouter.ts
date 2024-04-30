@@ -1,4 +1,4 @@
-import type { ReadPublicCardParams, SearchPublicCardParams } from '../models/CardsMongoDB';
+import type { ReadPublicCardParams } from '../models/CardsMongoDB';
 import { router, publicProcedure, authedProcedure } from '../trpc';
 import * as CardsDB from "../models/CardsMongoDB";
 import * as MetadataDB from "../models/MetadataMongoDB";
@@ -12,7 +12,7 @@ export const inAppRouter = router({
     }),
 
   searchPublicCards: publicProcedure
-    .input((params: unknown) => params as SearchPublicCardParams)
+    .input((params: unknown) => params as CardsDB.SearchCardParams)
     .query(({ input }) => {
       return CardsDB.publicSearch(input);
     }),
@@ -64,9 +64,9 @@ export const inAppRouter = router({
    * and isPublic in the latter.
    */
   searchCards: authedProcedure
-    .input((params: unknown) => params as Omit<CardsDB.SearchCardParams, "userIDInApp">)
+    .input((params: unknown) => params as CardsDB.SearchCardParams)
     .query(({ input, ctx }) => {
-      return CardsDB.search({ ...input, userIDInApp: ctx.user.userIDInApp });
+      return CardsDB.search(input, ctx.user.userIDInApp);
     }),
 
   duplicateCard: authedProcedure
