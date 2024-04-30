@@ -117,9 +117,19 @@ export class PublicCardViewer extends LitElement {
       }
 
       dialog {
-        max-width: 80%;
         border: 1px solid var(--main-border-color);
         border-radius: 4px;
+
+        /**
+         * Provide spatial stability to the previous/next buttons that are found
+         * in the bottom action row. That way, the user can click the same
+         * location to move to the next/previous card.
+         */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 80%;
+        height: 80%;
 
         div#top-row {
           display: flex;
