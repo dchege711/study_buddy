@@ -124,4 +124,32 @@ describe('CardsCarousel', function () {
     carousel.removeCard(currentCard!);
     expect(carousel.current()?._id).to.eql('2');
   });
+
+  it('should handle setting current() to a specific card', function () {
+    const carousel = new CardsCarousel([
+      { _id: '1', urgency: 1 },
+      { _id: '2', urgency: 2 },
+      { _id: '3', urgency: 3 },
+    ]);
+
+    expect(carousel.current()?._id).to.not.eql('2');
+    let success = carousel.setCurrentCard({ _id: '2', urgency: 2 });
+    expect(success).to.be.true;
+    expect(carousel.current()?._id).to.eql('2');
+  });
+
+  it('should no-op if setting current() to a non-existent card', function () {
+    const carousel = new CardsCarousel([
+      { _id: '1', urgency: 1 },
+      { _id: '2', urgency: 2 },
+      { _id: '3', urgency: 3 },
+    ]);
+
+    let currentId = carousel.current()!._id;
+    expect(currentId).to.eql('3');
+
+    let success = carousel.setCurrentCard({ _id: '4', urgency: 4 });
+    expect(success).to.be.false;
+    expect(carousel.current()?._id).to.eql(currentId);
+  });
 });
