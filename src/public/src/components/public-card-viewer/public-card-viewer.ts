@@ -56,7 +56,16 @@ export class PublicCardViewer extends LitElement {
     this.dispatchEvent(event);
   }
 
+  private closeDialog() {
+    this.cardDialogRef.value?.close();
+    this.card = null;
+  }
+
   render() {
+    if (!this.card) {
+      return nothing;
+    }
+
     return html`
       <dialog ${ref(this.cardDialogRef)}>
         ${this.renderCard()}
@@ -66,12 +75,12 @@ export class PublicCardViewer extends LitElement {
 
   private renderCard() {
     if (!this.card) {
-      return nothing;
+      throw new Error('No card to render');
     }
 
     return html`
       <div id='top-row'>
-        <button @click=${() => this.cardDialogRef.value?.close()}>
+        <button @click=${this.closeDialog}>
           &#10006; Close
         </button>
       </div>
