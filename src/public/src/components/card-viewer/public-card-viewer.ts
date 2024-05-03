@@ -1,13 +1,10 @@
-import { LitElement, css, html, nothing } from 'lit';
+import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { createRef, ref, Ref } from 'lit/directives/ref.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import { consume } from '@lit/context';
 
+import { CardViewer } from './base-card-viewer.js';
 import { FlagCardParams, PublicCardResult, trpc } from '../../trpc.js';
-import { atomOneLight } from '../syntax-highlighting.styles.js';
-import { CardsCarouselUpdateCursorDirection, CardsCarouselUpdateCursorEvent, cardsCarouselContext } from '../../context/cards-carousel-context.js';
-import { CardsCarousel } from '../../CardsCarousel.js';
+import { CardsCarouselUpdateCursorDirection } from '../../context/cards-carousel-context.js';
 
 enum FlagReason {
   Inappropriate = 1,
@@ -15,19 +12,9 @@ enum FlagReason {
 }
 
 @customElement('public-card-viewer')
-export class PublicCardViewer extends LitElement {
-  @property({ type: Object}) card: PublicCardResult = null;
-
-  @consume({ context: cardsCarouselContext, subscribe: true})
-  public cardsCarousel?: CardsCarousel;
-
-  private cardDialogRef: Ref<HTMLDialogElement> = createRef();
-
-  updated(changedProperties: Map<string, any>) {
-    if (changedProperties.has('card') && this.card) {
-      this.cardDialogRef.value?.showModal();
-    }
-  }
+export class PublicCardViewer extends CardViewer {
+  @property({ type: Object})
+  protected card: PublicCardResult = null;
 
   private flagCard(reason: FlagReason) {
     if (!this.card) {
@@ -47,33 +34,11 @@ export class PublicCardViewer extends LitElement {
     trpc.flagCard.mutate(flagCardParams);
   }
 
-  private updateCarouselCursor(direction: CardsCarouselUpdateCursorDirection) {
-    if (!this.cardsCarousel) {
-      return;
-    }
-
-    let event = new CardsCarouselUpdateCursorEvent(direction);
-    this.dispatchEvent(event);
-  }
-
-  private closeDialog() {
-    this.cardDialogRef.value?.close();
-    this.card = null;
-  }
-
   render() {
-    if (!this.card) {
-      return nothing;
-    }
-
-    return html`
-      <dialog ${ref(this.cardDialogRef)}>
-        ${this.renderCard()}
-      </dialog>
-    `
+    return super.render();
   }
 
-  private renderCard() {
+  protected renderCard() {
     if (!this.card) {
       throw new Error('No card to render');
     }
@@ -120,37 +85,17 @@ export class PublicCardViewer extends LitElement {
   }
 
   static styles = [
+    ...super.styles,
     css`
-      ::backdrop {
-        backdrop-filter: blur(0.1rem);
+      div#top-row {
+        display: flex;
+        justify-content: flex-end;
       }
 
-      dialog {
-        border: 1px solid var(--main-border-color);
-        border-radius: 4px;
-
-        /**
-         * Provide spatial stability to the previous/next buttons that are found
-         * in the bottom action row. That way, the user can click the same
-         * location to move to the next/previous card.
-         */
+      div.action-row {
         display: flex;
-        flex-direction: column;
         justify-content: space-between;
-        width: 80%;
-        height: 80%;
-
-        div#top-row {
-          display: flex;
-          justify-content: flex-end;
-        }
-
-        div.action-row {
-          display: flex;
-          justify-content: space-between;
-        }
       }
     `,
-    atomOneLight
   ];
 }

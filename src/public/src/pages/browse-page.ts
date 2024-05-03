@@ -9,7 +9,7 @@ import { trpc, CardSearchResult, PublicCardResult } from '../trpc.js';
 
 import '../components/search-bar/search-bar.js';
 import '../components/search-results/search-results.js';
-import '../components/public-card-viewer/public-card-viewer.js';
+import '../components/card-viewer/public-card-viewer.js';
 
 @customElement('browse-page')
 export class BrowsePage extends LitElement {
