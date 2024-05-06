@@ -34,10 +34,6 @@ export class PublicCardViewer extends CardViewer {
     trpc.flagCard.mutate(flagCardParams);
   }
 
-  render() {
-    return super.render();
-  }
-
   protected renderCard() {
     if (!this.card) {
       throw new Error('No card to render');
