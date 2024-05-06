@@ -38,6 +38,7 @@ module.exports = (env, args) => {
             },
             entry: {
                 'browse-page': './src/pages/browse-page.ts',
+                'home-page': './src/pages/home-page.ts',
             },
             plugins: [
                 copyWebpackPlugin

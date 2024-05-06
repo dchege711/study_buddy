@@ -21,9 +21,11 @@ type PublicCardSearchQuery = RouterInput['searchPublicCards'];
 type PrivateCardSearchQuery = RouterInput['searchCards'];
 export type CardSearchQuery = PublicCardSearchQuery | PrivateCardSearchQuery;
 
+export type CardFetchEndpoint = typeof trpc.fetchCard.query | typeof trpc.fetchPublicCard.query;
+
 export type CardSearchResult = RouterOutput['searchPublicCards'][0];
 export type PublicCardResult = RouterOutput['fetchPublicCard'];
-export type PrivateCardResult = RouterOutput['fetchCard'][0];
+export type PrivateCardResult = RouterOutput['fetchCard'];
 export type Card = NonNullable<PublicCardResult> | PrivateCardResult;
 export type FlagCardParams = RouterInput['flagCard'];
 export type AddCardParams = RouterInput['addCard'];

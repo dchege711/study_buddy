@@ -59,11 +59,11 @@ export interface ReadCardParams { userIDInApp: number; cardID?: string};
  *
  * @returns {Promise} resolves with an array of all matching cards.
  */
-export function read(payload: ReadCardParams, projection="title description descriptionHTML tags urgency createdById isPublic") : Promise<Partial<ICardRaw>[]> {
+export function read(payload: ReadCardParams, projection="title description descriptionHTML tags urgency createdById isPublic") : Promise<ICardRaw | null> {
     payload = sanitizeQuery(payload);
     let query : Partial<ICard> = {createdById: payload.userIDInApp};
     if (payload.cardID) query._id = payload.cardID;
-    return Card.find(query).select(projection).exec();
+    return Card.findOne(query).select(projection).exec();
 };
 
 /**

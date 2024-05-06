@@ -8,12 +8,12 @@ import '../components/search-bar/search-bar.js';
 import '../components/search-results/search-results.js';
 import '../components/card-viewer/public-card-viewer.js';
 
-@customElement('browse-page')
-export class BrowsePage extends CardsViewingPage {
-  @property({ type: Boolean }) isPrivateSearch = false;
+@customElement('home-page')
+export class HomePage extends CardsViewingPage {
+  @property({ type: Boolean }) isPrivateSearch = true;
 
   constructor() {
-    super(trpc.fetchPublicCard.query);
+    super(trpc.fetchCard.query);
   }
 
   render() {
