@@ -2,7 +2,7 @@ import { LitElement, css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { createRef, ref, Ref } from 'lit/directives/ref.js';
 
-import { trpc, CardSearchResult, CardSearchQuery } from '../../trpc.js';
+import { CardSearchResult, CardSearchQuery, CardSearchEndpoint } from '../../trpc.js';
 import { SearchResultsChangedEvent } from '../../context/search-results-context.js';
 
 enum InputState {
@@ -13,7 +13,7 @@ enum InputState {
 
 @customElement('search-bar')
 export class SearchBar extends LitElement {
-  @property({ type: Boolean }) isPrivateSearch = false;
+  searchEndpoint: CardSearchEndpoint | null = null;
 
   @state()
   private searchResults: CardSearchResult[] = [];
@@ -136,11 +136,11 @@ export class SearchBar extends LitElement {
   }
 
   private fetchResults(searchQuery: CardSearchQuery) {
-    if (this.isPrivateSearch) {
-      return trpc.searchCards.query(searchQuery);
-    } else {
-      return trpc.searchPublicCards.query(searchQuery);
+    if (!this.searchEndpoint) {
+      throw new Error('Search endpoint not set');
     }
+
+    return this.searchEndpoint(searchQuery);
   }
 
   static styles = css`
