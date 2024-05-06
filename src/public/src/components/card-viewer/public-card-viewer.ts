@@ -53,7 +53,12 @@ export class PublicCardViewer extends CardViewer {
       </div>
       <p><em>Tags: </em> ${this.card.tags}</p>
 
-      <div class='action-row'>
+      <div id='action-row'>
+        <button
+            @click=${() => this.updateCarouselCursor(CardsCarouselUpdateCursorDirection.Previous)}
+            ?disabled=${!this.cardsCarousel?.hasPrevious()}>
+          View Similar Card
+        </button>
         <button @click=${() => this.flagCard(FlagReason.Inappropriate)}>
           Flag as Inappropriate
         </button>
@@ -62,14 +67,6 @@ export class PublicCardViewer extends CardViewer {
         </button>
         <button disabled>
           Copy to My Collection
-        </button>
-      </div>
-
-      <div class='action-row'>
-        <button
-            @click=${() => this.updateCarouselCursor(CardsCarouselUpdateCursorDirection.Previous)}
-            ?disabled=${!this.cardsCarousel?.hasPrevious()}>
-          View Similar Card
         </button>
         <button
             @click=${() => this.updateCarouselCursor(CardsCarouselUpdateCursorDirection.Next)}
@@ -88,7 +85,7 @@ export class PublicCardViewer extends CardViewer {
         justify-content: flex-end;
       }
 
-      div.action-row {
+      div#action-row {
         display: flex;
         justify-content: space-between;
       }
