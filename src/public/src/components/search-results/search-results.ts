@@ -73,8 +73,6 @@ export class SearchResults extends LitElement {
   @property({ type: Array })
   results: CardSearchResult[] = [];
 
-  @property({ type: Boolean }) isPrivateSearch = false;
-
   render() {
     return html`
       ${this.results.map(
