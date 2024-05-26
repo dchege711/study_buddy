@@ -9,11 +9,18 @@ import { CardsCarouselUpdateCursorDirection, CardsCarouselUpdateCursorEvent, car
 import { CardsCarousel } from '../../CardsCarousel.js';
 import { atomOneLight } from '../syntax-highlighting.styles.js';
 
-const spoilerMarker = "<span id='spoiler'>[spoiler]</span>";
+export const markdownSpoilerMarker = "[spoiler]";
+const htmlSpoilerMarker = "<span id='spoiler'>[spoiler]</span>";
+
+export enum CardDescriptionType {
+  Prompt,
+  Response,
+}
 
 export interface CardDescription {
-  prompt: TemplateResult | null;
-  response: TemplateResult | null;
+  type: CardDescriptionType;
+  markup: TemplateResult;
+  raw: string;
 }
 
 export class CardViewer extends LitElement {
@@ -25,9 +32,23 @@ export class CardViewer extends LitElement {
 
   protected cardDialogRef: Ref<HTMLDialogElement> = createRef();
 
+  @property({ type: Object})
+  protected cardPrompt: CardDescription | null = null;
+
+  @property({ type: Object})
+  protected cardResponse: CardDescription | null = null;
+
+  protected willUpdate(changedProperties: Map<string, any>) {
+    if (changedProperties.has('card')) {
+      this.updatePromptAndResponse();
+    }
+  }
+
   updated(changedProperties: Map<string, any>) {
-    if (changedProperties.has('card') && this.card) {
-      this.cardDialogRef.value?.showModal();
+    if (changedProperties.has('card')) {
+      if (this.card) {
+        this.cardDialogRef.value?.showModal();
+      }
     }
   }
 
@@ -49,23 +70,43 @@ export class CardViewer extends LitElement {
     throw new Error('CardViewer must be subclassed and implement renderCard()');
   }
 
-  get splitDescription(): CardDescription | null {
+  private updatePromptAndResponse() {
     if (!this.card) {
-      return null;
+      this.cardPrompt = null;
+      this.cardResponse = null;
+      return;
     }
 
-    let combinedHTML = this.card.descriptionHTML;
-    let splitIndex = combinedHTML.indexOf(spoilerMarker);
-    if (splitIndex === -1) {
-      return {
-        prompt: null,
-        response: html`${unsafeHTML(combinedHTML)}`,
+    const combinedRawDescription = this.card.description;
+    const combinedHTML = this.card.descriptionHTML;
+
+    const markdownSplitIndex = combinedRawDescription.indexOf(markdownSpoilerMarker);
+    if (markdownSplitIndex === -1) {
+      this.cardPrompt = null;
+      this.cardResponse = {
+        type: CardDescriptionType.Response,
+        markup: html`${unsafeHTML(combinedHTML)}`,
+        raw: combinedRawDescription,
       };
+      return;
     }
 
-    return {
-      prompt: html`${unsafeHTML(combinedHTML.slice(0, splitIndex))}`,
-      response: html`${unsafeHTML(combinedHTML.slice(splitIndex + spoilerMarker.length))}`,
+    let htmlSplitIndex = combinedHTML.indexOf(htmlSpoilerMarker);
+    if (htmlSplitIndex === -1) {
+      // TODO: Can we avoid this code path? The HTML is updated server-side, so
+      // there is a time when there is a mismatch between the raw and HTML.
+      return;
+    }
+
+    this.cardPrompt = {
+      type: CardDescriptionType.Prompt,
+      markup: html`${unsafeHTML(combinedHTML.slice(0, htmlSplitIndex))}`,
+      raw: combinedRawDescription.slice(0, markdownSplitIndex),
+    };
+    this.cardResponse = {
+      type: CardDescriptionType.Response,
+      markup: html`${unsafeHTML(combinedHTML.slice(htmlSplitIndex + htmlSpoilerMarker.length))}`,
+      raw: combinedRawDescription.slice(markdownSplitIndex + markdownSpoilerMarker.length),
     };
   }
 
