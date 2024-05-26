@@ -5,92 +5,18 @@
         <title><%= APP_NAME %>: Home</title>
         <%- include('../partials/header.ejs'); %>
         <%- include('../partials/syntax_highlighting_and_latex.ejs'); %>
-        <script type="text/javascript" src="/src/CardsManager.bundle.min.js"></script>
-        <script type="text/javascript" src="/src/CardTemplateUtilities.bundle.min.js"></script>
-        <script type="text/javascript" src="/src/TagsBarUtilities.bundle.min.js"></script>
-        <script type="text/javascript" src="/src/AutoComplete.bundle.min.js"></script>
-
-        <style>
-            #streak_bar {
-                background-color: #bf033b;
-                background-image: linear-gradient(45deg, #ffc719 100%, #bf033b 0%);
-            }
-        </style>
-
     </head>
 
     <body>
         <%- include('../partials/app_banner.ejs'); %>
         <div role="presentation" id="app-container">
-
         <%- include('../partials/navbar.ejs'); %>
 
         <div id="main_div">
-
-            <div class="w3-container" id="status_bar">
-
-                <div id="card_search_container" class="w3-half">
-                    <%- include('../partials/search_bar_dropdown.ejs'); %>
-                </div>
-
-                <div class="w3-half">
-                    <div class="w3-threequarter w3-row">
-                        <span class="w3-light-grey w3-left w3-col w3-round-xlarge" style="width:100%">
-                            <div id="streak_bar" class="w3-container w3-center w3-round-xlarge w3-padding" style="width:0%"></div>
-                            <span class='w3-right' id="streak_text"></span>
-                        </span>
-                    </div>
-
-                    <div class="w3-quarter">
-                        <label class="w3-right switch tooltip">
-                            <input type="checkbox" id="reviewModeToggle" onchange="toggleOption('reviewModeToggle');">
-                            <span class="slider round" id="review_mode_label"></span>
-                            <span class="tooltiptext" id="review_mode_tooltip">
-                                After the urgency of a card has been modified, automatically
-                                save the current card and load the next card.
-                                <a href="/wiki#review_mode" target="_blank">Read more</a>
-                            </span>
-                        </label>
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div>
-                <p class="w3-left w3-quarter w3-container tooltip">
-                    <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> The Tagging and Urgency System
-                    <span class="tooltiptext" id="tagging_system_tooltip">
-                        The tags with the most urgent cards appear earlier on the list.
-                        "#probability (7)" means that there are 7 cards that have 'probability' as one of their tags.
-                        <a href="/wiki/#tagging_system" target="_blank">Read more</a>
-                    </span>
-                </p>
-                <p id="filter_list" class="w3-right w3-threequarter w3-container"></p>
-            </div>
-
-            <div class="w3-container">
-
-                <%- include('../partials/tags_bar_template.ejs'); %>
-
-                <div class="w3-threequarter w3-right flexbox" id="minicards_search_results">
-                </div>
-
-            </div>
-
+            <home-page></home-page>
         </div>
 
-        <div id="card_modal" class="w3-modal">
-            <div id="card_container_holder" class="w3-modal-content">
-                <%- include('../partials/card_template.ejs'); %>
-            </div>
-        </div>
-
-        <%- include('../partials/footer.ejs'); %>
-
-        </div>
-
-        <script type="text/javascript" src="/src/HomePage.bundle.min.js" onload="HomePage.initializeHomepage()"></script>
+        <script type="module" src="/src/home-page.js"></script>
 
     </body>
 
