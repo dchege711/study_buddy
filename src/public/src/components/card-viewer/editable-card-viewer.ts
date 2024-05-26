@@ -2,13 +2,14 @@ import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 
-import { CardViewer } from './base-card-viewer.js';
+import { CardViewer, markdownSpoilerMarker } from './base-card-viewer.js';
 import { PrivateCardResult, trpc } from '../../trpc.js';
 import { CardsCarouselUpdateCursorDirection } from '../../context/cards-carousel-context.js';
 import { kCardChangedEventName } from './components/card-changed-event.js';
 
 import './components/copyable.js';
 import './components/editable-card-title.js';
+import './components/editable-card-description.js';
 
 @customElement('editable-card-viewer')
 export class EditableCardViewer extends CardViewer {
@@ -26,11 +27,6 @@ export class EditableCardViewer extends CardViewer {
   protected renderCard() {
     if (!this.card) {
       throw new Error('No card to render');
-    }
-
-    const description = this.splitDescription;
-    if (!description) {
-      throw new Error('No description to render');
     }
 
     return html`
@@ -54,16 +50,18 @@ export class EditableCardViewer extends CardViewer {
         </div>
         <div>
           ${when(
-            description.prompt, () => html`
-              <div class='prompt'>
-                ${description.prompt}
-              </div>
+            this.cardPrompt, () => html`
+              <cg-editable-card-description
+                .value=${this.cardPrompt!}
+                .isEditing=${this.isEditing}>
+              </cg-editable-card-description>
             `)}
           ${when(
-            description.response, () => html`
-              <div class='response'>
-                ${description.response}
-              </div>
+            this.cardResponse, () => html`
+              <cg-editable-card-description
+                .value=${this.cardResponse!}
+                .isEditing=${this.isEditing}>
+              </cg-editable-card-description>
             `)}
         </div>
       </div>
@@ -109,10 +107,16 @@ export class EditableCardViewer extends CardViewer {
         throw new Error('No card to update');
       }
 
+      const updatedPrompt = ev.changes.prompt || this.cardPrompt?.raw || '';
+      const updatedResponse = ev.changes.response || this.cardResponse?.raw || '';
+      const updatedDescription = updatedResponse
+          ? `${updatedPrompt}\n${markdownSpoilerMarker}\n${updatedResponse}`
+          : updatedPrompt;
+
       this.card = {
         ...this.card,
         title: ev.changes.title || this.card.title,
-        description: ev.changes.description || this.card.description,
+        description: updatedDescription,
         tags: ev.changes.tags || this.card.tags,
         urgency: ev.changes.urgency || this.card.urgency,
         isPublic: ev.changes.isPublic || this.card.isPublic,

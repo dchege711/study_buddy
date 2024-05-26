@@ -2,7 +2,9 @@ import { Card } from '../../../trpc.js';
 
 export const kCardChangedEventName = 'card-changed';
 
-type ModifiableCardAttributes = Partial<Pick<Card, 'title' | 'description' | 'urgency' | 'tags' | 'isPublic'>>;
+export type ModifiableCardAttributes =
+  Partial<Pick<Card, 'title' | 'urgency' | 'tags' | 'isPublic'>>
+  & { prompt?: string, response?: string };
 
 export class CardChangedEvent extends Event {
     changes: ModifiableCardAttributes;
