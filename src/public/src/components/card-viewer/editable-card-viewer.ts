@@ -4,6 +4,8 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { CardViewer } from './base-card-viewer.js';
 import { PrivateCardResult } from '../../trpc.js';
 
+import './components/copyable.js';
+
 @customElement('editable-card-viewer')
 export class EditableCardViewer extends CardViewer {
   @property({ type: Object})
@@ -17,13 +19,9 @@ export class EditableCardViewer extends CardViewer {
       throw new Error('No card to render');
     }
 
-    const shareableLink = this.card.isPublic
-      ? html`<p>${document.location.origin}/browse/?cardID=${this.card._id}</p>`
-      : nothing;
-
     return html`
       <div id='top-row'>
-        ${shareableLink}
+        ${this.renderShareableLink()}
         <button @click=${this.closeDialog}>
           &#10006; Close
         </button>
@@ -45,4 +43,18 @@ export class EditableCardViewer extends CardViewer {
       }
     `,
   ];
+
+  private renderShareableLink() {
+    if (!this.card) {
+      throw new Error('No card to render');
+    }
+
+    return this.card.isPublic
+      ? html`
+          <cg-copyable>
+            <span>${document.location.origin}/browse/?cardID=${this.card._id}</span>
+          </cg-copyable>
+        `
+      : nothing;
+  }
 }
