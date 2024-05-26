@@ -4,12 +4,19 @@ import { when } from 'lit/directives/when.js';
 
 import { CardViewer } from './base-card-viewer.js';
 import { PrivateCardResult, trpc } from '../../trpc.js';
+import { CardsCarouselUpdateCursorDirection } from '../../context/cards-carousel-context.js';
+import { kCardChangedEventName } from './components/card-changed-event.js';
 
 import './components/copyable.js';
-import { CardsCarouselUpdateCursorDirection } from '../../context/cards-carousel-context.js';
+import './components/editable-card-title.js';
 
 @customElement('editable-card-viewer')
 export class EditableCardViewer extends CardViewer {
+  constructor() {
+    super();
+    this.addEventListeners();
+  }
+
   @property({ type: Object})
   protected card: PrivateCardResult = null;
 
@@ -27,27 +34,40 @@ export class EditableCardViewer extends CardViewer {
     }
 
     return html`
-      <div id='top-row'>
+      <div class='space-between reverse'>
         <button @click=${this.closeDialog}>
           &#10006; Close
         </button>
         ${this.renderShareableLink()}
       </div>
       <div>
-        ${when(
-          description.prompt, () => html`
-            <div class='prompt'>
-              ${description.prompt}
-            </div>
-          `)}
-        ${when(
-          description.response, () => html`
-            <div class='response'>
-              ${description.response}
-            </div>
-          `)}
+        <div class='space-between'>
+          <cg-editable-card-title .value=${this.card.title}>
+          </cg-editable-card-title>
+          <div>
+            <button
+                @click=${() => this.isEditing = !this.isEditing}
+                ?disabled=${this.isEditing}>
+              &#x270E; Edit
+            </button>
+          </div>
+        </div>
+        <div>
+          ${when(
+            description.prompt, () => html`
+              <div class='prompt'>
+                ${description.prompt}
+              </div>
+            `)}
+          ${when(
+            description.response, () => html`
+              <div class='response'>
+                ${description.response}
+              </div>
+            `)}
+        </div>
       </div>
-      <div id='action-row'>
+      <div class='space-between'>
         <button @click=${() => this.deleteCard()}>
           &#x2716; Delete
         </button>
@@ -71,18 +91,34 @@ export class EditableCardViewer extends CardViewer {
   static styles = [
     ...super.styles,
     css`
-      div#top-row {
-        display: flex;
-        justify-content: space-between;
+      .reverse {
         flex-direction: row-reverse;
       }
 
-      div#action-row {
+      .space-between {
         display: flex;
+        gap: 4px;
         justify-content: space-between;
       }
     `,
   ];
+
+  private addEventListeners() {
+    this.addEventListener(kCardChangedEventName, (ev) => {
+      if (!this.card) {
+        throw new Error('No card to update');
+      }
+
+      this.card = {
+        ...this.card,
+        title: ev.changes.title || this.card.title,
+        description: ev.changes.description || this.card.description,
+        tags: ev.changes.tags || this.card.tags,
+        urgency: ev.changes.urgency || this.card.urgency,
+        isPublic: ev.changes.isPublic || this.card.isPublic,
+      }
+    });
+  }
 
   private renderShareableLink() {
     if (!this.card) {
