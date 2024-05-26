@@ -9,6 +9,8 @@ import { CardsCarouselUpdateCursorDirection, CardsCarouselUpdateCursorEvent, car
 import { CardsCarousel } from '../../CardsCarousel.js';
 import { atomOneLight } from '../syntax-highlighting.styles.js';
 
+const spoilerMarker = "<span id='spoiler'>[spoiler]</span>";
+
 export interface CardDescription {
   prompt: TemplateResult | null;
   response: TemplateResult | null;
@@ -53,7 +55,7 @@ export class CardViewer extends LitElement {
     }
 
     let combinedHTML = this.card.descriptionHTML;
-    let splitIndex = combinedHTML.indexOf("<span id='spoiler'>");
+    let splitIndex = combinedHTML.indexOf(spoilerMarker);
     if (splitIndex === -1) {
       return {
         prompt: null,
@@ -63,7 +65,7 @@ export class CardViewer extends LitElement {
 
     return {
       prompt: html`${unsafeHTML(combinedHTML.slice(0, splitIndex))}`,
-      response: html`${unsafeHTML(combinedHTML.slice(splitIndex))}`,
+      response: html`${unsafeHTML(combinedHTML.slice(splitIndex + spoilerMarker.length))}`,
     };
   }
 
