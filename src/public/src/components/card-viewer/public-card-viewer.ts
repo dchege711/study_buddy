@@ -1,10 +1,12 @@
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import { when } from 'lit/directives/when.js';
 
 import { CardViewer } from './base-card-viewer.js';
 import { FlagCardParams, PublicCardResult, trpc } from '../../trpc.js';
 import { CardsCarouselUpdateCursorDirection } from '../../context/cards-carousel-context.js';
+
+import './components/editable-card-description.js';
 
 enum FlagReason {
   Inappropriate = 1,
@@ -46,12 +48,24 @@ export class PublicCardViewer extends CardViewer {
         </button>
       </div>
 
-      <h3>${this.card.title}</h3>
-
-      <div>
-        ${unsafeHTML(this.card.descriptionHTML)}
+      <div id='main-card-content'>
+        <h3>${this.card.title}</h3>
+        ${when(
+          this.cardPrompt, () => html`
+            <cg-editable-card-description
+              .value=${this.cardPrompt!}
+              .isEditing=${false}>
+            </cg-editable-card-description>
+          `)}
+        ${when(
+          this.cardResponse, () => html`
+            <cg-editable-card-description
+              .value=${this.cardResponse!}
+              .isEditing=${false}>
+            </cg-editable-card-description>
+          `)}
+        <p><em>Tags: </em> ${this.card.tags}</p>
       </div>
-      <p><em>Tags: </em> ${this.card.tags}</p>
 
       <div id='action-row'>
         <button
@@ -88,6 +102,13 @@ export class PublicCardViewer extends CardViewer {
       div#action-row {
         display: flex;
         justify-content: space-between;
+      }
+
+      div#main-card-content {
+        display: flex;
+        flex-grow: 1;
+        flex-direction: column;
+        gap: 4px;
       }
     `,
   ];
