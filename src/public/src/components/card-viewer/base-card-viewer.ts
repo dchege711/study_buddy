@@ -10,8 +10,8 @@ import { CardsCarousel } from '../../CardsCarousel.js';
 import { atomOneLight } from '../syntax-highlighting.styles.js';
 
 export interface CardDescription {
-  prompt: TemplateResult | typeof nothing;
-  response: TemplateResult | typeof nothing;
+  prompt: TemplateResult | null;
+  response: TemplateResult | null;
 }
 
 export class CardViewer extends LitElement {
@@ -56,7 +56,7 @@ export class CardViewer extends LitElement {
     let splitIndex = combinedHTML.indexOf("<span id='spoiler'>");
     if (splitIndex === -1) {
       return {
-        prompt: nothing,
+        prompt: null,
         response: html`${unsafeHTML(combinedHTML)}`,
       };
     }
