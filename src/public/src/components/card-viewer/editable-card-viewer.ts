@@ -36,7 +36,7 @@ export class EditableCardViewer extends CardViewer {
         </button>
         ${this.renderShareableLink()}
       </div>
-      <div>
+      <div id='main-card-content'>
         <div class='space-between'>
           <cg-editable-card-title .value=${this.card.title}>
           </cg-editable-card-title>
@@ -97,6 +97,13 @@ export class EditableCardViewer extends CardViewer {
         display: flex;
         gap: 4px;
         justify-content: space-between;
+      }
+
+      div#main-card-content {
+        display: flex;
+        flex-grow: 1;
+        flex-direction: column;
+        gap: 4px;
       }
     `,
   ];
