@@ -21,10 +21,10 @@ export class EditableCardViewer extends CardViewer {
 
     return html`
       <div id='top-row'>
-        ${this.renderShareableLink()}
         <button @click=${this.closeDialog}>
           &#10006; Close
         </button>
+        ${this.renderShareableLink()}
       </div>
     `;
   }
@@ -35,6 +35,7 @@ export class EditableCardViewer extends CardViewer {
       div#top-row {
         display: flex;
         justify-content: space-between;
+        flex-direction: row-reverse;
       }
 
       div#action-row {
