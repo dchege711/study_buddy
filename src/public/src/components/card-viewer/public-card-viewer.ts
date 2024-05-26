@@ -57,7 +57,7 @@ export class PublicCardViewer extends CardViewer {
         <button
             @click=${() => this.updateCarouselCursor(CardsCarouselUpdateCursorDirection.Previous)}
             ?disabled=${!this.cardsCarousel?.hasPrevious()}>
-          View Similar Card
+          &#x276E; View Similar Card
         </button>
         <button @click=${() => this.flagCard(FlagReason.Inappropriate)}>
           Flag as Inappropriate
@@ -71,7 +71,7 @@ export class PublicCardViewer extends CardViewer {
         <button
             @click=${() => this.updateCarouselCursor(CardsCarouselUpdateCursorDirection.Next)}
             ?disabled=${!this.cardsCarousel?.hasNext()}>
-          View Similar Card
+          View Similar Card &#x276F;
         </button>
       </div>
     `;
