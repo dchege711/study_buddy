@@ -6,7 +6,7 @@ import { CardsViewingPage } from './common/cards-viewing-page.js';
 
 import '../components/search-bar/search-bar.js';
 import '../components/search-results/search-results.js';
-import '../components/card-viewer/public-card-viewer.js';
+import '../components/card-viewer/editable-card-viewer.js';
 
 @customElement('home-page')
 export class HomePage extends CardsViewingPage {
@@ -20,7 +20,7 @@ export class HomePage extends CardsViewingPage {
           .searchEndpoint=${(q: CardSearchQuery) => trpc.searchCards.query(q)}>
       </search-bar>
       <search-results></search-results>
-      <public-card-viewer .card=${this.selectedResult}></public-card-viewer>
+      <editable-card-viewer .card=${this.selectedResult}></editable-card-viewer>
     `;
   }
 }
