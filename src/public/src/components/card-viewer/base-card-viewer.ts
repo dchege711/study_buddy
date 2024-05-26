@@ -2,11 +2,17 @@ import { LitElement, TemplateResult, css, html, nothing } from 'lit';
 import { property } from 'lit/decorators.js';
 import { createRef, ref, Ref } from 'lit/directives/ref.js';
 import { consume } from '@lit/context';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
 import { Card } from '../../trpc.js';
 import { CardsCarouselUpdateCursorDirection, CardsCarouselUpdateCursorEvent, cardsCarouselContext } from '../../context/cards-carousel-context.js';
 import { CardsCarousel } from '../../CardsCarousel.js';
 import { atomOneLight } from '../syntax-highlighting.styles.js';
+
+export interface CardDescription {
+  prompt: TemplateResult | typeof nothing;
+  response: TemplateResult | typeof nothing;
+}
 
 export class CardViewer extends LitElement {
   @property({ type: Object})
@@ -39,6 +45,26 @@ export class CardViewer extends LitElement {
 
   protected renderCard(): TemplateResult {
     throw new Error('CardViewer must be subclassed and implement renderCard()');
+  }
+
+  get splitDescription(): CardDescription | null {
+    if (!this.card) {
+      return null;
+    }
+
+    let combinedHTML = this.card.descriptionHTML;
+    let splitIndex = combinedHTML.indexOf("<span id='spoiler'>");
+    if (splitIndex === -1) {
+      return {
+        prompt: nothing,
+        response: html`${unsafeHTML(combinedHTML)}`,
+      };
+    }
+
+    return {
+      prompt: html`${unsafeHTML(combinedHTML.slice(0, splitIndex))}`,
+      response: html`${unsafeHTML(combinedHTML.slice(splitIndex))}`,
+    };
   }
 
   render() {
