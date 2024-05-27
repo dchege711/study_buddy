@@ -4,9 +4,7 @@ import { NextFunction, Request, Response, RequestHandler } from "express";
 import { StatusCodes } from "http-status-codes";
 
 import * as LogInUtilities from "../models/LogInUtilities";
-import { convertObjectToResponse, sendResponseFromPromise, getDefaultTemplateVars } from "./ControllerUtilities";
-
-const defaultTemplateObject = getDefaultTemplateVars();
+import { convertObjectToResponse, getDefaultTemplateVars } from "./ControllerUtilities";
 
 /**
  * Render `src/views/pages/forms_base_page.ejs` with the form in
@@ -14,9 +12,9 @@ const defaultTemplateObject = getDefaultTemplateVars();
  *
  * `formName` will be used as the page's title.
  */
-function renderForm(res: Response, formName: string, baseName: string) {
+function renderForm(req: Request, res: Response, formName: string, baseName: string) {
     res.render("pages/forms_base_page", {
-        ...defaultTemplateObject,
+        ...getDefaultTemplateVars(req),
         formName: formName,
         formPath: `../partials/forms/${baseName}.ejs`,
     });
@@ -74,7 +72,7 @@ export function handleLogIn(req: Request, res: Response) {
     } else if (req.cookies.session_token) {
         logInBySessionToken(req, res, function () { res.redirect(StatusCodes.SEE_OTHER, "/home"); });
     } else {
-        renderForm(res, "Log In", "login");
+        renderForm(req, res, "Log In", "login");
     }
 };
 
@@ -84,15 +82,20 @@ export function handleRegisterUser(req: Request, res: Response) {
   } else if (req.cookies.session_token) {
       logInBySessionToken(req, res, function () { res.redirect(StatusCodes.SEE_OTHER, "/home"); });
   } else {
-      renderForm(res, "Sign Up", "sign_up");
+      renderForm(req, res, "Sign Up", "sign_up");
   }
 };
 
 
 export function registerUser (req: Request, res: Response) {
-  sendResponseFromPromise(
-      LogInUtilities.registerUserAndPassword(req.body), res
-  );
+  LogInUtilities
+    .registerUserAndPassword(req.body)
+    .then((confirmation) => {
+        if (req.session) {
+          req.session.message = confirmation;
+        }
+        res.redirect(StatusCodes.SEE_OTHER, "/login");
+    });
 };
 
 export function loginUser (req: Request, res: Response, next: NextFunction) {
@@ -132,7 +135,7 @@ export async function logoutUser (req: Request, res: Response) {
 };
 
 export function sendValidationEmailGet (req: Request, res: Response) {
-    renderForm(res, "Send Validation URL", "send_validation_url");
+    renderForm(req, res, "Send Validation URL", "send_validation_url");
 };
 
 export function verifyAccount (req: Request, res: Response) {
@@ -146,7 +149,7 @@ export function verifyAccount (req: Request, res: Response) {
 };
 
 export function resetPasswordGet (req: Request, res: Response) {
-    renderForm(res, "Reset Password Request", "reset_password_request");
+    renderForm(req, res, "Reset Password Request", "reset_password_request");
 };
 
 export function resetPasswordLinkGet (req: Request, res: Response) {
@@ -155,7 +158,7 @@ export function resetPasswordLinkGet (req: Request, res: Response) {
         .validatePasswordResetLink(reset_password_uri)
         .then((result) => {
             if (result) {
-                renderForm(res, "Reset Password", "reset_password");
+                renderForm(req, res, "Reset Password", "reset_password");
             } else {
                 convertObjectToResponse(null, result, res);
             }
