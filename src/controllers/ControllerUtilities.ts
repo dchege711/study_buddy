@@ -1,12 +1,39 @@
 import { unlink } from "fs";
 
-import { Response } from "express";
+import { Request, Response } from "express";
 
-import { APP_NAME } from "../config";
+import { AuthenticateUser } from "../models/LogInUtilities";
+import { ICard } from "../models/mongoose_models/CardSchema";
+import * as allPaths from "../paths";
+import * as config from "../config";
 
 const generic_500_msg = {
     success: false, status: 500, message: "Internal Server Error"
 };
+
+interface TemplateVariables {
+  APP_NAME: string,
+  BASE_URL: string,
+  LOGGED_IN: boolean,
+  SEARCH_ENDPOINT_URL?: string;
+  abbreviatedCards?: Array<Partial<ICard>>;
+  account_info?: AuthenticateUser;
+  message: string;
+}
+
+/**
+ * @param {Object} req The incoming HTTP request
+ *
+ * @return {JSON} The key-value pairs that should be provided to templates by
+ * default.
+ */
+export function getDefaultTemplateVars(req: Request | null = null): TemplateVariables {
+  return {
+      APP_NAME: config.APP_NAME, BASE_URL: config.BASE_URL,
+      LOGGED_IN: req?.session?.user !== undefined, message: '',
+      ...allPaths
+  };
+}
 
 /**
  * @description A function to interpret JSON documents into server responses. It
@@ -27,25 +54,25 @@ export function convertObjectToResponse (err: Error | null, result_JSON: any, re
         res.status(500);
         res.render(
             "pages/5xx_error_page.ejs",
-            { response_JSON: generic_500_msg, APP_NAME: APP_NAME, LOGGED_IN: false }
+            { response_JSON: generic_500_msg, APP_NAME: config.APP_NAME, LOGGED_IN: false }
         );
+        return;
+    }
+
+    let status = result_JSON.status || 200;
+    res.status(status);
+    if (status >= 200 && status < 300) {
+        res.type("application/json");
+        res.json(result_JSON);
+    } else if (status >= 300 && status < 400) {
+        res.type('html');
+        res.redirect(status, result_JSON.redirect_url + "?msg=" + encodeURIComponent(result_JSON.message));
+    } else if (status >= 400 && status < 500) {
+        res.type('html');
+        res.render("pages/4xx_error_page.ejs", { response_JSON: result_JSON, APP_NAME: config.APP_NAME });
     } else {
-        console.error(err);
-        let status = result_JSON.status || 200;
-        res.status(status);
-        if (status >= 200 && status < 300) {
-            res.type("application/json");
-            res.json(result_JSON);
-        } else if (status >= 300 && status < 400) {
-            res.type('html');
-            res.redirect(status, result_JSON.redirect_url + "?msg=" + encodeURIComponent(result_JSON.message));
-        } else if (status >= 400 && status < 500) {
-            res.type('html');
-            res.render("pages/4xx_error_page.ejs", { response_JSON: result_JSON, APP_NAME: APP_NAME });
-        } else {
-            res.type('html');
-            res.render("pages/5xx_error_page.ejs", { response_JSON: result_JSON, APP_NAME: APP_NAME });
-        }
+        res.type('html');
+        res.render("pages/5xx_error_page.ejs", { response_JSON: result_JSON, APP_NAME: config.APP_NAME });
     }
 };
 

@@ -4,13 +4,9 @@ import { NextFunction, Request, Response, RequestHandler } from "express";
 import { StatusCodes } from "http-status-codes";
 
 import * as LogInUtilities from "../models/LogInUtilities";
-import { convertObjectToResponse, sendResponseFromPromise } from "./ControllerUtilities";
-import { APP_NAME } from "../config";
-import * as allPaths from "../paths";
+import { convertObjectToResponse, sendResponseFromPromise, getDefaultTemplateVars } from "./ControllerUtilities";
 
-const defaultTemplateObject = {
-    APP_NAME: APP_NAME, LOGGED_IN: false, ...allPaths
-};
+const defaultTemplateObject = getDefaultTemplateVars();
 
 /**
  * Render `src/views/pages/forms_base_page.ejs` with the form in
