@@ -2,7 +2,7 @@
  * A helper class for errors that the user can overcome with the appropriate
  * action.
  */
-export class UserFacingError extends Error {
+export class UserRecoverableError extends Error {
   /** The URL where the user should be redirected to. */
   redirectURL: string;
 
