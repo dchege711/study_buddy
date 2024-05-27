@@ -63,19 +63,20 @@
 
                 <div class="account_section">
 
-                    <h3 class="account_header">Download your cards</h3>
+                    <form method="GET" action="<%= DOWNLOAD_USER_DATA %>">
 
-                    <p>
-                        Download all of the cards you own.
-                        <br>
-                        <br>
-                        <button class="w3-btn w3-round-xxlarge w3-left w3-green" onClick="AccountPage.downloadUserData();">
-                            <b>
-                                <i class="fa fa-download fa-fw" aria-hidden="true"></i> Download My Cards
-                            </b>
-                        </button>
+                        <h3 class="account_header">
+                            <i class="fa fa-download fa-fw" aria-hidden="true"></i> Download your cards
+                        </h3>
 
-                    </p>
+                        <p>
+                            Download a file containing all of the cards that you own.
+                            <br>
+                            <br>
+                            <input type="submit" class="w3-btn w3-round-xxlarge w3-left w3-green" value="Download My Cards">
+                        </p>
+
+                    </form>
 
                 </div>
 
