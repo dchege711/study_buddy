@@ -4,7 +4,7 @@ import { NextFunction, Request, Response, RequestHandler } from "express";
 import { StatusCodes } from "http-status-codes";
 
 import * as LogInUtilities from "../models/LogInUtilities";
-import { convertObjectToResponse, getDefaultTemplateVars } from "./ControllerUtilities";
+import { convertObjectToResponse, getDefaultTemplateVars, redirectWithMessage } from "./ControllerUtilities";
 import * as allPaths from "../paths";
 
 /**
@@ -50,7 +50,7 @@ function logInBySessionToken(req: Request, res: Response, next: NextFunction) {
         .then((token) =>{
             if (token) {
                 if (!req.session) {
-                    return Promise.reject(new Error("User has valid toke but no session"));
+                    return Promise.reject(new Error("User has valid token but no session"));
                 }
 
                 req.session.user = token;
@@ -62,7 +62,9 @@ function logInBySessionToken(req: Request, res: Response, next: NextFunction) {
                 "Set-Cookie",
                 [`session_token=null;Expires=Thu, 01 Jan 1970 00:00:00 GMT`]
             );
-            res.redirect(StatusCodes.SEE_OTHER, allPaths.LOGIN);
+            redirectWithMessage(
+              req, res, allPaths.LOGIN,
+              "Your session has expired. Please log in again.");
         })
         .catch((err) => { convertObjectToResponse(err, null, req, res); });
 };
