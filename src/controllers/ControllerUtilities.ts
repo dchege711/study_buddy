@@ -41,20 +41,33 @@ export function getDefaultTemplateVars(req: Request | null = null): TemplateVari
   };
 }
 
+/**
+ * Redirect the user to `req.url` with and show `err.message` to the user.
+ */
 export function redirectWithRecoverableError(
     req: Request, res: Response, err: UserRecoverableError) {
-  redirectWithMessage(req, res, req.url, err.message);
+  redirectWithMessage(req, res, err.message);
 }
 
 /**
- * Redirect the user to `redirectURL` with and show `message` to the user.
+ * Redirect the user to `req.url` with and show `message` to the user.
  */
 export function redirectWithMessage(
-    req: Request, res: Response, redirectURL: string, message: string) {
+    req: Request, res: Response, message: string) {
   if (req.session) {
     req.session.message = message;
   }
-  res.redirect(StatusCodes.SEE_OTHER, redirectURL);
+  // From [1]:
+  //
+  // > `req.originalUrl` is much like `req.url`; however, it retains the
+  // > original request URL, allowing you to rewrite `req.url` freely for
+  // > internal routing purposes.
+  //
+  // In this case, we use `req.url` to store where the user should be redirected
+  // to.
+  //
+  // [1]: https://expressjs.com/en/api.html#req.originalUrl
+  res.redirect(StatusCodes.SEE_OTHER, req.url);
 }
 
 /**
