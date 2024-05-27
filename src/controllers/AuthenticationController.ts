@@ -27,7 +27,7 @@ function renderForm(req: Request, res: Response, formName: string, baseName: str
  */
 export const requireLogIn: RequestHandler = (req, res, next) => {
   if (!req.session?.user) {
-      res.redirect(StatusCodes.SEE_OTHER, "/login");
+      res.redirect(StatusCodes.SEE_OTHER, allPaths.LOGIN);
   } else if (req.session?.user) {
       if (req.body && req.body.userIDInApp) {
           // I expect these to be the same, but just in case...
@@ -71,7 +71,7 @@ export function handleLogIn(req: Request, res: Response) {
     if (req.session?.user) {
         res.redirect(StatusCodes.SEE_OTHER, allPaths.HOME);
     } else if (req.cookies.session_token) {
-        logInBySessionToken(req, res, function () { res.redirect(StatusCodes.SEE_OTHER, "/home"); });
+        logInBySessionToken(req, res, function () { res.redirect(StatusCodes.SEE_OTHER, allPaths.HOME); });
     } else {
         renderForm(req, res, "Log In", "login");
     }
@@ -79,9 +79,9 @@ export function handleLogIn(req: Request, res: Response) {
 
 export function handleRegisterUser(req: Request, res: Response) {
   if (req.session?.user) {
-      res.redirect(StatusCodes.SEE_OTHER, "/home");
+      res.redirect(StatusCodes.SEE_OTHER, allPaths.HOME);
   } else if (req.cookies.session_token) {
-      logInBySessionToken(req, res, function () { res.redirect(StatusCodes.SEE_OTHER, "/home"); });
+      logInBySessionToken(req, res, function () { res.redirect(StatusCodes.SEE_OTHER, allPaths.HOME); });
   } else {
       renderForm(req, res, "Sign Up", "sign_up");
   }
@@ -95,7 +95,7 @@ export function registerUser (req: Request, res: Response) {
         if (req.session) {
           req.session.message = confirmation;
         }
-        res.redirect(StatusCodes.SEE_OTHER, "/login");
+        res.redirect(StatusCodes.SEE_OTHER, allPaths.LOGIN);
     })
     .catch((err) => {
       if (typeof err === "string") {

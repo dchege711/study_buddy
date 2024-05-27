@@ -71,7 +71,7 @@ export function updateUserSettings(req: Request, res: Response) {
               cardsAreByDefaultPrivate: user.cardsAreByDefaultPrivate,
           }
         }
-        res.redirect(StatusCodes.SEE_OTHER, "/account");
+        res.redirect(StatusCodes.SEE_OTHER, allPaths.ACCOUNT);
       })
       .catch((err) => { convertObjectToResponse(err, null, res); });
 };
@@ -114,7 +114,7 @@ export function deleteAccount(req: Request, res: Response) {
                 "Set-Cookie",
                 [`session_token=null;Expires=Thu, 01 Jan 1970 00:00:00 GMT`]
             );
-            res.redirect(StatusCodes.SEE_OTHER, "/browse");
+            res.redirect(StatusCodes.SEE_OTHER, allPaths.BROWSE);
         })
         .catch((err) => { convertObjectToResponse(err, null, res); });
 };
