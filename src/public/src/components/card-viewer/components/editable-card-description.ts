@@ -14,9 +14,11 @@ export class EditableCardDescriptionElement extends LitElement {
 
   private descriptionRef: Ref<HTMLDivElement> = createRef();
 
-  protected willUpdate(_: Map<string, any>) {
-    this.showOverlay = !this.canEdit && this.value
+  protected willUpdate(changedProperties: Map<string, any>) {
+    if (changedProperties.has('value') || changedProperties.has('canEdit')) {
+      this.showOverlay = !this.canEdit && this.value
         && this.value.type === CardDescriptionType.Response;
+    }
   }
 
   render() {
