@@ -6,6 +6,7 @@ import { AuthenticateUser } from "../models/LogInUtilities";
 import { ICard } from "../models/mongoose_models/CardSchema";
 import * as allPaths from "../paths";
 import * as config from "../config";
+import { StatusCodes } from "http-status-codes";
 
 const generic_500_msg = {
     success: false, status: 500, message: "Internal Server Error"
@@ -37,6 +38,17 @@ export function getDefaultTemplateVars(req: Request | null = null): TemplateVari
       LOGGED_IN: req?.session?.user !== undefined, message,
       ...allPaths
   };
+}
+
+/**
+ * Redirect the user to `redirectURL` with and show `message` to the user.
+ */
+export function redirectWithMessage(
+    req: Request, res: Response, redirectURL: string, message: string) {
+  if (req.session) {
+    req.session.message = message;
+  }
+  res.redirect(StatusCodes.SEE_OTHER, redirectURL);
 }
 
 /**
