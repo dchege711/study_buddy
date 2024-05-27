@@ -35,7 +35,7 @@ export function browsePageGet(req: Request, res: Response) {
             templateVars.abbreviatedCards = abbreviatedCards;
             res.render("pages/browse_cards_page.ejs", templateVars);
         })
-        .catch((err) => {convertObjectToResponse(err, null, res); });
+        .catch((err) => {convertObjectToResponse(err, null, req, res); });
 };
 
 export function accountGet (req: Request, res: Response) {
@@ -73,7 +73,7 @@ export function updateUserSettings(req: Request, res: Response) {
         }
         res.redirect(StatusCodes.SEE_OTHER, allPaths.ACCOUNT);
       })
-      .catch((err) => { convertObjectToResponse(err, null, res); });
+      .catch((err) => { convertObjectToResponse(err, null, req, res); });
 };
 
 export interface MetadataResponse {
@@ -96,7 +96,7 @@ export function downloadUserData(req: Request, res: Response) {
                 else { deleteTempFile(writeResult.jsonFilePath); }
             });
         })
-        .catch((err) => { convertObjectToResponse(err, null, res); });
+        .catch((err) => { convertObjectToResponse(err, null, req, res); });
 };
 
 export function deleteAccount(req: Request, res: Response) {
@@ -116,5 +116,5 @@ export function deleteAccount(req: Request, res: Response) {
             );
             res.redirect(StatusCodes.SEE_OTHER, allPaths.BROWSE);
         })
-        .catch((err) => { convertObjectToResponse(err, null, res); });
+        .catch((err) => { convertObjectToResponse(err, null, req, res); });
 };

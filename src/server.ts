@@ -16,6 +16,7 @@ import { authRouter } from "./routes/AuthenticationRouter";
 import { IS_DEV } from "./config";
 import { populateDummyAccountWithCards } from "./tests/DummyAccountUtils";
 import * as allPaths from "./paths";
+import { getDefaultTemplateVars } from "./controllers/ControllerUtilities";
 
 var express = require("express");
 var session = require("express-session");
@@ -94,10 +95,8 @@ app.use(function (err: any, req: Request, res: Response, next: NextFunction) {
     res.status(500).render(
         "pages/5xx_error_page.ejs",
         {
-            response_JSON: {status: 500, message: "Internal Server Error"},
-            APP_NAME: config.APP_NAME,
-            LOGGED_IN: false,
-            ...allPaths,
+          ...getDefaultTemplateVars(req),
+          response_JSON: {status: 500, message: "Internal Server Error"},
         }
     );
 });
@@ -107,10 +106,8 @@ app.use(function (req: Request, res: Response, next: NextFunction) {
     res.status(404).render(
         "pages/4xx_error_page.ejs",
         {
+          ...getDefaultTemplateVars(req),
             response_JSON: {status: 404, message: "Page Not Found"},
-            APP_NAME: config.APP_NAME,
-            LOGGED_IN: false,
-            ...allPaths,
         }
     );
 });

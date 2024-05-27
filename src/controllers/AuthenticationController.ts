@@ -64,7 +64,7 @@ function logInBySessionToken(req: Request, res: Response, next: NextFunction) {
             );
             res.redirect(StatusCodes.SEE_OTHER, allPaths.LOGIN);
         })
-        .catch((err) => { convertObjectToResponse(err, null, res); });
+        .catch((err) => { convertObjectToResponse(err, null, req, res); });
 };
 
 export function handleLogIn(req: Request, res: Response) {
@@ -106,7 +106,7 @@ export function registerUser (req: Request, res: Response) {
         return;
       }
 
-      convertObjectToResponse(err, null, res);
+      convertObjectToResponse(err, null, req, res);
     });
 };
 
@@ -124,7 +124,7 @@ export function loginUser (req: Request, res: Response, next: NextFunction) {
             );
             res.redirect(StatusCodes.SEE_OTHER, allPaths.HOME);
         })
-        .catch((err) => { convertObjectToResponse(err, null, res); });
+        .catch((err) => { convertObjectToResponse(err, null, req, res); });
 };
 
 /**
@@ -157,7 +157,7 @@ export function verifyAccount (req: Request, res: Response) {
         .then((validationResult) => {
             res.redirect(StatusCodes.SEE_OTHER, validationResult.redirect_url);
         })
-        .catch((err) => { convertObjectToResponse(err, null, res); });
+        .catch((err) => { convertObjectToResponse(err, null, req, res); });
 };
 
 export function resetPasswordGet (req: Request, res: Response) {
@@ -172,10 +172,10 @@ export function resetPasswordLinkGet (req: Request, res: Response) {
             if (result) {
                 renderForm(req, res, "Reset Password", "reset_password");
             } else {
-                convertObjectToResponse(null, result, res);
+                convertObjectToResponse(null, result, req, res);
             }
         })
-        .catch((err) => { convertObjectToResponse(err, null, res); });
+        .catch((err) => { convertObjectToResponse(err, null, req, res); });
 };
 
 export function resetPasswordLinkPost (req: Request, res: Response) {
@@ -190,7 +190,7 @@ export function resetPasswordLinkPost (req: Request, res: Response) {
             return LogInUtilities.resetPassword(payload);
         })
         .then((reset_confirmation) => {
-            convertObjectToResponse(null, reset_confirmation, res);
+            convertObjectToResponse(null, reset_confirmation, req, res);
         })
-        .catch((err) => { convertObjectToResponse(err, null, res); });
+        .catch((err) => { convertObjectToResponse(err, null, req, res); });
 };
