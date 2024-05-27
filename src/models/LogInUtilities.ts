@@ -312,12 +312,6 @@ export interface AuthenticateUserParam {
  * `Invalid username/email or password` message without disclosing which is
  * incorrect. It's possible to enumerate usernames, so this is not entirely
  * foolproof.
- *
- * @param {JSON} payload Expected keys: `username_or_email`, `password`
- * @returns {Promise} resolves with a JSON object keyed by `success`, `status`
- * and `message`. The message field contains the following keys: `token_id`,
- * `userIDInApp`, `username`, `email`, `cardsAreByDefaultPrivate` and
- * `userRegistrationDate`.
  */
 export async function authenticateUser(payload: AuthenticateUserParam): Promise<AuthenticateUser> {
 
@@ -333,7 +327,8 @@ export async function authenticateUser(payload: AuthenticateUserParam): Promise<
 
     let user = await User.findOne(identifierQuery).exec();
     if (user === null) {
-        return Promise.reject(`No user matching "${submittedIdentifier}" found.`);
+        return Promise.reject(
+          new UserRecoverableError(`No user matching "${submittedIdentifier}" found.`));
     }
 
     let computedHash = getHash(password, user.salt);
@@ -346,7 +341,8 @@ export async function authenticateUser(payload: AuthenticateUserParam): Promise<
         }
     }
     if (!thereIsAMatch) {
-        return Promise.reject("Incorrect username/email and/or password");
+        return Promise.reject(
+          new UserRecoverableError("Incorrect username/email and/or password"));
     }
 
     let userToken = await provideSessionToken(user);

@@ -111,14 +111,14 @@ export function registerUser (req: Request, res: Response) {
 export function loginUser (req: Request, res: Response, next: NextFunction) {
     LogInUtilities
         .authenticateUser(req.body)
-        .then((confirmation) => {
+        .then((user) => {
             if (req.session) {
-                req.session.user = confirmation;
+                req.session.user = user;
             }
             let expiry_date = (new Date(Date.now() + 1000 * 3600 * 24 * 30)).toString();
             res.setHeader(
                 "Set-Cookie",
-                [`session_token=${confirmation.token_id};Expires=${expiry_date}`]
+                [`session_token=${user.token_id};Expires=${expiry_date}`]
             );
             res.redirect(StatusCodes.SEE_OTHER, allPaths.HOME);
         })
