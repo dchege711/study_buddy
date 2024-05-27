@@ -75,6 +75,31 @@ export function accountGet (req: Request, res: Response) {
     );
 };
 
+export function updateUserSettings(req: Request, res: Response) {
+  // Checkboxes only post data if they're checked. If we don't receive a value,
+  // we should assume that the user unchecked the box, and therefore
+  // cardsAreByDefaultPrivate should be set to false.
+  //
+  // https://stackoverflow.com/questions/11424037/do-checkbox-inputs-only-post-data-if-theyre-checked
+
+  MetadataDB
+      .updateUserSettings({
+        ...req.body,
+        cardsAreByDefaultPrivate: req.body.cardsAreByDefaultPrivate === "on",
+        userIDInApp: req.session?.user?.userIDInApp
+      })
+      .then((user) => {
+        if (req.session && req.session.user) {
+          req.session.user = {
+              ...req.session.user,
+              cardsAreByDefaultPrivate: user.cardsAreByDefaultPrivate,
+          }
+        }
+        res.redirect(StatusCodes.SEE_OTHER, "/account");
+      })
+      .catch((err) => { convertObjectToResponse(err, null, res); });
+};
+
 export interface MetadataResponse {
     metadataDocs?: IMetadata[],
     minicards?: MiniICard[]

@@ -449,12 +449,8 @@ export async function updateUserSettings(newUserSettings: UpdateUserSettingsPara
         return Promise.reject("No user found. User settings not updated!");
     }
 
-    if (newUserSettings.cardsAreByDefaultPrivate) {
-        user.cardsAreByDefaultPrivate = newUserSettings.cardsAreByDefaultPrivate;
-    }
-    if (newUserSettings.dailyTarget) {
-        user.dailyTarget = newUserSettings.dailyTarget;
-    }
+    user.cardsAreByDefaultPrivate = newUserSettings.cardsAreByDefaultPrivate;
+    user.dailyTarget = newUserSettings.dailyTarget;
 
     if (newUserSettings.dailyTarget) {
         let metadataDoc = await Metadata

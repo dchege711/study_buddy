@@ -6,6 +6,7 @@ import {
   wikiPage,
   browsePageGet,
   accountGet,
+  updateUserSettings,
   downloadUserData,
   deleteAccount,
 } from "../controllers/InAppController";
@@ -20,6 +21,8 @@ router.get(WIKI, wikiPage);
 router.get(BROWSE, browsePageGet);
 
 router.get(ACCOUNT, requireLogIn, accountGet);
+
+router.post(ACCOUNT, requireLogIn, updateUserSettings);
 
 router.get(DOWNLOAD_USER_DATA, requireLogIn, downloadUserData);
 
