@@ -4,6 +4,7 @@ import { Ref, createRef, ref } from 'lit/directives/ref.js';
 
 import { CardChangedEvent, ModifiableCardAttributes } from './card-changed-event.js';
 import { CardDescription, CardDescriptionType } from '../base-card-viewer.js';
+import { atomOneLight } from '../../syntax-highlighting.styles.js';
 
 @customElement('cg-editable-card-description')
 export class EditableCardTitle extends LitElement {
@@ -47,25 +48,28 @@ export class EditableCardTitle extends LitElement {
     this.dispatchEvent(new CardChangedEvent(changes));
   }
 
-  static styles = css`
-    div#positioned-lca {
-      position: relative;
+  static styles = [
+    css`
+      div#positioned-lca {
+        position: relative;
 
-      #overlay {
-      	position: absolute;
-      	width: 100%;
-        height: 100%;
-        z-index: 10;
-        cursor: pointer;
-        background-color: var(--main-bg-color);
-        border: 1px solid var(--main-border-color);
-        border-radius: 4px;
+        #overlay {
+        	position: absolute;
+        	width: 100%;
+          height: 100%;
+          z-index: 10;
+          cursor: pointer;
+          background-color: var(--main-bg-color);
+          border: 1px solid var(--main-border-color);
+          border-radius: 4px;
 
-    	  &:hover {
-          opacity: 0;
+      	  &:hover {
+            opacity: 0;
+          }
         }
       }
-    }
-  `;
+    `,
+    atomOneLight
+  ];
 
 }

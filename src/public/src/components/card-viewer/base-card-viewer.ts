@@ -7,7 +7,6 @@ import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 import { Card } from '../../trpc.js';
 import { CardsCarouselUpdateCursorDirection, CardsCarouselUpdateCursorEvent, cardsCarouselContext } from '../../context/cards-carousel-context.js';
 import { CardsCarousel } from '../../CardsCarousel.js';
-import { atomOneLight } from '../syntax-highlighting.styles.js';
 
 export const markdownSpoilerMarker = "[spoiler]";
 const htmlSpoilerMarker = "<span id='spoiler'>[spoiler]</span>";
@@ -144,6 +143,5 @@ export class CardViewer extends LitElement {
         height: 80%;
       }
     `,
-    atomOneLight,
   ];
 }
