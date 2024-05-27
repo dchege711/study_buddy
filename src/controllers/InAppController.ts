@@ -12,6 +12,7 @@ import * as config from "../config";
 import { ICard, MiniICard } from "../models/mongoose_models/CardSchema";
 import { IMetadata } from "../models/mongoose_models/MetadataCardSchema";
 import * as allPaths from "../paths";
+import { AuthenticateUser } from "../models/LogInUtilities";
 
 const convertObjectToResponse = controllerUtils.convertObjectToResponse;
 const deleteTempFile = controllerUtils.deleteTempFile;
@@ -22,6 +23,7 @@ interface TemplateVariables {
     LOGGED_IN: boolean,
     SEARCH_ENDPOINT_URL?: string;
     abbreviatedCards?: Array<Partial<ICard>>;
+    account_info?: AuthenticateUser;
 }
 
 /**
@@ -61,11 +63,14 @@ export function browsePageGet(req: Request, res: Response) {
 };
 
 export function accountGet (req: Request, res: Response) {
+    const templateVars = getDefaultTemplateVars(req);
+    templateVars.account_info = req.session?.user;
     res.render(
         "pages/account_page.ejs", {
             account_info: req.session?.user,
             APP_NAME: config.APP_NAME,
-            LOGGED_IN: req.session?.user !== undefined
+            LOGGED_IN: req.session?.user !== undefined,
+            ...allPaths,
         }
     );
 };
