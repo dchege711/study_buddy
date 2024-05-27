@@ -5,6 +5,7 @@ import { StatusCodes } from "http-status-codes";
 
 import * as LogInUtilities from "../models/LogInUtilities";
 import { convertObjectToResponse, getDefaultTemplateVars } from "./ControllerUtilities";
+import * as allPaths from "../paths";
 
 /**
  * Render `src/views/pages/forms_base_page.ejs` with the form in
@@ -61,14 +62,14 @@ function logInBySessionToken(req: Request, res: Response, next: NextFunction) {
                 "Set-Cookie",
                 [`session_token=null;Expires=Thu, 01 Jan 1970 00:00:00 GMT`]
             );
-            res.redirect(StatusCodes.SEE_OTHER, "/login");
+            res.redirect(StatusCodes.SEE_OTHER, allPaths.LOGIN);
         })
         .catch((err) => { convertObjectToResponse(err, null, res); });
 };
 
 export function handleLogIn(req: Request, res: Response) {
     if (req.session?.user) {
-        res.redirect(StatusCodes.SEE_OTHER, "/home");
+        res.redirect(StatusCodes.SEE_OTHER, allPaths.HOME);
     } else if (req.cookies.session_token) {
         logInBySessionToken(req, res, function () { res.redirect(StatusCodes.SEE_OTHER, "/home"); });
     } else {
@@ -95,6 +96,17 @@ export function registerUser (req: Request, res: Response) {
           req.session.message = confirmation;
         }
         res.redirect(StatusCodes.SEE_OTHER, "/login");
+    })
+    .catch((err) => {
+      if (typeof err === "string") {
+        if (req.session) {
+          req.session.message = err;
+        }
+        res.redirect(StatusCodes.SEE_OTHER, allPaths.REGISTER_USER);
+        return;
+      }
+
+      convertObjectToResponse(err, null, res);
     });
 };
 
@@ -110,7 +122,7 @@ export function loginUser (req: Request, res: Response, next: NextFunction) {
                 "Set-Cookie",
                 [`session_token=${confirmation.token_id};Expires=${expiry_date}`]
             );
-            res.redirect(StatusCodes.SEE_OTHER, "/home");
+            res.redirect(StatusCodes.SEE_OTHER, allPaths.HOME);
         })
         .catch((err) => { convertObjectToResponse(err, null, res); });
 };
@@ -131,7 +143,7 @@ export async function logoutUser (req: Request, res: Response) {
         "Set-Cookie",
         [`session_token=null;Expires=Thu, 01 Jan 1970 00:00:00 GMT`]
     );
-    res.redirect(StatusCodes.SEE_OTHER, "/browse");
+    res.redirect(StatusCodes.SEE_OTHER, allPaths.BROWSE);
 };
 
 export function sendValidationEmailGet (req: Request, res: Response) {
