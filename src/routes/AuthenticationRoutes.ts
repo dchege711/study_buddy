@@ -2,10 +2,12 @@ import { Router } from "express";
 
 import {
   handleLogIn,
+  handleRegisterUser,
   loginUser,
   logoutUser,
   sendValidationEmailGet,
   verifyAccount,
+  registerUser,
   resetPasswordGet,
   resetPasswordLinkGet,
   resetPasswordLinkPost,
@@ -21,6 +23,10 @@ router.get(LOGIN, handleLogIn);
 router.post(LOGIN, loginUser);
 
 router.get(LOGOUT, logoutUser);
+
+router.get(REGISTER_USER, handleRegisterUser);
+
+router.post(REGISTER_USER, registerUser);
 
 router.get(SEND_VALIDATION_EMAIL, sendValidationEmailGet);
 
