@@ -28,9 +28,13 @@ interface TemplateVariables {
  * default.
  */
 export function getDefaultTemplateVars(req: Request | null = null): TemplateVariables {
+  // Message is meant to be displayed to the user, and then cleared.
+  const message = req?.session?.message || '';
+  if (req?.session) req.session.message = '';
+
   return {
       APP_NAME: config.APP_NAME, BASE_URL: config.BASE_URL,
-      LOGGED_IN: req?.session?.user !== undefined, message: '',
+      LOGGED_IN: req?.session?.user !== undefined, message,
       ...allPaths
   };
 }

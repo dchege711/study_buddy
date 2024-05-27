@@ -12,6 +12,7 @@ import type { IUser } from "../models/mongoose_models/UserSchema.js";
 declare module "express" {
   interface Request {
     session?: {
+      message?: string;
       user?: AuthenticateUser;
     };
   }
