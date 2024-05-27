@@ -4,11 +4,14 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { CardViewer, markdownSpoilerMarker } from './base-card-viewer.js';
 import { PrivateCardResult, trpc } from '../../trpc.js';
 import { CardsCarouselUpdateCursorDirection } from '../../context/cards-carousel-context.js';
-import { kCardChangedEventName } from './components/card-changed-event.js';
+import { ModifiableCardAttributes, kCardChangedEventName } from './components/card-changed-event.js';
 
 import './components/copyable.js';
 import './components/editable-card-title.js';
 import './components/card-description.js';
+
+type PendingChanges = Partial<Omit<ModifiableCardAttributes, 'prompt' | 'response'>
+    & Pick<NonNullable<PrivateCardResult>, 'description'>>;
 
 @customElement('editable-card-viewer')
 export class EditableCardViewer extends CardViewer {
@@ -22,6 +25,9 @@ export class EditableCardViewer extends CardViewer {
 
   @state()
   protected canEdit = false;
+
+  @state()
+  private pendingChanges: PendingChanges = {};
 
   protected willUpdate(changedProperties: Map<string, any>) {
     if (changedProperties.has('card')) {
@@ -115,7 +121,7 @@ export class EditableCardViewer extends CardViewer {
           ? `${updatedPrompt}\n${markdownSpoilerMarker}\n${updatedResponse}`
           : updatedPrompt;
 
-      this.card = {
+      this.pendingChanges = {
         ...this.card,
         title: ev.changes.title || this.card.title,
         description: updatedDescription,
@@ -147,11 +153,7 @@ export class EditableCardViewer extends CardViewer {
 
     trpc.updateCard.mutate({
       _id: this.card._id,
-      title: this.card.title,
-      description: this.card.description,
-      tags: this.card.tags,
-      urgency: this.card.urgency,
-      isPublic: this.card.isPublic,
+      ...this.pendingChanges,
     });
   }
 
