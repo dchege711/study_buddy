@@ -185,41 +185,27 @@ export async function sendAccountValidationLink(payload: SendAccountValidationLi
         .then(() => `If ${payload.email} has an account, we've sent a validation URL`);
 };
 
-interface ValidateAccountResult {
-    redirect_url: string;
-    message: string;
-}
-
 /**
  * @description Once an account is registered, the user needs to click on a
  * validation link sent to the submitted email. ~~The user cannot log into
  * the app before the email address is verified.~~ We observed a high bounce
  * rate AND few signups, so we'll allow accounts with unvalidated email
  * addresses to sign in for at most 30 days.
- *
- * @param {String} validationURI The validation URL of the associated account
- * @returns {Promise} resolves with a JSON object keyed by `success`, `status`
- * and `message`
  */
-export async function validateAccount(validationURI: string): Promise<ValidateAccountResult> {
+export async function validateAccount(validationURI: string): Promise<string> {
     let user = await User.findOne({account_validation_uri: validationURI}).exec();
 
     // TODO(dchege711): How can we know that the user is already verified?
     if (user === null) {
-        return {
-            redirect_url: `/send-validation-email`,
-            message: `The validation URL is invalid.`
-        };
+      return Promise.reject(
+          new UserRecoverableError("The validation URL is invalid."));
     }
 
     user.account_validation_uri = "verified";
     user.account_is_valid = true;
     await user.save();
 
-    return {
-        redirect_url: `/login`,
-        message: `Successfully validated ${user.email}. Redirecting you to login`
-    };
+    return `Successfully validated ${user.email}. Redirecting you to login`;
 };
 
 export type RegisterUserAndPasswordParams = Pick<IUser, "username" | "email"> & {password: string};

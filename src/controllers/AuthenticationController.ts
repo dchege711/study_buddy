@@ -152,10 +152,18 @@ export function verifyAccount (req: Request, res: Response) {
     var verification_uri = req.path.split("/verify-account/")[1];
 
     LogInUtilities.validateAccount(verification_uri)
-        .then((validationResult) => {
-            res.redirect(StatusCodes.SEE_OTHER, validationResult.redirect_url);
+        .then((confirmation) => {
+          req.url = allPaths.LOGIN;
+          redirectWithMessage(req, res, allPaths.LOGIN, confirmation);
         })
-        .catch((err) => { convertObjectToResponse(err, null, req, res); });
+        .catch((err) => {
+          if (err instanceof UserRecoverableError) {
+            req.url = allPaths.SEND_VALIDATION_EMAIL;
+            redirectWithRecoverableError(req, res, err);
+            return;
+          }
+          convertObjectToResponse(err, null, req, res);
+        });
 };
 
 export function resetPasswordGet (req: Request, res: Response) {
