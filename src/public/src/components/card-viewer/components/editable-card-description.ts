@@ -28,7 +28,7 @@ export class EditableCardDescriptionElement extends LitElement {
         <div
             ?contenteditable=${this.canEdit} ${ref(this.descriptionRef)}
             @input=${this.handleDescriptionChange}>
-          ${this.canEdit ? this.value.raw : this.value.markup}
+          ${this.canEdit ? html`<pre>${this.value.raw}</pre>` : this.value.markup}
         </div>
       </div>
     `;
