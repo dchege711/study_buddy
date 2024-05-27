@@ -19,6 +19,7 @@ import { APP_NAME } from "../config";
 import { BaseResponse } from "../types";
 import { sanitizeQuery } from "./SanitizationAndValidation";
 import { FilterQuery } from "mongoose";
+import { UserRecoverableError } from "../errors";
 
 const DIGITS = "0123456789";
 const LOWER_CASE = "abcdefghijklmnopqrstuvwxyz";
@@ -224,17 +225,18 @@ export async function validateAccount(validationURI: string): Promise<ValidateAc
 export type RegisterUserAndPasswordParams = Pick<IUser, "username" | "email"> & {password: string};
 
 /**
- * @description Register a new user using the provided password, username and email.
+ * @description Register a new user using the provided password, username and
+ * email.
+ *
  * - If the username is taken, we let the user know that.
  * - If the email address is already taken, send an email to that address
- * notifying them of the signup.
+ *   notifying them of the signup.
  * - If the input is invalid, e.g. a non alphanumeric username, raise an error
- * since it should have been caught on the client side.
+ *   since it should have been caught on the client side.
  * - Otherwise, register the user and send them a validation link.
  *
- * @param {JSON} payload Expected keys: `username`, `password`, `email`
- * @returns {Promise} resolves with a JSON object containing the keys `success`,
- * `status` and `message`.
+ * @returns {Promise} Resolves with a confirmation message that should be shown
+ * to the user.
  */
 export async function registerUserAndPassword(payload: RegisterUserAndPasswordParams): Promise<string> {
     payload = sanitizeQuery(payload);
@@ -242,8 +244,8 @@ export async function registerUserAndPassword(payload: RegisterUserAndPasswordPa
     let conflictingUser = await User.findOne({ $or: [{ username: payload.username }, { email: payload.email }]}).exec();
     if (conflictingUser !== null) {
         return conflictingUser.username === payload.username
-            ? Promise.reject("Username already taken.")
-            : Promise.reject("Email already taken.");
+            ? Promise.reject(new UserRecoverableError("Username already taken."))
+            : Promise.reject(new UserRecoverableError("Email already taken."));
     }
 
     let {salt, hash} = await getSaltAndHash(payload.password);

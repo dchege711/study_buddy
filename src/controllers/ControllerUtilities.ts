@@ -7,6 +7,7 @@ import { ICard } from "../models/mongoose_models/CardSchema";
 import * as allPaths from "../paths";
 import * as config from "../config";
 import { StatusCodes } from "http-status-codes";
+import { UserRecoverableError } from "../errors";
 
 const generic_500_msg = {
     success: false, status: 500, message: "Internal Server Error"
@@ -38,6 +39,11 @@ export function getDefaultTemplateVars(req: Request | null = null): TemplateVari
       LOGGED_IN: req?.session?.user !== undefined, message,
       ...allPaths
   };
+}
+
+export function redirectWithRecoverableError(
+    req: Request, res: Response, err: UserRecoverableError) {
+  redirectWithMessage(req, res, req.url, err.message);
 }
 
 /**

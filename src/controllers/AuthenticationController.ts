@@ -4,8 +4,9 @@ import { NextFunction, Request, Response, RequestHandler } from "express";
 import { StatusCodes } from "http-status-codes";
 
 import * as LogInUtilities from "../models/LogInUtilities";
-import { convertObjectToResponse, getDefaultTemplateVars, redirectWithMessage } from "./ControllerUtilities";
+import { convertObjectToResponse, getDefaultTemplateVars, redirectWithMessage, redirectWithRecoverableError } from "./ControllerUtilities";
 import * as allPaths from "../paths";
+import { UserRecoverableError } from "../errors";
 
 /**
  * Render `src/views/pages/forms_base_page.ejs` with the form in
@@ -94,17 +95,12 @@ export function registerUser (req: Request, res: Response) {
   LogInUtilities
     .registerUserAndPassword(req.body)
     .then((confirmation) => {
-        if (req.session) {
-          req.session.message = confirmation;
-        }
-        res.redirect(StatusCodes.SEE_OTHER, allPaths.LOGIN);
+      redirectWithMessage(req, res, allPaths.LOGIN, confirmation);
     })
     .catch((err) => {
-      if (typeof err === "string") {
-        if (req.session) {
-          req.session.message = err;
-        }
-        res.redirect(StatusCodes.SEE_OTHER, allPaths.REGISTER_USER);
+      if (err instanceof UserRecoverableError) {
+        req.url = allPaths.REGISTER_USER;
+        redirectWithRecoverableError(req, res, err);
         return;
       }
 
