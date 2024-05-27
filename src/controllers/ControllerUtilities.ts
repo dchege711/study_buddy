@@ -47,7 +47,7 @@ export function getDefaultTemplateVars(req: Request | null = null): TemplateVari
  * @param {JSON} result_JSON Expected keys: `status`, `success`, `message`
  * @param {Response} res An Express JS res object
  */
-export function convertObjectToResponse (err: Error | null, result_JSON: any, res: Response) {
+export function convertObjectToResponse (err: Error | null, result_JSON: any, req: Request, res: Response) {
     if (err) {
         if (typeof err === "string") {
             res.type("text").status(200).send(err);
@@ -58,7 +58,7 @@ export function convertObjectToResponse (err: Error | null, result_JSON: any, re
         res.status(500);
         res.render(
             "pages/5xx_error_page.ejs",
-            { response_JSON: generic_500_msg, APP_NAME: config.APP_NAME, LOGGED_IN: false }
+            { ...getDefaultTemplateVars(req), response_JSON: generic_500_msg }
         );
         return;
     }
@@ -70,13 +70,20 @@ export function convertObjectToResponse (err: Error | null, result_JSON: any, re
         res.json(result_JSON);
     } else if (status >= 300 && status < 400) {
         res.type('html');
-        res.redirect(status, result_JSON.redirect_url + "?msg=" + encodeURIComponent(result_JSON.message));
+        if (req.session) {
+          req.session.message = result_JSON.message;
+        }
+        res.redirect(status, result_JSON.redirect_url);
     } else if (status >= 400 && status < 500) {
         res.type('html');
-        res.render("pages/4xx_error_page.ejs", { response_JSON: result_JSON, APP_NAME: config.APP_NAME });
+        res.render(
+          "pages/4xx_error_page.ejs",
+          { ...getDefaultTemplateVars(req), response_JSON: result_JSON });
     } else {
         res.type('html');
-        res.render("pages/5xx_error_page.ejs", { response_JSON: result_JSON, APP_NAME: config.APP_NAME });
+        res.render(
+          "pages/5xx_error_page.ejs",
+          { ...getDefaultTemplateVars(req), response_JSON: result_JSON });
     }
 };
 
@@ -84,21 +91,4 @@ export function deleteTempFile(filepath: string) {
     unlink(filepath, (err) => {
         if (err) console.error(err);
     });
-};
-
-/**
- * @description Most of my controller code involves waiting for results from a
- * promise, and then sending that response via the `res` object. This method
- * prevents unnecessarily duplicated code.
- *
- * @param {Promise} pendingPromise the promise should be such that calling
- * `then` delivers the message that needs to be sent to the user.
- *
- * @param {Response} res a reference to the Express Response object associated
- * with the pending request
- */
-export function sendResponseFromPromise(pendingPromise: Promise<any>, res: Response) {
-    pendingPromise
-        .then((results) => { convertObjectToResponse(null, results, res); })
-        .catch((err) => { convertObjectToResponse(err, null, res)});
 };
