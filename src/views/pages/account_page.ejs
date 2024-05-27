@@ -4,16 +4,10 @@
     <head>
         <title><%= APP_NAME %>: Account Page</title>
         <%- include('../partials/header.ejs'); %>
-        <%- include('../partials/syntax_highlighting_and_latex.ejs'); %>
-        <script type="text/javascript" src="/src/CardsManager.bundle.min.js"></script>
-        <script type="text/javascript" src="/src/CardTemplateUtilities.bundle.min.js"></script>
-
         <style>
-
             div#main_div {
                 align-items: start;
             }
-
         </style>
 
     </head>
@@ -35,8 +29,6 @@
                         Username: <%= account_info.username %>
                         <br><br>
                         Email Address: <%= account_info.email %>
-                        <br><br>
-                        <%= APP_NAME %> Birthday: <%= account_info.user_reg_date %>
                     </p>
 
                     <form id="accountSettingsForm" method="POST">
@@ -59,34 +51,6 @@
                         <br><br>
                         <input type="submit" class="w3-btn w3-round-xxlarge w3-left w3-blue" value="Save Changes" onclick="return updateAccountSettings();">
                     </form>
-
-                </div>
-
-                <div class="account_section">
-
-                    <h3 class="account_header">Restore/Delete Cards from Trash</h3>
-
-                    <p>
-                        The trash only holds a card for 30 days, after which the
-                        card will be permanently deleted. Use this option to either
-                        delete cards permanently, or restore them to your active cards.
-
-                        <br><br>
-
-                        <button id="trash_button" class="w3-btn w3-round-xxlarge w3-left w3-blue" onClick="AccountPage.showCardsFromTrash();">
-                            <b id="trash_button_text">
-                                <i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> View Trashed Cards
-                            </b>
-                        </button>
-
-                        <br>
-                    </p>
-
-                    <div>
-
-                        <%- include('../partials/trashed_card_template.ejs'); %>
-
-                    </div>
 
                 </div>
 
@@ -148,7 +112,4 @@
         </div>
 
     </body>
-
-    <script type="text/javascript" src="/src/AccountPage.bundle.min.js"  onload="AccountPage.initializeAccountPage();"></script>
-
 </html>
