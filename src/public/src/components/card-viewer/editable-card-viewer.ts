@@ -24,6 +24,13 @@ export class EditableCardViewer extends CardViewer {
   @state()
   protected isEditing = false;
 
+  protected willUpdate(changedProperties: Map<string, any>) {
+    if (changedProperties.has('card')) {
+      this.isEditing = false;
+    }
+    super.willUpdate(changedProperties);
+  }
+
   protected renderCard() {
     if (!this.card) {
       throw new Error('No card to render');
