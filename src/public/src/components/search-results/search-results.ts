@@ -4,6 +4,7 @@ import { consume } from '@lit/context';
 
 import { CardSearchResult } from '../../trpc.js';
 import { searchResultsContext, SearchResultSelectedEvent } from '../../context/search-results-context.js';
+import { when } from 'lit/directives/when.js';
 
 @customElement('search-result-tag')
 export class SearchResultTag extends LitElement {
@@ -79,6 +80,7 @@ export class SearchResults extends LitElement {
           (result) => html`
             <search-result .result=${result}></search-result>`
         )}
+      ${when(this.results.length === 0, () => html`<p>No results found</p>`)}
     `;
   }
 
