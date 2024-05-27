@@ -63,9 +63,9 @@ function logInBySessionToken(req: Request, res: Response, next: NextFunction) {
                 "Set-Cookie",
                 [`session_token=null;Expires=Thu, 01 Jan 1970 00:00:00 GMT`]
             );
+            req.url = allPaths.LOGIN;
             redirectWithMessage(
-              req, res, allPaths.LOGIN,
-              "Your session has expired. Please log in again.");
+                req, res, "Your session has expired. Please log in again.");
         })
         .catch((err) => { convertObjectToResponse(err, null, req, res); });
 };
@@ -95,7 +95,8 @@ export function registerUser (req: Request, res: Response) {
   LogInUtilities
     .registerUserAndPassword(req.body)
     .then((confirmation) => {
-      redirectWithMessage(req, res, allPaths.LOGIN, confirmation);
+      req.url = allPaths.LOGIN;
+      redirectWithMessage(req, res, confirmation);
     })
     .catch((err) => {
       if (err instanceof UserRecoverableError) {
@@ -154,7 +155,7 @@ export function verifyAccount (req: Request, res: Response) {
     LogInUtilities.validateAccount(verification_uri)
         .then((confirmation) => {
           req.url = allPaths.LOGIN;
-          redirectWithMessage(req, res, allPaths.LOGIN, confirmation);
+          redirectWithMessage(req, res, confirmation);
         })
         .catch((err) => {
           if (err instanceof UserRecoverableError) {
