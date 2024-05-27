@@ -7,15 +7,15 @@ import { CardDescription, CardDescriptionType } from '../base-card-viewer.js';
 import { atomOneLight } from '../../syntax-highlighting.styles.js';
 
 @customElement('cg-editable-card-description')
-export class EditableCardTitle extends LitElement {
-  @property({type: Boolean}) isEditing = false;
+export class EditableCardDescriptionElement extends LitElement {
+  @property({type: Boolean}) canEdit = false;
   @property({type: Object}) value!: CardDescription;
   @state() private showOverlay = false;
 
   private descriptionRef: Ref<HTMLDivElement> = createRef();
 
   protected willUpdate(_: Map<string, any>) {
-    this.showOverlay = !this.isEditing && this.value
+    this.showOverlay = !this.canEdit && this.value
         && this.value.type === CardDescriptionType.Response;
   }
 
@@ -24,9 +24,9 @@ export class EditableCardTitle extends LitElement {
       <div id='positioned-lca'>
         <div id='overlay' ?hidden=${!this.showOverlay} @click=${this.toggleOverlay}></div>
         <div
-            ?contenteditable=${this.isEditing} ${ref(this.descriptionRef)}
+            ?contenteditable=${this.canEdit} ${ref(this.descriptionRef)}
             @input=${this.handleDescriptionChange}>
-          ${this.isEditing ? this.value.raw : this.value.markup}
+          ${this.canEdit ? this.value.raw : this.value.markup}
         </div>
       </div>
     `;
@@ -71,5 +71,10 @@ export class EditableCardTitle extends LitElement {
     `,
     atomOneLight
   ];
+}
 
+declare global {
+  interface HTMLElementTagNameMap {
+    'cg-editable-card-description': EditableCardDescriptionElement;
+  }
 }
