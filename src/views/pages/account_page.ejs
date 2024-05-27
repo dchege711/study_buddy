@@ -82,20 +82,20 @@
 
                 <div class="account_section">
 
-                    <h3 class="account_header">Delete account</h3>
+                    <form method="GET" action="<%= DELETE_ACCOUNT %>">
+                        <h3 class="account_header">
+                            <i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> Delete account
+                        </h3>
 
-                    <p>
-                        Careful now. Once you delete your account, there is no going back.
-                        Please be sure. You might want to download your data first.
-                        <br>
-                        <br>
-                        <button class="w3-btn w3-round-xxlarge w3-left w3-red" id="delete_account_button" onClick="AccountPage.confirmDeletion();">
-                            <b>
-                                <i class="fa fa-trash-o fa-fw" aria-hidden="true"></i> Delete Account
-                            </b>
-                        </button>
+                        <p>
+                            Careful now. Once you delete your account, there is no going back.
+                            Please be sure. You might want to download your data first.
+                            <br>
+                            <br>
+                            <input type="submit" class="w3-btn w3-round-xxlarge w3-left w3-red" value="Delete Account">
+                        </p>
 
-                    </p>
+                    </form>
 
                 </div>
 
