@@ -1,0 +1,21 @@
+<form method="post">
+
+    <label for="email">Email Address: </label>
+    <input class="w3-input" type="email" name="email"
+        required/>
+
+    <label for="username"> Choose an alphanumeric username: </label>
+    <input class="w3-input" type="text" name="username"
+        pattern="[_\-A-Za-z0-9]+" required/>
+
+    <label for="password"> Choose a password: </label>
+    <input class="w3-input" type="password" name="password"
+        id="signup_password" minlength="8" required/>
+
+    <button class="w3-button w3-center w3-green" type="submit">Sign Up</button>
+
+    <p>
+        Already have an account? <a href="<%= LOGIN %>">Log In</a>
+    </p>
+
+</form>
