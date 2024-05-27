@@ -1,6 +1,5 @@
 import { css, html, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
-import { when } from 'lit/directives/when.js';
 
 import { CardViewer, markdownSpoilerMarker } from './base-card-viewer.js';
 import { PrivateCardResult, trpc } from '../../trpc.js';
@@ -9,7 +8,7 @@ import { kCardChangedEventName } from './components/card-changed-event.js';
 
 import './components/copyable.js';
 import './components/editable-card-title.js';
-import './components/editable-card-description.js';
+import './components/card-description.js';
 
 @customElement('editable-card-viewer')
 export class EditableCardViewer extends CardViewer {
@@ -22,11 +21,11 @@ export class EditableCardViewer extends CardViewer {
   protected card: PrivateCardResult = null;
 
   @state()
-  protected isEditing = false;
+  protected canEdit = false;
 
   protected willUpdate(changedProperties: Map<string, any>) {
     if (changedProperties.has('card')) {
-      this.isEditing = false;
+      this.canEdit = false;
     }
     super.willUpdate(changedProperties);
   }
@@ -49,28 +48,17 @@ export class EditableCardViewer extends CardViewer {
           </cg-editable-card-title>
           <div>
             <button
-                @click=${() => this.isEditing = !this.isEditing}
-                ?disabled=${this.isEditing}>
+                @click=${() => this.canEdit = !this.canEdit}
+                ?disabled=${this.canEdit}>
               &#x270E; Edit
             </button>
           </div>
         </div>
-        <div>
-          ${when(
-            this.cardPrompt, () => html`
-              <cg-editable-card-description
-                .value=${this.cardPrompt!}
-                .isEditing=${this.isEditing}>
-              </cg-editable-card-description>
-            `)}
-          ${when(
-            this.cardResponse, () => html`
-              <cg-editable-card-description
-                .value=${this.cardResponse!}
-                .isEditing=${this.isEditing}>
-              </cg-editable-card-description>
-            `)}
-        </div>
+        <cg-card-description
+          .cardPrompt=${this.cardPrompt}
+          .cardResponse=${this.cardResponse}
+          .canEdit=${this.canEdit}>
+        </cg-card-description>
       </div>
       <div class='space-between'>
         <button @click=${() => this.deleteCard()}>

@@ -6,7 +6,7 @@ import { CardViewer } from './base-card-viewer.js';
 import { FlagCardParams, PublicCardResult, trpc } from '../../trpc.js';
 import { CardsCarouselUpdateCursorDirection } from '../../context/cards-carousel-context.js';
 
-import './components/editable-card-description.js';
+import './components/card-description.js';
 
 enum FlagReason {
   Inappropriate = 1,
@@ -50,20 +50,11 @@ export class PublicCardViewer extends CardViewer {
 
       <div id='main-card-content'>
         <h3>${this.card.title}</h3>
-        ${when(
-          this.cardPrompt, () => html`
-            <cg-editable-card-description
-              .value=${this.cardPrompt!}
-              .isEditing=${false}>
-            </cg-editable-card-description>
-          `)}
-        ${when(
-          this.cardResponse, () => html`
-            <cg-editable-card-description
-              .value=${this.cardResponse!}
-              .isEditing=${false}>
-            </cg-editable-card-description>
-          `)}
+        <cg-card-description
+          .cardPrompt=${this.cardPrompt}
+          .cardResponse=${this.cardResponse}
+          .canEdit=${false}>
+        </cg-card-description>
         <p><em>Tags: </em> ${this.card.tags}</p>
       </div>
 
