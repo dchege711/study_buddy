@@ -117,9 +117,9 @@ export class EditableCardViewer extends CardViewer {
 
       const updatedPrompt = ev.changes.prompt || this.cardPrompt?.raw || '';
       const updatedResponse = ev.changes.response || this.cardResponse?.raw || '';
-      const updatedDescription = updatedResponse
+      const updatedDescription = updatedPrompt
           ? `${updatedPrompt}\n${markdownSpoilerMarker}\n${updatedResponse}`
-          : updatedPrompt;
+          : updatedResponse;
 
       this.pendingChanges = {
         ...this.card,
@@ -154,6 +154,9 @@ export class EditableCardViewer extends CardViewer {
     trpc.updateCard.mutate({
       _id: this.card._id,
       ...this.pendingChanges,
+    }).then((updatedCard) => {
+      this.card = updatedCard;
+      this.pendingChanges = {};
     });
   }
 
