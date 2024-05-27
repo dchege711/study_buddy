@@ -1,44 +1,20 @@
 "use strict";
 
-import { Request, RequestHandler, Response } from "express";
+import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 
 import * as CardsDB from "../models/CardsMongoDB";
-import { User } from "../models/mongoose_models/UserSchema";
 import * as MetadataDB from "../models/MetadataMongoDB";
 import * as controllerUtils from "./ControllerUtilities";
 import * as loginUtilities from "../models/LogInUtilities";
 import * as config from "../config";
-import { ICard, MiniICard } from "../models/mongoose_models/CardSchema";
+import { MiniICard } from "../models/mongoose_models/CardSchema";
 import { IMetadata } from "../models/mongoose_models/MetadataCardSchema";
 import * as allPaths from "../paths";
-import { AuthenticateUser } from "../models/LogInUtilities";
 
 const convertObjectToResponse = controllerUtils.convertObjectToResponse;
 const deleteTempFile = controllerUtils.deleteTempFile;
-
-interface TemplateVariables {
-    APP_NAME: string,
-    BASE_URL: string,
-    LOGGED_IN: boolean,
-    SEARCH_ENDPOINT_URL?: string;
-    abbreviatedCards?: Array<Partial<ICard>>;
-    account_info?: AuthenticateUser;
-}
-
-/**
- * @param {Object} req The incoming HTTP request
- *
- * @return {JSON} The key-value pairs that should be provided to templates by
- * default.
- */
-function getDefaultTemplateVars(req: Request | null = null): TemplateVariables {
-    return {
-        APP_NAME: config.APP_NAME, BASE_URL: config.BASE_URL,
-        LOGGED_IN: req?.session?.user !== undefined,
-        ...allPaths
-    };
-}
+const getDefaultTemplateVars = controllerUtils.getDefaultTemplateVars;
 
 export function home (req: Request, res: Response) {
     let templateVars = getDefaultTemplateVars(req);

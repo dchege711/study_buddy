@@ -1,0 +1,26 @@
+<% if (message) { %>
+    <div id="app-message-template">
+        <template shadowrootmode="open">
+            <style>
+                :host {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    font-size: larger;
+                    border: 1px solid var(--main-border-color);
+                    background-color: white;
+                    border-radius: 5px;
+                    padding: 0px 10px;
+                }
+            </style>
+            <p><%= message %></p>
+            <button type="button" onclick="hideMessage()">&#x2716; Dismiss</button>
+            <script>
+                function hideMessage() {
+                    const templateElem = document.getElementById("app-message-template");
+                    templateElem.style.display = "none";
+                }
+            </script>
+        </template>
+    </div>
+<% } %>
