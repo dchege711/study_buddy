@@ -363,9 +363,11 @@ export async function authenticateUser(payload: AuthenticateUserParam): Promise<
  * @description Provide an authentication endpoint where a session token has
  * been provided. Useful for maintaining persistent logins.
  *
- * @param {String} tokenID The token ID that can be used for logging in.
- * @returns {Promise} resolves with a JSON doc w/ `success`, `status`
- *  and `message` as keys
+ * @param {String} tokenID The token that can be used for logging in. This is
+ * stored on the Request object.
+ *
+ * @returns {Promise} Resolves with an `AuthenticateUser` object if the token is
+ * valid, and otherwise `null`. Never rejects.
  */
 export async function authenticateByToken(tokenID: string): Promise<AuthenticateUser | null> {
     return Token.findOne({ token_id: tokenID }).exec()
