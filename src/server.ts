@@ -12,7 +12,6 @@ import * as trpcExpress from '@trpc/server/adapters/express';
 import { publicProcedure, router, mergeRouters } from "./trpc";
 import { createContext } from "./context";
 import { inAppRouter } from "./routes/InAppRouter";
-import { authRouter } from "./routes/AuthenticationRouter";
 import { IS_DEV } from "./config";
 import { populateDummyAccountWithCards } from "./tests/DummyAccountUtils";
 import * as allPaths from "./paths";
@@ -47,7 +46,7 @@ if (process.env.NODE_ENV === "production") {
 }
 
 const appRouter = mergeRouters(
-  authRouter, inAppRouter
+  inAppRouter
 );
 
 // Export only the type of the router to prevent us from importing server code
