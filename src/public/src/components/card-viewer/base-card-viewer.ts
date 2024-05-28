@@ -92,9 +92,7 @@ export class CardViewer extends LitElement {
 
     let htmlSplitIndex = combinedHTML.indexOf(htmlSpoilerMarker);
     if (htmlSplitIndex === -1) {
-      // TODO: Can we avoid this code path? The HTML is updated server-side, so
-      // there is a time when there is a mismatch between the raw and HTML.
-      return;
+      throw new Error('HTML and Markdown descriptions are out of sync');
     }
 
     this.cardPrompt = {
