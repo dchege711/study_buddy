@@ -151,6 +151,15 @@ export function sendValidationEmailGet (req: Request, res: Response) {
     renderForm(req, res, "Send Validation URL", "send_validation_url");
 };
 
+export function sendValidationEmailPost (req: Request, res: Response) {
+    LogInUtilities
+        .sendAccountValidationLink({email: req.body.email})
+        .then((confirmation) => {
+          redirectWithMessage(req, res, confirmation);
+        })
+        .catch((err) => { maybeRenderError(err, req, res); });
+};
+
 export function verifyAccount (req: Request, res: Response) {
     var verification_uri = req.path.split("/verify-account/")[1];
 

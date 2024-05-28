@@ -6,6 +6,7 @@ import {
   loginUser,
   logoutUser,
   sendValidationEmailGet,
+  sendValidationEmailPost,
   verifyAccount,
   registerUser,
   resetPasswordGet,
@@ -30,6 +31,8 @@ router.get(REGISTER_USER, handleRegisterUser);
 router.post(REGISTER_USER, registerUser);
 
 router.get(SEND_VALIDATION_EMAIL, sendValidationEmailGet);
+
+router.post(SEND_VALIDATION_EMAIL, sendValidationEmailPost);
 
 router.get(`${VERIFY_ACCOUNT}/*`, verifyAccount);
 
