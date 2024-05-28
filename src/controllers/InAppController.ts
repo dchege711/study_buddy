@@ -27,15 +27,7 @@ export function wikiPage(req: Request, res: Response) {
 };
 
 export function browsePageGet(req: Request, res: Response) {
-    let templateVars = getDefaultTemplateVars(req);
-    templateVars.SEARCH_ENDPOINT_URL = "/browse";
-    CardsDB
-        .publicSearch(req.query as unknown as CardsDB.SearchCardParams)
-        .then((abbreviatedCards) => {
-            templateVars.abbreviatedCards = abbreviatedCards;
-            res.render("pages/browse_cards_page.ejs", templateVars);
-        })
-        .catch((err) => {convertObjectToResponse(err, null, req, res); });
+  res.render("pages/browse_cards_page.ejs", getDefaultTemplateVars(req));
 };
 
 export function accountGet (req: Request, res: Response) {
@@ -71,7 +63,7 @@ export function updateUserSettings(req: Request, res: Response) {
               cardsAreByDefaultPrivate: user.cardsAreByDefaultPrivate,
           }
         }
-        res.redirect(StatusCodes.SEE_OTHER, allPaths.ACCOUNT);
+        controllerUtils.redirectWithMessage(req, res, "Settings updated successfully.");
       })
       .catch((err) => { convertObjectToResponse(err, null, req, res); });
 };
