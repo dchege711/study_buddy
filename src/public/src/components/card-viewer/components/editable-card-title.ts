@@ -11,7 +11,7 @@ export class EditableCardTitle extends LitElement {
 
   render() {
     return html`
-      <input type='text' value=${this.value} @input=${this.inputChanged} />
+      <input type='text' .value=${this.value} @input=${this.inputChanged} />
     `;
   }
 
