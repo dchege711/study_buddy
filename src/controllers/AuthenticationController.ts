@@ -4,7 +4,7 @@ import { NextFunction, Request, Response, RequestHandler } from "express";
 import { StatusCodes } from "http-status-codes";
 
 import * as LogInUtilities from "../models/LogInUtilities";
-import { convertObjectToResponse, getDefaultTemplateVars, redirectWithMessage, redirectWithRecoverableError } from "./ControllerUtilities";
+import { maybeRenderError, getDefaultTemplateVars, redirectWithMessage, redirectWithRecoverableError } from "./ControllerUtilities";
 import * as allPaths from "../paths";
 import { UserRecoverableError } from "../errors";
 
@@ -67,7 +67,7 @@ function logInBySessionToken(req: Request, res: Response, next: NextFunction) {
             redirectWithMessage(
                 req, res, "Your session has expired. Please log in again.");
         })
-        .catch((err) => { convertObjectToResponse(err, null, req, res); });
+        .catch((err) => { maybeRenderError(err, req, res); });
 };
 
 export function handleLogIn(req: Request, res: Response) {
@@ -105,7 +105,7 @@ export function registerUser (req: Request, res: Response) {
         return;
       }
 
-      convertObjectToResponse(err, null, req, res);
+      maybeRenderError(err, req, res);
     });
 };
 
@@ -123,7 +123,7 @@ export function loginUser (req: Request, res: Response, next: NextFunction) {
             );
             res.redirect(StatusCodes.SEE_OTHER, allPaths.HOME);
         })
-        .catch((err) => { convertObjectToResponse(err, null, req, res); });
+        .catch((err) => { maybeRenderError(err, req, res); });
 };
 
 /**
@@ -163,7 +163,7 @@ export function verifyAccount (req: Request, res: Response) {
             redirectWithRecoverableError(req, res, err);
             return;
           }
-          convertObjectToResponse(err, null, req, res);
+          maybeRenderError(err, req, res);
         });
 };
 
@@ -178,7 +178,7 @@ export function resetPasswordLinkGet (req: Request, res: Response) {
         .then(() => {
             renderForm(req, res, "Reset Password", "reset_password");
         })
-        .catch((err) => { convertObjectToResponse(err, null, req, res); });
+        .catch((err) => { maybeRenderError(err, req, res); });
 };
 
 export function resetPasswordLinkPost (req: Request, res: Response) {
@@ -196,5 +196,5 @@ export function resetPasswordLinkPost (req: Request, res: Response) {
           req.url = allPaths.LOGIN;
           redirectWithMessage(req, res, reset_confirmation);
         })
-        .catch((err) => { convertObjectToResponse(err, null, req, res); });
+        .catch((err) => { maybeRenderError(err, req, res); });
 };

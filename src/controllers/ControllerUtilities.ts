@@ -71,51 +71,22 @@ export function redirectWithMessage(
 }
 
 /**
- * @description A function to interpret JSON documents into server responses. It
- * is meant to be used as the last function in the controller modules.
- *
- * @param {Error} err Any error that occurred in the preceding function
- * @param {JSON} result_JSON Expected keys: `status`, `success`, `message`
- * @param {Response} res An Express JS res object
+ * Decides how to communicate `err` to the user. If `err` is a
+ * `UserRecoverableError`, then this method is equivalent to
+ * `redirectWithRecoverableError`. Otherwise, this method logs `err` and renders
+ * a 5XX error page with `err.toString()` for easier debugging.
  */
-export function convertObjectToResponse (err: Error | null, result_JSON: any, req: Request, res: Response) {
-    if (err) {
-        if (typeof err === "string") {
-            res.type("text").status(200).send(err);
-            return;
-        }
+export function maybeRenderError (err: Error, req: Request, res: Response) {
+  if (err instanceof UserRecoverableError) {
+      redirectWithRecoverableError(req, res, err);
+      return;
+  }
 
-        res.type(".html");
-        res.status(500);
-        res.render(
-            "pages/5xx_error_page.ejs",
-            { ...getDefaultTemplateVars(req), response_JSON: generic_500_msg }
-        );
-        return;
-    }
-
-    let status = result_JSON.status || 200;
-    res.status(status);
-    if (status >= 200 && status < 300) {
-        res.type("application/json");
-        res.json(result_JSON);
-    } else if (status >= 300 && status < 400) {
-        res.type('html');
-        if (req.session) {
-          req.session.message = result_JSON.message;
-        }
-        res.redirect(status, result_JSON.redirect_url);
-    } else if (status >= 400 && status < 500) {
-        res.type('html');
-        res.render(
-          "pages/4xx_error_page.ejs",
-          { ...getDefaultTemplateVars(req), response_JSON: result_JSON });
-    } else {
-        res.type('html');
-        res.render(
-          "pages/5xx_error_page.ejs",
-          { ...getDefaultTemplateVars(req), response_JSON: result_JSON });
-    }
+  console.error(err);
+  res.type('html');
+  res.render(
+    "pages/5xx_error_page.ejs",
+    { ...getDefaultTemplateVars(req), message: err.toString() });
 };
 
 export function deleteTempFile(filepath: string) {
