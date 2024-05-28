@@ -185,15 +185,16 @@ export function resetPasswordLinkPost (req: Request, res: Response) {
     var reset_password_uri = req.path.split("/reset-password-link/")[1];
     LogInUtilities
         .validatePasswordResetLink(reset_password_uri)
-        .then((_) => {
-            let payload = req.body;
-            payload.reset_password_uri = reset_password_uri;
-            let todays_datetime = new Date();
-            payload.reset_request_time = todays_datetime.toString();
-            return LogInUtilities.resetPassword(payload);
+        .then(() => {
+            return LogInUtilities.resetPassword({
+              reset_request_time: new Date(),
+              password: req.body.password,
+              reset_password_uri: reset_password_uri,
+            });
         })
         .then((reset_confirmation) => {
-            convertObjectToResponse(null, reset_confirmation, req, res);
+          req.url = allPaths.LOGIN;
+          redirectWithMessage(req, res, reset_confirmation);
         })
         .catch((err) => { convertObjectToResponse(err, null, req, res); });
 };
