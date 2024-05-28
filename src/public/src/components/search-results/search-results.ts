@@ -6,25 +6,7 @@ import { CardSearchResult } from '../../trpc.js';
 import { searchResultsContext, SearchResultSelectedEvent } from '../../context/search-results-context.js';
 import { when } from 'lit/directives/when.js';
 
-@customElement('search-result-tag')
-export class SearchResultTag extends LitElement {
-  @property({ type: String }) tag!: string;
-
-  render() {
-    return html`
-      <span>#${this.tag}</span>
-    `;
-  }
-
-  static styles = css`
-    span {
-      background-color: var(--main-bg-color);
-      border-radius: 4px;
-      border: 1px solid var(--main-border-color);
-      padding: 2px;
-    }
-  `;
-}
+import '../tags/view-only-tag.js';
 
 @customElement('search-result')
 export class SearchResult extends LitElement {
@@ -41,7 +23,7 @@ export class SearchResult extends LitElement {
         <p class='tags-holder'>
           ${this.result.tags?.split(' ').filter(Boolean).map(
             (tag) => html`
-              <search-result-tag .tag=${tag}></search-result-tag>
+              <cg-view-only-tag .tag=${tag}></cg-view-only-tag>
             `
           )}
         </p>
