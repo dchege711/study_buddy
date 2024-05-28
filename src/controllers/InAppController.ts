@@ -100,13 +100,15 @@ export function deleteAccount(req: Request, res: Response) {
 
     loginUtilities
         .deleteAccount(userIDInApp)
-        .then((_) => {
+        .then(() => {
+            const email = req.session?.user?.email;
             delete req.session?.user;
             res.setHeader(
                 "Set-Cookie",
                 [`session_token=null;Expires=Thu, 01 Jan 1970 00:00:00 GMT`]
             );
-            res.redirect(StatusCodes.SEE_OTHER, allPaths.BROWSE);
+            req.url = allPaths.BROWSE;
+            controllerUtils.redirectWithMessage(req, res, `${email}'s account deleted successfully.`);
         })
         .catch((err) => { convertObjectToResponse(err, null, req, res); });
 };
