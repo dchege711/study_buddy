@@ -430,22 +430,19 @@ export async function sendResetLink(userIdentifier: ResetLinkParams): Promise<st
 type PasswordResetLinkResponse = BaseResponse & { message: string, redirect_url?: string };
 
 /**
- *
- * @param {String} resetPasswordURI The password reset uri sent in the email
- * @returns {Promise} resolves with a JSON object that has `success` and `message`
- * as its keys. Fails only if something goes wrong with the database.
+ * Resolves the promise if `resetPasswordURI` is valid and hasn't expired.
  */
-export async function validatePasswordResetLink(resetPasswordURI: string): Promise<string> {
+export async function validatePasswordResetLink(resetPasswordURI: string): Promise<void> {
     let user = await User.findOne({reset_password_uri: resetPasswordURI}).exec();
     if (user === null) {
-        return "Invalid link";
+      return Promise.reject(
+        new UserRecoverableError("Invalid link. Please submit another reset request."));
     }
 
     if (Date.now() > user.reset_password_timestamp + 2 * 3600 * 1000) {
-        return `Expired link. Please submit another reset request via ${config.BASE_URL}/reset-password.`;
+      return Promise.reject(
+        new UserRecoverableError("Expired link. Please submit another reset request."));
     }
-
-    return "Please submit a new password";
 };
 
 export type ResetPasswordParams = Pick<IUser, "reset_password_uri"> & { password: string, reset_request_time: Date };
