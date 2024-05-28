@@ -451,16 +451,11 @@ export type ResetPasswordParams = Pick<IUser, "reset_password_uri"> & { password
  * @description Reset the user's password. We also invalidate all previously
  * issued session tokens so that the user has to provide their new password
  * before logging into any session.
- *
- * @param {payload} payload Expected keys: `reset_password_uri`, `password`,
- * `reset_info`.
- * @returns {Promise} resolves with a JSON object that has the keys `success`
- * and `message`.
  */
 export async function resetPassword(payload: ResetPasswordParams): Promise<string> {
     let user = await User.findOne({reset_password_uri: payload.reset_password_uri}).exec();
     if (user === null) {
-        return "Invalid link";
+        return Promise.reject(new UserRecoverableError("Invalid link"));
     }
 
     let {salt, hash} = await getSaltAndHash(payload.password);
