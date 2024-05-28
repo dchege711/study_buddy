@@ -31,14 +31,10 @@ export function browsePageGet(req: Request, res: Response) {
 };
 
 export function accountGet (req: Request, res: Response) {
-    const templateVars = getDefaultTemplateVars(req);
-    templateVars.account_info = req.session?.user;
     res.render(
         "pages/account_page.ejs", {
+            ...getDefaultTemplateVars(req),
             account_info: req.session?.user,
-            APP_NAME: config.APP_NAME,
-            LOGGED_IN: req.session?.user !== undefined,
-            ...allPaths,
         }
     );
 };
