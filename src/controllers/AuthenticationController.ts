@@ -131,7 +131,8 @@ export function loginUser (req: Request, res: Response, next: NextFunction) {
  * their initial login and redirect them to the welcome/login page.
  */
 export async function logoutUser (req: Request, res: Response) {
-    var session_token = req.session?.user?.token_id;
+    const session_token = req.session?.user?.token_id;
+    const email = req.session?.user?.email;
     delete req.session?.user;
 
     if (session_token) {
@@ -142,7 +143,8 @@ export async function logoutUser (req: Request, res: Response) {
         "Set-Cookie",
         [`session_token=null;Expires=Thu, 01 Jan 1970 00:00:00 GMT`]
     );
-    res.redirect(StatusCodes.SEE_OTHER, allPaths.BROWSE);
+    req.url = allPaths.BROWSE;
+    redirectWithMessage(req, res, `${email} logged out successfully.`);
 };
 
 export function sendValidationEmailGet (req: Request, res: Response) {
