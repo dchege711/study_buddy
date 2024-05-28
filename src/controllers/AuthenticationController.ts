@@ -175,12 +175,8 @@ export function resetPasswordLinkGet (req: Request, res: Response) {
     var reset_password_uri = req.path.split("/reset-password-link/")[1];
     LogInUtilities
         .validatePasswordResetLink(reset_password_uri)
-        .then((result) => {
-            if (result) {
-                renderForm(req, res, "Reset Password", "reset_password");
-            } else {
-                convertObjectToResponse(null, result, req, res);
-            }
+        .then(() => {
+            renderForm(req, res, "Reset Password", "reset_password");
         })
         .catch((err) => { convertObjectToResponse(err, null, req, res); });
 };
