@@ -173,6 +173,15 @@ export function resetPasswordGet (req: Request, res: Response) {
     renderForm(req, res, "Reset Password Request", "reset_password_request");
 };
 
+export function resetPasswordPost (req: Request, res: Response) {
+    LogInUtilities
+        .sendResetLink({email: req.body.email})
+        .then((confirmation) => {
+          redirectWithMessage(req, res, confirmation);
+        })
+        .catch((err) => { maybeRenderError(err, req, res); });
+};
+
 export function resetPasswordLinkGet (req: Request, res: Response) {
     var reset_password_uri = req.path.split("/reset-password-link/")[1];
     LogInUtilities

@@ -424,7 +424,7 @@ export async function sendResetLink(userIdentifier: ResetLinkParams): Promise<st
             `request a password reset, please ignore this email.`
     });
 
-    return `If ${userIdentifier.email} has an account, we've sent a password reset link`;
+    return `We've sent a reset link to ${userIdentifier.email} that is valid for 2 hours.`;
 };
 
 type PasswordResetLinkResponse = BaseResponse & { message: string, redirect_url?: string };

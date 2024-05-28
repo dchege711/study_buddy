@@ -9,6 +9,7 @@ import {
   verifyAccount,
   registerUser,
   resetPasswordGet,
+  resetPasswordPost,
   resetPasswordLinkGet,
   resetPasswordLinkPost,
 } from "../controllers/AuthenticationController";
@@ -33,6 +34,8 @@ router.get(SEND_VALIDATION_EMAIL, sendValidationEmailGet);
 router.get(`${VERIFY_ACCOUNT}/*`, verifyAccount);
 
 router.get(RESET_PASSWORD, resetPasswordGet);
+
+router.post(RESET_PASSWORD, resetPasswordPost);
 
 router.get(`${RESET_PASSWORD_LINK}/*`, resetPasswordLinkGet);
 

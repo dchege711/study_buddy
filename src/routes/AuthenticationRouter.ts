@@ -10,10 +10,4 @@ export const authRouter = router({
     .mutation(({ input }) => {
       return sendAccountValidationLink(input);
     }),
-
-   sendResetPasswordLink: publicProcedure
-    .input((params: unknown) => params as ResetLinkParams)
-    .mutation(({ input }) => {
-      return sendResetLink(input);
-    }),
 });
