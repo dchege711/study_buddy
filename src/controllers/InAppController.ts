@@ -12,7 +12,7 @@ import { MiniICard } from "../models/mongoose_models/CardSchema";
 import { IMetadata } from "../models/mongoose_models/MetadataCardSchema";
 import * as allPaths from "../paths";
 
-const convertObjectToResponse = controllerUtils.convertObjectToResponse;
+const maybeRenderError = controllerUtils.maybeRenderError;
 const deleteTempFile = controllerUtils.deleteTempFile;
 const getDefaultTemplateVars = controllerUtils.getDefaultTemplateVars;
 
@@ -65,7 +65,7 @@ export function updateUserSettings(req: Request, res: Response) {
         }
         controllerUtils.redirectWithMessage(req, res, "Settings updated successfully.");
       })
-      .catch((err) => { convertObjectToResponse(err, null, req, res); });
+      .catch((err) => { maybeRenderError(err, req, res); });
 };
 
 export interface MetadataResponse {
@@ -88,7 +88,7 @@ export function downloadUserData(req: Request, res: Response) {
                 else { deleteTempFile(writeResult.jsonFilePath); }
             });
         })
-        .catch((err) => { convertObjectToResponse(err, null, req, res); });
+        .catch((err) => { maybeRenderError(err, req, res); });
 };
 
 export function deleteAccount(req: Request, res: Response) {
@@ -110,5 +110,5 @@ export function deleteAccount(req: Request, res: Response) {
             req.url = allPaths.BROWSE;
             controllerUtils.redirectWithMessage(req, res, `${email}'s account deleted successfully.`);
         })
-        .catch((err) => { convertObjectToResponse(err, null, req, res); });
+        .catch((err) => { maybeRenderError(err, req, res); });
 };
