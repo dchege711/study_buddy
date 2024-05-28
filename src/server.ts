@@ -96,7 +96,7 @@ app.use(function (err: any, req: Request, res: Response, next: NextFunction) {
         "pages/5xx_error_page.ejs",
         {
           ...getDefaultTemplateVars(req),
-          response_JSON: {status: 500, message: "Internal Server Error"},
+          message: "500: Internal Server Error",
         }
     );
 });
@@ -107,7 +107,7 @@ app.use(function (req: Request, res: Response, next: NextFunction) {
         "pages/4xx_error_page.ejs",
         {
           ...getDefaultTemplateVars(req),
-            response_JSON: {status: 404, message: "Page Not Found"},
+          message: "404: Page Not Found",
         }
     );
 });
