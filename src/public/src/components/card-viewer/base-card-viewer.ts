@@ -37,6 +37,14 @@ export class CardViewer extends LitElement {
   @property({ type: Object})
   protected cardResponse: CardDescription | null = null;
 
+  get tags(): string[] {
+    if (!this.card) {
+      return [];
+    }
+
+    return this.card.tags.split(' ').filter(Boolean);
+  }
+
   protected willUpdate(changedProperties: Map<string, any>) {
     if (changedProperties.has('card')) {
       this.updatePromptAndResponse();

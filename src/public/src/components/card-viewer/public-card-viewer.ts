@@ -1,12 +1,13 @@
 import { css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { when } from 'lit/directives/when.js';
+import { repeat } from 'lit/directives/repeat.js';
 
 import { CardViewer } from './base-card-viewer.js';
 import { FlagCardParams, PublicCardResult, trpc } from '../../trpc.js';
 import { CardsCarouselUpdateCursorDirection } from '../../context/cards-carousel-context.js';
 
 import './components/card-description.js';
+import '../tags/view-only-tag.js';
 
 enum FlagReason {
   Inappropriate = 1,
@@ -55,7 +56,12 @@ export class PublicCardViewer extends CardViewer {
           .cardResponse=${this.cardResponse}
           .canEdit=${false}>
         </cg-card-description>
-        <p><em>Tags: </em> ${this.card.tags}</p>
+        <p>
+        ${repeat(
+            this.tags, (tag) => tag,
+            (tag) => html`<cg-view-only-tag .tag=${tag}></cg-view-only-tag>`
+          )}
+        </p>
       </div>
 
       <div id='action-row'>
