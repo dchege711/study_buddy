@@ -37,12 +37,12 @@ export class CardViewer extends LitElement {
   @property({ type: Object})
   protected cardResponse: CardDescription | null = null;
 
-  get tags(): string[] {
+  get tags(): Set<string> {
     if (!this.card) {
-      return [];
+      return new Set();
     }
 
-    return this.card.tags.split(' ').filter(Boolean);
+    return new Set(this.card.tags.split(' ').filter(Boolean));
   }
 
   protected willUpdate(changedProperties: Map<string, any>) {
