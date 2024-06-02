@@ -1,5 +1,5 @@
 import { LitElement, html, css, nothing } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { CardChangedEvent } from '../components/card-changed-event.js';
 
@@ -47,9 +47,23 @@ export class EditableCardTag extends LitElement {
   }
 }
 
+interface PendingTags {
+  removed: Set<string>;
+}
+
 @customElement('cg-editable-card-tags')
 export class EditableCardTags extends LitElement {
   @property({type: Object}) tags: Set<string> = new Set();
+
+  /**
+   * Dispatching `CardChangedEvent` bubbles up to `EditableCardViewer` which
+   * updates its inner state. Even though that state is not used in a template,
+   * it still triggers a re-render, which sets `this.tags`. To show an updated
+   * UI to the user, we need to keep track of the tags that are pending so that
+   * we can exclude/show them until the parent component saves the changes and
+   * updates `this.tags`.
+   */
+  @state() _pendingTags: PendingTags = { removed: new Set() };
 
   constructor() {
     super();
@@ -57,9 +71,12 @@ export class EditableCardTags extends LitElement {
   }
 
   render() {
+    const tagsToShow = new Set(this.tags);
+    this._pendingTags.removed.forEach((tag) => tagsToShow.delete(tag));
+
     return html`
       ${repeat(
-        this.tags, (tag) => tag,
+        tagsToShow, (tag) => tag,
         (tag) => html`<cg-editable-tag .tag=${tag}></cg-editable-tag>`
       )}
     `;
@@ -73,17 +90,23 @@ export class EditableCardTags extends LitElement {
   `;
 
   private addEventListeners() {
-    this.addEventListener(kTagRemovedEventName, (e: TagRemovedEvent) => {
-      e.stopPropagation();
+    this.addEventListener(kTagRemovedEventName, this.onTagRemoved.bind(this));
+  }
 
-      const newTags = new Set(this.tags);
-      newTags.delete(e.tag);
-      this.tags = newTags;
+  private onTagRemoved(e: TagRemovedEvent) {
+    // Create a new set of tags that excludes the removed tag. A new set is
+    // better practice because it ensures that sub-components also get
+    // updated.
+    //
+    // [1]: https://lit.dev/docs/components/properties/#mutating-properties
+    const newTags = new Set(this.tags);
+    newTags.delete(e.tag);
 
-      // TODO: Why does this lead to the card not updating visually?
-      // this.dispatchEvent(
-      //     new CardChangedEvent({ tags: Array.from(this.tags).join(' ')}));
-    });
+    this._pendingTags.removed.add(e.tag);
+
+    this.dispatchEvent(
+        new CardChangedEvent({ tags: Array.from(newTags).join(' ')}));
+
   }
 }
 
