@@ -4,12 +4,9 @@ import { createRef, ref, Ref } from 'lit/directives/ref.js';
 
 import { CardSearchResult, CardSearchQuery, CardSearchEndpoint } from '../../trpc.js';
 import { SearchResultsChangedEvent } from '../../context/search-results-context.js';
+import { TextInputEvent, InputState, kTextInputBlurEvent, kTextInputEvent } from '../input/text-input.js';
 
-enum InputState {
-  PressedSpace = 1,
-  PressedEnter = 2,
-  InWord = 3,
-}
+import '../input/text-input.js';
 
 @customElement('search-bar')
 export class SearchBar extends LitElement {
@@ -25,17 +22,15 @@ export class SearchBar extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
     this.maybeFetchInitialResults();
+    this.addEventListeners();
   }
 
   render() {
     const showResults = this.searchResults.length > 0 || this.receivedNoResults;
     return html`
-      <input
-          id='card_search_input'
-          placeholder='Search card descriptions and titles. Press [Enter] to view all results'
-          @keydown=${this.searchCards}
-          @blur=${this.clearResultsAfterTimeout}
-          ${ref(this.inputRef)}>
+      <cg-text-input
+          .placeholder=${'Search card descriptions and titles. Press [Enter] to view all results'}>
+      </cg-text-input>
       ${showResults ? this.renderSearchResults() : nothing}
     `;
   }
@@ -53,6 +48,11 @@ export class SearchBar extends LitElement {
         </ul>
       </div>
     `;
+  }
+
+  private addEventListeners() {
+    this.addEventListener(kTextInputEvent, (e: TextInputEvent) => this.searchCards(e));
+    this.addEventListener(kTextInputBlurEvent, () => this.clearResultsAfterTimeout());
   }
 
   /**
@@ -73,22 +73,12 @@ export class SearchBar extends LitElement {
    * card, i.e. first check if the card is in the cache, otherwise, fetch the
    * full card from the database.
    */
-  private async searchCards(event: KeyboardEvent) {
-    const inputState = this.getInputState(event.key);
-    if (inputState === InputState.InWord) {
-      return;
-    }
-
-    const queryString = this.inputRef.value?.value.trim() || '';
-    if (queryString.length === 0) {
-      return;
-    }
-
-    const stillTyping = inputState === InputState.PressedSpace;
+  private async searchCards(event: TextInputEvent) {
+    const stillTyping = event.state === InputState.PressedSpace;
 
     const cards = await this.fetchResults({
       limit: stillTyping ? 7 : Infinity,
-      queryString,
+      queryString: event.text,
     });
 
     if (stillTyping) {
@@ -114,17 +104,6 @@ export class SearchBar extends LitElement {
     this.dispatchEvent(new SearchResultsChangedEvent(results));
   }
 
-  private getInputState(keyPress: string): InputState {
-    switch(keyPress) {
-      case ' ':
-        return InputState.PressedSpace;
-      case 'Enter':
-        return InputState.PressedEnter;
-      default:
-        return InputState.InWord;
-    }
-  }
-
   private maybeFetchInitialResults() {
     if (this.searchResults.length !== 0) {
       return;
@@ -148,12 +127,6 @@ export class SearchBar extends LitElement {
       width: 100%;
       display: flex;
       flex-direction: column;
-    }
-
-    input {
-      border: none;
-      border-bottom: 0.2px solid black;
-      padding: 1%;
     }
 
     div#search-results-anchor {
