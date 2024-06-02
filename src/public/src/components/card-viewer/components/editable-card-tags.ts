@@ -2,8 +2,10 @@ import { LitElement, html, css, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { CardChangedEvent } from '../components/card-changed-event.js';
+import { TextInputEvent, kTextInputEvent } from '../../input/text-input.js';
 
 import '../../tags/card-tag.js';
+import '../../input/text-input.js';
 
 enum TagEditType {
   kAdd, kRemove
@@ -111,7 +113,7 @@ export class EditableCardTags extends LitElement {
         )}
       </div>
       <div id='input-tags-container'>
-        <input type='text' @keydown=${this.onKeyDown.bind(this)} placeholder='Add tag'>
+        <cg-text-input placeholder='Add tag'></cg-text-input>
         <span>
           ${repeat(
             suggestedTags, (tag) => tag,
@@ -136,7 +138,7 @@ export class EditableCardTags extends LitElement {
     }
 
     div#input-tags-container {
-      input {
+      cg-text-input {
         flex-grow: 1;
       }
 
@@ -150,6 +152,7 @@ export class EditableCardTags extends LitElement {
 
   private addEventListeners() {
     this.addEventListener(kTagEditEventName, this.onTagEdited.bind(this));
+    this.addEventListener(kTextInputEvent, this.onTagTyped.bind(this));
   }
 
   private onTagEdited(e: TagEditEvent) {
@@ -170,7 +173,14 @@ export class EditableCardTags extends LitElement {
         new CardChangedEvent({ tags: Array.from(newTags).join(' ')}));
   }
 
-  private onKeyDown(e: KeyboardEvent) {
+  private onTagTyped(e: TextInputEvent) {
+    const newTags = new Set(this.tags);
+    const tag = e.text;
+    newTags.add(tag);
+    this._pendingTags.added.add(tag);
+
+    this.dispatchEvent(
+        new CardChangedEvent({ tags: Array.from(newTags).join(' ')}));
   }
 }
 
