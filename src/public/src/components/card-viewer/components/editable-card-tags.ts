@@ -5,27 +5,40 @@ import { CardChangedEvent } from '../components/card-changed-event.js';
 
 import '../../tags/card-tag.js';
 
-const kTagRemovedEventName = 'tag-removed';
-class TagRemovedEvent extends Event {
+enum TagEditType {
+  kAdd, kRemove
+}
+
+const kTagEditEventName = 'tag-edit';
+class TagEditEvent extends Event {
     tag: string;
-    constructor(tag: string) {
-        super(kTagRemovedEventName, { bubbles: true, composed: true });
+    editType: TagEditType;
+
+    constructor(tag: string, type: TagEditType) {
+        super(kTagEditEventName, { bubbles: true, composed: true });
         this.tag = tag;
+        this.editType = type;
     }
 }
 
 @customElement('cg-editable-tag')
 export class EditableCardTag extends LitElement {
   @property({ type: String}) tag = '';
+  @property({ attribute: false }) type = TagEditType.kAdd;
 
   render() {
     if (!this.tag) {
       return nothing;
     }
 
+    const buttonTitle = this.type === TagEditType.kAdd ? 'Add tag' : 'Remove tag';
+    const buttonText = this.type === TagEditType.kAdd ? html`&#x2795;` : html`&#x2716;`;
+
     return html`
       <cg-card-tag .tag=${this.tag}>
-        <button @click=${this.removeTag} title='Remove tag'>&#x2716;</button>
+        <button @click=${this.editTag} title=${buttonTitle}>
+          ${buttonText}
+        </button>
       </cg-card-tag>
     `;
   }
@@ -36,19 +49,24 @@ export class EditableCardTag extends LitElement {
       border: none;
       border-radius: 2px;
 
-      &:hover {
+      &:hover[title='Remove tag'] {
         background-color: red;
+      }
+
+      &:hover[title='Add tag'] {
+        background-color: green;
       }
     }
   `;
 
-  private removeTag() {
-    this.dispatchEvent(new TagRemovedEvent(this.tag));
+  private editTag() {
+    this.dispatchEvent(new TagEditEvent(this.tag, this.type));
   }
 }
 
 interface PendingTags {
   removed: Set<string>;
+  added: Set<string>;
 }
 
 @customElement('cg-editable-card-tags')
@@ -63,7 +81,10 @@ export class EditableCardTags extends LitElement {
    * we can exclude/show them until the parent component saves the changes and
    * updates `this.tags`.
    */
-  @state() _pendingTags: PendingTags = { removed: new Set() };
+  @state() _pendingTags: PendingTags = {
+    removed: new Set(),
+    added: new Set(),
+  };
 
   constructor() {
     super();
@@ -73,40 +94,83 @@ export class EditableCardTags extends LitElement {
   render() {
     const tagsToShow = new Set(this.tags);
     this._pendingTags.removed.forEach((tag) => tagsToShow.delete(tag));
+    this._pendingTags.added.forEach((tag) => tagsToShow.add(tag));
+
+    const suggestedTags = new Set([
+      'suggested', 'tags', 'here', 'for', 'you', 'to', 'use'
+    ]);
 
     return html`
-      ${repeat(
-        tagsToShow, (tag) => tag,
-        (tag) => html`<cg-editable-tag .tag=${tag}></cg-editable-tag>`
-      )}
+      <div id='current-tags-container'>
+        ${repeat(
+          tagsToShow, (tag) => tag,
+          (tag) => html`
+            <cg-editable-tag .tag=${tag} .type=${TagEditType.kRemove}>
+            </cg-editable-tag>
+          `
+        )}
+      </div>
+      <div id='input-tags-container'>
+        <input type='text' @keydown=${this.onKeyDown.bind(this)} placeholder='Add tag'>
+        <span>
+          ${repeat(
+            suggestedTags, (tag) => tag,
+            (tag) => html`
+              <cg-editable-tag .tag=${tag} .type=${TagEditType.kAdd}>
+              </cg-editable-tag>
+            `
+          )}
+        </span>
+      </div>
     `;
   }
 
   static styles = css`
-    :host {
+    :host, div#current-tags-container, div#input-tags-container {
       display: flex;
       gap: 4px;
+    }
+
+    :host {
+      flex-direction: column;
+    }
+
+    div#input-tags-container {
+      input {
+        flex-grow: 1;
+      }
+
+      span {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2px;
+      }
     }
   `;
 
   private addEventListeners() {
-    this.addEventListener(kTagRemovedEventName, this.onTagRemoved.bind(this));
+    this.addEventListener(kTagEditEventName, this.onTagEdited.bind(this));
   }
 
-  private onTagRemoved(e: TagRemovedEvent) {
-    // Create a new set of tags that excludes the removed tag. A new set is
-    // better practice because it ensures that sub-components also get
-    // updated.
+  private onTagEdited(e: TagEditEvent) {
+    // Create a new Set instance. A new set is better practice because it
+    // ensures that sub-components also get updated.
     //
     // [1]: https://lit.dev/docs/components/properties/#mutating-properties
     const newTags = new Set(this.tags);
-    newTags.delete(e.tag);
-
-    this._pendingTags.removed.add(e.tag);
+    if (e.editType === TagEditType.kAdd) {
+      newTags.add(e.tag);
+      this._pendingTags.added.add(e.tag);
+    } else if (e.editType === TagEditType.kRemove) {
+      newTags.delete(e.tag);
+      this._pendingTags.removed.add(e.tag);
+    }
 
     this.dispatchEvent(
         new CardChangedEvent({ tags: Array.from(newTags).join(' ')}));
+  }
 
+  private onKeyDown(e: KeyboardEvent) {
   }
 }
 
@@ -117,6 +181,6 @@ declare global {
   }
 
   interface GlobalEventHandlersEventMap {
-    'tag-removed': TagRemovedEvent;
+    'tag-edit': TagEditEvent;
   }
 }
