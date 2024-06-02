@@ -114,6 +114,10 @@ export class EditableCardTags extends LitElement {
       flex-direction: column;
     }
 
+    div#current-tags-container {
+      flex-wrap: wrap;
+    }
+
     div#input-tags-container {
       span {
         display: flex;
