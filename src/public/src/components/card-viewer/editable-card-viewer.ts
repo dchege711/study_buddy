@@ -27,7 +27,6 @@ export class EditableCardViewer extends CardViewer {
   @state()
   protected canEdit = false;
 
-  @state()
   private pendingChanges: PendingChanges = {};
 
   protected willUpdate(changedProperties: Map<string, any>) {

@@ -66,27 +66,9 @@ export class EditableCardTag extends LitElement {
   }
 }
 
-interface PendingTags {
-  removed: Set<string>;
-  added: Set<string>;
-}
-
 @customElement('cg-editable-card-tags')
 export class EditableCardTags extends LitElement {
   @property({type: Object}) tags: Set<string> = new Set();
-
-  /**
-   * Dispatching `CardChangedEvent` bubbles up to `EditableCardViewer` which
-   * updates its inner state. Even though that state is not used in a template,
-   * it still triggers a re-render, which sets `this.tags`. To show an updated
-   * UI to the user, we need to keep track of the tags that are pending so that
-   * we can exclude/show them until the parent component saves the changes and
-   * updates `this.tags`.
-   */
-  @state() _pendingTags: PendingTags = {
-    removed: new Set(),
-    added: new Set(),
-  };
 
   constructor() {
     super();
@@ -94,17 +76,13 @@ export class EditableCardTags extends LitElement {
   }
 
   render() {
-    const tagsToShow = new Set(this.tags);
-    this._pendingTags.removed.forEach((tag) => tagsToShow.delete(tag));
-    this._pendingTags.added.forEach((tag) => tagsToShow.add(tag));
-
     // TODO: Hook up the tags autocomplete functionality.
     const suggestedTags = new Set(['suggested', 'tags']);
 
     return html`
       <div id='current-tags-container'>
         ${repeat(
-          tagsToShow, (tag) => tag,
+          this.tags, (tag) => tag,
           (tag) => html`
             <cg-editable-tag .tag=${tag} .type=${TagEditType.kRemove}>
             </cg-editable-tag>
@@ -162,11 +140,10 @@ export class EditableCardTags extends LitElement {
     const newTags = new Set(this.tags);
     if (e.editType === TagEditType.kAdd) {
       newTags.add(e.tag);
-      this._pendingTags.added.add(e.tag);
     } else if (e.editType === TagEditType.kRemove) {
       newTags.delete(e.tag);
-      this._pendingTags.removed.add(e.tag);
     }
+    this.tags = newTags;
 
     this.dispatchEvent(
         new CardChangedEvent({ tags: Array.from(newTags).join(' ')}));
@@ -176,7 +153,7 @@ export class EditableCardTags extends LitElement {
     const newTags = new Set(this.tags);
     const tag = e.text;
     newTags.add(tag);
-    this._pendingTags.added.add(tag);
+    this.tags = newTags;
 
     this.dispatchEvent(
         new CardChangedEvent({ tags: Array.from(newTags).join(' ')}));
