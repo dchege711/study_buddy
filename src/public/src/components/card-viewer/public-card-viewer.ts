@@ -7,7 +7,7 @@ import { FlagCardParams, PublicCardResult, trpc } from '../../trpc.js';
 import { CardsCarouselUpdateCursorDirection } from '../../context/cards-carousel-context.js';
 
 import './components/card-description.js';
-import '../tags/view-only-tag.js';
+import '../tags/card-tag.js';
 
 enum FlagReason {
   Inappropriate = 1,
@@ -59,7 +59,7 @@ export class PublicCardViewer extends CardViewer {
         <p>
         ${repeat(
             this.tags, (tag) => tag,
-            (tag) => html`<cg-view-only-tag .tag=${tag}></cg-view-only-tag>`
+            (tag) => html`<cg-card-tag .tag=${tag}></cg-card-tag>`
           )}
         </p>
       </div>

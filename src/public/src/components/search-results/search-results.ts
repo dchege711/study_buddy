@@ -6,7 +6,7 @@ import { CardSearchResult } from '../../trpc.js';
 import { searchResultsContext, SearchResultSelectedEvent } from '../../context/search-results-context.js';
 import { when } from 'lit/directives/when.js';
 
-import '../tags/view-only-tag.js';
+import '../tags/card-tag.js';
 
 @customElement('search-result')
 export class SearchResult extends LitElement {
@@ -23,7 +23,7 @@ export class SearchResult extends LitElement {
         <p class='tags-holder'>
           ${this.result.tags?.split(' ').filter(Boolean).map(
             (tag) => html`
-              <cg-view-only-tag .tag=${tag}></cg-view-only-tag>
+              <cg-card-tag .tag=${tag}></cg-card-tag>
             `
           )}
         </p>
