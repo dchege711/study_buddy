@@ -98,9 +98,8 @@ export class EditableCardTags extends LitElement {
     this._pendingTags.removed.forEach((tag) => tagsToShow.delete(tag));
     this._pendingTags.added.forEach((tag) => tagsToShow.add(tag));
 
-    const suggestedTags = new Set([
-      'suggested', 'tags', 'here', 'for', 'you', 'to', 'use'
-    ]);
+    // TODO: Hook up the tags autocomplete functionality.
+    const suggestedTags = new Set(['suggested', 'tags']);
 
     return html`
       <div id='current-tags-container'>
