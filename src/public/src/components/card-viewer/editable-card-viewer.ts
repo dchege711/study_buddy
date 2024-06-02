@@ -9,6 +9,7 @@ import { ModifiableCardAttributes, kCardChangedEventName } from './components/ca
 import './components/copyable.js';
 import './components/editable-card-title.js';
 import './components/card-description.js';
+import './components/editable-card-tags.js';
 
 type PendingChanges = Partial<Omit<ModifiableCardAttributes, 'prompt' | 'response'>
     & Pick<NonNullable<PrivateCardResult>, 'description'>>;
@@ -65,6 +66,7 @@ export class EditableCardViewer extends CardViewer {
           .cardResponse=${this.cardResponse}
           .canEdit=${this.canEdit}>
         </cg-card-description>
+       <cg-editable-card-tags .tags=${this.tags}></cg-editable-card-tags>
       </div>
       <div class='space-between'>
         <button @click=${() => this.deleteCard()}>
