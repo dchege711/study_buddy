@@ -1,28 +1,31 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
-@customElement('cg-view-only-tag')
+@customElement('cg-card-tag')
 export class ViewOnlyTagElement extends LitElement {
   @property({ type: String }) tag!: string;
 
   render() {
     return html`
-      <span>#${this.tag}</span>
+      <span>#${this.tag}</span><slot></slot>
     `;
   }
 
   static styles = css`
-    span {
+    :host {
       background-color: var(--main-bg-color);
       border-radius: 4px;
       border: 1px solid var(--main-border-color);
       padding: 2px;
+
+      display: flex;
+      gap: 2px;
     }
   `;
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'cg-view-only-tag': ViewOnlyTagElement;
+    'cg-card-tag': ViewOnlyTagElement;
   }
 }
