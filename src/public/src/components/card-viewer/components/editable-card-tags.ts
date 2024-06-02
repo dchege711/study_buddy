@@ -115,13 +115,8 @@ export class EditableCardTags extends LitElement {
     }
 
     div#input-tags-container {
-      cg-text-input {
-        flex-grow: 1;
-      }
-
       span {
         display: flex;
-        flex-wrap: wrap;
         gap: 2px;
       }
     }
