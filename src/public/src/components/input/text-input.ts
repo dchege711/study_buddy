@@ -1,6 +1,5 @@
 import { LitElement, css, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import { createRef, ref, Ref } from 'lit/directives/ref.js';
+import { customElement, property, query } from 'lit/decorators.js';
 
 export enum InputState {
   PressedSpace = 1,
@@ -37,15 +36,22 @@ export class TextInputElement extends LitElement {
 
   private inputState = InputState.InWord;
 
-  inputRef: Ref<HTMLInputElement> = createRef();
+  @query('input') private input!: HTMLInputElement;
+
+  /**
+   * Clear the current text input.
+   */
+  clearText() {
+    this.input.value = '';
+  }
 
   render() {
     return html`
       <input
-          placeholder=${this.placeholder}
-          @keydown=${this.onKeyDown}
-          @blur=${this.onBlur}
-          ${ref(this.inputRef)} >
+          .placeholder=${this.placeholder}
+          .value=${''}
+          @keyup=${this.onKeyUp}
+          @blur=${this.onBlur} >
     `;
   }
 
@@ -63,13 +69,13 @@ export class TextInputElement extends LitElement {
     }
   `;
 
-  private onKeyDown(e: KeyboardEvent) {
+  private onKeyUp(e: KeyboardEvent) {
     this.inputState = this.getInputState(e.key);
     if (this.inputState === InputState.InWord) {
       return;
     }
 
-    const text = this.inputRef.value?.value.trim() || '';
+    const text = this.input.value.trim() || '';
     if (text.length === 0) {
       return;
     }
