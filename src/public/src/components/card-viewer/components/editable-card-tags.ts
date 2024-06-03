@@ -1,8 +1,8 @@
 import { LitElement, html, css, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property, query } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { CardChangedEvent } from '../components/card-changed-event.js';
-import { TextInputEvent, kTextInputEvent } from '../../input/text-input.js';
+import { TextInputEvent, kTextInputEvent, TextInputElement } from '../../input/text-input.js';
 
 import '../../tags/card-tag.js';
 import '../../input/text-input.js';
@@ -69,6 +69,7 @@ export class EditableCardTag extends LitElement {
 @customElement('cg-editable-card-tags')
 export class EditableCardTags extends LitElement {
   @property({type: Object}) tags: Set<string> = new Set();
+  @query('cg-text-input') private textInput!: TextInputElement;
 
   constructor() {
     super();
@@ -153,6 +154,7 @@ export class EditableCardTags extends LitElement {
     const tag = e.text;
     newTags.add(tag);
     this.tags = newTags;
+    this.textInput.clearText();
 
     this.dispatchEvent(
         new CardChangedEvent({ tags: Array.from(newTags).join(' ')}));
