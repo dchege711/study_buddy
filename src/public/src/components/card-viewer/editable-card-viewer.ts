@@ -68,28 +68,30 @@ export class EditableCardViewer extends CardViewer {
           .canEdit=${this.canEdit}>
         </cg-card-description>
         <cg-editable-card-tags .tags=${this.tags}></cg-editable-card-tags>
+      </div>
+      <div id='bottom-card-content'>
         <div class='space-between'>
           <cg-card-urgency-bar .urgency=${this.card.urgency}></cg-card-urgency-bar>
           <cg-card-privacy-toggle .isPublic=${this.card.isPublic}></cg-card-privacy-toggle>
         </div>
-      </div>
-      <div class='space-between'>
-        <button @click=${() => this.deleteCard()}>
-          &#x2716; Delete
-        </button>
-        <button
-            @click=${() => this.updateCarouselCursor(CardsCarouselUpdateCursorDirection.Previous)}
-            ?disabled=${!this.cardsCarousel?.hasPrevious()}>
-          &#x276E; Previous
-        </button>
-        <button
-            @click=${() => this.updateCarouselCursor(CardsCarouselUpdateCursorDirection.Next)}
-            ?disabled=${!this.cardsCarousel?.hasNext()}>
-          Next &#x276F;
-        </button>
-        <button @click=${() => this.saveCard()}>
-          &#x1F4BE; Save
-        </button>
+        <div class='space-between'>
+          <button @click=${() => this.deleteCard()}>
+            &#x2716; Delete
+          </button>
+          <button
+              @click=${() => this.updateCarouselCursor(CardsCarouselUpdateCursorDirection.Previous)}
+              ?disabled=${!this.cardsCarousel?.hasPrevious()}>
+            &#x276E; Previous
+          </button>
+          <button
+              @click=${() => this.updateCarouselCursor(CardsCarouselUpdateCursorDirection.Next)}
+              ?disabled=${!this.cardsCarousel?.hasNext()}>
+            Next &#x276F;
+          </button>
+          <button @click=${() => this.saveCard()}>
+            &#x1F4BE; Save
+          </button>
+        </div>
       </div>
     `;
   }
@@ -110,6 +112,12 @@ export class EditableCardViewer extends CardViewer {
       div#main-card-content {
         display: flex;
         flex-grow: 1;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      div#bottom-card-content {
+        display: flex;
         flex-direction: column;
         gap: 4px;
       }
