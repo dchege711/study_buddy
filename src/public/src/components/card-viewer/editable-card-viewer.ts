@@ -10,6 +10,8 @@ import './components/copyable.js';
 import './components/editable-card-title.js';
 import './components/card-description.js';
 import './components/editable-card-tags.js';
+import './components/urgency-bar.js';
+import './components/public-private-toggle.js';
 
 type PendingChanges = Partial<Omit<ModifiableCardAttributes, 'prompt' | 'response'>
     & Pick<NonNullable<PrivateCardResult>, 'description'>>;
@@ -65,7 +67,11 @@ export class EditableCardViewer extends CardViewer {
           .cardResponse=${this.cardResponse}
           .canEdit=${this.canEdit}>
         </cg-card-description>
-       <cg-editable-card-tags .tags=${this.tags}></cg-editable-card-tags>
+        <cg-editable-card-tags .tags=${this.tags}></cg-editable-card-tags>
+        <div class='space-between'>
+          <cg-card-urgency-bar .urgency=${this.card.urgency}></cg-card-urgency-bar>
+          <cg-card-privacy-toggle .isPublic=${this.card.isPublic}></cg-card-privacy-toggle>
+        </div>
       </div>
       <div class='space-between'>
         <button @click=${() => this.deleteCard()}>
@@ -106,6 +112,10 @@ export class EditableCardViewer extends CardViewer {
         flex-grow: 1;
         flex-direction: column;
         gap: 4px;
+      }
+
+      cg-card-urgency-bar {
+        flex-grow: 1;
       }
     `,
   ];
