@@ -154,6 +154,10 @@ export class EditableCardTags extends LitElement {
     const tag = e.text;
     newTags.add(tag);
     this.tags = newTags;
+
+    // TODO: Can we avoid the need to do this? Update [1] if you figure it out.
+    //
+    // [1]: https://www.curiosities.dev/computer-science/programming-challenges/flashcards-app/web-components/of-stale-ui-and-re-renders/#re-renders-on-tagged-templates
     this.textInput.clearText();
 
     this.dispatchEvent(
