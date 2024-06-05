@@ -4,14 +4,6 @@ html {
 
 /************************ Navbar **********************************************/
 
-div#topnav-banner {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: larger;
-    background-color: #ddffdd;
-}
-
 ul#topnavitems {
     list-style-type: none;
     margin: 0;
