@@ -28,7 +28,9 @@ export class EditableCardDescriptionElement extends LitElement {
         <div
             ?contenteditable=${this.canEdit} ${ref(this.descriptionRef)}
             @input=${this.handleDescriptionChange}>
-          ${this.canEdit ? html`<pre>${this.value.raw}</pre>` : this.value.markup}
+          ${this.canEdit
+              ? html`<pre id='raw-card-description'>${this.value.raw}</pre>`
+              : this.value.markup}
         </div>
       </div>
     `;
@@ -68,6 +70,12 @@ export class EditableCardDescriptionElement extends LitElement {
       	  &:hover {
             opacity: 0;
           }
+        }
+
+        div[contenteditable] > pre#raw-card-description {
+          margin: 0;
+          white-space: pre-wrap;
+          padding: 6px;
         }
       }
     `,
