@@ -42,9 +42,6 @@ export class CardsViewingPage extends LitElement {
           };
         })
       );
-      if (this.searchResults.length > 0) {
-        this.updateSelectedCard(this.searchResults[0]._id!);
-      }
     });
 
     this.addEventListener(kSearchResultSelectedEventName, (ev) => {
