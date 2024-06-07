@@ -51,7 +51,7 @@
     "body-parser": "^1.20.2",
     "connect-mongo": "^4.6.0",
     "cookie-parser": "^1.4.3",
-    "ejs": "3.1.7",
+    "ejs": "3.1.10",
     "express": "^4.19.2",
     "express-session": "1.15.6",
     "express-sslify": "^1.2.0",
