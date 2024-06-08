@@ -6,7 +6,7 @@ import { unsafeHTML } from 'lit/directives/unsafe-html.js';
 
 import { Card } from '../../trpc.js';
 import { CardsCarouselUpdateCursorDirection, CardsCarouselUpdateCursorEvent, cardsCarouselContext } from '../../context/cards-carousel-context.js';
-import { CardsCarousel } from '../../CardsCarousel.js';
+import { CardsCarousel } from '../../models/CardsCarousel.js';
 
 export const markdownSpoilerMarker = "[spoiler]";
 const htmlSpoilerMarker = "<span id='spoiler'>[spoiler]</span>";

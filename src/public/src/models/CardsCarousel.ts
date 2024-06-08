@@ -1,6 +1,6 @@
 import AVLTree, { Node } from 'avl';
 
-import { CardSearchResult } from './trpc.js';
+import { CardSearchResult } from '../trpc.js';
 
 export type CardsCarouselBSTKey = Required<Pick<CardSearchResult, "_id" | "urgency">>;
 type CardsCarouselBSTValue = null;
