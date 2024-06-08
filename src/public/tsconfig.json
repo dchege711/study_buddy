@@ -24,7 +24,6 @@
     // Files to be excluded from compilation
     "exclude": [
         "src/lib/**/*",
-        "src/legacy/**/*",
     ],
 
     // Reference the server configuration so that incremental builds work
