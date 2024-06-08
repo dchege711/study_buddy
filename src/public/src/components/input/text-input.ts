@@ -71,9 +71,6 @@ export class TextInputElement extends LitElement {
 
   private onKeyUp(e: KeyboardEvent) {
     this.inputState = this.getInputState(e.key);
-    if (this.inputState === InputState.InWord) {
-      return;
-    }
 
     const text = this.input.value.trim() || '';
     if (text.length === 0) {

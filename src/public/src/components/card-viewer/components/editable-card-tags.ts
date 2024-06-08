@@ -1,10 +1,10 @@
 import { LitElement, html, css, nothing } from 'lit';
 import { consume } from '@lit/context';
-import { customElement, property, query } from 'lit/decorators.js';
+import { customElement, property, query, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 
 import { CardChangedEvent } from '../components/card-changed-event.js';
-import { TextInputEvent, kTextInputEvent, TextInputElement } from '../../input/text-input.js';
+import { TextInputEvent, kTextInputEvent, TextInputElement, InputState } from '../../input/text-input.js';
 import { tagsAutoCompleteContext } from '../../../context/tags-auto-complete-context.js';
 import { AutoComplete } from '../../../models/auto-complete.js';
 
@@ -78,9 +78,16 @@ export class EditableCardTags extends LitElement {
   @consume({ context: tagsAutoCompleteContext, subscribe: true })
   private tagsAutoComplete?: AutoComplete;
 
+  @state() private suggestedTags: string[] = [];
+
   constructor() {
     super();
     this.addEventListeners();
+  }
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    this.updateTagsSuggestions('');
   }
 
   render() {
@@ -137,12 +144,6 @@ export class EditableCardTags extends LitElement {
     this.addEventListener(kTextInputEvent, this.onTagTyped.bind(this));
   }
 
-  private get suggestedTags(): string[] {
-    return this.tagsAutoComplete
-      ? this.tagsAutoComplete.kNeighbors(Array.from(this.tags), 5)
-      : [];
-  }
-
   private onTagEdited(e: TagEditEvent) {
     // Create a new Set instance. A new set is better practice because it
     // ensures that sub-components also get updated.
@@ -161,6 +162,11 @@ export class EditableCardTags extends LitElement {
   }
 
   private onTagTyped(e: TextInputEvent) {
+    if (e.state === InputState.InWord) {
+      this.updateTagsSuggestions(e.text);
+      return;
+    }
+
     const newTags = new Set(this.tags);
     const tag = e.text;
     newTags.add(tag);
@@ -173,6 +179,20 @@ export class EditableCardTags extends LitElement {
 
     this.dispatchEvent(
         new CardChangedEvent({ tags: Array.from(newTags).join(' ')}));
+  }
+
+  private updateTagsSuggestions(prefix: string) {
+    if (!this.tagsAutoComplete) {
+      return;
+    }
+
+    if (prefix.length === 0) {
+      this.suggestedTags = this.tagsAutoComplete.kNeighbors(Array.from(this.tags), 5);
+      return;
+    }
+
+    this.suggestedTags = this.tagsAutoComplete.keysWithPrefix(prefix).filter(
+      (tag) => !this.tags.has(tag));
   }
 }
 
