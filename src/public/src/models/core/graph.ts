@@ -1,6 +1,6 @@
 "uses strict";
 
-import { MaxPriorityQueue } from "./MaxPriorityQueue";
+import { MaxPriorityQueue } from "./max-priority-queue.js";
 
 /**
  * @description A minimal graph data type

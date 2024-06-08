@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { MaxPriorityQueue } from "./MaxPriorityQueue";
+import { MaxPriorityQueue } from "./max-priority-queue.js";
 
 describe("Test MaxPriorityQueue\n", function () {
   let testPQ: MaxPriorityQueue<string>;

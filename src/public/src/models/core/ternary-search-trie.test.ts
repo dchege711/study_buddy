@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { TernarySearchTrie } from "./TernarySearchTrie";
+import { TernarySearchTrie } from "./ternary-search-trie.js";
 
 describe("Test TernarySearchTrie\n", function() {
 
