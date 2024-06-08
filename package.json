@@ -23,14 +23,12 @@
     ]
   },
   "scripts": {
-    "build": "npm run transpile-server && npm run gulp",
-    "gulp": "gulp",
+    "build": "tsc --project tsconfig.json",
     "jsdoc": "jsdoc -r models",
     "start": "npm run build && node dist/server.js",
     "debug": "ts-node-dev --files --transpile-only src/server.ts",
     "single_test": "npm run build && ts-mocha",
     "test": "npm run mocha_tests",
-    "transpile-server": "tsc --project tsconfig.json",
     "mocha_tests": "npm run build && nyc ts-mocha --no-warnings --recursive --sort './src/tests/mocha_tests/*/*.ts' './src/**/*.test.ts' --exclude './src/public/**/*'",
     "docs": "jsdoc -c ./config.jsdoc.js"
   },
@@ -99,8 +97,6 @@
     "copy-webpack-plugin": "^11.0.0",
     "ejs-lint": "^2.0.0",
     "esbuild-loader": "^4.1.0",
-    "gulp": "^4.0.2",
-    "gulp-typescript": "^6.0.0-alpha.1",
     "highlightjs": "^9.12.0",
     "jsdoc": "^4.0.2",
     "mathjax": "^2.7.5",
