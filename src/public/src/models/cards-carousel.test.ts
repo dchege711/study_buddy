@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import { CardsCarousel } from './CardsCarousel.js';
+import { CardsCarousel } from './cards-carousel.js';
 
 describe('CardsCarousel', function () {
   it('should handle the empty list', function () {
