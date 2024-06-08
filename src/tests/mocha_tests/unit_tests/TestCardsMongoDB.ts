@@ -41,7 +41,7 @@ describe("Test CardsMongoDB\n", function() {
         let cardIDs: Set<string> = new Set([]);
 
         CardsDB
-          .read({userIDInApp: dummyUser.userIDInApp})
+          .search({queryString: '', limit: Infinity}, dummyUser.userIDInApp)
           .then(function(cards) {
             for (let i = 0; i < cards.length; i++) {
               let card = cards[i] as ICard;

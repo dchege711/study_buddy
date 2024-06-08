@@ -23,6 +23,5 @@
     "exclude": [
         "node_modules",
         "src/public/**/*",
-        "src/tests/mocha_tests/**/*",
     ]
 }
