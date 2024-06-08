@@ -2,16 +2,16 @@ import { UndirectedGraph } from "./core/graph.js";
 import { TernarySearchTrie } from "./core/ternary-search-trie.js";
 
 /**
- * @description Provide autocomplete functionality for the card tags. This
- * helps the user use the fewest tags possible while still being descriptive.
- * The suggestions are generated in one of 2 ways:
+ * @description Provide autocomplete functionality for a universe of strings,
+ * e.g., card tags. This helps the UI provide suggestions to the user. The
+ * suggestions are generated in one of 2 ways:
  *
- * - If a partial tag is being entered, other tags that share the prefix are
+ * - If a partial word is being entered, other strings that share the prefix are
  *   provided, e.g. `pr` might generate `probability` and `primes` if the user
- *   has used these tags on other cards that they own.
+ *   has used these words are known by `AutoComplete`.
  *
- * - Near neighbors of the already completed tags. The graph has tags as nodes,
- *   with links between tags that appear on the same card.
+ * - Near neighbors of an existing set of strings. The graph has tags as nodes,
+ *   with links between strings that have been associated with each other.
  *
  * {@tutorial main.editing_cards}
  *
