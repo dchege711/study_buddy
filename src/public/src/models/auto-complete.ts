@@ -1,8 +1,7 @@
 "use strict";
 
-import { TagGroupings } from "../../models/CardsMongoDB";
-import { UndirectedGraph } from "./Graph";
-import { TernarySearchTrie } from "./TernarySearchTrie";
+import { UndirectedGraph } from "./core/graph.js";
+import { TernarySearchTrie } from "./core/ternary-search-trie.js";
 
 /**
  * @description Provide autocomplete functionality for the card tags. This
@@ -37,7 +36,7 @@ export class AutoComplete {
         this.prefixTree.put(word);
     }
 
-    initializeGraphFromGroups(wordGroups: TagGroupings) {
+    initializeGraphFromGroups(wordGroups: string[][]) {
         this.graph = new UndirectedGraph();
         let words, weight;
         for (let i = 0; i < wordGroups.length; i++) {
