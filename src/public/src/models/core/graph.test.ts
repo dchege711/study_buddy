@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { UndirectedGraph } from "./Graph";
+import { UndirectedGraph } from "./graph.js";
 
 describe("Test Graph\n", function() {
   it("should have undirected edges", function() {
