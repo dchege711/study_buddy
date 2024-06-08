@@ -30,7 +30,6 @@
     "single_test": "npm run build && ts-mocha",
     "test": "npm run mocha_tests",
     "mocha_tests": "npm run build && nyc ts-mocha --no-warnings --recursive --sort './src/tests/mocha_tests/*/*.ts' './src/**/*.test.ts'",
-    "selenium_tests": "npm run build && cd dist/tests/selenium_tests/ && nyc ./run_selenium_tests.sh firefox headless && cd ../../",
     "docs": "jsdoc -c ./config.jsdoc.js"
   },
   "repository": {
@@ -87,7 +86,6 @@
     "@types/mocha": "^10.0.1",
     "@types/mongoose": "^5.11.97",
     "@types/nodemailer": "^6.4.8",
-    "@types/selenium-webdriver": "^4.1.15",
     "@types/showdown": "^2.0.1",
     "@types/sjcl": "^1.0.30",
     "@types/validator": "^13.11.9",
@@ -106,7 +104,6 @@
     "mongodb-memory-server": "^8.9.3",
     "nodemon": "^2.0.20",
     "nyc": "^14.1.1",
-    "selenium-webdriver": "^4.10.0",
     "source-map-loader": "^4.0.1",
     "ts-loader": "^9.4.3",
     "ts-mocha": "^10.0.0",
