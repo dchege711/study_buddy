@@ -29,7 +29,7 @@
     "debug": "ts-node-dev --files --transpile-only src/server.ts",
     "single_test": "npm run build && ts-mocha",
     "test": "npm run mocha_tests",
-    "mocha_tests": "npm run build && nyc ts-mocha --no-warnings --recursive --sort './src/tests/mocha_tests/*/*.ts' './src/**/*.test.ts'",
+    "mocha_tests": "npm run build && nyc ts-mocha --no-warnings --recursive --sort './src/tests/mocha_tests/*/*.ts' './src/**/*.test.ts' --exclude './src/public/**/*'",
     "docs": "jsdoc -c ./config.jsdoc.js"
   },
   "repository": {
