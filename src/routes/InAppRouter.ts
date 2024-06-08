@@ -88,11 +88,7 @@ export const inAppRouter = router({
   metadata: authedProcedure
     .query(({ ctx }) => {
       return MetadataDB
-        .read({ userIDInApp: ctx.user.userIDInApp })
-        .then(async (metadataDocs) => {
-          let minicards = await CardsDB.read({ userIDInApp: ctx.user.userIDInApp }, "title tags urgency");
-          return { metadataDocs, minicards };
-        });
+        .read({ userIDInApp: ctx.user.userIDInApp });
     }),
 
   tagGroups: authedProcedure

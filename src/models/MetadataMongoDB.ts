@@ -43,12 +43,12 @@ export async function create(payload: MetadataCreateParams): Promise<IMetadata> 
 
 /**
  * @description Read all the metadata associated with a user's cards.
- *
- * @param {JSON} payload Must contain `userIDInApp` as a key
- * @returns {Promise} If successful, the `message` attribute is an array of
- * JSON `Metadata` objects
  */
-export function read(payload: Pick<IUser, "userIDInApp">): Promise<IMetadata[]> {
+export function read(payload: Pick<IUser, "userIDInApp">): Promise<IMetadataRaw[]> {
+  return _readInternal(payload);
+};
+
+function _readInternal(payload: Pick<IUser, "userIDInApp">): Promise<IMetadata[]> {
     payload = sanitizeQuery(payload);
     return Metadata.find({createdById: payload.userIDInApp}).exec();
 };
@@ -136,7 +136,7 @@ export async function updatePublicUserMetadata(cards: SavedCardParams[]): Promis
 
     let metadataDoc = cardsToAdd.length > 0
         ? await update(cardsToAdd, {createdById: user.userIDInApp, metadataIndex: 0}, "numChildren")
-        : (await read({userIDInApp: user.userIDInApp}))[0];
+        : (await _readInternal({userIDInApp: user.userIDInApp}))[0];
 
     // TODO(dchege711): This shouldn't happen. Investigate why it does.
     let metadataStats = metadataDoc.stats.length > 0 ? metadataDoc.stats[0]: {};
