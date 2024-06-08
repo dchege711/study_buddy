@@ -1,5 +1,3 @@
-"uses strict";
-
 import { MaxPriorityQueue } from "./max-priority-queue.js";
 
 /**

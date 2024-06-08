@@ -1,5 +1,3 @@
-"use strict";
-
 interface TSTNode {
     c: string,
     left: TSTNode | null,
