@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import { sanitizeCard } from './SanitizationAndValidation.js';
+import { sanitizeCard } from './SanitizationAndValidation';
 
 describe('HTML Transformations', function () {
   it('should convert markdown to HTML', function () {
