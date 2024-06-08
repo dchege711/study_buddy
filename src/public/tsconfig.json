@@ -23,7 +23,7 @@
     ],
     // Files to be excluded from compilation
     "exclude": [
-        "./src/lib/**/*",
+        "src/lib/**/*",
     ],
 
     // Reference the server configuration so that incremental builds work
