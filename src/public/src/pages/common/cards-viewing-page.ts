@@ -6,6 +6,8 @@ import { CardsCarouselUpdateCursorDirection, cardsCarouselContext, kCardsCarouse
 import { CardsCarousel, CardsCarouselBSTKey } from '../../models/cards-carousel.js';
 import { kSearchResultsChangedEventName, searchResultsContext, SearchResultsChangedEvent, kSearchResultSelectedEventName, SearchResultSelectedEvent } from '../../context/search-results-context.js';
 import { trpc, CardSearchResult, Card, CardFetchEndpoint } from '../../trpc.js';
+import { tagsAutoCompleteContext } from '../../context/tags-auto-complete-context.js';
+import { AutoComplete } from '../../models/auto-complete.js';
 
 import '../../components/search-bar/search-bar.js';
 import '../../components/search-results/search-results.js';
@@ -19,12 +21,20 @@ export class CardsViewingPage extends LitElement {
   @provide({ context: cardsCarouselContext })
   @state() protected cardsCarousel = new CardsCarousel([]);
 
+  @provide({ context: tagsAutoCompleteContext })
+  protected tagsAutoComplete = new AutoComplete();
+
   protected cardFetcher: CardFetchEndpoint;
 
   constructor(cardFetcher: CardFetchEndpoint) {
     super();
     this.cardFetcher = cardFetcher;
     this.addEventListeners();
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this.populateTagsAutoComplete();
   }
 
   render() {
@@ -85,4 +95,8 @@ export class CardsViewingPage extends LitElement {
       gap: 10px;
     }
   `;
+
+  protected populateTagsAutoComplete() {
+    throw new Error('CardsViewingPage must be subclassed and implement populateTagsAutoComplete()');
+  }
 }

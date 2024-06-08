@@ -14,6 +14,15 @@ export class HomePage extends CardsViewingPage {
     super(trpc.fetchCard.query);
   }
 
+  protected populateTagsAutoComplete() {
+    trpc.tagGroups.query()
+      .then((tagGroups) => {
+        // TODO: Make this easier to hold by having one initialization point.
+        this.tagsAutoComplete.initializePrefixTree(tagGroups.flat());
+        this.tagsAutoComplete.initializeGraphFromGroups(tagGroups);
+      })
+  }
+
   render() {
     return html`
       <search-bar
