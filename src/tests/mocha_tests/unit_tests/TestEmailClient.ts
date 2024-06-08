@@ -8,7 +8,8 @@ describe("Test EmailClient\n", function() {
 
     describe("Sending an email...", function() {
 
-        it("should send an email successfully", function() {
+        // TODO: This test should not hit the actual email server.
+        it.skip("should send an email successfully", function() {
             return emailClient.sendEmail({
                 from: `${APP_NAME} <${EMAIL_ADDRESS}>`,
                 to: DEBUG_EMAIL_ADDRESS,
