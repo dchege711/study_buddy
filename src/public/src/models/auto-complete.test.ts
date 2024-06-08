@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { AutoComplete } from "./AutoComplete";
+import { AutoComplete } from "./auto-complete.js";
 
 describe("Test AutoComplete\n", function() {
   it("should put more weight on repeated edges", function() {
