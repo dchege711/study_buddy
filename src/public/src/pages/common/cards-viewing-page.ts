@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { provide } from '@lit/context';
 
 import { CardsCarouselUpdateCursorDirection, cardsCarouselContext, kCardsCarouselUpdateCursorEventName } from '../../context/cards-carousel-context.js';
-import { CardsCarousel, CardsCarouselBSTKey } from '../../models/CardsCarousel.js';
+import { CardsCarousel, CardsCarouselBSTKey } from '../../models/cards-carousel.js';
 import { kSearchResultsChangedEventName, searchResultsContext, SearchResultsChangedEvent, kSearchResultSelectedEventName, SearchResultSelectedEvent } from '../../context/search-results-context.js';
 import { trpc, CardSearchResult, Card, CardFetchEndpoint } from '../../trpc.js';
 
