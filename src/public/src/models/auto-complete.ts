@@ -1,5 +1,3 @@
-"use strict";
-
 import { UndirectedGraph } from "./core/graph.js";
 import { TernarySearchTrie } from "./core/ternary-search-trie.js";
 
