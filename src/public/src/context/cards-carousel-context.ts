@@ -1,6 +1,6 @@
 import { createContext } from '@lit/context';
 
-import { CardsCarousel } from '../CardsCarousel.js';
+import { CardsCarousel } from '../models/CardsCarousel.js';
 
 export const kCardsCarouselUpdateCursorEventName = 'cards-carousel-update-cursor';
 
