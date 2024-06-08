@@ -14,6 +14,21 @@ export class BrowsePage extends CardsViewingPage {
     super(trpc.fetchPublicCard.query);
   }
 
+  protected populateTagsAutoComplete() {
+    trpc.publicMetadata.query()
+      .then((metadataDocs) => {
+        if (metadataDocs.length === 0) {
+          throw new Error('No metadata documents found');
+        }
+
+        const tags: string[] = [];
+        for (const metadataDoc of metadataDocs) {
+          tags.push(...Object.keys(metadataDoc.node_information));
+        }
+        this.tagsAutoComplete.initializePrefixTree(tags);
+      })
+  }
+
   render() {
     return html`
       <search-bar

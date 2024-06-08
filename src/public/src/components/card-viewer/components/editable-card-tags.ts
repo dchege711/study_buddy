@@ -1,8 +1,12 @@
 import { LitElement, html, css, nothing } from 'lit';
+import { consume } from '@lit/context';
 import { customElement, property, query } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
+
 import { CardChangedEvent } from '../components/card-changed-event.js';
 import { TextInputEvent, kTextInputEvent, TextInputElement } from '../../input/text-input.js';
+import { tagsAutoCompleteContext } from '../../../context/tags-auto-complete-context.js';
+import { AutoComplete } from '../../../models/auto-complete.js';
 
 import '../../tags/card-tag.js';
 import '../../input/text-input.js';
@@ -71,15 +75,15 @@ export class EditableCardTags extends LitElement {
   @property({type: Object}) tags: Set<string> = new Set();
   @query('cg-text-input') private textInput!: TextInputElement;
 
+  @consume({ context: tagsAutoCompleteContext, subscribe: true })
+  private tagsAutoComplete?: AutoComplete;
+
   constructor() {
     super();
     this.addEventListeners();
   }
 
   render() {
-    // TODO: Hook up the tags autocomplete functionality.
-    const suggestedTags = new Set(['suggested', 'tags']);
-
     return html`
       <div id='current-tags-container'>
         ${repeat(
@@ -94,7 +98,7 @@ export class EditableCardTags extends LitElement {
         <cg-text-input placeholder='Add tag'></cg-text-input>
         <span>
           ${repeat(
-            suggestedTags, (tag) => tag,
+            this.suggestedTags, (tag) => tag,
             (tag) => html`
               <cg-editable-tag .tag=${tag} .type=${TagEditType.kAdd}>
               </cg-editable-tag>
@@ -123,6 +127,7 @@ export class EditableCardTags extends LitElement {
       span {
         display: flex;
         gap: 2px;
+        flex-wrap: wrap;
       }
     }
   `;
@@ -130,6 +135,12 @@ export class EditableCardTags extends LitElement {
   private addEventListeners() {
     this.addEventListener(kTagEditEventName, this.onTagEdited.bind(this));
     this.addEventListener(kTextInputEvent, this.onTagTyped.bind(this));
+  }
+
+  private get suggestedTags(): string[] {
+    return this.tagsAutoComplete
+      ? this.tagsAutoComplete.kNeighbors(Array.from(this.tags), 5)
+      : [];
   }
 
   private onTagEdited(e: TagEditEvent) {
