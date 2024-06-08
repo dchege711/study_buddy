@@ -21,6 +21,10 @@ export class ViewOnlyTagElement extends LitElement {
       display: flex;
       gap: 2px;
     }
+
+    span {
+      word-break: break-word;
+    }
   `;
 }
 
