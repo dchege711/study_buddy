@@ -23,9 +23,11 @@
     ]
   },
   "scripts": {
-    "build": "tsc --project tsconfig.json && npm run webpack",
+    "build": "npm run build:server && npm run build:client",
+    "build:server": "tsc --project tsconfig.json && npm run webpack",
+    "build:client": "pushd src/public && npm run build && popd",
     "jsdoc": "jsdoc -r models",
-    "start": "npm run build && node dist/server.js",
+    "start": "node dist/server.js",
     "debug": "ts-node-dev --files --transpile-only src/server.ts",
     "single_test": "npm run build && ts-mocha",
     "test": "npm run mocha_tests",
