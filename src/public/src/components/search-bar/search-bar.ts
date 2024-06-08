@@ -74,6 +74,11 @@ export class SearchBar extends LitElement {
    * full card from the database.
    */
   private async searchCards(event: TextInputEvent) {
+    if (event.state === InputState.InWord) {
+      // Do not search mid-word.
+      return;
+    }
+
     const stillTyping = event.state === InputState.PressedSpace;
 
     const cards = await this.fetchResults({
