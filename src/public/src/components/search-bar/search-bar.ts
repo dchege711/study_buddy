@@ -40,7 +40,7 @@ export class SearchBar extends LitElement {
       <div role='presentation' id='search-results-anchor'>
         <ul>
           ${this.searchResults.map((card) => html`
-            <li @click=${() => this.clearResults()}>${card.title}</li>
+            <li @click=${() => this.onSearchResultSelected(card._id)}>${card.title}</li>
           `)}
           ${this.receivedNoResults
           ? html`<li class='gray-text'><em>No cards found</em></li>`
@@ -107,6 +107,12 @@ export class SearchBar extends LitElement {
 
   private dispatchSearchResults(results: CardSearchResult[]) {
     this.dispatchEvent(new SearchResultsChangedEvent(results));
+  }
+
+  private onSearchResultSelected(cardId: string) {
+    const results = this.searchResults.filter((result) => result._id === cardId);
+    this.dispatchSearchResults(results);
+    this.clearResults();
   }
 
   private maybeFetchInitialResults() {
