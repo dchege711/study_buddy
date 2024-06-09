@@ -72,7 +72,6 @@
     "mongoose": "^5.13.20",
     "nodemailer": "^6.9.9",
     "path": "0.12.7",
-    "showdown": "1.9.1",
     "sjcl": "1.0.7",
     "validator": "^13.7.0",
     "xss": "1.0.3"
