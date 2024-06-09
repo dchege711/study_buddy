@@ -91,7 +91,6 @@
     "@types/validator": "^13.11.9",
     "chai": "^4.3.7",
     "circular-dependency-plugin": "^5.0.2",
-    "clean-webpack-plugin": "^0.1.19",
     "copy-webpack-plugin": "^11.0.0",
     "ejs-lint": "^2.0.0",
     "esbuild-loader": "^4.1.0",
