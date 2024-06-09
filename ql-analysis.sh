@@ -12,10 +12,11 @@ codeql database create $codeql_db_dir --language=javascript-typescript --no-run-
 output_file_path="$codeql_db_dir/analysis.sarif"
 codeql database analyze codeql-db codeql/javascript-queries \
     --download --sarif-category=javascript-typescript --format=sarifv2.1.0 \
-    --output=$output_file_path
+    --output=$output_file_path --sarif-include-query-help=always
 
 # https://marketplace.visualstudio.com/items?itemName=MS-SarifVSCode.sarif-viewer
 # helps me see the SARIF file in a more readable format. No need to push to GitHub.
+code $output_file_path
 #
 # Upload the SARIF file to GitHub for easier viewing.
 # head_sha="$(git log --format="%H" -n 1)"
