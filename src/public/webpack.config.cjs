@@ -20,10 +20,6 @@ module.exports = (env, args) => {
                 from: path.resolve(__dirname, 'images'),
                 to: path.resolve(serverDistPath, 'images')
             },
-            {
-                from: path.resolve(__dirname, 'src', 'lib'),
-                to: path.resolve(serverDistPath, 'src', 'lib')
-            },
         ]
     });
 
