@@ -14,19 +14,20 @@ import {
   resetPasswordLinkGet,
   resetPasswordLinkPost,
 } from "../controllers/AuthenticationController";
+import { rateLimiter } from "../controllers/ControllerUtilities";
 import { LOGIN, LOGOUT, REGISTER_USER, RESET_PASSWORD, RESET_PASSWORD_LINK, ROOT, SEND_VALIDATION_EMAIL, VERIFY_ACCOUNT } from "../paths";
 
 const router = Router();
 
-router.get(ROOT, handleLogIn);
+router.get(ROOT, rateLimiter, handleLogIn);
 
-router.get(LOGIN, handleLogIn);
+router.get(LOGIN, rateLimiter, handleLogIn);
 
-router.post(LOGIN, loginUser);
+router.post(LOGIN, rateLimiter, loginUser);
 
 router.get(LOGOUT, logoutUser);
 
-router.get(REGISTER_USER, handleRegisterUser);
+router.get(REGISTER_USER, rateLimiter, handleRegisterUser);
 
 router.post(REGISTER_USER, registerUser);
 
