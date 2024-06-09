@@ -1,10 +1,11 @@
-import { LitElement, html, css } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
-import { CardChangedEvent } from './card-changed-event.js';
+import { css, html, LitElement } from "lit";
+import { customElement, property, query } from "lit/decorators.js";
+import { CardChangedEvent } from "./card-changed-event.js";
 
-@customElement('cg-card-privacy-toggle')
+@customElement("cg-card-privacy-toggle")
 export class CardPrivacyToggle extends LitElement {
-  @property({ type: Boolean}) isPublic = false;
+  @property({ type: Boolean })
+  isPublic = false;
 
   render() {
     return html`
@@ -36,6 +37,6 @@ export class CardPrivacyToggle extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'cg-card-privacy-toggle': CardPrivacyToggle;
+    "cg-card-privacy-toggle": CardPrivacyToggle;
   }
 }

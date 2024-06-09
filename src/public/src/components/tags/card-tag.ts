@@ -1,9 +1,10 @@
-import { LitElement, css, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { css, html, LitElement } from "lit";
+import { customElement, property } from "lit/decorators.js";
 
-@customElement('cg-card-tag')
+@customElement("cg-card-tag")
 export class ViewOnlyTagElement extends LitElement {
-  @property({ type: String }) tag!: string;
+  @property({ type: String })
+  tag!: string;
 
   render() {
     return html`
@@ -30,6 +31,6 @@ export class ViewOnlyTagElement extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'cg-card-tag': ViewOnlyTagElement;
+    "cg-card-tag": ViewOnlyTagElement;
   }
 }

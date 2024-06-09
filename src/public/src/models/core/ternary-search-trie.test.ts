@@ -3,7 +3,6 @@ import { expect } from "chai";
 import { TernarySearchTrie } from "./ternary-search-trie.js";
 
 describe("Test TernarySearchTrie\n", function() {
-
   it("should find words from the initialization set", function() {
     let tst = new TernarySearchTrie(["a", "b", "aa", "c", "da", "Ae", "f"]);
 
@@ -24,5 +23,4 @@ describe("Test TernarySearchTrie\n", function() {
     let matchingWords = tst.keysWithPrefix("a");
     expect(matchingWords).to.have.members(["a", "aa", "axyz"]);
   });
-
 });

@@ -1,44 +1,56 @@
-import { LitElement, html, css, nothing } from 'lit';
-import { consume } from '@lit/context';
-import { customElement, property, query, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
+import { consume } from "@lit/context";
+import { css, html, LitElement, nothing } from "lit";
+import { customElement, property, query, state } from "lit/decorators.js";
+import { repeat } from "lit/directives/repeat.js";
 
-import { CardChangedEvent } from '../components/card-changed-event.js';
-import { TextInputEvent, kTextInputEvent, TextInputElement, InputState } from '../../input/text-input.js';
-import { tagsAutoCompleteContext } from '../../../context/tags-auto-complete-context.js';
-import { AutoComplete } from '../../../models/auto-complete.js';
+import { tagsAutoCompleteContext } from "../../../context/tags-auto-complete-context.js";
+import { AutoComplete } from "../../../models/auto-complete.js";
+import {
+  InputState,
+  kTextInputEvent,
+  TextInputElement,
+  TextInputEvent,
+} from "../../input/text-input.js";
+import { CardChangedEvent } from "../components/card-changed-event.js";
 
-import '../../tags/card-tag.js';
-import '../../input/text-input.js';
+import "../../tags/card-tag.js";
+import "../../input/text-input.js";
 
 enum TagEditType {
-  kAdd, kRemove
+  kAdd,
+  kRemove,
 }
 
-const kTagEditEventName = 'tag-edit';
+const kTagEditEventName = "tag-edit";
 class TagEditEvent extends Event {
-    tag: string;
-    editType: TagEditType;
+  tag: string;
+  editType: TagEditType;
 
-    constructor(tag: string, type: TagEditType) {
-        super(kTagEditEventName, { bubbles: true, composed: true });
-        this.tag = tag;
-        this.editType = type;
-    }
+  constructor(tag: string, type: TagEditType) {
+    super(kTagEditEventName, { bubbles: true, composed: true });
+    this.tag = tag;
+    this.editType = type;
+  }
 }
 
-@customElement('cg-editable-tag')
+@customElement("cg-editable-tag")
 export class EditableCardTag extends LitElement {
-  @property({ type: String}) tag = '';
-  @property({ attribute: false }) type = TagEditType.kAdd;
+  @property({ type: String })
+  tag = "";
+  @property({ attribute: false })
+  type = TagEditType.kAdd;
 
   render() {
     if (!this.tag) {
       return nothing;
     }
 
-    const buttonTitle = this.type === TagEditType.kAdd ? 'Add tag' : 'Remove tag';
-    const buttonText = this.type === TagEditType.kAdd ? html`&#x2795;` : html`&#x2716;`;
+    const buttonTitle = this.type === TagEditType.kAdd
+      ? "Add tag"
+      : "Remove tag";
+    const buttonText = this.type === TagEditType.kAdd
+      ? html`&#x2795;`
+      : html`&#x2716;`;
 
     return html`
       <cg-card-tag .tag=${this.tag}>
@@ -70,15 +82,18 @@ export class EditableCardTag extends LitElement {
   }
 }
 
-@customElement('cg-editable-card-tags')
+@customElement("cg-editable-card-tags")
 export class EditableCardTags extends LitElement {
-  @property({type: Object}) tags: Set<string> = new Set();
-  @query('cg-text-input') private textInput!: TextInputElement;
+  @property({ type: Object })
+  tags: Set<string> = new Set();
+  @query("cg-text-input")
+  private textInput!: TextInputElement;
 
   @consume({ context: tagsAutoCompleteContext, subscribe: true })
   private tagsAutoComplete?: AutoComplete;
 
-  @state() private suggestedTags: string[] = [];
+  @state()
+  private suggestedTags: string[] = [];
 
   constructor() {
     super();
@@ -87,30 +102,38 @@ export class EditableCardTags extends LitElement {
 
   connectedCallback(): void {
     super.connectedCallback();
-    this.updateTagsSuggestions('');
+    this.updateTagsSuggestions("");
   }
 
   render() {
     return html`
       <div id='current-tags-container'>
-        ${repeat(
-          this.tags, (tag) => tag,
-          (tag) => html`
+        ${
+      repeat(
+        this.tags,
+        (tag) => tag,
+        (tag) =>
+          html`
             <cg-editable-tag .tag=${tag} .type=${TagEditType.kRemove}>
             </cg-editable-tag>
-          `
-        )}
+          `,
+      )
+    }
       </div>
       <div id='input-tags-container'>
         <cg-text-input placeholder='Add tag'></cg-text-input>
         <span>
-          ${repeat(
-            this.suggestedTags, (tag) => tag,
-            (tag) => html`
+          ${
+      repeat(
+        this.suggestedTags,
+        (tag) => tag,
+        (tag) =>
+          html`
               <cg-editable-tag .tag=${tag} .type=${TagEditType.kAdd}>
               </cg-editable-tag>
-            `
-          )}
+            `,
+      )
+    }
         </span>
       </div>
     `;
@@ -158,7 +181,8 @@ export class EditableCardTags extends LitElement {
     this.tags = newTags;
 
     this.dispatchEvent(
-        new CardChangedEvent({ tags: Array.from(newTags).join(' ')}));
+      new CardChangedEvent({ tags: Array.from(newTags).join(" ") }),
+    );
   }
 
   private onTagTyped(e: TextInputEvent) {
@@ -178,7 +202,8 @@ export class EditableCardTags extends LitElement {
     this.textInput.clearText();
 
     this.dispatchEvent(
-        new CardChangedEvent({ tags: Array.from(newTags).join(' ')}));
+      new CardChangedEvent({ tags: Array.from(newTags).join(" ") }),
+    );
   }
 
   private updateTagsSuggestions(prefix: string) {
@@ -187,22 +212,26 @@ export class EditableCardTags extends LitElement {
     }
 
     if (prefix.length === 0) {
-      this.suggestedTags = this.tagsAutoComplete.kNeighbors(Array.from(this.tags), 5);
+      this.suggestedTags = this.tagsAutoComplete.kNeighbors(
+        Array.from(this.tags),
+        5,
+      );
       return;
     }
 
     this.suggestedTags = this.tagsAutoComplete.keysWithPrefix(prefix).filter(
-      (tag) => !this.tags.has(tag));
+      (tag) => !this.tags.has(tag),
+    );
   }
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'cg-editable-tag': EditableCardTag;
-    'cg-editable-card-tags': EditableCardTags;
+    "cg-editable-tag": EditableCardTag;
+    "cg-editable-card-tags": EditableCardTags;
   }
 
   interface GlobalEventHandlersEventMap {
-    'tag-edit': TagEditEvent;
+    "tag-edit": TagEditEvent;
   }
 }

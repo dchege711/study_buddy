@@ -1,9 +1,9 @@
-import { expect } from 'chai';
+import { expect } from "chai";
 
-import { CardsCarousel } from './cards-carousel.js';
+import { CardsCarousel } from "./cards-carousel.js";
 
-describe('CardsCarousel', function () {
-  it('should handle the empty list', function () {
+describe("CardsCarousel", function() {
+  it("should handle the empty list", function() {
     const carousel = new CardsCarousel([]);
     expect(carousel.current()).to.be.null;
     expect(carousel.hasNext()).to.be.false;
@@ -11,48 +11,48 @@ describe('CardsCarousel', function () {
     expect([...carousel]).to.eql([]);
   });
 
-  it('should handle a single card', function () {
-    const carousel = new CardsCarousel([{ _id: '1', urgency: 1 }]);
-    expect(carousel.current()?._id).to.eql('1');
+  it("should handle a single card", function() {
+    const carousel = new CardsCarousel([{ _id: "1", urgency: 1 }]);
+    expect(carousel.current()?._id).to.eql("1");
     expect(carousel.hasNext()).to.be.false;
     expect(carousel.hasPrevious()).to.be.false;
-    expect([...carousel].map(card => card._id)).to.eql(['1']);
+    expect([...carousel].map(card => card._id)).to.eql(["1"]);
   });
 
-  it('should handle removing the only card', function () {
-    const carousel = new CardsCarousel([{ _id: '1', urgency: 1 }]);
-    carousel.removeCard({ _id: '1', urgency: 1 });
+  it("should handle removing the only card", function() {
+    const carousel = new CardsCarousel([{ _id: "1", urgency: 1 }]);
+    carousel.removeCard({ _id: "1", urgency: 1 });
     expect(carousel.current()).to.be.null;
     expect(carousel.hasNext()).to.be.false;
     expect(carousel.hasPrevious()).to.be.false;
     expect([...carousel]).to.eql([]);
   });
 
-  it('should start from the highest priority card', function () {
+  it("should start from the highest priority card", function() {
     const carousel = new CardsCarousel([
-      { _id: '1', urgency: 1 },
-      { _id: '2', urgency: 2 },
-      { _id: '3', urgency: 3 },
+      { _id: "1", urgency: 1 },
+      { _id: "2", urgency: 2 },
+      { _id: "3", urgency: 3 },
     ]);
 
-    expect(carousel.current()?._id).to.eql('3');
+    expect(carousel.current()?._id).to.eql("3");
   });
 
-  it('should be able to iterate over the cards in decreasing priority', function () {
+  it("should be able to iterate over the cards in decreasing priority", function() {
     const carousel = new CardsCarousel([
-      { _id: '1', urgency: 1 },
-      { _id: '2', urgency: 2 },
-      { _id: '3', urgency: 3 },
+      { _id: "1", urgency: 1 },
+      { _id: "2", urgency: 2 },
+      { _id: "3", urgency: 3 },
     ]);
 
-    expect([...carousel].map(card => card._id)).to.eql(['3', '2', '1']);
+    expect([...carousel].map(card => card._id)).to.eql(["3", "2", "1"]);
   });
 
-  it('should cycle through all cards via next/previous', function () {
+  it("should cycle through all cards via next/previous", function() {
     const carousel = new CardsCarousel([
-      { _id: '1', urgency: 1 },
-      { _id: '2', urgency: 2 },
-      { _id: '3', urgency: 3 },
+      { _id: "1", urgency: 1 },
+      { _id: "2", urgency: 2 },
+      { _id: "3", urgency: 3 },
     ]);
 
     const forwardDirectionIds = [];
@@ -60,58 +60,58 @@ describe('CardsCarousel', function () {
       forwardDirectionIds.push(carousel.next()!._id);
     }
 
-    expect(forwardDirectionIds).to.eql(['2', '1']);
+    expect(forwardDirectionIds).to.eql(["2", "1"]);
     expect(carousel.next()).to.be.null;
     expect(carousel.hasNext()).to.be.false;
-    expect(carousel.current()?._id).to.eql('1');
+    expect(carousel.current()?._id).to.eql("1");
 
     const backwardDirectionIds = [];
     while (carousel.hasPrevious()) {
       backwardDirectionIds.push(carousel.previous()!._id);
     }
 
-    expect(backwardDirectionIds).to.eql(['2', '3']);
+    expect(backwardDirectionIds).to.eql(["2", "3"]);
     expect(carousel.previous()).to.be.null;
     expect(carousel.hasPrevious()).to.be.false;
-    expect(carousel.current()?._id).to.eql('3');
+    expect(carousel.current()?._id).to.eql("3");
   });
 
-  it('should be able to remove cards', function () {
+  it("should be able to remove cards", function() {
     const carousel = new CardsCarousel([
-      { _id: '1', urgency: 1 },
-      { _id: '2', urgency: 2 },
-      { _id: '3', urgency: 3 },
+      { _id: "1", urgency: 1 },
+      { _id: "2", urgency: 2 },
+      { _id: "3", urgency: 3 },
     ]);
 
-    carousel.removeCard({ _id: '2', urgency: 2 });
-    expect([...carousel].map(card => card._id)).to.eql(['3', '1']);
+    carousel.removeCard({ _id: "2", urgency: 2 });
+    expect([...carousel].map(card => card._id)).to.eql(["3", "1"]);
   });
 
-  it('should move to the next card after removing the current card', function () {
+  it("should move to the next card after removing the current card", function() {
     const carousel = new CardsCarousel([
-      { _id: '1', urgency: 1 },
-      { _id: '2', urgency: 2 },
-      { _id: '3', urgency: 3 },
+      { _id: "1", urgency: 1 },
+      { _id: "2", urgency: 2 },
+      { _id: "3", urgency: 3 },
     ]);
 
-    expect(carousel.current()?._id).to.eql('3');
+    expect(carousel.current()?._id).to.eql("3");
 
     carousel.removeCard(carousel.current()!);
-    expect(carousel.current()?._id).to.eql('2');
-    expect([...carousel].map(card => card._id)).to.eql(['2', '1']);
+    expect(carousel.current()?._id).to.eql("2");
+    expect([...carousel].map(card => card._id)).to.eql(["2", "1"]);
 
     carousel.removeCard(carousel.current()!);
-    expect(carousel.current()?._id).to.eql('1');
+    expect(carousel.current()?._id).to.eql("1");
 
     carousel.removeCard(carousel.current()!);
     expect(carousel.current()).to.be.null;
   });
 
-  it('should move to the previous card if removing the last card', function() {
+  it("should move to the previous card if removing the last card", function() {
     const carousel = new CardsCarousel([
-      { _id: '1', urgency: 1 },
-      { _id: '2', urgency: 2 },
-      { _id: '3', urgency: 3 },
+      { _id: "1", urgency: 1 },
+      { _id: "2", urgency: 2 },
+      { _id: "3", urgency: 3 },
     ]);
 
     while (carousel.hasNext()) {
@@ -119,50 +119,50 @@ describe('CardsCarousel', function () {
     }
 
     let currentCard = carousel.current();
-    expect(currentCard?._id).to.eql('1');
+    expect(currentCard?._id).to.eql("1");
 
     carousel.removeCard(currentCard!);
-    expect(carousel.current()?._id).to.eql('2');
+    expect(carousel.current()?._id).to.eql("2");
   });
 
-  it('should handle setting current() to a specific card', function () {
+  it("should handle setting current() to a specific card", function() {
     const carousel = new CardsCarousel([
-      { _id: '1', urgency: 1 },
-      { _id: '2', urgency: 2 },
-      { _id: '3', urgency: 3 },
+      { _id: "1", urgency: 1 },
+      { _id: "2", urgency: 2 },
+      { _id: "3", urgency: 3 },
     ]);
 
-    expect(carousel.current()?._id).to.not.eql('2');
-    let success = carousel.setCurrentCard({ _id: '2', urgency: 2 });
+    expect(carousel.current()?._id).to.not.eql("2");
+    let success = carousel.setCurrentCard({ _id: "2", urgency: 2 });
     expect(success).to.be.true;
-    expect(carousel.current()?._id).to.eql('2');
+    expect(carousel.current()?._id).to.eql("2");
   });
 
-  it('should no-op if setting current() to a non-existent card', function () {
+  it("should no-op if setting current() to a non-existent card", function() {
     const carousel = new CardsCarousel([
-      { _id: '1', urgency: 1 },
-      { _id: '2', urgency: 2 },
-      { _id: '3', urgency: 3 },
+      { _id: "1", urgency: 1 },
+      { _id: "2", urgency: 2 },
+      { _id: "3", urgency: 3 },
     ]);
 
     let currentId = carousel.current()!._id;
-    expect(currentId).to.eql('3');
+    expect(currentId).to.eql("3");
 
-    let success = carousel.setCurrentCard({ _id: '4', urgency: 4 });
+    let success = carousel.setCurrentCard({ _id: "4", urgency: 4 });
     expect(success).to.be.false;
     expect(carousel.current()?._id).to.eql(currentId);
   });
 
-  it('should populate state correctly', function() {
+  it("should populate state correctly", function() {
     const carousel = new CardsCarousel([
-      { _id: '1', urgency: 1 },
-      { _id: '2', urgency: 2 },
-      { _id: '3', urgency: 3 },
+      { _id: "1", urgency: 1 },
+      { _id: "2", urgency: 2 },
+      { _id: "3", urgency: 3 },
     ]);
 
     expect(carousel.state).deep.eq({
-      current: { _id: '3', urgency: 3 },
-      next: { _id: '2', urgency: 2 },
+      current: { _id: "3", urgency: 3 },
+      next: { _id: "2", urgency: 2 },
       previous: null,
       hasNext: true,
       hasPrevious: false,
@@ -171,9 +171,9 @@ describe('CardsCarousel', function () {
 
     carousel.next();
     expect(carousel.state).deep.eq({
-      current: { _id: '2', urgency: 2 },
-      next: { _id: '1', urgency: 1 },
-      previous: { _id: '3', urgency: 3 },
+      current: { _id: "2", urgency: 2 },
+      next: { _id: "1", urgency: 1 },
+      previous: { _id: "3", urgency: 3 },
       hasNext: true,
       hasPrevious: true,
       size: 3,
@@ -181,22 +181,22 @@ describe('CardsCarousel', function () {
 
     carousel.next();
     expect(carousel.state).deep.eq({
-      current: { _id: '1', urgency: 1 },
+      current: { _id: "1", urgency: 1 },
       next: null,
-      previous: { _id: '2', urgency: 2 },
+      previous: { _id: "2", urgency: 2 },
       hasNext: false,
       hasPrevious: true,
       size: 3,
     });
 
-    carousel.removeCard({ _id: '1', urgency: 1 });
+    carousel.removeCard({ _id: "1", urgency: 1 });
     expect(carousel.state).deep.eq({
-      current: { _id: '2', urgency: 2 },
+      current: { _id: "2", urgency: 2 },
       next: null,
-      previous: { _id: '3', urgency: 3 },
+      previous: { _id: "3", urgency: 3 },
       hasNext: false,
       hasPrevious: true,
       size: 2,
     });
-  })
+  });
 });

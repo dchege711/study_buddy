@@ -1,7 +1,7 @@
-import { createContext } from '@lit/context';
+import { createContext } from "@lit/context";
 
-import { AutoComplete } from '../models/auto-complete.js';
+import { AutoComplete } from "../models/auto-complete.js";
 
 export const tagsAutoCompleteContext = createContext<AutoComplete>(
-  Symbol('tags-auto-complete-context')
+  Symbol("tags-auto-complete-context"),
 );

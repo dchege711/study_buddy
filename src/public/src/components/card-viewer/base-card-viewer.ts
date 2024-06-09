@@ -1,12 +1,16 @@
-import { LitElement, TemplateResult, css, html, nothing } from 'lit';
-import { property } from 'lit/decorators.js';
-import { createRef, ref, Ref } from 'lit/directives/ref.js';
-import { consume } from '@lit/context';
-import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import { consume } from "@lit/context";
+import { css, html, LitElement, nothing, TemplateResult } from "lit";
+import { property } from "lit/decorators.js";
+import { createRef, Ref, ref } from "lit/directives/ref.js";
+import { unsafeHTML } from "lit/directives/unsafe-html.js";
 
-import { Card } from '../../trpc.js';
-import { CardsCarouselUpdateCursorDirection, CardsCarouselUpdateCursorEvent, cardsCarouselContext } from '../../context/cards-carousel-context.js';
-import { CardsCarousel } from '../../models/cards-carousel.js';
+import {
+  cardsCarouselContext,
+  CardsCarouselUpdateCursorDirection,
+  CardsCarouselUpdateCursorEvent,
+} from "../../context/cards-carousel-context.js";
+import { CardsCarousel } from "../../models/cards-carousel.js";
+import { Card } from "../../trpc.js";
 
 export const markdownSpoilerMarker = "[spoiler]";
 const htmlSpoilerMarker = "<span id='spoiler'>[spoiler]</span>";
@@ -23,18 +27,18 @@ export interface CardDescription {
 }
 
 export class CardViewer extends LitElement {
-  @property({ type: Object})
+  @property({ type: Object })
   protected card: Card | null = null;
 
-  @consume({ context: cardsCarouselContext, subscribe: true})
+  @consume({ context: cardsCarouselContext, subscribe: true })
   protected cardsCarousel?: CardsCarousel;
 
   protected cardDialogRef: Ref<HTMLDialogElement> = createRef();
 
-  @property({ type: Object})
+  @property({ type: Object })
   protected cardPrompt: CardDescription | null = null;
 
-  @property({ type: Object})
+  @property({ type: Object })
   protected cardResponse: CardDescription | null = null;
 
   get tags(): Set<string> {
@@ -42,24 +46,26 @@ export class CardViewer extends LitElement {
       return new Set();
     }
 
-    return new Set(this.card.tags.split(' ').filter(Boolean));
+    return new Set(this.card.tags.split(" ").filter(Boolean));
   }
 
   protected willUpdate(changedProperties: Map<string, any>) {
-    if (changedProperties.has('card')) {
+    if (changedProperties.has("card")) {
       this.updatePromptAndResponse();
     }
   }
 
   updated(changedProperties: Map<string, any>) {
-    if (changedProperties.has('card')) {
+    if (changedProperties.has("card")) {
       if (this.card) {
         this.cardDialogRef.value?.showModal();
       }
     }
   }
 
-  protected updateCarouselCursor(direction: CardsCarouselUpdateCursorDirection) {
+  protected updateCarouselCursor(
+    direction: CardsCarouselUpdateCursorDirection,
+  ) {
     if (!this.cardsCarousel) {
       return;
     }
@@ -74,7 +80,7 @@ export class CardViewer extends LitElement {
   }
 
   protected renderCard(): TemplateResult {
-    throw new Error('CardViewer must be subclassed and implement renderCard()');
+    throw new Error("CardViewer must be subclassed and implement renderCard()");
   }
 
   private updatePromptAndResponse() {
@@ -87,7 +93,9 @@ export class CardViewer extends LitElement {
     const combinedRawDescription = this.card.description;
     const combinedHTML = this.card.descriptionHTML;
 
-    const markdownSplitIndex = combinedRawDescription.indexOf(markdownSpoilerMarker);
+    const markdownSplitIndex = combinedRawDescription.indexOf(
+      markdownSpoilerMarker,
+    );
     if (markdownSplitIndex === -1) {
       this.cardPrompt = null;
       this.cardResponse = {
@@ -100,7 +108,7 @@ export class CardViewer extends LitElement {
 
     let htmlSplitIndex = combinedHTML.indexOf(htmlSpoilerMarker);
     if (htmlSplitIndex === -1) {
-      throw new Error('HTML and Markdown descriptions are out of sync');
+      throw new Error("HTML and Markdown descriptions are out of sync");
     }
 
     this.cardPrompt = {
@@ -110,8 +118,14 @@ export class CardViewer extends LitElement {
     };
     this.cardResponse = {
       type: CardDescriptionType.Response,
-      markup: html`${unsafeHTML(combinedHTML.slice(htmlSplitIndex + htmlSpoilerMarker.length))}`,
-      raw: combinedRawDescription.slice(markdownSplitIndex + markdownSpoilerMarker.length),
+      markup: html`${
+        unsafeHTML(
+          combinedHTML.slice(htmlSplitIndex + htmlSpoilerMarker.length),
+        )
+      }`,
+      raw: combinedRawDescription.slice(
+        markdownSplitIndex + markdownSpoilerMarker.length,
+      ),
     };
   }
 

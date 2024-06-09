@@ -1,8 +1,8 @@
-import type { ReadPublicCardParams } from '../models/CardsMongoDB';
-import { router, publicProcedure, authedProcedure } from '../trpc';
+import type { ReadPublicCardParams } from "../models/CardsMongoDB";
 import * as CardsDB from "../models/CardsMongoDB";
 import * as MetadataDB from "../models/MetadataMongoDB";
-import { ICardRaw } from '../models/mongoose_models/CardSchema';
+import { ICardRaw } from "../models/mongoose_models/CardSchema";
+import { authedProcedure, publicProcedure, router } from "../trpc";
 
 export const inAppRouter = router({
   fetchPublicCard: publicProcedure
@@ -29,13 +29,17 @@ export const inAppRouter = router({
     }),
 
   fetchCard: authedProcedure
-    .input((params: unknown) => params as Omit<CardsDB.ReadCardParams, "userIDInApp">)
+    .input((params: unknown) =>
+      params as Omit<CardsDB.ReadCardParams, "userIDInApp">
+    )
     .query(({ input, ctx }) => {
       return CardsDB.read({ ...input, userIDInApp: ctx.user.userIDInApp });
     }),
 
   addCard: authedProcedure
-    .input((params: unknown) => params as Omit<CardsDB.CreateCardParams, "createdById">)
+    .input((params: unknown) =>
+      params as Omit<CardsDB.CreateCardParams, "createdById">
+    )
     .mutation(({ input, ctx }) => {
       return CardsDB.create({ ...input, createdById: ctx.user.userIDInApp });
     }),
@@ -47,15 +51,25 @@ export const inAppRouter = router({
     }),
 
   trashCard: authedProcedure
-    .input((params: unknown) => params as Omit<MetadataDB.SendCardToTrashParams, "createdById">)
+    .input((params: unknown) =>
+      params as Omit<MetadataDB.SendCardToTrashParams, "createdById">
+    )
     .mutation(({ input, ctx }) => {
-      return MetadataDB.sendCardToTrash({ ...input, createdById: ctx.user.userIDInApp });
+      return MetadataDB.sendCardToTrash({
+        ...input,
+        createdById: ctx.user.userIDInApp,
+      });
     }),
 
   deleteCard: authedProcedure
-    .input((params: unknown) => params as Omit<MetadataDB.SendCardToTrashParams, "createdById">)
+    .input((params: unknown) =>
+      params as Omit<MetadataDB.SendCardToTrashParams, "createdById">
+    )
     .mutation(({ input, ctx }) => {
-      return MetadataDB.deleteCardFromTrash({ ...input, createdById: ctx.user.userIDInApp });
+      return MetadataDB.deleteCardFromTrash({
+        ...input,
+        createdById: ctx.user.userIDInApp,
+      });
     }),
 
   /**
@@ -70,7 +84,9 @@ export const inAppRouter = router({
     }),
 
   duplicateCard: authedProcedure
-    .input((params: unknown) => params as Pick<CardsDB.DuplicateCardParams, "cardID">)
+    .input((params: unknown) =>
+      params as Pick<CardsDB.DuplicateCardParams, "cardID">
+    )
     .mutation(({ input, ctx }) => {
       return CardsDB.duplicateCard({
         ...input,
@@ -80,9 +96,14 @@ export const inAppRouter = router({
     }),
 
   restoreCardFromTrash: authedProcedure
-    .input((params: unknown) => params as Omit<MetadataDB.SendCardToTrashParams, "createdById">)
+    .input((params: unknown) =>
+      params as Omit<MetadataDB.SendCardToTrashParams, "createdById">
+    )
     .mutation(({ input, ctx }) => {
-      return MetadataDB.restoreCardFromTrash({ ...input, createdById: ctx.user.userIDInApp });
+      return MetadataDB.restoreCardFromTrash({
+        ...input,
+        createdById: ctx.user.userIDInApp,
+      });
     }),
 
   metadata: authedProcedure
@@ -97,15 +118,24 @@ export const inAppRouter = router({
     }),
 
   streak: authedProcedure
-    .input((params: unknown) => params as Omit<MetadataDB.UpdateStreakParams, "userIDInApp">)
+    .input((params: unknown) =>
+      params as Omit<MetadataDB.UpdateStreakParams, "userIDInApp">
+    )
     .mutation(({ input, ctx }) => {
-      return MetadataDB.updateStreak({ ...input, userIDInApp: ctx.user.userIDInApp });
+      return MetadataDB.updateStreak({
+        ...input,
+        userIDInApp: ctx.user.userIDInApp,
+      });
     }),
 
   settings: authedProcedure
-    .input((params: unknown) => params as Omit<MetadataDB.UpdateUserSettingsParams, "userIDInApp">)
+    .input((params: unknown) =>
+      params as Omit<MetadataDB.UpdateUserSettingsParams, "userIDInApp">
+    )
     .mutation(({ input, ctx }) => {
-      return MetadataDB.updateUserSettings({ ...input, userIDInApp: ctx.user.userIDInApp });
+      return MetadataDB.updateUserSettings({
+        ...input,
+        userIDInApp: ctx.user.userIDInApp,
+      });
     }),
-
 });

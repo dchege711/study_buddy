@@ -24,7 +24,7 @@ declare module "express" {
   }
 }
 
-declare module 'express-session' {
+declare module "express-session" {
   export interface SessionData {
     user: AuthenticateUser;
   }

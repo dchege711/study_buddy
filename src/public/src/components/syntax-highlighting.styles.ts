@@ -97,4 +97,4 @@ export const atomOneLight = css`
   .hljs-link {
     text-decoration: underline;
   }
-`
+`;

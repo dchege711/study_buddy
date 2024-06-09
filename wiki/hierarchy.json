@@ -1,14 +1,14 @@
 {
-    "_readme": {
-        "title": "About Flashcards by c13u"
-    },
+  "_readme": {
+    "title": "About Flashcards by c13u"
+  },
 
-    "main._readme": {
-        "title": "User Guide", 
-        "children": {
-            "main.editing_cards": {
-                "title": "Editing Cards"
-            }
-        }
+  "main._readme": {
+    "title": "User Guide",
+    "children": {
+      "main.editing_cards": {
+        "title": "Editing Cards"
+      }
     }
+  }
 }

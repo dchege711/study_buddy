@@ -2,10 +2,10 @@ import { expect } from "chai";
 
 import { MaxPriorityQueue } from "./max-priority-queue.js";
 
-describe("Test MaxPriorityQueue\n", function () {
+describe("Test MaxPriorityQueue\n", function() {
   let testPQ: MaxPriorityQueue<string>;
 
-  beforeEach(function () {
+  beforeEach(function() {
     testPQ = new MaxPriorityQueue<string>();
     testPQ.initialize([
       ["one", 1],
@@ -17,7 +17,7 @@ describe("Test MaxPriorityQueue\n", function () {
     ]);
   });
 
-  it("should return items in descending order", function () {
+  it("should return items in descending order", function() {
     let expectedOrder = [
       ["five", 5],
       ["four", 4],
@@ -32,7 +32,7 @@ describe("Test MaxPriorityQueue\n", function () {
     });
   });
 
-  it("should return items in descending order after insertions", function () {
+  it("should return items in descending order after insertions", function() {
     testPQ.insert(["ten", 10]);
     testPQ.insert(["twenty", 20]);
     testPQ.insert(["-ve one", -1]);
@@ -53,5 +53,4 @@ describe("Test MaxPriorityQueue\n", function () {
       expect(testPQ.del_max()).deep.equal(item);
     });
   });
-
 });

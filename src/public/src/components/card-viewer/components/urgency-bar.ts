@@ -1,12 +1,13 @@
-import { LitElement, html, css } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
-import { CardChangedEvent } from './card-changed-event.js';
+import { css, html, LitElement } from "lit";
+import { customElement, property, query } from "lit/decorators.js";
+import { CardChangedEvent } from "./card-changed-event.js";
 
-@customElement('cg-card-urgency-bar')
+@customElement("cg-card-urgency-bar")
 export class CardUrgencyBar extends LitElement {
-  @property({ type: Number}) urgency = 0;
+  @property({ type: Number })
+  urgency = 0;
 
-  @query('input')
+  @query("input")
   private input!: HTMLInputElement;
 
   render() {
@@ -48,6 +49,6 @@ export class CardUrgencyBar extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'cg-card-urgency-bar': CardUrgencyBar;
+    "cg-card-urgency-bar": CardUrgencyBar;
   }
 }

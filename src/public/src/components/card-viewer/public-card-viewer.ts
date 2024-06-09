@@ -1,30 +1,30 @@
-import { css, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
+import { css, html } from "lit";
+import { customElement, property } from "lit/decorators.js";
+import { repeat } from "lit/directives/repeat.js";
 
-import { CardViewer } from './base-card-viewer.js';
-import { FlagCardParams, PublicCardResult, trpc } from '../../trpc.js';
-import { CardsCarouselUpdateCursorDirection } from '../../context/cards-carousel-context.js';
+import { CardsCarouselUpdateCursorDirection } from "../../context/cards-carousel-context.js";
+import { FlagCardParams, PublicCardResult, trpc } from "../../trpc.js";
+import { CardViewer } from "./base-card-viewer.js";
 
-import './components/card-description.js';
-import '../tags/card-tag.js';
+import "./components/card-description.js";
+import "../tags/card-tag.js";
 
 enum FlagReason {
   Inappropriate = 1,
   Duplicate = 2,
 }
 
-@customElement('public-card-viewer')
+@customElement("public-card-viewer")
 export class PublicCardViewer extends CardViewer {
-  @property({ type: Object})
+  @property({ type: Object })
   protected card: PublicCardResult = null;
 
   private flagCard(reason: FlagReason) {
     if (!this.card) {
-      throw new Error('No card to flag');
+      throw new Error("No card to flag");
     }
 
-    let flagCardParams : FlagCardParams = { cardID: this.card._id };
+    let flagCardParams: FlagCardParams = { cardID: this.card._id };
     switch (reason) {
       case FlagReason.Inappropriate:
         flagCardParams.markedForReview = true;
@@ -39,7 +39,7 @@ export class PublicCardViewer extends CardViewer {
 
   protected renderCard() {
     if (!this.card) {
-      throw new Error('No card to render');
+      throw new Error("No card to render");
     }
 
     return html`
@@ -57,16 +57,20 @@ export class PublicCardViewer extends CardViewer {
           .canEdit=${false}>
         </cg-card-description>
         <p id='tags-holder'>
-        ${repeat(
-            this.tags, (tag) => tag,
-            (tag) => html`<cg-card-tag .tag=${tag}></cg-card-tag>`
-          )}
+        ${
+      repeat(
+        this.tags,
+        (tag) => tag,
+        (tag) => html`<cg-card-tag .tag=${tag}></cg-card-tag>`,
+      )
+    }
         </p>
       </div>
 
       <div id='action-row'>
         <button
-            @click=${() => this.updateCarouselCursor(CardsCarouselUpdateCursorDirection.Previous)}
+            @click=${() =>
+      this.updateCarouselCursor(CardsCarouselUpdateCursorDirection.Previous)}
             ?disabled=${!this.cardsCarousel?.hasPrevious()}>
           &#x276E; View Similar Card
         </button>
@@ -80,7 +84,8 @@ export class PublicCardViewer extends CardViewer {
           Copy to My Collection
         </button>
         <button
-            @click=${() => this.updateCarouselCursor(CardsCarouselUpdateCursorDirection.Next)}
+            @click=${() =>
+      this.updateCarouselCursor(CardsCarouselUpdateCursorDirection.Next)}
             ?disabled=${!this.cardsCarousel?.hasNext()}>
           View Similar Card &#x276F;
         </button>

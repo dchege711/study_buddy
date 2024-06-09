@@ -1,7 +1,7 @@
 {
-    "jshint.enable": false,
-    "eslint.enable": true,
-    "markdownlint.config":{
-        "MD041": false
-    }
+  "jshint.enable": false,
+  "eslint.enable": true,
+  "markdownlint.config": {
+    "MD041": false
+  }
 }
