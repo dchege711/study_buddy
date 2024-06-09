@@ -105,7 +105,6 @@
     "ejs-lint": "^2.0.0",
     "esbuild-loader": "^4.1.0",
     "highlightjs": "^9.12.0",
-    "jsdoc": "^4.0.2",
     "mathjax": "^2.7.5",
     "mocha": "^10.2.0",
     "mongodb-memory-server": "^8.9.3",
