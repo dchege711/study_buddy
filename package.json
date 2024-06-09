@@ -26,7 +26,6 @@
     "build": "npm run build:server && npm run build:client",
     "build:server": "tsc --project tsconfig.json && npm run webpack",
     "build:client": "cd src/public && npm run build && cd ../../",
-    "jsdoc": "jsdoc -r models",
     "start": "node dist/server.js",
     "debug": "ts-node-dev --files --transpile-only src/server.ts",
     "single_test": "npm run build && ts-mocha",
@@ -34,7 +33,6 @@
     "test:server": "npm run mocha_tests",
     "test:client": "cd src/public && npm run test && cd ../../",
     "mocha_tests": "nyc ts-mocha --no-warnings --recursive --sort './src/tests/mocha_tests/*/*.ts' './src/**/*.test.ts' --exclude './src/public/**/*'",
-    "docs": "jsdoc -c ./config.jsdoc.js",
     "webpack": "webpack --config ./webpack.config.cjs"
   },
   "repository": {
