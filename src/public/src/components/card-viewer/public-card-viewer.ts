@@ -56,7 +56,7 @@ export class PublicCardViewer extends CardViewer {
           .cardResponse=${this.cardResponse}
           .canEdit=${false}>
         </cg-card-description>
-        <p>
+        <p id='tags-holder'>
         ${repeat(
             this.tags, (tag) => tag,
             (tag) => html`<cg-card-tag .tag=${tag}></cg-card-tag>`
@@ -106,6 +106,12 @@ export class PublicCardViewer extends CardViewer {
         flex-grow: 1;
         flex-direction: column;
         gap: 4px;
+
+        p#tags-holder {
+          display: flex;
+          gap: 4px;
+          flex-wrap: wrap;
+        }
       }
     `,
   ];
