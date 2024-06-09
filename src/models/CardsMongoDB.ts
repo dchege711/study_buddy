@@ -6,13 +6,22 @@
  * @module
  */
 
-import { Card, ICard, ICardRaw } from "./mongoose_models/CardSchema";
-import * as MetadataDB from "./MetadataMongoDB";
-import { sanitizeCard, sanitizeQuery } from "./SanitizationAndValidation";
-import { BaseResponse } from "../types";
 import { FilterQuery } from "mongoose";
+import { BaseResponse } from "../types";
+import * as MetadataDB from "./MetadataMongoDB";
+import { Card, ICard, ICardRaw } from "./mongoose_models/CardSchema";
+import { sanitizeCard, sanitizeQuery } from "./SanitizationAndValidation";
 
-export type CreateCardParams = Pick<ICard, "title" | "description" | "tags" | "createdById" | "urgency" | "isPublic" | "parent">;
+export type CreateCardParams = Pick<
+  ICard,
+  | "title"
+  | "description"
+  | "tags"
+  | "createdById"
+  | "urgency"
+  | "isPublic"
+  | "parent"
+>;
 
 /**
  * Create a new card from `payload` and add it to the user's current cards.
@@ -21,12 +30,12 @@ export type CreateCardParams = Pick<ICard, "title" | "description" | "tags" | "c
  * as its keys. If successful, the message will contain the saved card.
  */
 export async function create(unsavedCard: CreateCardParams): Promise<ICard> {
-    let card = await Card.create(sanitizeCard(unsavedCard));
-    return Promise.all([
-        MetadataDB.update([{card, previousTags: ""}]),
-        MetadataDB.updatePublicUserMetadata([{card, previousTags: ""}])
-    ]).then(() => card);
-};
+  let card = await Card.create(sanitizeCard(unsavedCard));
+  return Promise.all([
+    MetadataDB.update([{ card, previousTags: "" }]),
+    MetadataDB.updatePublicUserMetadata([{ card, previousTags: "" }]),
+  ]).then(() => card);
+}
 
 /**
  * Create multiple cards at once.
@@ -37,16 +46,23 @@ export async function create(unsavedCard: CreateCardParams): Promise<ICard> {
  * @returns {Promise} takes a JSON object with `success`, `status` and `message`
  * as its keys. If successful, the message will be an array of the saved cards' IDs
  */
-export async function createMany(unsavedCards: CreateCardParams[]): Promise<ICard[]> {
-    let sanitizedCards = unsavedCards.map((card) => sanitizeCard(card));
-    let cards = await Card.insertMany(sanitizedCards);
-    return Promise.all([
-        MetadataDB.update(cards.map((card) => ({card, previousTags: ""}))),
-        MetadataDB.updatePublicUserMetadata(cards.map((card) => ({card, previousTags: ""})))
-    ]).then(() => cards);
+export async function createMany(
+  unsavedCards: CreateCardParams[],
+): Promise<ICard[]> {
+  let sanitizedCards = unsavedCards.map((card) => sanitizeCard(card));
+  let cards = await Card.insertMany(sanitizedCards);
+  return Promise.all([
+    MetadataDB.update(cards.map((card) => ({ card, previousTags: "" }))),
+    MetadataDB.updatePublicUserMetadata(
+      cards.map((card) => ({ card, previousTags: "" })),
+    ),
+  ]).then(() => cards);
 }
 
-export interface ReadCardParams { userIDInApp: number; cardID?: string};
+export interface ReadCardParams {
+  userIDInApp: number;
+  cardID?: string;
+}
 
 /**
  * Read cards from the database that match `payload`.
@@ -59,12 +75,16 @@ export interface ReadCardParams { userIDInApp: number; cardID?: string};
  *
  * @returns {Promise} resolves with an array of all matching cards.
  */
-export function read(payload: ReadCardParams, projection="title description descriptionHTML tags urgency createdById isPublic") : Promise<ICardRaw | null> {
-    payload = sanitizeQuery(payload);
-    let query : Partial<ICard> = {createdById: payload.userIDInApp};
-    if (payload.cardID) query._id = payload.cardID;
-    return Card.findOne(query).select(projection).exec();
-};
+export function read(
+  payload: ReadCardParams,
+  projection =
+    "title description descriptionHTML tags urgency createdById isPublic",
+): Promise<ICardRaw | null> {
+  payload = sanitizeQuery(payload);
+  let query: Partial<ICard> = { createdById: payload.userIDInApp };
+  if (payload.cardID) { query._id = payload.cardID; }
+  return Card.findOne(query).select(projection).exec();
+}
 
 /**
  * Update an existing card. Some fields of the card are treated as constants,
@@ -73,27 +93,33 @@ export function read(payload: ReadCardParams, projection="title description desc
  * @returns {Promise} resolves with the updated card.
  */
 export async function update(payload: Partial<ICard>): Promise<ICardRaw> {
-    payload = sanitizeCard(payload);
-    let oldCard = await Card.findByIdAndUpdate(
-        payload._id, payload, {returnOriginal: true, runValidators: true}).exec();
-    if (oldCard === null) {
-        return Promise.reject("Card not found.");
-    }
+  payload = sanitizeCard(payload);
+  let oldCard = await Card.findByIdAndUpdate(
+    payload._id,
+    payload,
+    { returnOriginal: true, runValidators: true },
+  ).exec();
+  if (oldCard === null) {
+    return Promise.reject("Card not found.");
+  }
 
-    let newCard = await Card.findById(oldCard._id).exec();
-    if (newCard === null) {
-        return Promise.reject("Card not found.");
-    }
+  let newCard = await Card.findById(oldCard._id).exec();
+  if (newCard === null) {
+    return Promise.reject("Card not found.");
+  }
 
-    if (newCard.tags === oldCard.tags && newCard.urgency === oldCard.urgency) {
-        return Promise.resolve(newCard);
-    }
+  if (newCard.tags === oldCard.tags && newCard.urgency === oldCard.urgency) {
+    return Promise.resolve(newCard);
+  }
 
-    return Promise.all([
-        MetadataDB.update([{card: newCard, previousTags: oldCard.tags}]),
-        MetadataDB.updatePublicUserMetadata([{card: newCard, previousTags: oldCard.tags}])
-    ]).then(() => newCard as ICard);
-};
+  return Promise.all([
+    MetadataDB.update([{ card: newCard, previousTags: oldCard.tags }]),
+    MetadataDB.updatePublicUserMetadata([{
+      card: newCard,
+      previousTags: oldCard.tags,
+    }]),
+  ]).then(() => newCard as ICard);
+}
 
 export interface SearchCardParams {
   queryString: string;
@@ -102,7 +128,7 @@ export interface SearchCardParams {
   creationEndDate?: Date;
   // TODO: Change this to Array<Pick<ICardRaw, "_id">>?
   cardIDs?: string;
-};
+}
 
 interface ServerAddedSearchCardParams {
   createdById?: number;
@@ -110,11 +136,11 @@ interface ServerAddedSearchCardParams {
 }
 
 interface CardQuery {
-    filter: FilterQuery<ICard>;
-    projection: string;
-    limit: number;
-    sortCriteria: object;
-};
+  filter: FilterQuery<ICard>;
+  projection: string;
+  limit: number;
+  sortCriteria: object;
+}
 
 const kCardsSearchProjection = "title tags urgency";
 type CardsSearchResult = Pick<ICardRaw, "_id" | "title" | "tags" | "urgency">;
@@ -134,16 +160,22 @@ type CardsSearchResult = Pick<ICardRaw, "_id" | "title" | "tags" | "urgency">;
  * as keys. If successful `message` will contain abbreviated cards that only
  * the `id`, `urgency` and `title` fields.
  */
-export function search(payload: SearchCardParams, createdById: number): Promise<CardsSearchResult[]> {
-    /**
-     * $expr is faster than $where because it does not execute JavaScript
-     * and should be preferred where possible. Note that the JS expression
-     * is processed for EACH document in the collection. Yikes!
-     */
-    return collectSearchResults(
-      computeInternalQueryFromClientQuery(
-        sanitizeQuery(payload), { createdById }));
-};
+export function search(
+  payload: SearchCardParams,
+  createdById: number,
+): Promise<CardsSearchResult[]> {
+  /**
+   * $expr is faster than $where because it does not execute JavaScript
+   * and should be preferred where possible. Note that the JS expression
+   * is processed for EACH document in the collection. Yikes!
+   */
+  return collectSearchResults(
+    computeInternalQueryFromClientQuery(
+      sanitizeQuery(payload),
+      { createdById },
+    ),
+  );
+}
 
 /**
  * @description Append a copy of the hyphenated/underscored words in the incoming
@@ -157,20 +189,25 @@ export function search(payload: SearchCardParams, createdById: number): Promise<
  * @returns {String} a string with extra space delimited words, e.g.
  * `arrays dynamic_programming iterative-algorithms dynamic programming iterative algorithms`
  */
-let splitTags = function(s:string): string {
-    let possibleTags = s.match(/[\w|\d]+(\_|-){1}[\w|\d]+/g);
-    if (possibleTags === null) return s;
+let splitTags = function(s: string): string {
+  let possibleTags = s.match(/[\w|\d]+(\_|-){1}[\w|\d]+/g);
+  if (possibleTags === null) { return s; }
 
-    for (let i = 0; i < possibleTags.length; i++) {
-        s += " " + possibleTags[i].split(/[\_-]/g).join(" ");
-    }
-    return s;
-}
+  for (let i = 0; i < possibleTags.length; i++) {
+    s += " " + possibleTags[i].split(/[\_-]/g).join(" ");
+  }
+  return s;
+};
 
-function computeInternalQueryFromClientQuery(clientQuery: SearchCardParams, serverAddedParams: ServerAddedSearchCardParams): CardQuery {
+function computeInternalQueryFromClientQuery(
+  clientQuery: SearchCardParams,
+  serverAddedParams: ServerAddedSearchCardParams,
+): CardQuery {
   const mandatoryFields: FilterQuery<ICard>[] = [];
   if (clientQuery.queryString) {
-      mandatoryFields.push({ $text: { $search: splitTags(clientQuery.queryString) }});
+    mandatoryFields.push({
+      $text: { $search: splitTags(clientQuery.queryString) },
+    });
   }
   if (serverAddedParams.createdById) {
     mandatoryFields.push({ createdById: serverAddedParams.createdById });
@@ -181,27 +218,31 @@ function computeInternalQueryFromClientQuery(clientQuery: SearchCardParams, serv
   }
 
   if (clientQuery.cardIDs) {
-    mandatoryFields.push({ _id: { $in: Array.from(clientQuery.cardIDs.split(",")) }});
-}
+    mandatoryFields.push({
+      _id: { $in: Array.from(clientQuery.cardIDs.split(",")) },
+    });
+  }
 
   if (clientQuery.creationStartDate || clientQuery.creationEndDate) {
-    let dateQuery: {$gt?: Date, $lt?: Date} = {}
+    let dateQuery: { $gt?: Date; $lt?: Date } = {};
     if (clientQuery.creationStartDate) {
       dateQuery["$gt"] = clientQuery.creationStartDate;
     }
     if (clientQuery.creationEndDate) {
       dateQuery["$lt"] = clientQuery.creationEndDate;
     }
-    mandatoryFields.push({createdAt: dateQuery});
+    mandatoryFields.push({ createdAt: dateQuery });
   }
 
-  const sortCriteria = clientQuery.queryString ? { score: { $meta: "textScore" } } : {};
+  const sortCriteria = clientQuery.queryString
+    ? { score: { $meta: "textScore" } }
+    : {};
 
   return {
-      filter: { $and: mandatoryFields },
-      projection: kCardsSearchProjection,
-      limit: clientQuery.limit || 100,
-      sortCriteria: sortCriteria,
+    filter: { $and: mandatoryFields },
+    projection: kCardsSearchProjection,
+    limit: clientQuery.limit || 100,
+    sortCriteria: sortCriteria,
   };
 }
 
@@ -212,12 +253,14 @@ function computeInternalQueryFromClientQuery(clientQuery: SearchCardParams, serv
  * @returns {Promise} resolves with a JSON object. If `success` is set, then
  * the `message` attribute will be an array of matching cards.
  */
-let collectSearchResults = function(queryObject: CardQuery): Promise<CardsSearchResult[]> {
-    return Card.find(queryObject.filter, kCardsSearchProjection)
-        .sort(queryObject.sortCriteria)
-        .limit(queryObject.limit)
-        .exec();
-}
+let collectSearchResults = function(
+  queryObject: CardQuery,
+): Promise<CardsSearchResult[]> {
+  return Card.find(queryObject.filter, kCardsSearchProjection)
+    .sort(queryObject.sortCriteria)
+    .limit(queryObject.limit)
+    .exec();
+};
 
 /**
  * @description Find cards that satisfy the given criteria and are publicly
@@ -234,10 +277,15 @@ let collectSearchResults = function(queryObject: CardQuery): Promise<CardsSearch
  * @returns {Promise} resolves with a JSON object. If `success` is set, then
  * the `message` attribute will be an array of matching cards.
  */
-export function publicSearch(payload: SearchCardParams): Promise<CardsSearchResult[]> {
-    return collectSearchResults(
-      computeInternalQueryFromClientQuery(
-        sanitizeQuery(payload), {isPublic: true}));
+export function publicSearch(
+  payload: SearchCardParams,
+): Promise<CardsSearchResult[]> {
+  return collectSearchResults(
+    computeInternalQueryFromClientQuery(
+      sanitizeQuery(payload),
+      { isPublic: true },
+    ),
+  );
 }
 
 export type ReadPublicCardParams = Omit<ReadCardParams, "userIDInApp">;
@@ -249,7 +297,9 @@ export type ReadPublicCardParams = Omit<ReadCardParams, "userIDInApp">;
  * the `message` attribute will contain a single-element array containing the
  * matching card if any.
  */
-export function readPublicCard(payload: ReadPublicCardParams): Promise<ICardRaw | null> {
+export function readPublicCard(
+  payload: ReadPublicCardParams,
+): Promise<ICardRaw | null> {
   return _readPublicCard(payload);
 }
 
@@ -265,13 +315,16 @@ export function readPublicCard(payload: ReadPublicCardParams): Promise<ICardRaw 
 function _readPublicCard(payload: ReadPublicCardParams): Promise<ICard | null> {
   payload = sanitizeQuery(payload);
   if (payload.cardID === undefined) {
-      return Promise.reject("cardID is undefined");
+    return Promise.reject("cardID is undefined");
   }
-  return Card.findOne({isPublic: true, _id: payload.cardID}).exec();
+  return Card.findOne({ isPublic: true, _id: payload.cardID }).exec();
 }
 
 export interface DuplicateCardParams {
-    cardID: string; userIDInApp: number; cardsAreByDefaultPrivate: boolean};
+  cardID: string;
+  userIDInApp: number;
+  cardsAreByDefaultPrivate: boolean;
+}
 
 /**
  * @description Create a copy of the referenced card and add it to the user's
@@ -284,30 +337,36 @@ export interface DuplicateCardParams {
  * as its keys. If successful, the message will contain the saved card. This
  * response is the same as that of `CardsMongoDB.create(payload)`.
  */
-export async function duplicateCard(payload: DuplicateCardParams): Promise<ICard> {
-    payload = sanitizeQuery(payload);
-    let originalCard = await _readPublicCard({cardID: payload.cardID});
-    if (originalCard === null) {
-        return Promise.reject("Card not found!");
-    }
+export async function duplicateCard(
+  payload: DuplicateCardParams,
+): Promise<ICard> {
+  payload = sanitizeQuery(payload);
+  let originalCard = await _readPublicCard({ cardID: payload.cardID });
+  if (originalCard === null) {
+    return Promise.reject("Card not found!");
+  }
 
-    let idsOfUsersWithCopy = new Set(originalCard.idsOfUsersWithCopy.split(", "));
-    idsOfUsersWithCopy.add(payload.userIDInApp.toString());
-    originalCard.idsOfUsersWithCopy = Array.from(idsOfUsersWithCopy).join(", ");
-    await originalCard.save();
+  let idsOfUsersWithCopy = new Set(originalCard.idsOfUsersWithCopy.split(", "));
+  idsOfUsersWithCopy.add(payload.userIDInApp.toString());
+  originalCard.idsOfUsersWithCopy = Array.from(idsOfUsersWithCopy).join(", ");
+  await originalCard.save();
 
-    return create({
-        title: originalCard.title,
-        description: originalCard.description,
-        tags: originalCard.tags,
-        parent: originalCard._id,
-        createdById: payload.userIDInApp,
-        isPublic: payload.cardsAreByDefaultPrivate,
-        urgency: 10,
-    });
-};
+  return create({
+    title: originalCard.title,
+    description: originalCard.description,
+    tags: originalCard.tags,
+    parent: originalCard._id,
+    createdById: payload.userIDInApp,
+    isPublic: payload.cardsAreByDefaultPrivate,
+    urgency: 10,
+  });
+}
 
-export interface FlagCardParams {cardID: string; markedForReview?: boolean; markedAsDuplicate?: boolean};
+export interface FlagCardParams {
+  cardID: string;
+  markedForReview?: boolean;
+  markedAsDuplicate?: boolean;
+}
 
 /**
  * @description With public cards, it's possible that some malicious users may
@@ -324,18 +383,23 @@ export interface FlagCardParams {cardID: string; markedForReview?: boolean; mark
  * as its keys. If successful, the message will contain the saved card.
  */
 export async function flagCard(payload: FlagCardParams): Promise<ICardRaw> {
-    payload = sanitizeQuery(payload);
-    let flagsToUpdate : Partial<Pick<ICard, "numTimesMarkedAsDuplicate" | "numTimesMarkedForReview">> = {};
-    if (payload.markedForReview) flagsToUpdate.numTimesMarkedForReview = 1;
-    if (payload.markedAsDuplicate) flagsToUpdate.numTimesMarkedAsDuplicate = 1;
+  payload = sanitizeQuery(payload);
+  let flagsToUpdate: Partial<
+    Pick<ICard, "numTimesMarkedAsDuplicate" | "numTimesMarkedForReview">
+  > = {};
+  if (payload.markedForReview) { flagsToUpdate.numTimesMarkedForReview = 1; }
+  if (payload.markedAsDuplicate) { flagsToUpdate.numTimesMarkedAsDuplicate =
+      1; }
 
-    const card = await Card
-        .findOneAndUpdate({ _id: payload.cardID }, { $inc: flagsToUpdate }, { returnDocument: 'after' })
-        .exec();
-    if (card === null) {
-        return Promise.reject("Card not found!");
-    }
-    return card;
+  const card = await Card
+    .findOneAndUpdate({ _id: payload.cardID }, { $inc: flagsToUpdate }, {
+      returnDocument: "after",
+    })
+    .exec();
+  if (card === null) {
+    return Promise.reject("Card not found!");
+  }
+  return card;
 }
 
 export type TagGroupingsParam = Pick<ReadCardParams, "userIDInApp">;
@@ -350,16 +414,18 @@ export type TagGroupings = string[][];
  * as its keys. If successful, the message will contain an array of arrays. Each
  * inner array will have tags that were found on a same card.
  */
-export function getTagGroupings(payload: TagGroupingsParam): Promise<TagGroupings> {
-    payload = sanitizeQuery(payload);
-    return Card
-        .find({createdById: payload.userIDInApp})
-        .select("tags").exec()
-        .then((cards) => {
-            let tagsArray = [];
-            for (let i = 0; i < cards.length; i++) {
-                tagsArray.push(cards[i].tags.split(" "));
-            }
-            return tagsArray;
-        });
+export function getTagGroupings(
+  payload: TagGroupingsParam,
+): Promise<TagGroupings> {
+  payload = sanitizeQuery(payload);
+  return Card
+    .find({ createdById: payload.userIDInApp })
+    .select("tags").exec()
+    .then((cards) => {
+      let tagsArray = [];
+      for (let i = 0; i < cards.length; i++) {
+        tagsArray.push(cards[i].tags.split(" "));
+      }
+      return tagsArray;
+    });
 }

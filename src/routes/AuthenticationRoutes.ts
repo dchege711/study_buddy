@@ -5,17 +5,26 @@ import {
   handleRegisterUser,
   loginUser,
   logoutUser,
+  registerUser,
+  resetPasswordGet,
+  resetPasswordLinkGet,
+  resetPasswordLinkPost,
+  resetPasswordPost,
   sendValidationEmailGet,
   sendValidationEmailPost,
   verifyAccount,
-  registerUser,
-  resetPasswordGet,
-  resetPasswordPost,
-  resetPasswordLinkGet,
-  resetPasswordLinkPost,
 } from "../controllers/AuthenticationController";
 import { rateLimiter } from "../controllers/ControllerUtilities";
-import { LOGIN, LOGOUT, REGISTER_USER, RESET_PASSWORD, RESET_PASSWORD_LINK, ROOT, SEND_VALIDATION_EMAIL, VERIFY_ACCOUNT } from "../paths";
+import {
+  LOGIN,
+  LOGOUT,
+  REGISTER_USER,
+  RESET_PASSWORD,
+  RESET_PASSWORD_LINK,
+  ROOT,
+  SEND_VALIDATION_EMAIL,
+  VERIFY_ACCOUNT,
+} from "../paths";
 
 const router = Router();
 

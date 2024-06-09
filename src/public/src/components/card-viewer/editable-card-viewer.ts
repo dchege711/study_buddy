@@ -1,29 +1,34 @@
-import { css, html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { css, html, nothing } from "lit";
+import { customElement, property, state } from "lit/decorators.js";
 
-import { CardViewer, markdownSpoilerMarker } from './base-card-viewer.js';
-import { PrivateCardResult, trpc } from '../../trpc.js';
-import { CardsCarouselUpdateCursorDirection } from '../../context/cards-carousel-context.js';
-import { ModifiableCardAttributes, kCardChangedEventName } from './components/card-changed-event.js';
+import { CardsCarouselUpdateCursorDirection } from "../../context/cards-carousel-context.js";
+import { PrivateCardResult, trpc } from "../../trpc.js";
+import { CardViewer, markdownSpoilerMarker } from "./base-card-viewer.js";
+import {
+  kCardChangedEventName,
+  ModifiableCardAttributes,
+} from "./components/card-changed-event.js";
 
-import './components/copyable.js';
-import './components/editable-card-title.js';
-import './components/card-description.js';
-import './components/editable-card-tags.js';
-import './components/urgency-bar.js';
-import './components/public-private-toggle.js';
+import "./components/copyable.js";
+import "./components/editable-card-title.js";
+import "./components/card-description.js";
+import "./components/editable-card-tags.js";
+import "./components/urgency-bar.js";
+import "./components/public-private-toggle.js";
 
-type PendingChanges = Partial<Omit<ModifiableCardAttributes, 'prompt' | 'response'>
-    & Pick<NonNullable<PrivateCardResult>, 'description'>>;
+type PendingChanges = Partial<
+  & Omit<ModifiableCardAttributes, "prompt" | "response">
+  & Pick<NonNullable<PrivateCardResult>, "description">
+>;
 
-@customElement('editable-card-viewer')
+@customElement("editable-card-viewer")
 export class EditableCardViewer extends CardViewer {
   constructor() {
     super();
     this.addEventListeners();
   }
 
-  @property({ type: Object})
+  @property({ type: Object })
   protected card: PrivateCardResult = null;
 
   @state()
@@ -32,7 +37,7 @@ export class EditableCardViewer extends CardViewer {
   private pendingChanges: PendingChanges = {};
 
   protected willUpdate(changedProperties: Map<string, any>) {
-    if (changedProperties.has('card')) {
+    if (changedProperties.has("card")) {
       this.canEdit = false;
     }
     super.willUpdate(changedProperties);
@@ -40,7 +45,7 @@ export class EditableCardViewer extends CardViewer {
 
   protected renderCard() {
     if (!this.card) {
-      throw new Error('No card to render');
+      throw new Error("No card to render");
     }
 
     return html`
@@ -79,12 +84,14 @@ export class EditableCardViewer extends CardViewer {
             &#x2716; Delete
           </button>
           <button
-              @click=${() => this.updateCarouselCursor(CardsCarouselUpdateCursorDirection.Previous)}
+              @click=${() =>
+      this.updateCarouselCursor(CardsCarouselUpdateCursorDirection.Previous)}
               ?disabled=${!this.cardsCarousel?.hasPrevious()}>
             &#x276E; Previous
           </button>
           <button
-              @click=${() => this.updateCarouselCursor(CardsCarouselUpdateCursorDirection.Next)}
+              @click=${() =>
+      this.updateCarouselCursor(CardsCarouselUpdateCursorDirection.Next)}
               ?disabled=${!this.cardsCarousel?.hasNext()}>
             Next &#x276F;
           </button>
@@ -131,14 +138,15 @@ export class EditableCardViewer extends CardViewer {
   private addEventListeners() {
     this.addEventListener(kCardChangedEventName, (ev) => {
       if (!this.card) {
-        throw new Error('No card to update');
+        throw new Error("No card to update");
       }
 
-      const updatedPrompt = ev.changes.prompt || this.cardPrompt?.raw || '';
-      const updatedResponse = ev.changes.response || this.cardResponse?.raw || '';
+      const updatedPrompt = ev.changes.prompt || this.cardPrompt?.raw || "";
+      const updatedResponse = ev.changes.response || this.cardResponse?.raw
+        || "";
       const updatedDescription = updatedPrompt
-          ? `${updatedPrompt}\n${markdownSpoilerMarker}\n${updatedResponse}`
-          : updatedResponse;
+        ? `${updatedPrompt}\n${markdownSpoilerMarker}\n${updatedResponse}`
+        : updatedResponse;
 
       this.pendingChanges = {
         ...this.card,
@@ -147,13 +155,13 @@ export class EditableCardViewer extends CardViewer {
         tags: ev.changes.tags || this.card.tags,
         urgency: ev.changes.urgency || this.card.urgency,
         isPublic: ev.changes.isPublic || this.card.isPublic,
-      }
+      };
     });
   }
 
   private renderShareableLink() {
     if (!this.card) {
-      throw new Error('No card to render');
+      throw new Error("No card to render");
     }
 
     return this.card.isPublic
@@ -167,7 +175,7 @@ export class EditableCardViewer extends CardViewer {
 
   private saveCard() {
     if (!this.card) {
-      throw new Error('No card to save');
+      throw new Error("No card to save");
     }
 
     trpc.updateCard.mutate({
@@ -181,7 +189,7 @@ export class EditableCardViewer extends CardViewer {
 
   private deleteCard() {
     if (!this.card) {
-      throw new Error('No card to delete');
+      throw new Error("No card to delete");
     }
 
     trpc.deleteCard.mutate({

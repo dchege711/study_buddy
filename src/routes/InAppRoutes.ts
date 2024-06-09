@@ -1,17 +1,39 @@
 import { Router } from "express";
 
 import { requireLogIn } from "../controllers/AuthenticationController";
-import {
-  home,
-  wikiPage,
-  browsePageGet,
-  accountGet,
-  updateUserSettings,
-  downloadUserData,
-  deleteAccount,
-} from "../controllers/InAppController";
 import { rateLimiter } from "../controllers/ControllerUtilities";
-import { ACCOUNT, ADD_CARD, BROWSE, DELETE_ACCOUNT, DELETE_CARD, DOWNLOAD_USER_DATA, DUPLICATE_CARD, FLAG_CARD, HOME, READ_CARD, READ_METADATA, READ_PUBLIC_CARD, READ_PUBLIC_METADATA, READ_TAG_GROUPS, RESTORE_CARD_FROM_TRASH, SEARCH_CARDS, TRASH_CARD, UPDATE_CARD, UPDATE_STREAK, UPDATE_USER_SETTINGS, WIKI } from "../paths";
+import {
+  accountGet,
+  browsePageGet,
+  deleteAccount,
+  downloadUserData,
+  home,
+  updateUserSettings,
+  wikiPage,
+} from "../controllers/InAppController";
+import {
+  ACCOUNT,
+  ADD_CARD,
+  BROWSE,
+  DELETE_ACCOUNT,
+  DELETE_CARD,
+  DOWNLOAD_USER_DATA,
+  DUPLICATE_CARD,
+  FLAG_CARD,
+  HOME,
+  READ_CARD,
+  READ_METADATA,
+  READ_PUBLIC_CARD,
+  READ_PUBLIC_METADATA,
+  READ_TAG_GROUPS,
+  RESTORE_CARD_FROM_TRASH,
+  SEARCH_CARDS,
+  TRASH_CARD,
+  UPDATE_CARD,
+  UPDATE_STREAK,
+  UPDATE_USER_SETTINGS,
+  WIKI,
+} from "../paths";
 
 const router = Router();
 

@@ -18,45 +18,43 @@ import { TernarySearchTrie } from "./core/ternary-search-trie.js";
  * @class
  */
 export class AutoComplete {
+  prefixTree: TernarySearchTrie = new TernarySearchTrie([]);
+  graph: UndirectedGraph = new UndirectedGraph();
 
-    prefixTree: TernarySearchTrie = new TernarySearchTrie([]);
-    graph: UndirectedGraph = new UndirectedGraph();
+  initializePrefixTree(words: string[]) {
+    this.prefixTree = new TernarySearchTrie(words);
+  }
 
-    initializePrefixTree(words: string[]) {
-        this.prefixTree = new TernarySearchTrie(words);
-    }
+  keysWithPrefix(prefix: string): string[] {
+    return this.prefixTree.keysWithPrefix(prefix);
+  }
 
-    keysWithPrefix(prefix: string): string[] {
-        return this.prefixTree.keysWithPrefix(prefix);
-    }
+  updatePrefixTree(word: string) {
+    this.prefixTree.put(word);
+  }
 
-    updatePrefixTree(word: string) {
-        this.prefixTree.put(word);
-    }
-
-    initializeGraphFromGroups(wordGroups: string[][]) {
-        this.graph = new UndirectedGraph();
-        let words, weight;
-        for (let i = 0; i < wordGroups.length; i++) {
-            words = wordGroups[i];
-            for (let j = 0; j < words.length; j++) {
-                for (let k = 0; k < words.length; k++) {
-                    if (j !== k) {
-                        weight = this.graph.getEdgeWeight(words[j], words[k]) || 1;
-                        this.graph.addEdge(words[j], words[k], 1 / (1/weight + 1));
-                    }
-                }
-            }
+  initializeGraphFromGroups(wordGroups: string[][]) {
+    this.graph = new UndirectedGraph();
+    let words, weight;
+    for (let i = 0; i < wordGroups.length; i++) {
+      words = wordGroups[i];
+      for (let j = 0; j < words.length; j++) {
+        for (let k = 0; k < words.length; k++) {
+          if (j !== k) {
+            weight = this.graph.getEdgeWeight(words[j], words[k]) || 1;
+            this.graph.addEdge(words[j], words[k], 1 / (1 / weight + 1));
+          }
         }
+      }
     }
+  }
 
-    addPairToGraph(wordA: string, wordB: string, edgeWeight: number = 1) {
-        let weight = this.graph.getEdgeWeight(wordA, wordB) || 1;
-        this.graph.addEdge(wordA, wordB, 1 / (1/weight + edgeWeight));
-    }
+  addPairToGraph(wordA: string, wordB: string, edgeWeight: number = 1) {
+    let weight = this.graph.getEdgeWeight(wordA, wordB) || 1;
+    this.graph.addEdge(wordA, wordB, 1 / (1 / weight + edgeWeight));
+  }
 
-    kNeighbors(words: string[], k: number = 10): string[] {
-        return this.graph.kNearNeighbors(words, k);
-    }
-
+  kNeighbors(words: string[], k: number = 10): string[] {
+    return this.graph.kNearNeighbors(words, k);
+  }
 }

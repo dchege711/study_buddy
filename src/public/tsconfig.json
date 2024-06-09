@@ -1,37 +1,37 @@
 {
-    // This inherits everything except the references from the root. Overrides
-    // are defined below.
-    // https://www.typescriptlang.org/tsconfig#extends
-    "extends": "../../tools/tsconfig.base.json",
+  // This inherits everything except the references from the root. Overrides
+  // are defined below.
+  // https://www.typescriptlang.org/tsconfig#extends
+  "extends": "../../tools/tsconfig.base.json",
 
-    "compilerOptions": {
-        // Output directory for compiled files
-        "outDir": "./dist",
-        // Root directory of source files
-        "rootDir": "./src",
-        // Needed by [1]. Decorators are ES7 syntax that are not yet formal.
-        // https://lit.dev/docs/components/decorators/#decorators-typescript
-        "experimentalDecorators": true,
-        // Needed by [1]. Otherwise, reactive properties need more boilerplate.
-        // https://lit.dev/docs/components/decorators/#decorators-typescript
-        "useDefineForClassFields": false
-    },
+  "compilerOptions": {
+    // Output directory for compiled files
+    "outDir": "./dist",
+    // Root directory of source files
+    "rootDir": "./src",
+    // Needed by [1]. Decorators are ES7 syntax that are not yet formal.
+    // https://lit.dev/docs/components/decorators/#decorators-typescript
+    "experimentalDecorators": true,
+    // Needed by [1]. Otherwise, reactive properties need more boilerplate.
+    // https://lit.dev/docs/components/decorators/#decorators-typescript
+    "useDefineForClassFields": false
+  },
 
-    // Files to be included in compilation
-    "include": [
-        "./src/**/*"
-    ],
-    // Files to be excluded from compilation
-    "exclude": [
-        "src/lib/**/*",
-    ],
+  // Files to be included in compilation
+  "include": [
+    "./src/**/*"
+  ],
+  // Files to be excluded from compilation
+  "exclude": [
+    "src/lib/**/*"
+  ],
 
-    // Reference the server configuration so that incremental builds work
-    // correctly.
-    // https://www.typescriptlang.org/docs/handbook/project-references.html
-    "references": [
-        {
-            "path": "../../",
-        }
-    ]
+  // Reference the server configuration so that incremental builds work
+  // correctly.
+  // https://www.typescriptlang.org/docs/handbook/project-references.html
+  "references": [
+    {
+      "path": "../../"
+    }
+  ]
 }

@@ -1,5 +1,5 @@
-import { LitElement, css, html } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { css, html, LitElement } from "lit";
+import { customElement, property, query } from "lit/decorators.js";
 
 export enum InputState {
   PressedSpace = 1,
@@ -7,7 +7,7 @@ export enum InputState {
   InWord = 3,
 }
 
-export const kTextInputEvent = 'text-input';
+export const kTextInputEvent = "text-input";
 export class TextInputEvent extends Event {
   /**
    * The text content as was inputted by the user. Guaranteed to be non-empty.
@@ -23,33 +23,35 @@ export class TextInputEvent extends Event {
   }
 }
 
-export const kTextInputBlurEvent = 'text-input-blur';
+export const kTextInputBlurEvent = "text-input-blur";
 export class TextInputBlurEvent extends Event {
   constructor() {
     super(kTextInputBlurEvent, { bubbles: true, composed: true });
   }
 }
 
-@customElement('cg-text-input')
+@customElement("cg-text-input")
 export class TextInputElement extends LitElement {
-  @property({ type: String }) placeholder = '';
+  @property({ type: String })
+  placeholder = "";
 
   private inputState = InputState.InWord;
 
-  @query('input') private input!: HTMLInputElement;
+  @query("input")
+  private input!: HTMLInputElement;
 
   /**
    * Clear the current text input.
    */
   clearText() {
-    this.input.value = '';
+    this.input.value = "";
   }
 
   render() {
     return html`
       <input
           .placeholder=${this.placeholder}
-          .value=${''}
+          .value=${""}
           @keyup=${this.onKeyUp}
           @blur=${this.onBlur} >
     `;
@@ -72,7 +74,7 @@ export class TextInputElement extends LitElement {
   private onKeyUp(e: KeyboardEvent) {
     this.inputState = this.getInputState(e.key);
 
-    const text = this.input.value.trim() || '';
+    const text = this.input.value.trim() || "";
     if (text.length === 0) {
       return;
     }
@@ -85,10 +87,10 @@ export class TextInputElement extends LitElement {
   }
 
   private getInputState(keyPress: string): InputState {
-    switch(keyPress) {
-      case ' ':
+    switch (keyPress) {
+      case " ":
         return InputState.PressedSpace;
-      case 'Enter':
+      case "Enter":
         return InputState.PressedEnter;
       default:
         return InputState.InWord;
@@ -98,10 +100,10 @@ export class TextInputElement extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'cg-text-input': TextInputElement;
+    "cg-text-input": TextInputElement;
   }
 
   interface GlobalEventHandlersEventMap {
-    'text-input': TextInputEvent;
+    "text-input": TextInputEvent;
   }
 }

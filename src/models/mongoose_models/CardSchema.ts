@@ -4,7 +4,7 @@
  * @module
  */
 
-import { model, Schema, Types, Document } from "mongoose";
+import { Document, model, Schema, Types } from "mongoose";
 
 /**
  * The schema for cards in the database
@@ -28,49 +28,53 @@ import { model, Schema, Types, Document } from "mongoose";
  *  to its owner. It will not appear in the search results at the `/browse` page. In contrast, a public card will appear in the search results as a read-only card. Any user that adds the card to their own collection will get a separate copy of the card.
  */
 export interface ICardRaw {
-    _id: string,
-    title: string;
-    description: string;
-    descriptionHTML: string;
-    tags: string;
-    urgency: number;
-    metadataIndex: number;
-    createdById: number;
-    isPublic: boolean;
-    lastReviewed: Date;
-    parent: string;
-    numChildren: number;
-    idsOfUsersWithCopy: string;
-    numTimesMarkedAsDuplicate: number;
-    numTimesMarkedForReview: number;
-    createdAt: Date;
-    updatedAt: Date;
+  _id: string;
+  title: string;
+  description: string;
+  descriptionHTML: string;
+  tags: string;
+  urgency: number;
+  metadataIndex: number;
+  createdById: number;
+  isPublic: boolean;
+  lastReviewed: Date;
+  parent: string;
+  numChildren: number;
+  idsOfUsersWithCopy: string;
+  numTimesMarkedAsDuplicate: number;
+  numTimesMarkedForReview: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-
 var cardSchema = new Schema<ICardRaw>(
-    {
-        title: { type: String, default: "", trim: true },
-        description: { type: String, trim: true, default: "" },
-        descriptionHTML: { type: String, trim: true, default: "" },
-        tags: { type: String, lowercase: true, trim: true, default: "" },
-        urgency: { type: Number, default: 10 },
-        metadataIndex: { type: Number, default: 0, immutable: true },
-        createdById: { type: Number, required: true, immutable: true},
-        isPublic: { type: Boolean, default: false },
-        lastReviewed: { type: Date, default: Date.now },
-        parent: { type: String, trim: true, default: "", immutable: true },
-        numChildren: { type: Number, default: 0 },
-        idsOfUsersWithCopy: { type: String, lowercase: true, trim: true, default: "" },
-        numTimesMarkedAsDuplicate: { type: Number, default: 0 },
-        numTimesMarkedForReview: { type: Number, default: 0 }
+  {
+    title: { type: String, default: "", trim: true },
+    description: { type: String, trim: true, default: "" },
+    descriptionHTML: { type: String, trim: true, default: "" },
+    tags: { type: String, lowercase: true, trim: true, default: "" },
+    urgency: { type: Number, default: 10 },
+    metadataIndex: { type: Number, default: 0, immutable: true },
+    createdById: { type: Number, required: true, immutable: true },
+    isPublic: { type: Boolean, default: false },
+    lastReviewed: { type: Date, default: Date.now },
+    parent: { type: String, trim: true, default: "", immutable: true },
+    numChildren: { type: Number, default: 0 },
+    idsOfUsersWithCopy: {
+      type: String,
+      lowercase: true,
+      trim: true,
+      default: "",
     },
-    {
-        timestamps: true,
-        autoIndex: true,
-        collection: "c13u_study_buddy",
-        strict: true
-    }
+    numTimesMarkedAsDuplicate: { type: Number, default: 0 },
+    numTimesMarkedForReview: { type: Number, default: 0 },
+  },
+  {
+    timestamps: true,
+    autoIndex: true,
+    collection: "c13u_study_buddy",
+    strict: true,
+  },
 );
 
 /**
@@ -78,12 +82,14 @@ var cardSchema = new Schema<ICardRaw>(
  * fields. [docs](https://docs.mongodb.com/manual/tutorial/control-results-of-text-search/)
  */
 cardSchema.index(
-    {
-        title: "text", description: "text", tags: "text"
-    },
-    {
-        weights: {title: 1, description: 1, tags: 2},
-    }
+  {
+    title: "text",
+    description: "text",
+    tags: "text",
+  },
+  {
+    weights: { title: 1, description: 1, tags: 2 },
+  },
 );
 
 /*
@@ -94,24 +100,32 @@ cardSchema.index(
  * connection when you use mongoose.model()).
  * You create a new connection and call .model() on it to create the
  * documents on a different database.
- *
  */
-export const Card = model<ICardRaw>('Card', cardSchema);
+export const Card = model<ICardRaw>("Card", cardSchema);
 export type ICard = ICardRaw & Document<any, any, ICardRaw>;
 
-export type MiniICard = Partial<Pick<ICard, "title" | "tags" | "urgency" | "_id">>;
+export type MiniICard = Partial<
+  Pick<ICard, "title" | "tags" | "urgency" | "_id">
+>;
 
 if (require.main === module) {
-    // Run this script as main if you change the indexes
-    // http://thecodebarbarian.com/whats-new-in-mongoose-5-2-syncindexes
-    Card
-        .syncIndexes()
-        .then((msg) => { console.log(msg); })
-        .catch((err) => { console.error(err); });
+  // Run this script as main if you change the indexes
+  // http://thecodebarbarian.com/whats-new-in-mongoose-5-2-syncindexes
+  Card
+    .syncIndexes()
+    .then((msg) => {
+      console.log(msg);
+    })
+    .catch((err) => {
+      console.error(err);
+    });
 
-    Card
-        .listIndexes()
-        .then((indexes) => { console.log(indexes); })
-        .catch((err) => { console.error(err); });
-
+  Card
+    .listIndexes()
+    .then((indexes) => {
+      console.log(indexes);
+    })
+    .catch((err) => {
+      console.error(err);
+    });
 }

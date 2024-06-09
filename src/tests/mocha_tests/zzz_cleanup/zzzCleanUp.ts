@@ -1,8 +1,10 @@
 "use strict";
 
-import { mongooseConnection, closeMongooseConnection } from "../../../models/MongooseClient";
 import * as LogInUtilities from "../../../models/LogInUtilities";
-
+import {
+  closeMongooseConnection,
+  mongooseConnection,
+} from "../../../models/MongooseClient";
 
 /**
  * @description Clean up after all tests are done. This file is prefixed with
@@ -15,13 +17,13 @@ import * as LogInUtilities from "../../../models/LogInUtilities";
  */
 
 describe("Cleaning up pending actions\n", function() {
-
-    it("close all pending actions", function() {
-        LogInUtilities
-            .close()
-            .then(function() { return closeMongooseConnection(); })
-    });
-
+  it("close all pending actions", function() {
+    LogInUtilities
+      .close()
+      .then(function() {
+        return closeMongooseConnection();
+      });
+  });
 });
 
 // In case the process doesn't close, run this to discover why

@@ -1,21 +1,21 @@
 {
-    "$schema": "https://json.schemastore.org/tsconfig",
-    "compilerOptions": {
-        // Use ES6 module system
-        "module": "NodeNext",
-        // Resolve modules like Node.js
-        "moduleResolution": "NodeNext",
-        // Avoid having incomplete outputs. Fix all compiler errors first.
-        "noEmitOnError": true,
-        // Target ES6, the latest version of ECMAScript.
-        "target": "ESNext",
-        // Skip type checking of declaration files.
-        "skipLibCheck": true,
-        // Enable all strict type-checking options.
-        "strict": true,
-        // Disallow inconsistently-cased references to the same file.
-        "forceConsistentCasingInFileNames": true,
-        // Generate corresponding '.map' file for debugging.
-        "sourceMap": true,
-    }
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    // Use ES6 module system
+    "module": "NodeNext",
+    // Resolve modules like Node.js
+    "moduleResolution": "NodeNext",
+    // Avoid having incomplete outputs. Fix all compiler errors first.
+    "noEmitOnError": true,
+    // Target ES6, the latest version of ECMAScript.
+    "target": "ESNext",
+    // Skip type checking of declaration files.
+    "skipLibCheck": true,
+    // Enable all strict type-checking options.
+    "strict": true,
+    // Disallow inconsistently-cased references to the same file.
+    "forceConsistentCasingInFileNames": true,
+    // Generate corresponding '.map' file for debugging.
+    "sourceMap": true
+  }
 }

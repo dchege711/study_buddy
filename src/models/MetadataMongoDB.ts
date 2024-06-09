@@ -8,14 +8,21 @@
 
 import * as fs from "fs/promises";
 
-import { IUser, User } from "./mongoose_models/UserSchema";
-import { Metadata, IMetadata, IStreak, IMetadataRaw } from "./mongoose_models/MetadataCardSchema";
-import { Card, ICard } from "./mongoose_models/CardSchema";
-import { sanitizeQuery } from "./SanitizationAndValidation";
 import { PUBLIC_USER_USERNAME } from "../config";
 import { BaseResponse } from "../types";
+import { Card, ICard } from "./mongoose_models/CardSchema";
+import {
+  IMetadata,
+  IMetadataRaw,
+  IStreak,
+  Metadata,
+} from "./mongoose_models/MetadataCardSchema";
+import { IUser, User } from "./mongoose_models/UserSchema";
+import { sanitizeQuery } from "./SanitizationAndValidation";
 
-type MetadataCreateParams = Pick<IMetadata, "metadataIndex"> & Pick<IUser, "userIDInApp">;
+type MetadataCreateParams =
+  & Pick<IMetadata, "metadataIndex">
+  & Pick<IUser, "userIDInApp">;
 
 /**
  * @description Create & save a new metadata document for a user
@@ -23,42 +30,49 @@ type MetadataCreateParams = Pick<IMetadata, "metadataIndex"> & Pick<IUser, "user
  * @return {Promise} resolves with a JSON object with `success`, `status` and
  * `message` as keys.
  */
-export async function create(payload: MetadataCreateParams): Promise<IMetadata> {
-    payload = sanitizeQuery(payload);
+export async function create(
+  payload: MetadataCreateParams,
+): Promise<IMetadata> {
+  payload = sanitizeQuery(payload);
 
-    let preExistingMetadata = await Metadata.findOne({
-        createdById: payload.userIDInApp,
-        metadataIndex: payload.metadataIndex
-    }).exec();
-    if (preExistingMetadata) {
-        return Promise.reject("Metadata already exists");
-    }
+  let preExistingMetadata = await Metadata.findOne({
+    createdById: payload.userIDInApp,
+    metadataIndex: payload.metadataIndex,
+  }).exec();
+  if (preExistingMetadata) {
+    return Promise.reject("Metadata already exists");
+  }
 
-    return Metadata.create({
-        createdById: payload.userIDInApp,
-        metadataIndex: payload.metadataIndex,
-        stats: [], node_information: []
-    });
-};
+  return Metadata.create({
+    createdById: payload.userIDInApp,
+    metadataIndex: payload.metadataIndex,
+    stats: [],
+    node_information: [],
+  });
+}
 
 /**
  * @description Read all the metadata associated with a user's cards.
  */
-export function read(payload: Pick<IUser, "userIDInApp">): Promise<IMetadataRaw[]> {
+export function read(
+  payload: Pick<IUser, "userIDInApp">,
+): Promise<IMetadataRaw[]> {
   return _readInternal(payload);
-};
+}
 
-function _readInternal(payload: Pick<IUser, "userIDInApp">): Promise<IMetadata[]> {
-    payload = sanitizeQuery(payload);
-    return Metadata.find({createdById: payload.userIDInApp}).exec();
-};
+function _readInternal(
+  payload: Pick<IUser, "userIDInApp">,
+): Promise<IMetadata[]> {
+  payload = sanitizeQuery(payload);
+  return Metadata.find({ createdById: payload.userIDInApp }).exec();
+}
 
 type SortableCardAttribute = "urgency" | "numChildren";
 
 type SavedCardParams = {
-    card: ICard;
-    previousTags: string;
-}
+  card: ICard;
+  previousTags: string;
+};
 
 /**
  * Update the metadata with the new cards' details. This method
@@ -79,41 +93,46 @@ type SavedCardParams = {
  * `message` as keys. If successful, `message` has a metadata JSON object.
  */
 export async function update(
-        savedCards: SavedCardParams[], metadataQuery: Partial<IMetadata> | null = null,
-        attributeName: SortableCardAttribute = "urgency") : Promise<IMetadata> {
-    /*
-     * How many cards before we need a new metadata JSON?
-     * (400 + 150 * num_id_metadata) * 5 bytes/char <= 16MB
-     * num_id_metadata <= 21330. So let's say 15,000 cards max
-     * Will that ever happen, probably not!
-     */
-    if (savedCards[0].card.metadataIndex === undefined) {
-        savedCards[0].card.metadataIndex = 0;
-    }
+  savedCards: SavedCardParams[],
+  metadataQuery: Partial<IMetadata> | null = null,
+  attributeName: SortableCardAttribute = "urgency",
+): Promise<IMetadata> {
+  /*
+   * How many cards before we need a new metadata JSON?
+   * (400 + 150 * num_id_metadata) * 5 bytes/char <= 16MB
+   * num_id_metadata <= 21330. So let's say 15,000 cards max
+   * Will that ever happen, probably not!
+   */
+  if (savedCards[0].card.metadataIndex === undefined) {
+    savedCards[0].card.metadataIndex = 0;
+  }
 
-    if (metadataQuery === null) {
-        metadataQuery = {
-            createdById: savedCards[0].card.createdById,
-            metadataIndex: savedCards[0].card.metadataIndex
-        }
-    }
+  if (metadataQuery === null) {
+    metadataQuery = {
+      createdById: savedCards[0].card.createdById,
+      metadataIndex: savedCards[0].card.metadataIndex,
+    };
+  }
 
-    let metadataDoc = await Metadata.findOne(metadataQuery).exec();
-    if (metadataDoc === null) {
-        return Promise.reject("Could not find metadata document");
-    }
+  let metadataDoc = await Metadata.findOne(metadataQuery).exec();
+  if (metadataDoc === null) {
+    return Promise.reject("Could not find metadata document");
+  }
 
-    savedCards.forEach(async (savedCard) => {
-        await updateMetadataWithCardDetails(
-            savedCard.card, (metadataDoc as IMetadata), savedCard.previousTags,
-            attributeName);
-    });
-    metadataDoc.markModified("stats");
-    metadataDoc.markModified("node_information");
-    await metadataDoc.save();
+  savedCards.forEach(async (savedCard) => {
+    await updateMetadataWithCardDetails(
+      savedCard.card,
+      metadataDoc as IMetadata,
+      savedCard.previousTags,
+      attributeName,
+    );
+  });
+  metadataDoc.markModified("stats");
+  metadataDoc.markModified("node_information");
+  await metadataDoc.save();
 
-    return metadataDoc;
-};
+  return metadataDoc;
+}
 
 /**
  * @description Update the metadata for a public card.
@@ -122,46 +141,51 @@ export async function update(
  *
  * @returns {Promise} resolves with a JSON with `success`, `status` and
  * `message` as keys. If successful, `message` has a metadata JSON object.
- *
  */
-export async function updatePublicUserMetadata(cards: SavedCardParams[]): Promise<IMetadata>{
+export async function updatePublicUserMetadata(
+  cards: SavedCardParams[],
+): Promise<IMetadata> {
+  let cardsToAdd = cards.filter(savedCard => savedCard.card.isPublic);
+  let cardsToRemove = cards.filter(savedCard => !savedCard.card.isPublic);
 
-    let cardsToAdd = cards.filter(savedCard => savedCard.card.isPublic);
-    let cardsToRemove = cards.filter(savedCard => !savedCard.card.isPublic);
+  let user = await User.findOne({ username: PUBLIC_USER_USERNAME }).exec();
+  if (!user) {
+    return Promise.reject("Could not find public user");
+  }
 
-    let user = await User.findOne({username: PUBLIC_USER_USERNAME}).exec();
-    if (!user) {
-        return Promise.reject("Could not find public user");
-    }
+  let metadataDoc = cardsToAdd.length > 0
+    ? await update(cardsToAdd, {
+      createdById: user.userIDInApp,
+      metadataIndex: 0,
+    }, "numChildren")
+    : (await _readInternal({ userIDInApp: user.userIDInApp }))[0];
 
-    let metadataDoc = cardsToAdd.length > 0
-        ? await update(cardsToAdd, {createdById: user.userIDInApp, metadataIndex: 0}, "numChildren")
-        : (await _readInternal({userIDInApp: user.userIDInApp}))[0];
+  // TODO(dchege711): This shouldn't happen. Investigate why it does.
+  let metadataStats = metadataDoc.stats.length > 0 ? metadataDoc.stats[0] : {};
+  let metadataNodeInfo = metadataDoc.node_information.length > 0
+    ? metadataDoc.node_information[0]
+    : {};
 
-    // TODO(dchege711): This shouldn't happen. Investigate why it does.
-    let metadataStats = metadataDoc.stats.length > 0 ? metadataDoc.stats[0]: {};
-    let metadataNodeInfo = metadataDoc.node_information.length > 0 ? metadataDoc.node_information[0]: {};
+  for (let savedCard of cardsToRemove) {
+    let cardID = savedCard.card._id;
+    // Remove the card from the lists that the user previews from.
+    savedCard.card.tags.split(" ").forEach(tagToRemove => {
+      tagToRemove = tagToRemove.trim();
+      if (tagToRemove !== "" && metadataNodeInfo[tagToRemove]) {
+        delete metadataNodeInfo[tagToRemove][cardID];
+        if (Object.keys(metadataNodeInfo[tagToRemove]).length === 0) {
+          delete metadataNodeInfo[tagToRemove];
+        }
+      }
+    });
+    delete metadataStats[cardID];
+  }
 
-    for (let savedCard of cardsToRemove) {
-        let cardID = savedCard.card._id;
-        // Remove the card from the lists that the user previews from.
-        savedCard.card.tags.split(" ").forEach(tagToRemove => {
-            tagToRemove = tagToRemove.trim();
-            if (tagToRemove !== "" && metadataNodeInfo[tagToRemove]) {
-                delete metadataNodeInfo[tagToRemove][cardID];
-                if (Object.keys(metadataNodeInfo[tagToRemove]).length === 0) {
-                    delete metadataNodeInfo[tagToRemove];
-                }
-            }
-        });
-        delete metadataStats[cardID];
-    }
+  metadataDoc.markModified("stats");
+  metadataDoc.markModified("node_information");
+  // await metadataDoc.save();
 
-    metadataDoc.markModified("stats");
-    metadataDoc.markModified("node_information");
-    // await metadataDoc.save();
-
-    return metadataDoc;
+  return metadataDoc;
 }
 
 /**
@@ -170,10 +194,12 @@ export async function updatePublicUserMetadata(cards: SavedCardParams[]): Promis
  * @returns {Promise} resolves with a JSON object keyed by `success`, `status`
  * and `message`
  */
-export function deleteAllMetadata(payload: Pick<IUser, "userIDInApp">): Promise<void> {
-    payload = sanitizeQuery(payload);
-    return Metadata.deleteMany({createdById: payload.userIDInApp}).exec();
-};
+export function deleteAllMetadata(
+  payload: Pick<IUser, "userIDInApp">,
+): Promise<void> {
+  payload = sanitizeQuery(payload);
+  return Metadata.deleteMany({ createdById: payload.userIDInApp }).exec();
+}
 
 export type SendCardToTrashParams = Pick<ICard, "_id" | "createdById">;
 
@@ -184,60 +210,66 @@ export type SendCardToTrashParams = Pick<ICard, "_id" | "createdById">;
  * @returns {Promise} resolves with a JSON keyed by `success`, `status` and
  * `message`
  */
-export async function sendCardToTrash(payload: SendCardToTrashParams): Promise<string> {
-    payload = sanitizeQuery(payload);
+export async function sendCardToTrash(
+  payload: SendCardToTrashParams,
+): Promise<string> {
+  payload = sanitizeQuery(payload);
 
-    let card = await Card.findOne({_id: payload._id, createdById: payload.createdById}).exec();
-    if (!card) {
-        return Promise.reject("Could not find card");
+  let card = await Card.findOne({
+    _id: payload._id,
+    createdById: payload.createdById,
+  }).exec();
+  if (!card) {
+    return Promise.reject("Could not find card");
+  }
+
+  if (!card.metadataIndex) {
+    card.metadataIndex = 0;
+    await card.save();
+  }
+
+  let metadataDoc = await Metadata.findOne({
+    createdById: card.createdById,
+    metadataIndex: card.metadataIndex,
+  }).exec();
+  if (!metadataDoc) {
+    return Promise.reject("Could not find metadata document");
+  }
+
+  let metadataStats = metadataDoc.stats[0];
+  let metadataNodeInfo = metadataDoc.node_information[0];
+  let trashedCardID = card._id;
+
+  // Remove the card from the lists that the user previews from
+  card.tags.split(" ").forEach(tagToRemove => {
+    tagToRemove = tagToRemove.trim();
+    if (tagToRemove !== "") {
+      delete metadataNodeInfo[tagToRemove][trashedCardID.toString()];
+      if (Object.keys(metadataNodeInfo[tagToRemove]).length === 0) {
+        delete metadataNodeInfo[tagToRemove];
+      }
     }
+  });
+  delete metadataStats[trashedCardID.toString()];
 
-    if (!card.metadataIndex) {
-        card.metadataIndex = 0;
-        await card.save();
-    }
+  // Add the card to the trashed items associated with the user
+  // Associate the deletion time so that we can have a clean up
+  // of all cards in the trash that are older than 30 days
+  if (!metadataDoc.trashed_cards || metadataDoc.trashed_cards.length == 0) {
+    metadataDoc.trashed_cards = [];
+    metadataDoc.trashed_cards.push({});
+  }
+  metadataDoc.trashed_cards[0][trashedCardID.toString()] = Date.now();
 
-    let metadataDoc = await Metadata.findOne({
-        createdById: card.createdById, metadataIndex: card.metadataIndex
-    }).exec();
-    if (!metadataDoc) {
-        return Promise.reject("Could not find metadata document");
-    }
+  // This is necessary. All that hair pulling can now stop :-/
+  metadataDoc.markModified("stats");
+  metadataDoc.markModified("node_information");
+  metadataDoc.markModified("trashed_cards");
 
-    let metadataStats = metadataDoc.stats[0];
-    let metadataNodeInfo = metadataDoc.node_information[0];
-    let trashedCardID = card._id;
+  // await metadataDoc.save();
 
-    // Remove the card from the lists that the user previews from
-    card.tags.split(" ").forEach(tagToRemove => {
-        tagToRemove = tagToRemove.trim();
-        if (tagToRemove !== "") {
-            delete metadataNodeInfo[tagToRemove][trashedCardID.toString()];
-            if (Object.keys(metadataNodeInfo[tagToRemove]).length === 0) {
-                delete metadataNodeInfo[tagToRemove];
-            }
-        }
-    });
-    delete metadataStats[trashedCardID.toString()];
-
-    // Add the card to the trashed items associated with the user
-    // Associate the deletion time so that we can have a clean up
-    // of all cards in the trash that are older than 30 days
-    if (!metadataDoc.trashed_cards || metadataDoc.trashed_cards.length == 0) {
-        metadataDoc.trashed_cards = [];
-        metadataDoc.trashed_cards.push({});
-    }
-    metadataDoc.trashed_cards[0][trashedCardID.toString()] = Date.now();
-
-    // This is necessary. All that hair pulling can now stop :-/
-    metadataDoc.markModified("stats");
-    metadataDoc.markModified("node_information");
-    metadataDoc.markModified("trashed_cards");
-
-    // await metadataDoc.save();
-
-    return `Card moved to the trash. <span class="underline_bold_text clickable" onclick="restoreCardFromTrash('${card._id}', '${card.urgency}')">Undo Action</span>`;
-};
+  return `Card moved to the trash. <span class="underline_bold_text clickable" onclick="restoreCardFromTrash('${card._id}', '${card.urgency}')">Undo Action</span>`;
+}
 
 export type RestoreCardFromTrashParams = SendCardToTrashParams;
 
@@ -248,22 +280,30 @@ export type RestoreCardFromTrashParams = SendCardToTrashParams;
  * @returns {Promise} resolves with a JSON keyed by `success`, `status` and
  * `message`
  */
-export async function restoreCardFromTrash(restoreCardArgs: RestoreCardFromTrashParams): Promise<string> {
-    restoreCardArgs = sanitizeQuery(restoreCardArgs);
+export async function restoreCardFromTrash(
+  restoreCardArgs: RestoreCardFromTrashParams,
+): Promise<string> {
+  restoreCardArgs = sanitizeQuery(restoreCardArgs);
 
-    let card = await Card.findOne({
-        _id: restoreCardArgs._id, createdById: restoreCardArgs.createdById
-    }).exec();
-    if (!card) {
-        return Promise.reject("Card wasn't found");
-    }
+  let card = await Card.findOne({
+    _id: restoreCardArgs._id,
+    createdById: restoreCardArgs.createdById,
+  }).exec();
+  if (!card) {
+    return Promise.reject("Card wasn't found");
+  }
 
-    let metadataDoc = await removeCardFromMetadataTrash(card);
-    metadataDoc = await updateMetadataWithCardDetails(card, metadataDoc, card.tags, "urgency");
-    // await metadataDoc.save();
+  let metadataDoc = await removeCardFromMetadataTrash(card);
+  metadataDoc = await updateMetadataWithCardDetails(
+    card,
+    metadataDoc,
+    card.tags,
+    "urgency",
+  );
+  // await metadataDoc.save();
 
-    return `${card.title} has been restored!`;
-};
+  return `${card.title} has been restored!`;
+}
 
 type DeleteCardFromTrashParams = SendCardToTrashParams;
 
@@ -274,22 +314,24 @@ type DeleteCardFromTrashParams = SendCardToTrashParams;
  * @returns {Promise} resolves with a JSON keyed by `success`, `status` and
  * `message`
  */
-export async function deleteCardFromTrash(deleteCardArgs: DeleteCardFromTrashParams): Promise<string> {
-    deleteCardArgs = sanitizeQuery(deleteCardArgs);
+export async function deleteCardFromTrash(
+  deleteCardArgs: DeleteCardFromTrashParams,
+): Promise<string> {
+  deleteCardArgs = sanitizeQuery(deleteCardArgs);
 
-    let card = await Card.findOneAndRemove({
-        _id: deleteCardArgs._id,
-        createdById: deleteCardArgs.createdById
-    }).exec();
-    if (!card) {
-        return Promise.reject("Card wasn't found");
-    }
+  let card = await Card.findOneAndRemove({
+    _id: deleteCardArgs._id,
+    createdById: deleteCardArgs.createdById,
+  }).exec();
+  if (!card) {
+    return Promise.reject("Card wasn't found");
+  }
 
-    let metadataDoc = await removeCardFromMetadataTrash(card);
-    // await metadataDoc.save();
+  let metadataDoc = await removeCardFromMetadataTrash(card);
+  // await metadataDoc.save();
 
-    return `${card.title} has been permanently deleted!`;
-};
+  return `${card.title} has been permanently deleted!`;
+}
 
 /**
  * @description Remove the card from the trash records of the metadata object.
@@ -301,28 +343,31 @@ export async function deleteCardFromTrash(deleteCardArgs: DeleteCardFromTrashPar
  * @returns {Promise} resolves with the modified metadata document. It is up to
  * the callee to persist the saved metadata in the database.
  */
-async function removeCardFromMetadataTrash(cardIdentifier: Pick<ICard, "_id" | "createdById" | "metadataIndex">) : Promise<IMetadata> {
-    let metadataDoc = await Metadata.findOne({
-        createdById: cardIdentifier.createdById,
-        metadataIndex: cardIdentifier.metadataIndex})
+async function removeCardFromMetadataTrash(
+  cardIdentifier: Pick<ICard, "_id" | "createdById" | "metadataIndex">,
+): Promise<IMetadata> {
+  let metadataDoc = await Metadata.findOne({
+    createdById: cardIdentifier.createdById,
+    metadataIndex: cardIdentifier.metadataIndex,
+  })
     .exec();
-    if (!metadataDoc) {
-        return Promise.reject("Metadata document wasn't found");
-    }
+  if (!metadataDoc) {
+    return Promise.reject("Metadata document wasn't found");
+  }
 
-    if (cardIdentifier._id in metadataDoc.trashed_cards[0]) {
-        delete metadataDoc.trashed_cards[0][cardIdentifier._id];
-        metadataDoc.markModified("trashed_cards");
-        // await metadataDoc.save();
-        return metadataDoc;
-    } else {
-        return Promise.reject("Card wasn't found in the trash");
-    }
+  if (cardIdentifier._id in metadataDoc.trashed_cards[0]) {
+    delete metadataDoc.trashed_cards[0][cardIdentifier._id];
+    metadataDoc.markModified("trashed_cards");
+    // await metadataDoc.save();
+    return metadataDoc;
+  } else {
+    return Promise.reject("Card wasn't found in the trash");
+  }
 }
 
 interface WriteCardsToJSONFileResult {
-    jsonFilePath: string;
-    jsonFileName: string;
+  jsonFilePath: string;
+  jsonFileName: string;
 }
 
 /**
@@ -334,23 +379,25 @@ interface WriteCardsToJSONFileResult {
  * @returns {Promise} resolves with two string arguments. The first one is a path
  * to the written JSON file. The 2nd argument is the name of the JSON file.
  */
-export async function writeCardsToJSONFile(userIDInApp: number): Promise<WriteCardsToJSONFileResult> {
-    let query = sanitizeQuery({userIDInApp: userIDInApp});
-    let cards = await Card
-        .find({ createdById: query.userIDInApp})
-        .select("title description tags urgency createdAt isPublic")
-        .exec();
+export async function writeCardsToJSONFile(
+  userIDInApp: number,
+): Promise<WriteCardsToJSONFileResult> {
+  let query = sanitizeQuery({ userIDInApp: userIDInApp });
+  let cards = await Card
+    .find({ createdById: query.userIDInApp })
+    .select("title description tags urgency createdAt isPublic")
+    .exec();
 
-    let jsonFileName = `flashcards_${userIDInApp}.json`;
-    let jsonFilePath = `${process.cwd()}/${jsonFileName}`;
+  let jsonFileName = `flashcards_${userIDInApp}.json`;
+  let jsonFilePath = `${process.cwd()}/${jsonFileName}`;
 
-    let fileDescriptor = await fs.open(jsonFilePath, "w");
-    await fs
-        .writeFile(fileDescriptor, JSON.stringify(cards))
-        .then(() => fileDescriptor.close());
+  let fileDescriptor = await fs.open(jsonFilePath, "w");
+  await fs
+    .writeFile(fileDescriptor, JSON.stringify(cards))
+    .then(() => fileDescriptor.close());
 
-    return {jsonFilePath, jsonFileName};
-};
+  return { jsonFilePath, jsonFileName };
+}
 
 /**
  * @description Helper method for updating the metadata from a given card. This
@@ -367,66 +414,72 @@ export async function writeCardsToJSONFile(userIDInApp: number): Promise<WriteCa
  * @returns {Promise} resolved with a reference to the modified metadata doc
  */
 function updateMetadataWithCardDetails(
-        savedCard: ICard, metadataDoc: IMetadata, previousTags: string,
-        attributeName: SortableCardAttribute): Promise<IMetadata> {
+  savedCard: ICard,
+  metadataDoc: IMetadata,
+  previousTags: string,
+  attributeName: SortableCardAttribute,
+): Promise<IMetadata> {
+  let sortableAttribute = attributeName === "numChildren"
+    ? savedCard.idsOfUsersWithCopy.split(", ").length
+    : savedCard[attributeName];
 
-    let sortableAttribute = attributeName === "numChildren"
-        ? savedCard.idsOfUsersWithCopy.split(", ").length
-        : savedCard[attributeName];
+  if (metadataDoc.stats.length == 0) { metadataDoc.stats.push({}); }
+  if (metadataDoc.node_information.length == 0) {
+    metadataDoc.node_information.push({});
+  }
 
-    if (metadataDoc.stats.length == 0) metadataDoc.stats.push({});
-    if (metadataDoc.node_information.length == 0) {
-        metadataDoc.node_information.push({});
-    }
+  let metadataStats = metadataDoc.stats[0];
+  let metadataNodeInfo = metadataDoc.node_information[0];
 
-    let metadataStats = metadataDoc.stats[0];
-    let metadataNodeInfo = metadataDoc.node_information[0];
+  // Save this card in the stats field where it only appears once
+  if (metadataStats[savedCard._id] === undefined) {
+    metadataStats[savedCard._id] = {};
+  }
+  metadataStats[savedCard._id].urgency = sortableAttribute;
+  metadataDoc.markModified("stats");
 
-    // Save this card in the stats field where it only appears once
-    if (metadataStats[savedCard._id] === undefined) {
-        metadataStats[savedCard._id] = {};
-    }
-    metadataStats[savedCard._id].urgency = sortableAttribute;
-    metadataDoc.markModified("stats");
+  // TODO(dchege711): Keep track of which tags have been changed. Remove ones
+  // that have been removed from the card.
+  let currentTags = new Set(
+    savedCard.tags.split(" ").map(s => s.trim()).filter(s => s.length > 0),
+  );
+  if (currentTags) {
+    currentTags.forEach(tag => {
+      // If we've not seen this tag before, create its node
+      if (metadataNodeInfo[tag] === undefined) {
+        metadataNodeInfo[tag] = {};
+      }
 
-    // TODO(dchege711): Keep track of which tags have been changed. Remove ones
-    // that have been removed from the card.
-    let currentTags = new Set(
-        savedCard.tags.split(" ").map(s => s.trim()).filter(s => s.length > 0));
-    if (currentTags) {
-        currentTags.forEach(tag => {
-            // If we've not seen this tag before, create its node
-            if (metadataNodeInfo[tag] === undefined) {
-                metadataNodeInfo[tag] = {};
-            }
-
-            // If we've not seen this card under this tag, add it
-            if (metadataNodeInfo[tag][savedCard._id] === undefined) {
-                metadataNodeInfo[tag][savedCard._id] = {
-                    urgency: sortableAttribute,
-                };
-            } else {
-                metadataNodeInfo[tag][savedCard._id].urgency = sortableAttribute;
-            }
-        });
-    }
-
-    // Get rid of all tags that were deleted in the current card
-    let deletedTags = previousTags.split(" ")
-        .map(s => s.trim())
-        .filter(tag => tag.length > 0 && !currentTags.has(tag));
-    deletedTags.forEach((tag) => {
-        delete metadataNodeInfo[tag][savedCard._id];
-        if (Object.keys(metadataNodeInfo[tag]).length === 0) {
-            delete metadataNodeInfo[tag];
-        }
+      // If we've not seen this card under this tag, add it
+      if (metadataNodeInfo[tag][savedCard._id] === undefined) {
+        metadataNodeInfo[tag][savedCard._id] = {
+          urgency: sortableAttribute,
+        };
+      } else {
+        metadataNodeInfo[tag][savedCard._id].urgency = sortableAttribute;
+      }
     });
+  }
 
-    metadataDoc.markModified("node_information");
-    return Promise.resolve(metadataDoc);
+  // Get rid of all tags that were deleted in the current card
+  let deletedTags = previousTags.split(" ")
+    .map(s => s.trim())
+    .filter(tag => tag.length > 0 && !currentTags.has(tag));
+  deletedTags.forEach((tag) => {
+    delete metadataNodeInfo[tag][savedCard._id];
+    if (Object.keys(metadataNodeInfo[tag]).length === 0) {
+      delete metadataNodeInfo[tag];
+    }
+  });
+
+  metadataDoc.markModified("node_information");
+  return Promise.resolve(metadataDoc);
 }
 
-export type UpdateUserSettingsParams = Pick<IUser, "cardsAreByDefaultPrivate" | "dailyTarget" | "userIDInApp">;
+export type UpdateUserSettingsParams = Pick<
+  IUser,
+  "cardsAreByDefaultPrivate" | "dailyTarget" | "userIDInApp"
+>;
 
 /**
  * @description Update the settings of the given user.
@@ -434,39 +487,49 @@ export type UpdateUserSettingsParams = Pick<IUser, "cardsAreByDefaultPrivate" | 
  * @returns {Promise} resolves with a JSON keyed by `success`, `status` and
  * `message`
  */
-export async function updateUserSettings(newUserSettings: UpdateUserSettingsParams): Promise<IUser> {
-    newUserSettings = sanitizeQuery(newUserSettings);
+export async function updateUserSettings(
+  newUserSettings: UpdateUserSettingsParams,
+): Promise<IUser> {
+  newUserSettings = sanitizeQuery(newUserSettings);
 
-    let supportedChanges = new Set(["cardsAreByDefaultPrivate", "dailyTarget"]);
-    let validChanges = Object.keys(newUserSettings).filter((setting) => supportedChanges.has(setting));
+  let supportedChanges = new Set(["cardsAreByDefaultPrivate", "dailyTarget"]);
+  let validChanges = Object.keys(newUserSettings).filter((setting) =>
+    supportedChanges.has(setting)
+  );
 
-    if (validChanges.length == 0) {
-        return Promise.reject("No changes were made as there were no valid changes provided");
+  if (validChanges.length == 0) {
+    return Promise.reject(
+      "No changes were made as there were no valid changes provided",
+    );
+  }
+
+  let user = await User.findOne({
+    userIDInApp: { $eq: newUserSettings.userIDInApp },
+  }).exec();
+  if (user === null) {
+    return Promise.reject("No user found. User settings not updated!");
+  }
+
+  user.cardsAreByDefaultPrivate = newUserSettings.cardsAreByDefaultPrivate;
+  user.dailyTarget = newUserSettings.dailyTarget;
+
+  if (newUserSettings.dailyTarget) {
+    let metadataDoc = await Metadata
+      .findOne({ createdById: user.userIDInApp, metadataIndex: 0 }).exec();
+    if (metadataDoc === null) {
+      return Promise.reject("No metadata found. User settings not updated!");
     }
+    metadataDoc.streak.set("dailyTarget", newUserSettings.dailyTarget);
+    metadataDoc.markModified("streak");
+    // await metadataDoc.save();
+  }
 
-    let user = await User.findOne({userIDInApp: { $eq: newUserSettings.userIDInApp }}).exec();
-    if (user === null) {
-        return Promise.reject("No user found. User settings not updated!");
-    }
+  return user.save();
+}
 
-    user.cardsAreByDefaultPrivate = newUserSettings.cardsAreByDefaultPrivate;
-    user.dailyTarget = newUserSettings.dailyTarget;
-
-    if (newUserSettings.dailyTarget) {
-        let metadataDoc = await Metadata
-            .findOne({createdById: user.userIDInApp, metadataIndex: 0}).exec();
-        if (metadataDoc === null) {
-            return Promise.reject("No metadata found. User settings not updated!");
-        }
-        metadataDoc.streak.set("dailyTarget", newUserSettings.dailyTarget);
-        metadataDoc.markModified("streak");
-        // await metadataDoc.save();
-    }
-
-    return user.save();
-};
-
-export type UpdateStreakParams = Pick<IStreak, "cardIDs"> & Pick<IUser, "userIDInApp">;
+export type UpdateStreakParams =
+  & Pick<IStreak, "cardIDs">
+  & Pick<IUser, "userIDInApp">;
 
 /**
  * @description Update the streak object for the current user. Assumes that the
@@ -476,39 +539,42 @@ export type UpdateStreakParams = Pick<IStreak, "cardIDs"> & Pick<IUser, "userIDI
  *
  * @returns {Object} the saved metadata object with the updated streak
  */
-export function updateStreak(streakUpdateObj: UpdateStreakParams): Promise<IStreak> {
-    streakUpdateObj = sanitizeQuery(streakUpdateObj);
+export function updateStreak(
+  streakUpdateObj: UpdateStreakParams,
+): Promise<IStreak> {
+  streakUpdateObj = sanitizeQuery(streakUpdateObj);
 
-    return Metadata
-        .findOne({createdById: streakUpdateObj.userIDInApp, metadataIndex: 0}).exec()
-        .then((metadataDoc) => {
-            if (metadataDoc === null) {
-                return Promise.reject("No metadata found. Streak not updated!");
-            }
+  return Metadata
+    .findOne({ createdById: streakUpdateObj.userIDInApp, metadataIndex: 0 })
+    .exec()
+    .then((metadataDoc) => {
+      if (metadataDoc === null) {
+        return Promise.reject("No metadata found. Streak not updated!");
+      }
 
-            let idsReviewedCards = new Set(metadataDoc.streak.get("cardIDs"));
-            for (let cardID of streakUpdateObj.cardIDs) {
-                idsReviewedCards.add(cardID);
-            }
-            metadataDoc.streak.set('cardIDs', Array.from(idsReviewedCards));
-            metadataDoc.markModified("streak");
-            return metadataDoc.save();
-        })
-        .then((metadataDoc) => {
-            return metadataDoc.streak;
-        });
-};
+      let idsReviewedCards = new Set(metadataDoc.streak.get("cardIDs"));
+      for (let cardID of streakUpdateObj.cardIDs) {
+        idsReviewedCards.add(cardID);
+      }
+      metadataDoc.streak.set("cardIDs", Array.from(idsReviewedCards));
+      metadataDoc.markModified("streak");
+      return metadataDoc.save();
+    })
+    .then((metadataDoc) => {
+      return metadataDoc.streak;
+    });
+}
 
 /**
  * Read metadata for the public user.
  */
 export function readPublicMetadata(): Promise<IMetadataRaw[]> {
-  return User.findOne({username: PUBLIC_USER_USERNAME})
-      .then((publicUser) => {
-          if (publicUser === null) {
-              throw new Error("Public user not found");
-          }
+  return User.findOne({ username: PUBLIC_USER_USERNAME })
+    .then((publicUser) => {
+      if (publicUser === null) {
+        throw new Error("Public user not found");
+      }
 
-          return read({userIDInApp: publicUser.userIDInApp});
-      });
+      return read({ userIDInApp: publicUser.userIDInApp });
+    });
 }

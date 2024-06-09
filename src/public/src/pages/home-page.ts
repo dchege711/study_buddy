@@ -1,14 +1,14 @@
-import { html } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { html } from "lit";
+import { customElement } from "lit/decorators.js";
 
-import { trpc, CardSearchQuery } from '../trpc.js';
-import { CardsViewingPage } from './common/cards-viewing-page.js';
+import { CardSearchQuery, trpc } from "../trpc.js";
+import { CardsViewingPage } from "./common/cards-viewing-page.js";
 
-import '../components/search-bar/search-bar.js';
-import '../components/search-results/search-results.js';
-import '../components/card-viewer/editable-card-viewer.js';
+import "../components/search-bar/search-bar.js";
+import "../components/search-results/search-results.js";
+import "../components/card-viewer/editable-card-viewer.js";
 
-@customElement('home-page')
+@customElement("home-page")
 export class HomePage extends CardsViewingPage {
   constructor() {
     super(trpc.fetchCard.query);
@@ -20,7 +20,7 @@ export class HomePage extends CardsViewingPage {
         // TODO: Make this easier to hold by having one initialization point.
         this.tagsAutoComplete.initializePrefixTree(tagGroups.flat());
         this.tagsAutoComplete.initializeGraphFromGroups(tagGroups);
-      })
+      });
   }
 
   render() {

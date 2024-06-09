@@ -1,8 +1,8 @@
-import { createContext } from '@lit/context';
+import { createContext } from "@lit/context";
 
-import { CardSearchResult } from '../trpc.js';
+import { CardSearchResult } from "../trpc.js";
 
-export const kSearchResultsChangedEventName = 'search-results';
+export const kSearchResultsChangedEventName = "search-results";
 
 export class SearchResultsChangedEvent extends Event {
   results: CardSearchResult[];
@@ -13,7 +13,7 @@ export class SearchResultsChangedEvent extends Event {
   }
 }
 
-export const kSearchResultSelectedEventName = 'search-result-selected';
+export const kSearchResultSelectedEventName = "search-result-selected";
 
 export class SearchResultSelectedEvent extends Event {
   result: CardSearchResult;
@@ -22,15 +22,15 @@ export class SearchResultSelectedEvent extends Event {
     super(kSearchResultSelectedEventName, { bubbles: true, composed: true });
     this.result = result;
   }
-
 }
 
 export const searchResultsContext = createContext<CardSearchResult[]>(
-  Symbol('search-results-context'));
+  Symbol("search-results-context"),
+);
 
 declare global {
   interface GlobalEventHandlersEventMap {
-    'search-results': SearchResultsChangedEvent;
-    'search-result-selected': SearchResultSelectedEvent;
+    "search-results": SearchResultsChangedEvent;
+    "search-result-selected": SearchResultSelectedEvent;
   }
 }

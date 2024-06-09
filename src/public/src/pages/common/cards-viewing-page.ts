@@ -1,25 +1,41 @@
-import { LitElement, html, css } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { provide } from '@lit/context';
+import { provide } from "@lit/context";
+import { css, html, LitElement } from "lit";
+import { customElement, property, state } from "lit/decorators.js";
 
-import { CardsCarouselUpdateCursorDirection, cardsCarouselContext, kCardsCarouselUpdateCursorEventName } from '../../context/cards-carousel-context.js';
-import { CardsCarousel, CardsCarouselBSTKey } from '../../models/cards-carousel.js';
-import { kSearchResultsChangedEventName, searchResultsContext, SearchResultsChangedEvent, kSearchResultSelectedEventName, SearchResultSelectedEvent } from '../../context/search-results-context.js';
-import { trpc, CardSearchResult, Card, CardFetchEndpoint } from '../../trpc.js';
-import { tagsAutoCompleteContext } from '../../context/tags-auto-complete-context.js';
-import { AutoComplete } from '../../models/auto-complete.js';
+import {
+  cardsCarouselContext,
+  CardsCarouselUpdateCursorDirection,
+  kCardsCarouselUpdateCursorEventName,
+} from "../../context/cards-carousel-context.js";
+import {
+  kSearchResultsChangedEventName,
+  kSearchResultSelectedEventName,
+  SearchResultsChangedEvent,
+  searchResultsContext,
+  SearchResultSelectedEvent,
+} from "../../context/search-results-context.js";
+import { tagsAutoCompleteContext } from "../../context/tags-auto-complete-context.js";
+import { AutoComplete } from "../../models/auto-complete.js";
+import {
+  CardsCarousel,
+  CardsCarouselBSTKey,
+} from "../../models/cards-carousel.js";
+import { Card, CardFetchEndpoint, CardSearchResult, trpc } from "../../trpc.js";
 
-import '../../components/search-bar/search-bar.js';
-import '../../components/search-results/search-results.js';
-import '../../components/card-viewer/public-card-viewer.js';
+import "../../components/search-bar/search-bar.js";
+import "../../components/search-results/search-results.js";
+import "../../components/card-viewer/public-card-viewer.js";
 
 export class CardsViewingPage extends LitElement {
   @provide({ context: searchResultsContext })
-  @state() protected searchResults: CardSearchResult[] = [];
-  @state() protected selectedResult: Card | null = null;
+  @state()
+  protected searchResults: CardSearchResult[] = [];
+  @state()
+  protected selectedResult: Card | null = null;
 
   @provide({ context: cardsCarouselContext })
-  @state() protected cardsCarousel = new CardsCarousel([]);
+  @state()
+  protected cardsCarousel = new CardsCarousel([]);
 
   @provide({ context: tagsAutoCompleteContext })
   protected tagsAutoComplete = new AutoComplete();
@@ -38,7 +54,9 @@ export class CardsViewingPage extends LitElement {
   }
 
   render() {
-    throw new Error('CardsViewingPage must be subclassed and implement render()');
+    throw new Error(
+      "CardsViewingPage must be subclassed and implement render()",
+    );
   }
 
   private addEventListeners() {
@@ -50,7 +68,7 @@ export class CardsViewingPage extends LitElement {
             _id: result._id!,
             urgency: result.urgency!,
           };
-        })
+        }),
       );
     });
 
@@ -61,10 +79,12 @@ export class CardsViewingPage extends LitElement {
     this.addEventListener(kCardsCarouselUpdateCursorEventName, (ev) => {
       switch (ev.direction) {
         case CardsCarouselUpdateCursorDirection.Next:
-          if (this.cardsCarousel.hasNext()) this.cardsCarousel.next();
+          if (this.cardsCarousel.hasNext()) { this.cardsCarousel.next(); }
           break;
         case CardsCarouselUpdateCursorDirection.Previous:
-          if (this.cardsCarousel.hasPrevious()) this.cardsCarousel.previous();
+          if (this.cardsCarousel.hasPrevious()) {
+            this.cardsCarousel.previous();
+          }
           break;
       }
       let currentCard = this.cardsCarousel.current();
@@ -76,7 +96,9 @@ export class CardsViewingPage extends LitElement {
 
   private updateSelectedCard(cardID: string) {
     if (!this.cardFetcher) {
-      throw new Error('CardFetcher must be set before calling updateSelectedCard');
+      throw new Error(
+        "CardFetcher must be set before calling updateSelectedCard",
+      );
     }
 
     this.cardFetcher({ cardID }).then((card) => {
@@ -97,6 +119,8 @@ export class CardsViewingPage extends LitElement {
   `;
 
   protected populateTagsAutoComplete() {
-    throw new Error('CardsViewingPage must be subclassed and implement populateTagsAutoComplete()');
+    throw new Error(
+      "CardsViewingPage must be subclassed and implement populateTagsAutoComplete()",
+    );
   }
 }

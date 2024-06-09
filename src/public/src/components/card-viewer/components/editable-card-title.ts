@@ -1,12 +1,13 @@
-import { LitElement, html, css } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
-import { CardChangedEvent } from './card-changed-event.js';
+import { css, html, LitElement } from "lit";
+import { customElement, property, query } from "lit/decorators.js";
+import { CardChangedEvent } from "./card-changed-event.js";
 
-@customElement('cg-editable-card-title')
+@customElement("cg-editable-card-title")
 export class EditableCardTitle extends LitElement {
-  @property({ type: String}) value = '';
+  @property({ type: String })
+  value = "";
 
-  @query('input')
+  @query("input")
   private input!: HTMLInputElement;
 
   render() {
@@ -37,6 +38,6 @@ export class EditableCardTitle extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'cg-editable-card-title': EditableCardTitle;
+    "cg-editable-card-title": EditableCardTitle;
   }
 }

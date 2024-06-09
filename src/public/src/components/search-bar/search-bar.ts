@@ -1,21 +1,31 @@
-import { LitElement, css, html, nothing } from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
-import { createRef, ref, Ref } from 'lit/directives/ref.js';
+import { css, html, LitElement, nothing } from "lit";
+import { customElement, property, state } from "lit/decorators.js";
+import { createRef, Ref, ref } from "lit/directives/ref.js";
 
-import { CardSearchResult, CardSearchQuery, CardSearchEndpoint } from '../../trpc.js';
-import { SearchResultsChangedEvent } from '../../context/search-results-context.js';
-import { TextInputEvent, InputState, kTextInputBlurEvent, kTextInputEvent } from '../input/text-input.js';
+import { SearchResultsChangedEvent } from "../../context/search-results-context.js";
+import {
+  CardSearchEndpoint,
+  CardSearchQuery,
+  CardSearchResult,
+} from "../../trpc.js";
+import {
+  InputState,
+  kTextInputBlurEvent,
+  kTextInputEvent,
+  TextInputEvent,
+} from "../input/text-input.js";
 
-import '../input/text-input.js';
+import "../input/text-input.js";
 
-@customElement('search-bar')
+@customElement("search-bar")
 export class SearchBar extends LitElement {
   searchEndpoint: CardSearchEndpoint | null = null;
 
   @state()
   private searchResults: CardSearchResult[] = [];
 
-  @state() private receivedNoResults = false;
+  @state()
+  private receivedNoResults = false;
 
   inputRef: Ref<HTMLInputElement> = createRef();
 
@@ -29,7 +39,7 @@ export class SearchBar extends LitElement {
     const showResults = this.searchResults.length > 0 || this.receivedNoResults;
     return html`
       <cg-text-input
-          .placeholder=${'Search card descriptions and titles. Press [Enter] to view all results'}>
+          .placeholder=${"Search card descriptions and titles. Press [Enter] to view all results"}>
       </cg-text-input>
       ${showResults ? this.renderSearchResults() : nothing}
     `;
@@ -39,20 +49,33 @@ export class SearchBar extends LitElement {
     return html`
       <div role='presentation' id='search-results-anchor'>
         <ul>
-          ${this.searchResults.map((card) => html`
-            <li @click=${() => this.onSearchResultSelected(card._id)}>${card.title}</li>
-          `)}
-          ${this.receivedNoResults
-          ? html`<li class='gray-text'><em>No cards found</em></li>`
-          : html`<li class='gray-text'><em>Press [Enter] to view all matches</em></li>`}
+          ${
+      this.searchResults.map((card) =>
+        html`
+            <li @click=${() =>
+          this.onSearchResultSelected(card._id)}>${card.title}</li>
+          `
+      )
+    }
+          ${
+      this.receivedNoResults
+        ? html`<li class='gray-text'><em>No cards found</em></li>`
+        : html`<li class='gray-text'><em>Press [Enter] to view all matches</em></li>`
+    }
         </ul>
       </div>
     `;
   }
 
   private addEventListeners() {
-    this.addEventListener(kTextInputEvent, (e: TextInputEvent) => this.searchCards(e));
-    this.addEventListener(kTextInputBlurEvent, () => this.clearResultsAfterTimeout());
+    this.addEventListener(
+      kTextInputEvent,
+      (e: TextInputEvent) => this.searchCards(e),
+    );
+    this.addEventListener(
+      kTextInputBlurEvent,
+      () => this.clearResultsAfterTimeout(),
+    );
   }
 
   /**
@@ -110,7 +133,9 @@ export class SearchBar extends LitElement {
   }
 
   private onSearchResultSelected(cardId: string) {
-    const results = this.searchResults.filter((result) => result._id === cardId);
+    const results = this.searchResults.filter((result) =>
+      result._id === cardId
+    );
     this.dispatchSearchResults(results);
     this.clearResults();
   }
@@ -120,14 +145,14 @@ export class SearchBar extends LitElement {
       return;
     }
 
-    this.fetchResults({ limit: Infinity, queryString: '' }).then((results) => {
+    this.fetchResults({ limit: Infinity, queryString: "" }).then((results) => {
       this.dispatchSearchResults(results);
     });
   }
 
   private fetchResults(searchQuery: CardSearchQuery) {
     if (!this.searchEndpoint) {
-      throw new Error('Search endpoint not set');
+      throw new Error("Search endpoint not set");
     }
 
     return this.searchEndpoint(searchQuery);
@@ -178,4 +203,3 @@ export class SearchBar extends LitElement {
     }
   `;
 }
-

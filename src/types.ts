@@ -3,6 +3,6 @@
  */
 
 export interface BaseResponse {
-    status: number;
-    success: boolean;
+  status: number;
+  success: boolean;
 }
