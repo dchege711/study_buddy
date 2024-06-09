@@ -24,6 +24,7 @@ var path = require("path");
 var bodyParser = require("body-parser");
 var cookieParser = require("cookie-parser");
 var enforce = require('express-sslify');
+const lusca = require('lusca');
 
 var AccountRoutes = require("./routes/AuthenticationRoutes");
 var InAppRoutes = require("./routes/InAppRoutes");
@@ -68,6 +69,20 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser());
+
+/**
+ * Protections against CSRF attacks.
+ *
+ * With csrf enabled, the CSRF token must be in the payload when modifying data
+ * or the client will receive a 403 Forbidden. To send the token the client
+ * needs to echo back the _csrf value you received from the previous request.
+ * Furthermore, parsers must be registered before lusca.
+ *
+ * [1]: https://github.com/krakenjs/lusca#readme
+ *
+ * TODO: Enable CSRF protection
+ */
+// app.use(lusca.csrf());
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
