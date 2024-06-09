@@ -1,5 +1,7 @@
 {
   "jshint.enable": false,
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "dprint.dprint",
   "eslint.enable": true,
   "gitlens.advanced.blame.customArguments": [
     "--ignore-revs-file",
