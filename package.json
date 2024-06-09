@@ -87,7 +87,6 @@
     "@types/mocha": "^10.0.1",
     "@types/mongoose": "^5.11.97",
     "@types/nodemailer": "^6.4.8",
-    "@types/showdown": "^2.0.1",
     "@types/sjcl": "^1.0.30",
     "@types/validator": "^13.11.9",
     "chai": "^4.3.7",
