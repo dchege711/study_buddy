@@ -56,7 +56,8 @@ export type AppRouter = typeof appRouter;
 
 app.use(session({
     secret: [config.STUDY_BUDDY_SESSION_SECRET_1],
-    httpOnly: false,
+    secure: true,
+    httpOnly: true,
     resave: false,
     name: "c13u-study-buddy",
     store: config.IS_DEV ? session.MemoryStore() : MongoStore.create({
