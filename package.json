@@ -62,7 +62,6 @@
     "express-rate-limit": "^7.3.1",
     "express-session": "1.15.6",
     "express-sslify": "^1.2.0",
-    "express-validator": "^7.0.1",
     "highlight.js": "^11.9.0",
     "http-status-codes": "^2.3.0",
     "jsdom": "^24.0.0",
