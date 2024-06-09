@@ -35,6 +35,6 @@ export class CopyableElement extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "cg-copyable": CopyableElement;
+    'cg-copyable': CopyableElement;
   }
 }
