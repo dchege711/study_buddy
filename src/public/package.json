@@ -4,8 +4,7 @@
     "version": "2.0.0",
     "scripts": {
         "build": "npm run typecheck && npm run webpack",
-        "mocha_tests": "npm run typecheck && mocha 'dist/**/*.test.js'",
-        "single_mocha_test": "npm run typecheck && ts-mocha",
+        "test": "mocha 'dist/**/*.test.js'",
         "typecheck": "tsc --project tsconfig.json",
         "webpack": "webpack --config ./webpack.config.cjs"
     }

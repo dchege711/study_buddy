@@ -30,8 +30,10 @@
     "start": "node dist/server.js",
     "debug": "ts-node-dev --files --transpile-only src/server.ts",
     "single_test": "npm run build && ts-mocha",
-    "test": "npm run mocha_tests",
-    "mocha_tests": "npm run build && nyc ts-mocha --no-warnings --recursive --sort './src/tests/mocha_tests/*/*.ts' './src/**/*.test.ts' --exclude './src/public/**/*'",
+    "test": "npm run test:server && npm run test:client",
+    "test:server": "npm run mocha_tests",
+    "test:client": "cd src/public && npm run test && cd ../../",
+    "mocha_tests": "nyc ts-mocha --no-warnings --recursive --sort './src/tests/mocha_tests/*/*.ts' './src/**/*.test.ts' --exclude './src/public/**/*'",
     "docs": "jsdoc -c ./config.jsdoc.js",
     "webpack": "webpack --config ./webpack.config.cjs"
   },
