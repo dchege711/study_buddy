@@ -168,7 +168,7 @@ export type SendAccountValidationLinkParams = Pick<IUser, "email">;
  * and `message`
  */
 export async function sendAccountValidationLink(payload: SendAccountValidationLinkParams): Promise<string> {
-    let user = await User.findOne({email: payload.email}).exec();
+    let user = await User.findOne({email: { $eq: payload.email }}).exec();
     if (user === null) {
         return `If ${payload.email} has an account, we've sent a validation URL`;
     }
@@ -304,9 +304,9 @@ export async function authenticateUser(payload: AuthenticateUserParam): Promise<
     let identifierQuery: FilterQuery<IUser> = {};
     let submittedIdentifier = payload.username_or_email;
     if (submittedIdentifier.includes("@")) {
-        identifierQuery = { email: submittedIdentifier };
+        identifierQuery = { email: { $eq: submittedIdentifier } };
     } else {
-        identifierQuery = { username: submittedIdentifier };
+        identifierQuery = { username: { $eq: submittedIdentifier } };
     }
 
     let password = payload.password;
@@ -395,7 +395,7 @@ export type ResetLinkParams = Pick<IUser, "email">;
  * and `message` as keys.
  */
 export async function sendResetLink(userIdentifier: ResetLinkParams): Promise<string> {
-    let user = await User.findOne({email: userIdentifier.email}).exec();
+    let user = await User.findOne({email: { $eq: userIdentifier.email } }).exec();
     if (!user) {
         return `No user found with the email address: ${userIdentifier.email}`;
     }

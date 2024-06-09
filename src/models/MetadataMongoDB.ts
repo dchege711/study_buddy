@@ -444,7 +444,7 @@ export async function updateUserSettings(newUserSettings: UpdateUserSettingsPara
         return Promise.reject("No changes were made as there were no valid changes provided");
     }
 
-    let user = await User.findOne({userIDInApp: newUserSettings.userIDInApp}).exec();
+    let user = await User.findOne({userIDInApp: { $eq: newUserSettings.userIDInApp }}).exec();
     if (user === null) {
         return Promise.reject("No user found. User settings not updated!");
     }
