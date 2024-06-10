@@ -17,18 +17,18 @@ import { inAppRouter } from "./routes/InAppRouter";
 import { populateDummyAccountWithCards } from "./tests/DummyAccountUtils";
 import { mergeRouters, publicProcedure, router } from "./trpc";
 
-var express = require("express");
-var session = require("express-session");
-var MongoStore = require("connect-mongo");
-var path = require("path");
-var bodyParser = require("body-parser");
-var cookieParser = require("cookie-parser");
-var enforce = require("express-sslify");
+const express = require("express");
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
+const path = require("path");
+const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
+const enforce = require("express-sslify");
 const lusca = require("lusca");
 
-var AccountRoutes = require("./routes/AuthenticationRoutes");
-var InAppRoutes = require("./routes/InAppRoutes");
-var config = require("./config");
+const AccountRoutes = require("./routes/AuthenticationRoutes");
+const InAppRoutes = require("./routes/InAppRoutes");
+const config = require("./config");
 const misc = require("./models/Miscellaneous");
 
 // Needed to get a Mongoose instance running for this process
@@ -39,8 +39,8 @@ const dbConnection = require("./models/MongooseClient");
   await misc.addPublicUser();
 })();
 
-var app = express();
-var port = config.PORT;
+const app = express();
+const port = config.PORT;
 
 // In Heroku's honesty we trust. Beware otherwise as headers can be spoofed
 // https://github.com/florianheinemann/express-sslify

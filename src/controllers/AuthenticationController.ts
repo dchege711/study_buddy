@@ -186,7 +186,7 @@ export function sendValidationEmailPost(req: Request, res: Response) {
 }
 
 export function verifyAccount(req: Request, res: Response) {
-  var verification_uri = req.path.split("/verify-account/")[1];
+  const verification_uri = req.path.split("/verify-account/")[1];
 
   LogInUtilities.validateAccount(verification_uri)
     .then((confirmation) => {
@@ -219,7 +219,7 @@ export function resetPasswordPost(req: Request, res: Response) {
 }
 
 export function resetPasswordLinkGet(req: Request, res: Response) {
-  var reset_password_uri = req.path.split("/reset-password-link/")[1];
+  const reset_password_uri = req.path.split("/reset-password-link/")[1];
   LogInUtilities
     .validatePasswordResetLink(reset_password_uri)
     .then(() => {
@@ -231,7 +231,7 @@ export function resetPasswordLinkGet(req: Request, res: Response) {
 }
 
 export function resetPasswordLinkPost(req: Request, res: Response) {
-  var reset_password_uri = req.path.split("/reset-password-link/")[1];
+  const reset_password_uri = req.path.split("/reset-password-link/")[1];
   LogInUtilities
     .validatePasswordResetLink(reset_password_uri)
     .then(() => {

@@ -47,7 +47,7 @@ export interface ICardRaw {
   updatedAt: Date;
 }
 
-var cardSchema = new Schema<ICardRaw>(
+const cardSchema = new Schema<ICardRaw>(
   {
     title: { type: String, default: "", trim: true },
     description: { type: String, trim: true, default: "" },
