@@ -23,6 +23,17 @@ module.exports = {
     "plugin:@typescript-eslint/recommended",
   ],
 
+  ignorePatterns: [
+    // The `dist` directory contains generated code.
+    "dist/",
+
+    // The `node_modules` directory contains third-party code.
+    "node_modules/",
+
+    // Ignore declaration files.
+    "**/*.d.ts",
+  ],
+
   // ESLint should not search beyond this directory for config files.
   root: true,
 };
