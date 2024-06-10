@@ -37,7 +37,7 @@ export interface IMetadataRaw {
 // Using SchemaTypes.Mixed produces unreliable write results
 // It's better to include the dictionary in an array.
 
-let metadataSchema = new Schema<IMetadataRaw>(
+const metadataSchema = new Schema<IMetadataRaw>(
   {
     createdById: { type: Number, immutable: true },
     metadataIndex: { type: Number, immutable: true },

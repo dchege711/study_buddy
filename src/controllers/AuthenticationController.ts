@@ -136,7 +136,7 @@ export function loginUser(req: Request, res: Response, next: NextFunction) {
       if (req.session) {
         req.session.user = user;
       }
-      let expiry_date = (new Date(Date.now() + 1000 * 3600 * 24 * 30))
+      const expiry_date = (new Date(Date.now() + 1000 * 3600 * 24 * 30))
         .toString();
       res.setHeader(
         "Set-Cookie",

@@ -17,7 +17,7 @@ const deleteTempFile = controllerUtils.deleteTempFile;
 const getDefaultTemplateVars = controllerUtils.getDefaultTemplateVars;
 
 export function home(req: Request, res: Response) {
-  let templateVars = getDefaultTemplateVars(req);
+  const templateVars = getDefaultTemplateVars(req);
   templateVars.SEARCH_ENDPOINT_URL = "/search-cards";
   res.render("pages/home.ejs", templateVars);
 }
@@ -77,7 +77,7 @@ export interface MetadataResponse {
 }
 
 export function downloadUserData(req: Request, res: Response) {
-  let userIDInApp = req.session?.user?.userIDInApp;
+  const userIDInApp = req.session?.user?.userIDInApp;
   if (userIDInApp === undefined) {
     res.status(401).send("You must be logged in to download your data.");
     return;
@@ -101,7 +101,7 @@ export function downloadUserData(req: Request, res: Response) {
 }
 
 export function deleteAccount(req: Request, res: Response) {
-  let userIDInApp = req.session?.user?.userIDInApp;
+  const userIDInApp = req.session?.user?.userIDInApp;
   if (userIDInApp === undefined) {
     res.status(401).send("You must be logged in to delete your account.");
     return;

@@ -14,7 +14,7 @@ import { IUser } from "../models/mongoose_models/UserSchema";
 export async function getDummyAccount(): Promise<
   LogInUtilities.AuthenticateUser
 > {
-  let dummyAccountDetails = {
+  const dummyAccountDetails = {
     username: config.DEBUG_USERNAME as string,
     password: config.DEBUG_PASSWORD as string,
     email: config.DEBUG_EMAIL_ADDRESS as string,

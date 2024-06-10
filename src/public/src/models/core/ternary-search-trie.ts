@@ -20,7 +20,7 @@ export class TernarySearchTrie {
   root: TSTNode | null = null;
 
   constructor(words: string[]) {
-    for (let word of words) {
+    for (const word of words) {
       this.root = this.insertKey(this.root, word, 0);
     }
   }
@@ -32,7 +32,7 @@ export class TernarySearchTrie {
    */
   contains(key: string): boolean {
     if (!this.root || !key || key.length === 0) { return false; }
-    let tst_node = this.getKey(this.root, key, 0);
+    const tst_node = this.getKey(this.root, key, 0);
     return tst_node !== null && tst_node.val !== null;
   }
 
@@ -55,8 +55,8 @@ export class TernarySearchTrie {
   keysWithPrefix(prefix: string): string[] {
     if (!this.root) { return []; }
 
-    let matching_keys: string[] = [];
-    let tst_node = this.getKey(this.root, prefix, 0);
+    const matching_keys: string[] = [];
+    const tst_node = this.getKey(this.root, prefix, 0);
     if (!tst_node) { return matching_keys; }
     if (tst_node.val) { matching_keys.push(prefix); }
     this.collect(tst_node.mid, prefix, matching_keys);

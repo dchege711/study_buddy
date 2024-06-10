@@ -20,7 +20,7 @@ import {
   MAILGUN_PASSWORD,
 } from "../config";
 
-let transporter = createTransport({
+const transporter = createTransport({
   pool: true,
   host: "smtp.mailgun.org",
   port: 587,

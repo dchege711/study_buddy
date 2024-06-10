@@ -22,7 +22,7 @@ export class CardsCarousel implements Iterable<CardsCarouselBSTKey> {
     this.bst = new AVLTree.default<CardsCarouselBSTKey, CardsCarouselBSTValue>(
       this.reverseComparator,
     );
-    for (let card of minicards) {
+    for (const card of minicards) {
       if (!card._id || !card.urgency) {
         throw new Error("Card missing _id or urgency");
       }
@@ -54,13 +54,13 @@ export class CardsCarousel implements Iterable<CardsCarouselBSTKey> {
    * the `prev()` and `next()` methods of the `CardsCarousel`
    */
   [Symbol.iterator]() {
-    let bst = this.bst;
+    const bst = this.bst;
     let node: CardsCarouselBSTNode | null = bst.minNode();
 
     return {
       next(): IteratorResult<CardsCarouselBSTKey> {
         if (node && node.key) {
-          let value = node.key;
+          const value = node.key;
           node = bst.next(node);
           return {
             done: false,
@@ -87,7 +87,7 @@ export class CardsCarousel implements Iterable<CardsCarouselBSTKey> {
     }
 
     if (this.currentNode === null) {
-      let min = this.bst.min();
+      const min = this.bst.min();
       if (min === null) {
         throw new Error("No cards left, but hasNext() claims there are some");
       }
@@ -174,7 +174,7 @@ export class CardsCarousel implements Iterable<CardsCarouselBSTKey> {
   }
 
   setCurrentCard(key: CardsCarouselBSTKey): Boolean {
-    let node = this.bst.find(key);
+    const node = this.bst.find(key);
     if (node === null) {
       return false;
     }
@@ -216,20 +216,20 @@ export class CardsCarousel implements Iterable<CardsCarouselBSTKey> {
    * quartiles of the urgences.
    */
   quartiles() {
-    let N = this.bst.size;
+    const N = this.bst.size;
     if (N == 0) {
       return [0, 0, 0, 0, 0];
     } else if (N <= 4) {
       // Recall that the BST is populated using `reverseComparator()`, thus
       // the min node on the BST has the highest urgency.
-      let maxUrgency = this.bst.min()?.urgency || -Infinity;
+      const maxUrgency = this.bst.min()?.urgency || -Infinity;
       return [maxUrgency, maxUrgency, maxUrgency, maxUrgency, maxUrgency];
     } else {
-      let zeroQuartile = this.bst.max();
-      let firstQuartile = this.bst.at(Math.floor(3 * N / 4));
-      let secondQuartile = this.bst.at(Math.floor(N / 2));
-      let thirdQuartile = this.bst.at(Math.floor(N / 4));
-      let fourthQuartile = this.bst.min();
+      const zeroQuartile = this.bst.max();
+      const firstQuartile = this.bst.at(Math.floor(3 * N / 4));
+      const secondQuartile = this.bst.at(Math.floor(N / 2));
+      const thirdQuartile = this.bst.at(Math.floor(N / 4));
+      const fourthQuartile = this.bst.min();
       if (
         zeroQuartile === null || firstQuartile === null
         || secondQuartile === null || thirdQuartile === null

@@ -2226,7 +2226,7 @@ export const sampleCards: SampleCard[] = [
  * @returns {Array} contains at most `numCards` chosen at random without replacement.
  */
 export function getRandomSampleCards(numCards: number): SampleCard[] {
-  let cardIndexes = new Array(Math.min(numCards, sampleCards.length));
+  const cardIndexes = new Array(Math.min(numCards, sampleCards.length));
   for (let i = 0; i < cardIndexes.length; i++) { cardIndexes[i] = i; }
   let randomIdx, temp;
   for (let i = 0; i < cardIndexes.length; i++) {
@@ -2236,7 +2236,7 @@ export function getRandomSampleCards(numCards: number): SampleCard[] {
     cardIndexes[i] = temp;
   }
 
-  let cards = new Array(cardIndexes.length);
+  const cards = new Array(cardIndexes.length);
   for (let i = 0; i < cardIndexes.length; i++) {
     cards[i] = sampleCards[cardIndexes[i]];
   }

@@ -35,7 +35,7 @@ export async function create(
 ): Promise<IMetadata> {
   payload = sanitizeQuery(payload);
 
-  let preExistingMetadata = await Metadata.findOne({
+  const preExistingMetadata = await Metadata.findOne({
     createdById: payload.userIDInApp,
     metadataIndex: payload.metadataIndex,
   }).exec();
@@ -114,7 +114,7 @@ export async function update(
     };
   }
 
-  let metadataDoc = await Metadata.findOne(metadataQuery).exec();
+  const metadataDoc = await Metadata.findOne(metadataQuery).exec();
   if (metadataDoc === null) {
     return Promise.reject("Could not find metadata document");
   }
@@ -145,15 +145,15 @@ export async function update(
 export async function updatePublicUserMetadata(
   cards: SavedCardParams[],
 ): Promise<IMetadata> {
-  let cardsToAdd = cards.filter(savedCard => savedCard.card.isPublic);
-  let cardsToRemove = cards.filter(savedCard => !savedCard.card.isPublic);
+  const cardsToAdd = cards.filter(savedCard => savedCard.card.isPublic);
+  const cardsToRemove = cards.filter(savedCard => !savedCard.card.isPublic);
 
-  let user = await User.findOne({ username: PUBLIC_USER_USERNAME }).exec();
+  const user = await User.findOne({ username: PUBLIC_USER_USERNAME }).exec();
   if (!user) {
     return Promise.reject("Could not find public user");
   }
 
-  let metadataDoc = cardsToAdd.length > 0
+  const metadataDoc = cardsToAdd.length > 0
     ? await update(cardsToAdd, {
       createdById: user.userIDInApp,
       metadataIndex: 0,
@@ -161,13 +161,15 @@ export async function updatePublicUserMetadata(
     : (await _readInternal({ userIDInApp: user.userIDInApp }))[0];
 
   // TODO(dchege711): This shouldn't happen. Investigate why it does.
-  let metadataStats = metadataDoc.stats.length > 0 ? metadataDoc.stats[0] : {};
-  let metadataNodeInfo = metadataDoc.node_information.length > 0
+  const metadataStats = metadataDoc.stats.length > 0
+    ? metadataDoc.stats[0]
+    : {};
+  const metadataNodeInfo = metadataDoc.node_information.length > 0
     ? metadataDoc.node_information[0]
     : {};
 
-  for (let savedCard of cardsToRemove) {
-    let cardID = savedCard.card._id;
+  for (const savedCard of cardsToRemove) {
+    const cardID = savedCard.card._id;
     // Remove the card from the lists that the user previews from.
     savedCard.card.tags.split(" ").forEach(tagToRemove => {
       tagToRemove = tagToRemove.trim();
@@ -215,7 +217,7 @@ export async function sendCardToTrash(
 ): Promise<string> {
   payload = sanitizeQuery(payload);
 
-  let card = await Card.findOne({
+  const card = await Card.findOne({
     _id: payload._id,
     createdById: payload.createdById,
   }).exec();
@@ -228,7 +230,7 @@ export async function sendCardToTrash(
     await card.save();
   }
 
-  let metadataDoc = await Metadata.findOne({
+  const metadataDoc = await Metadata.findOne({
     createdById: card.createdById,
     metadataIndex: card.metadataIndex,
   }).exec();
@@ -236,9 +238,9 @@ export async function sendCardToTrash(
     return Promise.reject("Could not find metadata document");
   }
 
-  let metadataStats = metadataDoc.stats[0];
-  let metadataNodeInfo = metadataDoc.node_information[0];
-  let trashedCardID = card._id;
+  const metadataStats = metadataDoc.stats[0];
+  const metadataNodeInfo = metadataDoc.node_information[0];
+  const trashedCardID = card._id;
 
   // Remove the card from the lists that the user previews from
   card.tags.split(" ").forEach(tagToRemove => {
@@ -285,7 +287,7 @@ export async function restoreCardFromTrash(
 ): Promise<string> {
   restoreCardArgs = sanitizeQuery(restoreCardArgs);
 
-  let card = await Card.findOne({
+  const card = await Card.findOne({
     _id: restoreCardArgs._id,
     createdById: restoreCardArgs.createdById,
   }).exec();
@@ -319,7 +321,7 @@ export async function deleteCardFromTrash(
 ): Promise<string> {
   deleteCardArgs = sanitizeQuery(deleteCardArgs);
 
-  let card = await Card.findOneAndRemove({
+  const card = await Card.findOneAndRemove({
     _id: deleteCardArgs._id,
     createdById: deleteCardArgs.createdById,
   }).exec();
@@ -327,7 +329,7 @@ export async function deleteCardFromTrash(
     return Promise.reject("Card wasn't found");
   }
 
-  let metadataDoc = await removeCardFromMetadataTrash(card);
+  const metadataDoc = await removeCardFromMetadataTrash(card);
   // await metadataDoc.save();
 
   return `${card.title} has been permanently deleted!`;
@@ -346,7 +348,7 @@ export async function deleteCardFromTrash(
 async function removeCardFromMetadataTrash(
   cardIdentifier: Pick<ICard, "_id" | "createdById" | "metadataIndex">,
 ): Promise<IMetadata> {
-  let metadataDoc = await Metadata.findOne({
+  const metadataDoc = await Metadata.findOne({
     createdById: cardIdentifier.createdById,
     metadataIndex: cardIdentifier.metadataIndex,
   })
@@ -382,16 +384,16 @@ interface WriteCardsToJSONFileResult {
 export async function writeCardsToJSONFile(
   userIDInApp: number,
 ): Promise<WriteCardsToJSONFileResult> {
-  let query = sanitizeQuery({ userIDInApp: userIDInApp });
-  let cards = await Card
+  const query = sanitizeQuery({ userIDInApp: userIDInApp });
+  const cards = await Card
     .find({ createdById: query.userIDInApp })
     .select("title description tags urgency createdAt isPublic")
     .exec();
 
-  let jsonFileName = `flashcards_${userIDInApp}.json`;
-  let jsonFilePath = `${process.cwd()}/${jsonFileName}`;
+  const jsonFileName = `flashcards_${userIDInApp}.json`;
+  const jsonFilePath = `${process.cwd()}/${jsonFileName}`;
 
-  let fileDescriptor = await fs.open(jsonFilePath, "w");
+  const fileDescriptor = await fs.open(jsonFilePath, "w");
   await fs
     .writeFile(fileDescriptor, JSON.stringify(cards))
     .then(() => fileDescriptor.close());
@@ -419,7 +421,7 @@ function updateMetadataWithCardDetails(
   previousTags: string,
   attributeName: SortableCardAttribute,
 ): Promise<IMetadata> {
-  let sortableAttribute = attributeName === "numChildren"
+  const sortableAttribute = attributeName === "numChildren"
     ? savedCard.idsOfUsersWithCopy.split(", ").length
     : savedCard[attributeName];
 
@@ -428,8 +430,8 @@ function updateMetadataWithCardDetails(
     metadataDoc.node_information.push({});
   }
 
-  let metadataStats = metadataDoc.stats[0];
-  let metadataNodeInfo = metadataDoc.node_information[0];
+  const metadataStats = metadataDoc.stats[0];
+  const metadataNodeInfo = metadataDoc.node_information[0];
 
   // Save this card in the stats field where it only appears once
   if (metadataStats[savedCard._id] === undefined) {
@@ -440,7 +442,7 @@ function updateMetadataWithCardDetails(
 
   // TODO(dchege711): Keep track of which tags have been changed. Remove ones
   // that have been removed from the card.
-  let currentTags = new Set(
+  const currentTags = new Set(
     savedCard.tags.split(" ").map(s => s.trim()).filter(s => s.length > 0),
   );
   if (currentTags) {
@@ -462,7 +464,7 @@ function updateMetadataWithCardDetails(
   }
 
   // Get rid of all tags that were deleted in the current card
-  let deletedTags = previousTags.split(" ")
+  const deletedTags = previousTags.split(" ")
     .map(s => s.trim())
     .filter(tag => tag.length > 0 && !currentTags.has(tag));
   deletedTags.forEach((tag) => {
@@ -492,8 +494,8 @@ export async function updateUserSettings(
 ): Promise<IUser> {
   newUserSettings = sanitizeQuery(newUserSettings);
 
-  let supportedChanges = new Set(["cardsAreByDefaultPrivate", "dailyTarget"]);
-  let validChanges = Object.keys(newUserSettings).filter((setting) =>
+  const supportedChanges = new Set(["cardsAreByDefaultPrivate", "dailyTarget"]);
+  const validChanges = Object.keys(newUserSettings).filter((setting) =>
     supportedChanges.has(setting)
   );
 
@@ -503,7 +505,7 @@ export async function updateUserSettings(
     );
   }
 
-  let user = await User.findOne({
+  const user = await User.findOne({
     userIDInApp: { $eq: newUserSettings.userIDInApp },
   }).exec();
   if (user === null) {
@@ -514,7 +516,7 @@ export async function updateUserSettings(
   user.dailyTarget = newUserSettings.dailyTarget;
 
   if (newUserSettings.dailyTarget) {
-    let metadataDoc = await Metadata
+    const metadataDoc = await Metadata
       .findOne({ createdById: user.userIDInApp, metadataIndex: 0 }).exec();
     if (metadataDoc === null) {
       return Promise.reject("No metadata found. User settings not updated!");
@@ -552,8 +554,8 @@ export function updateStreak(
         return Promise.reject("No metadata found. Streak not updated!");
       }
 
-      let idsReviewedCards = new Set(metadataDoc.streak.get("cardIDs"));
-      for (let cardID of streakUpdateObj.cardIDs) {
+      const idsReviewedCards = new Set(metadataDoc.streak.get("cardIDs"));
+      for (const cardID of streakUpdateObj.cardIDs) {
         idsReviewedCards.add(cardID);
       }
       metadataDoc.streak.set("cardIDs", Array.from(idsReviewedCards));

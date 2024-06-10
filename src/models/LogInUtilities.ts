@@ -48,10 +48,10 @@ interface SaltAndHash {
  * @returns {Promise} the resolved value is an array where the first element is
  * the salt and the second element is the hash.
  */
-let getSaltAndHash = function(password: string): SaltAndHash {
+const getSaltAndHash = function(password: string): SaltAndHash {
   // 8 words = 32 bytes = 256 bits, a paranoia of 7
-  let salt = stanfordCrypto.random.randomWords(8, 7);
-  let hash = stanfordCrypto.misc.pbkdf2(password, salt);
+  const salt = stanfordCrypto.random.randomWords(8, 7);
+  const hash = stanfordCrypto.misc.pbkdf2(password, salt);
   return { salt, hash };
 };
 
@@ -59,7 +59,7 @@ let getSaltAndHash = function(password: string): SaltAndHash {
  * @returns {Promise} resolves with the hash computed from the provided
  * `password` and `salt` parameters.
  */
-let getHash = function(
+const getHash = function(
   password: string,
   salt: stanfordCrypto.BitArray,
 ): stanfordCrypto.BitArray {
@@ -99,7 +99,7 @@ interface UniqueIDAndValidationURI {
  * @returns {Promise} the first param is a user ID and the second is a
  * validation string.
  */
-let getIdInAppAndValidationURI = async function(): Promise<
+const getIdInAppAndValidationURI = async function(): Promise<
   UniqueIDAndValidationURI
 > {
   let lookingForUniqueIDAndURL = true,
@@ -108,7 +108,7 @@ let getIdInAppAndValidationURI = async function(): Promise<
   while (lookingForUniqueIDAndURL) {
     userIDInApp = parseInt(getRandomString(12, "123456789"), 10);
     validationURI = getRandomString(32, LOWER_CASE + DIGITS);
-    let conflictingUser = await User
+    const conflictingUser = await User
       .findOne({
         $or: [
           { userIDInApp: userIDInApp },
@@ -133,7 +133,7 @@ let getIdInAppAndValidationURI = async function(): Promise<
  * `userIDInApp`, `username`, `email`, `cardsAreByDefaultPrivate` and
  * `userRegistrationDate`.
  */
-let provideSessionToken = async function(
+const provideSessionToken = async function(
   user: Pick<
     IUser,
     | "userIDInApp"
@@ -143,9 +143,9 @@ let provideSessionToken = async function(
     | "createdAt"
   >,
 ): Promise<IToken> {
-  let sessionToken = getRandomString(64, LOWER_CASE + DIGITS + UPPER_CASE);
+  const sessionToken = getRandomString(64, LOWER_CASE + DIGITS + UPPER_CASE);
 
-  let conflictingToken = await Token.findOne({ value: sessionToken }).exec();
+  const conflictingToken = await Token.findOne({ value: sessionToken }).exec();
   if (conflictingToken) {
     return provideSessionToken(user);
   }
@@ -169,7 +169,7 @@ let provideSessionToken = async function(
  * @param {Promise} resolves with a JSON object having the keys `success`,
  * `message`, `status`.
  */
-let sendAccountValidationURLToEmail = function(
+const sendAccountValidationURLToEmail = function(
   userDetails: Pick<IUser, "email" | "account_validation_uri">,
 ): Promise<string> {
   return Email.sendEmail({
@@ -196,7 +196,7 @@ export type SendAccountValidationLinkParams = Pick<IUser, "email">;
 export async function sendAccountValidationLink(
   payload: SendAccountValidationLinkParams,
 ): Promise<string> {
-  let user = await User.findOne({ email: { $eq: payload.email } }).exec();
+  const user = await User.findOne({ email: { $eq: payload.email } }).exec();
   if (user === null) {
     return `If ${payload.email} has an account, we've sent a validation URL`;
   }
@@ -205,7 +205,7 @@ export async function sendAccountValidationLink(
     return `${payload.email} has already validated their account.`;
   }
 
-  let { userIDInApp, validationURI } = await getIdInAppAndValidationURI();
+  const { userIDInApp, validationURI } = await getIdInAppAndValidationURI();
   user.account_validation_uri = validationURI;
   await user.save();
 
@@ -223,7 +223,7 @@ export async function sendAccountValidationLink(
  * addresses to sign in for at most 30 days.
  */
 export async function validateAccount(validationURI: string): Promise<string> {
-  let user = await User.findOne({ account_validation_uri: validationURI })
+  const user = await User.findOne({ account_validation_uri: validationURI })
     .exec();
 
   // TODO(dchege711): How can we know that the user is already verified?
@@ -263,7 +263,7 @@ export async function registerUserAndPassword(
 ): Promise<string> {
   payload = sanitizeQuery(payload);
 
-  let conflictingUser = await User.findOne({
+  const conflictingUser = await User.findOne({
     $or: [{ username: payload.username }, { email: payload.email }],
   }).exec();
   if (conflictingUser !== null) {
@@ -272,9 +272,9 @@ export async function registerUserAndPassword(
       : Promise.reject(new UserRecoverableError("Email already taken."));
   }
 
-  let { salt, hash } = await getSaltAndHash(payload.password);
-  let { userIDInApp, validationURI } = await getIdInAppAndValidationURI();
-  let user = await User.create({
+  const { salt, hash } = await getSaltAndHash(payload.password);
+  const { userIDInApp, validationURI } = await getIdInAppAndValidationURI();
+  const user = await User.create({
     username: payload.username,
     salt: salt,
     hash: hash,
@@ -286,7 +286,7 @@ export async function registerUserAndPassword(
   await Metadata.create({ createdById: userIDInApp, metadataIndex: 0 });
   await sendAccountValidationURLToEmail(user);
 
-  let starterCards = [
+  const starterCards = [
     {
       title: "Example of a Card Title",
       tags: "sample_card",
@@ -373,16 +373,16 @@ export async function authenticateUser(
   payload: AuthenticateUserParam,
 ): Promise<AuthenticateUser> {
   let identifierQuery: FilterQuery<IUser> = {};
-  let submittedIdentifier = payload.username_or_email;
+  const submittedIdentifier = payload.username_or_email;
   if (submittedIdentifier.includes("@")) {
     identifierQuery = { email: { $eq: submittedIdentifier } };
   } else {
     identifierQuery = { username: { $eq: submittedIdentifier } };
   }
 
-  let password = payload.password;
+  const password = payload.password;
 
-  let user = await User.findOne(identifierQuery).exec();
+  const user = await User.findOne(identifierQuery).exec();
   if (user === null) {
     return Promise.reject(
       new UserRecoverableError(
@@ -391,7 +391,7 @@ export async function authenticateUser(
     );
   }
 
-  let computedHash = getHash(password, user.salt);
+  const computedHash = getHash(password, user.salt);
   let thereIsAMatch = computedHash.length === user.hash.length;
   if (thereIsAMatch) {
     for (let i = 0; i < computedHash.length; i++) {
@@ -407,7 +407,7 @@ export async function authenticateUser(
     );
   }
 
-  let userToken = await provideSessionToken(user);
+  const userToken = await provideSessionToken(user);
 
   return {
     token_id: userToken.token_id,
@@ -438,7 +438,8 @@ export async function authenticateByToken(
         return Promise.resolve(null);
       }
 
-      let user = await User.findOne({ userIDInApp: token.userIDInApp }).exec();
+      const user = await User.findOne({ userIDInApp: token.userIDInApp })
+        .exec();
       if (!user) {
         return Promise.resolve(null);
       }
@@ -477,7 +478,7 @@ export type ResetLinkParams = Pick<IUser, "email">;
 export async function sendResetLink(
   userIdentifier: ResetLinkParams,
 ): Promise<string> {
-  let user = await User.findOne({ email: { $eq: userIdentifier.email } })
+  const user = await User.findOne({ email: { $eq: userIdentifier.email } })
     .exec();
   if (!user) {
     return `No user found with the email address: ${userIdentifier.email}`;
@@ -485,7 +486,7 @@ export async function sendResetLink(
 
   let resetPasswordURI = getRandomString(50, LOWER_CASE + DIGITS);
   while (true) {
-    let conflictingUser = await User.findOne({
+    const conflictingUser = await User.findOne({
       reset_password_uri: resetPasswordURI,
     }).exec();
     if (!conflictingUser) {
@@ -523,7 +524,7 @@ type PasswordResetLinkResponse = BaseResponse & {
 export async function validatePasswordResetLink(
   resetPasswordURI: string,
 ): Promise<void> {
-  let user = await User.findOne({ reset_password_uri: resetPasswordURI })
+  const user = await User.findOne({ reset_password_uri: resetPasswordURI })
     .exec();
   if (user === null) {
     return Promise.reject(
@@ -555,14 +556,14 @@ export type ResetPasswordParams = Pick<IUser, "reset_password_uri"> & {
 export async function resetPassword(
   payload: ResetPasswordParams,
 ): Promise<string> {
-  let user = await User.findOne({
+  const user = await User.findOne({
     reset_password_uri: payload.reset_password_uri,
   }).exec();
   if (user === null) {
     return Promise.reject(new UserRecoverableError("Invalid link"));
   }
 
-  let { salt, hash } = await getSaltAndHash(payload.password);
+  const { salt, hash } = await getSaltAndHash(payload.password);
   user.salt = salt;
   user.hash = hash;
   user.reset_password_timestamp += -3 * 3600 * 1000; // Invalidate link
@@ -629,7 +630,7 @@ export function deleteAllAccounts(
     .find({ username: { $nin: usernamesToSpare } }).exec()
     .then(async (existingUsers) => {
       let numAccountsDeleted = 0;
-      for (let user of existingUsers) {
+      for (const user of existingUsers) {
         await deleteAccount(user.userIDInApp);
         numAccountsDeleted += 1;
       }

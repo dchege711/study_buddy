@@ -50,7 +50,7 @@ export class AutoComplete {
   }
 
   addPairToGraph(wordA: string, wordB: string, edgeWeight: number = 1) {
-    let weight = this.graph.getEdgeWeight(wordA, wordB) || 1;
+    const weight = this.graph.getEdgeWeight(wordA, wordB) || 1;
     this.graph.addEdge(wordA, wordB, 1 / (1 / weight + edgeWeight));
   }
 
