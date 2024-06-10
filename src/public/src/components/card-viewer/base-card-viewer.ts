@@ -70,7 +70,7 @@ export class CardViewer extends LitElement {
       return;
     }
 
-    let event = new CardsCarouselUpdateCursorEvent(direction);
+    const event = new CardsCarouselUpdateCursorEvent(direction);
     this.dispatchEvent(event);
   }
 
@@ -106,7 +106,7 @@ export class CardViewer extends LitElement {
       return;
     }
 
-    let htmlSplitIndex = combinedHTML.indexOf(htmlSpoilerMarker);
+    const htmlSplitIndex = combinedHTML.indexOf(htmlSpoilerMarker);
     if (htmlSplitIndex === -1) {
       throw new Error("HTML and Markdown descriptions are out of sync");
     }

@@ -30,7 +30,7 @@ export type CreateCardParams = Pick<
  * as its keys. If successful, the message will contain the saved card.
  */
 export async function create(unsavedCard: CreateCardParams): Promise<ICard> {
-  let card = await Card.create(sanitizeCard(unsavedCard));
+  const card = await Card.create(sanitizeCard(unsavedCard));
   return Promise.all([
     MetadataDB.update([{ card, previousTags: "" }]),
     MetadataDB.updatePublicUserMetadata([{ card, previousTags: "" }]),
@@ -49,8 +49,8 @@ export async function create(unsavedCard: CreateCardParams): Promise<ICard> {
 export async function createMany(
   unsavedCards: CreateCardParams[],
 ): Promise<ICard[]> {
-  let sanitizedCards = unsavedCards.map((card) => sanitizeCard(card));
-  let cards = await Card.insertMany(sanitizedCards);
+  const sanitizedCards = unsavedCards.map((card) => sanitizeCard(card));
+  const cards = await Card.insertMany(sanitizedCards);
   return Promise.all([
     MetadataDB.update(cards.map((card) => ({ card, previousTags: "" }))),
     MetadataDB.updatePublicUserMetadata(
@@ -81,7 +81,7 @@ export function read(
     "title description descriptionHTML tags urgency createdById isPublic",
 ): Promise<ICardRaw | null> {
   payload = sanitizeQuery(payload);
-  let query: Partial<ICard> = { createdById: payload.userIDInApp };
+  const query: Partial<ICard> = { createdById: payload.userIDInApp };
   if (payload.cardID) { query._id = payload.cardID; }
   return Card.findOne(query).select(projection).exec();
 }
@@ -94,7 +94,7 @@ export function read(
  */
 export async function update(payload: Partial<ICard>): Promise<ICardRaw> {
   payload = sanitizeCard(payload);
-  let oldCard = await Card.findByIdAndUpdate(
+  const oldCard = await Card.findByIdAndUpdate(
     payload._id,
     payload,
     { returnOriginal: true, runValidators: true },
@@ -103,7 +103,7 @@ export async function update(payload: Partial<ICard>): Promise<ICardRaw> {
     return Promise.reject("Card not found.");
   }
 
-  let newCard = await Card.findById(oldCard._id).exec();
+  const newCard = await Card.findById(oldCard._id).exec();
   if (newCard === null) {
     return Promise.reject("Card not found.");
   }
@@ -189,8 +189,8 @@ export function search(
  * @returns {String} a string with extra space delimited words, e.g.
  * `arrays dynamic_programming iterative-algorithms dynamic programming iterative algorithms`
  */
-let splitTags = function(s: string): string {
-  let possibleTags = s.match(/[\w|\d]+(\_|-){1}[\w|\d]+/g);
+const splitTags = function(s: string): string {
+  const possibleTags = s.match(/[\w|\d]+(\_|-){1}[\w|\d]+/g);
   if (possibleTags === null) { return s; }
 
   for (let i = 0; i < possibleTags.length; i++) {
@@ -224,7 +224,7 @@ function computeInternalQueryFromClientQuery(
   }
 
   if (clientQuery.creationStartDate || clientQuery.creationEndDate) {
-    let dateQuery: { $gt?: Date; $lt?: Date } = {};
+    const dateQuery: { $gt?: Date; $lt?: Date } = {};
     if (clientQuery.creationStartDate) {
       dateQuery["$gt"] = clientQuery.creationStartDate;
     }
@@ -253,7 +253,7 @@ function computeInternalQueryFromClientQuery(
  * @returns {Promise} resolves with a JSON object. If `success` is set, then
  * the `message` attribute will be an array of matching cards.
  */
-let collectSearchResults = function(
+const collectSearchResults = function(
   queryObject: CardQuery,
 ): Promise<CardsSearchResult[]> {
   return Card.find(queryObject.filter, kCardsSearchProjection)
@@ -341,12 +341,14 @@ export async function duplicateCard(
   payload: DuplicateCardParams,
 ): Promise<ICard> {
   payload = sanitizeQuery(payload);
-  let originalCard = await _readPublicCard({ cardID: payload.cardID });
+  const originalCard = await _readPublicCard({ cardID: payload.cardID });
   if (originalCard === null) {
     return Promise.reject("Card not found!");
   }
 
-  let idsOfUsersWithCopy = new Set(originalCard.idsOfUsersWithCopy.split(", "));
+  const idsOfUsersWithCopy = new Set(
+    originalCard.idsOfUsersWithCopy.split(", "),
+  );
   idsOfUsersWithCopy.add(payload.userIDInApp.toString());
   originalCard.idsOfUsersWithCopy = Array.from(idsOfUsersWithCopy).join(", ");
   await originalCard.save();
@@ -384,7 +386,7 @@ export interface FlagCardParams {
  */
 export async function flagCard(payload: FlagCardParams): Promise<ICardRaw> {
   payload = sanitizeQuery(payload);
-  let flagsToUpdate: Partial<
+  const flagsToUpdate: Partial<
     Pick<ICard, "numTimesMarkedAsDuplicate" | "numTimesMarkedForReview">
   > = {};
   if (payload.markedForReview) { flagsToUpdate.numTimesMarkedForReview = 1; }
@@ -422,7 +424,7 @@ export function getTagGroupings(
     .find({ createdById: payload.userIDInApp })
     .select("tags").exec()
     .then((cards) => {
-      let tagsArray = [];
+      const tagsArray = [];
       for (let i = 0; i < cards.length; i++) {
         tagsArray.push(cards[i].tags.split(" "));
       }

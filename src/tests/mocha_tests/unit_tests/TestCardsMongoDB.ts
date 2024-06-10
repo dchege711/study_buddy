@@ -40,19 +40,19 @@ describe("Test CardsMongoDB\n", function() {
   });
 
   it("should successfully create a card from a payload", function() {
-    let card = getRandomCards(1, dummyUser.userIDInApp)[0];
+    const card = getRandomCards(1, dummyUser.userIDInApp)[0];
     card.createdById = dummyUser.userIDInApp;
     return CardsDB.create(card);
   });
 
   it("should read all cards belonging to the user", function(done) {
-    let cardIDs: Set<string> = new Set([]);
+    const cardIDs: Set<string> = new Set([]);
 
     CardsDB
       .search({ queryString: "", limit: Infinity }, dummyUser.userIDInApp)
       .then(function(cards) {
         for (let i = 0; i < cards.length; i++) {
-          let card = cards[i] as ICard;
+          const card = cards[i] as ICard;
           cardIDs.add(card._id.toString());
         }
         return Card.find({ createdById: dummyUser.userIDInApp }).exec();
@@ -80,7 +80,7 @@ describe("Test CardsMongoDB\n", function() {
   });
 
   it("should ignore new cards in the update() method", function(done) {
-    let card = getRandomCards(1, dummyUser.userIDInApp)[0];
+    const card = getRandomCards(1, dummyUser.userIDInApp)[0];
     card.createdById = dummyUser.userIDInApp;
     CardsDB
       .update(card)
@@ -114,8 +114,8 @@ describe("Test CardsMongoDB\n", function() {
   });
 
   it("should provide correct tag groupings", async function() {
-    let userIDInApp = dummyUser.userIDInApp;
-    let sampleCards: CardsDB.CreateCardParams[] = [
+    const userIDInApp = dummyUser.userIDInApp;
+    const sampleCards: CardsDB.CreateCardParams[] = [
       {
         title: "A",
         description: "B",
@@ -164,11 +164,11 @@ describe("Test CardsMongoDB\n", function() {
     ];
     await CardsDB.createMany(sampleCards);
 
-    let tagGroups = await CardsDB.getTagGroupings({ userIDInApp });
+    const tagGroups = await CardsDB.getTagGroupings({ userIDInApp });
     tagGroups.sort();
 
-    let expectedTagGroups: string[][] = [];
-    for (let card of sampleCards) {
+    const expectedTagGroups: string[][] = [];
+    for (const card of sampleCards) {
       expectedTagGroups.push(card.tags.split(" "));
       expectedTagGroups.push(["sample_card"]);
     }

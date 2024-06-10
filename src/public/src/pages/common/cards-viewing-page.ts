@@ -87,7 +87,7 @@ export class CardsViewingPage extends LitElement {
           }
           break;
       }
-      let currentCard = this.cardsCarousel.current();
+      const currentCard = this.cardsCarousel.current();
       if (currentCard) {
         this.updateSelectedCard(currentCard._id);
       }

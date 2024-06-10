@@ -102,7 +102,7 @@ app.use("/", AccountRoutes);
 app.use("/", InAppRoutes);
 
 if (config.IS_TS_NODE) {
-  let newStaticsPath = path.join(__dirname, "..", "dist", "public");
+  const newStaticsPath = path.join(__dirname, "..", "dist", "public");
   console.log(`Detected ts-node: Using ${newStaticsPath} as the static path`);
   app.use(express.static(newStaticsPath));
 }

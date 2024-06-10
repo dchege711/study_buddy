@@ -88,7 +88,7 @@ export class MaxPriorityQueue<T extends MaxPriorityQueue.T> {
   del_max(): MaxPriorityQueue.KeyAndWeight | null {
     if (this.is_empty()) { return null; }
 
-    let max = this.pq[1];
+    const max = this.pq[1];
     this.exchange(1, this.n);
     this.n -= 1;
     this.sink(1);
@@ -120,7 +120,7 @@ export class MaxPriorityQueue<T extends MaxPriorityQueue.T> {
    */
   resize(capacity: number) {
     // console.assert(capacity > n);
-    let newPQ = Array(capacity).fill([null, Number.NEGATIVE_INFINITY]);
+    const newPQ = Array(capacity).fill([null, Number.NEGATIVE_INFINITY]);
     for (var i = 0; i <= this.n; i++) {
       newPQ[i] = this.pq[i];
     }
@@ -201,8 +201,8 @@ export class MaxPriorityQueue<T extends MaxPriorityQueue.T> {
    */
   is_max_heap(k: number): boolean {
     if (k > this.n) { return true; }
-    let left = 2 * k;
-    let right = 2 * k + 1;
+    const left = 2 * k;
+    const right = 2 * k + 1;
     if (left <= this.n && this.less(k, left)) { return false; }
     if (right <= this.n && this.less(k, right)) { return false; }
     return this.is_max_heap(left) && this.is_max_heap(right);

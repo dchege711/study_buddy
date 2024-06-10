@@ -4,7 +4,7 @@ import { UndirectedGraph } from "./graph.js";
 
 describe("Test Graph\n", function() {
   it("should have undirected edges", function() {
-    let graph = new UndirectedGraph();
+    const graph = new UndirectedGraph();
     expect(graph.getEdgeWeight("a", "b")).to.be.null;
 
     graph.addEdge("a", "b", 2);
@@ -22,7 +22,7 @@ describe("Test Graph\n", function() {
      *      \   /
      *        e
      */
-    let edges = [
+    const edges = [
       ["a", "b"],
       ["a", "c"],
       ["a", "d"],
@@ -32,8 +32,8 @@ describe("Test Graph\n", function() {
       ["f", "g"],
       ["g", "h"],
     ];
-    let graph = new UndirectedGraph();
-    for (let edge of edges) {
+    const graph = new UndirectedGraph();
+    for (const edge of edges) {
       graph.addEdge(edge[0], edge[1]);
     }
 

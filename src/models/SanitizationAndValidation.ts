@@ -106,7 +106,7 @@ export function sanitizeCard(card: Partial<ICard>): Partial<ICard> {
  * achieved by deleting all query values that begin with `$`.
  */
 export function sanitizeQuery(query: any) {
-  let keys = Object.keys(query);
+  const keys = Object.keys(query);
   for (let i = 0; i < keys.length; i++) {
     if (/^\$/.test(query[keys[i]])) { delete query[keys[i]]; }
   }

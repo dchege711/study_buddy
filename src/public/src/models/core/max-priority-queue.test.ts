@@ -18,7 +18,7 @@ describe("Test MaxPriorityQueue\n", function() {
   });
 
   it("should return items in descending order", function() {
-    let expectedOrder = [
+    const expectedOrder = [
       ["five", 5],
       ["four", 4],
       ["three", 3],
@@ -37,7 +37,7 @@ describe("Test MaxPriorityQueue\n", function() {
     testPQ.insert(["twenty", 20]);
     testPQ.insert(["-ve one", -1]);
 
-    let expectedOrder = [
+    const expectedOrder = [
       ["twenty", 20],
       ["ten", 10],
       ["five", 5],

@@ -23,7 +23,7 @@ interface IUserRaw {
   updatedAt: Date;
 }
 
-let userSchema = new Schema<IUserRaw>(
+const userSchema = new Schema<IUserRaw>(
   {
     username: {
       type: String,

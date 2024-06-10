@@ -17,7 +17,7 @@ import { IUser, User } from "./mongoose_models/UserSchema";
  * public cards easier
  */
 export async function addPublicUser(): Promise<IUser> {
-  let existingUser = await User.findOne({
+  const existingUser = await User.findOne({
     username: PUBLIC_USER_USERNAME,
     email: PUBLIC_USER_EMAIL,
   }).exec();
@@ -31,14 +31,14 @@ export async function addPublicUser(): Promise<IUser> {
     password: getRandomString(20), // Never meant to login
   });
 
-  let user = await User
+  const user = await User
     .findOne({ username: PUBLIC_USER_USERNAME, email: PUBLIC_USER_EMAIL })
     .exec();
   if (!user) {
     return Promise.reject("Could not find the user we just created");
   }
 
-  let publicCards = await Card.find({ isPublic: true }).exec();
+  const publicCards = await Card.find({ isPublic: true }).exec();
   await updatePublicUserMetadata(
     publicCards.map((card) => ({ card, previousTags: "" })),
   );

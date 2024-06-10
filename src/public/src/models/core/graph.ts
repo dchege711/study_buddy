@@ -45,11 +45,11 @@ export class UndirectedGraph {
    * values are the respective distances
    */
   kNearNeighbors(nodeIDs: string[], k: number = 7): string[] {
-    let kNeighbors: Map<MaxPriorityQueue.T, number> = new Map([]);
-    let alreadySeenIDs: Set<MaxPriorityQueue.T> = new Set(nodeIDs);
+    const kNeighbors: Map<MaxPriorityQueue.T, number> = new Map([]);
+    const alreadySeenIDs: Set<MaxPriorityQueue.T> = new Set(nodeIDs);
     let pq = new MaxPriorityQueue<string>();
 
-    let enqueue = (
+    const enqueue = (
       node: MaxPriorityQueue.T,
       currentPQ: MaxPriorityQueue<string>,
     ): void => {

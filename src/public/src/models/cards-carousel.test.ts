@@ -118,7 +118,7 @@ describe("CardsCarousel", function() {
       carousel.next();
     }
 
-    let currentCard = carousel.current();
+    const currentCard = carousel.current();
     expect(currentCard?._id).to.eql("1");
 
     carousel.removeCard(currentCard!);
@@ -133,7 +133,7 @@ describe("CardsCarousel", function() {
     ]);
 
     expect(carousel.current()?._id).to.not.eql("2");
-    let success = carousel.setCurrentCard({ _id: "2", urgency: 2 });
+    const success = carousel.setCurrentCard({ _id: "2", urgency: 2 });
     expect(success).to.be.true;
     expect(carousel.current()?._id).to.eql("2");
   });
@@ -145,10 +145,10 @@ describe("CardsCarousel", function() {
       { _id: "3", urgency: 3 },
     ]);
 
-    let currentId = carousel.current()!._id;
+    const currentId = carousel.current()!._id;
     expect(currentId).to.eql("3");
 
-    let success = carousel.setCurrentCard({ _id: "4", urgency: 4 });
+    const success = carousel.setCurrentCard({ _id: "4", urgency: 4 });
     expect(success).to.be.false;
     expect(carousel.current()?._id).to.eql(currentId);
   });
