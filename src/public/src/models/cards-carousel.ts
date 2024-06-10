@@ -173,7 +173,7 @@ export class CardsCarousel implements Iterable<CardsCarouselBSTKey> {
     }
   }
 
-  setCurrentCard(key: CardsCarouselBSTKey): Boolean {
+  setCurrentCard(key: CardsCarouselBSTKey): boolean {
     const node = this.bst.find(key);
     if (node === null) {
       return false;
