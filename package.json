@@ -31,6 +31,7 @@
     "format": "dprint fmt",
     "format:check": "dprint check",
     "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
     "single_test": "npm run build && ts-mocha",
     "test": "npm run test:server && npm run test:client",
     "test:server": "npm run mocha_tests",
