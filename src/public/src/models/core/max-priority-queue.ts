@@ -33,7 +33,7 @@ export class MaxPriorityQueue<T extends MaxPriorityQueue.T> {
       this.insert_order_id += 1;
     }
 
-    for (var k = Math.floor(this.n / 2); k >= 1; k--) {
+    for (let k = Math.floor(this.n / 2); k >= 1; k--) {
       this.sink(k);
     }
 
@@ -121,7 +121,7 @@ export class MaxPriorityQueue<T extends MaxPriorityQueue.T> {
   resize(capacity: number) {
     // console.assert(capacity > n);
     const newPQ = Array(capacity).fill([null, Number.NEGATIVE_INFINITY]);
-    for (var i = 0; i <= this.n; i++) {
+    for (let i = 0; i <= this.n; i++) {
       newPQ[i] = this.pq[i];
     }
     this.pq = newPQ;
@@ -148,7 +148,7 @@ export class MaxPriorityQueue<T extends MaxPriorityQueue.T> {
   sink(k: number) {
     // console.assert(is_int(k));
     while (2 * k <= this.n) {
-      var j = 2 * k;
+      let j = 2 * k;
       if (j < this.n && this.less(j, j + 1)) { j++; }
       if (!this.less(k, j)) { break; }
       this.exchange(k, j);
@@ -181,7 +181,7 @@ export class MaxPriorityQueue<T extends MaxPriorityQueue.T> {
     // console.assert(is_int(i));
     // console.assert(is_int(j));
 
-    var swap = this.pq[i];
+    const swap = this.pq[i];
     this.pq[i] = this.pq[j];
     this.pq[j] = swap;
   }

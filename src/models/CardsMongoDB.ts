@@ -132,7 +132,7 @@ export interface SearchCardParams {
 
 interface ServerAddedSearchCardParams {
   createdById?: number;
-  isPublic?: Boolean;
+  isPublic?: boolean;
 }
 
 interface CardQuery {

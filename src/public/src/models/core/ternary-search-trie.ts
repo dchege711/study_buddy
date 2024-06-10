@@ -73,7 +73,7 @@ export class TernarySearchTrie {
   getKey(x: TSTNode | null, key: string, i: number): TSTNode | null {
     if (x === null) { return null; }
 
-    var c = key.charAt(i);
+    const c = key.charAt(i);
     if (c < x.c) { return this.getKey(x.left, key, i); }
     else if (c > x.c) { return this.getKey(x.right, key, i); }
     else if (i < key.length - 1) { return this.getKey(x.mid, key, i + 1); }
@@ -105,7 +105,7 @@ export class TernarySearchTrie {
    * @returns {Object} A node in the TST. Might be null.
    */
   insertKey(x: TSTNode | null, key: string, i: number): TSTNode | null {
-    var current_char = key.charAt(i);
+    const current_char = key.charAt(i);
     if (x === null) {
       x = {
         c: current_char,

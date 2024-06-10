@@ -14,7 +14,7 @@ interface ITokenRaw {
   user_reg_date: string;
 }
 
-var tokenSchema = new Schema<ITokenRaw>(
+const tokenSchema = new Schema<ITokenRaw>(
   {
     token_id: {
       type: String,
