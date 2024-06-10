@@ -102,6 +102,7 @@
     "ejs-lint": "^2.0.0",
     "esbuild-loader": "^4.1.0",
     "eslint": "^8.57.0",
+    "eslint-interactive": "^11.0.2",
     "mocha": "^10.2.0",
     "mongodb-memory-server": "^8.9.3",
     "nyc": "^14.1.1",
