@@ -1,7 +1,6 @@
 {
   "jshint.enable": false,
   "editor.formatOnSave": true,
-  "editor.defaultFormatter": "dprint.dprint",
   "eslint.enable": true,
   "gitlens.advanced.blame.customArguments": [
     "--ignore-revs-file",
@@ -9,5 +8,8 @@
   ],
   "markdownlint.config": {
     "MD041": false
-  }
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "dprint.dprint",
+  },
 }
