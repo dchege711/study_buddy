@@ -8,6 +8,7 @@
 
 import * as fs from "fs/promises";
 
+import { DeleteResult } from "mongodb";
 import { FilterQuery } from "mongoose";
 import { PUBLIC_USER_USERNAME } from "../config";
 import { BaseResponse } from "../types";
@@ -199,7 +200,7 @@ export async function updatePublicUserMetadata(
  */
 export function deleteAllMetadata(
   payload: Pick<IUser, "userIDInApp">,
-): Promise<void> {
+): Promise<DeleteResult> {
   payload = sanitizeQuery(payload);
   return Metadata.deleteMany({ createdById: payload.userIDInApp }).exec();
 }
