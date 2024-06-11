@@ -81,7 +81,7 @@ export function read(
     "title description descriptionHTML tags urgency createdById isPublic",
 ): Promise<ICardRaw | null> {
   payload = sanitizeQuery(payload);
-  const query: Partial<ICard> = { createdById: payload.userIDInApp };
+  const query: FilterQuery<ICard> = { createdById: payload.userIDInApp };
   if (payload.cardID) { query._id = payload.cardID; }
   return Card.findOne(query).select(projection).exec();
 }
