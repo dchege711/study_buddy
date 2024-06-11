@@ -6,7 +6,7 @@
  * @module
  */
 
-import { FilterQuery } from "mongoose";
+import { FilterQuery, SortOrder } from "mongoose";
 import { BaseResponse } from "../types";
 import * as MetadataDB from "./MetadataMongoDB";
 import { Card, ICard, ICardRaw } from "./mongoose_models/CardSchema";
@@ -135,11 +135,15 @@ interface ServerAddedSearchCardParams {
   isPublic?: boolean;
 }
 
+interface SortCriteria {
+  [key: string]: SortOrder | { $meta: "textScore" };
+}
+
 interface CardQuery {
   filter: FilterQuery<ICard>;
   projection: string;
   limit: number;
-  sortCriteria: object;
+  sortCriteria: SortCriteria;
 }
 
 const kCardsSearchProjection = "title tags urgency";
@@ -234,7 +238,7 @@ function computeInternalQueryFromClientQuery(
     mandatoryFields.push({ createdAt: dateQuery });
   }
 
-  const sortCriteria = clientQuery.queryString
+  const sortCriteria: SortCriteria = clientQuery.queryString
     ? { score: { $meta: "textScore" } }
     : {};
 
