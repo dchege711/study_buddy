@@ -5,12 +5,14 @@
  */
 import { Document, model, Schema } from "mongoose";
 
-export interface IStreak extends Map<string, any> {
+export interface IStreakRaw {
   cardIDs: Array<string>;
   length: number;
   dailyTarget: number;
   timeStamp: number;
 }
+
+export type IStreak = IStreakRaw & Map<string, any>;
 
 interface IMetadataNodeInformationEntry {
   [id: string]: { urgency: number };
@@ -47,10 +49,10 @@ const metadataSchema = new Schema<IMetadataRaw>(
     streak: {
       type: Map,
       default: {
-        cardIDs: [],
+        cardIDs: new Array<string>(),
         length: 0,
         dailyTarget: 25,
-        timeStamp: Date.now,
+        timeStamp: Date.now(),
       },
     },
     cardsAreByDefaultPrivate: { type: Boolean, default: true },
