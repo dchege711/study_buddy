@@ -8,6 +8,7 @@
 
 import * as fs from "fs/promises";
 
+import { FilterQuery } from "mongoose";
 import { PUBLIC_USER_USERNAME } from "../config";
 import { BaseResponse } from "../types";
 import { Card, ICard } from "./mongoose_models/CardSchema";
@@ -94,7 +95,7 @@ type SavedCardParams = {
  */
 export async function update(
   savedCards: SavedCardParams[],
-  metadataQuery: Partial<IMetadata> | null = null,
+  metadataQuery: FilterQuery<IMetadata> | null = null,
   attributeName: SortableCardAttribute = "urgency",
 ): Promise<IMetadata> {
   /*
