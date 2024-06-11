@@ -28,7 +28,7 @@ const userSchema = new Schema<IUserRaw>(
     username: {
       type: String,
       required: true,
-      unique: [true, "This username is already taken"],
+      unique: true,
       immutable: true,
       match: /[_\-A-Za-z0-9]+/,
     },

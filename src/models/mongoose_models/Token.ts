@@ -19,7 +19,7 @@ const tokenSchema = new Schema<ITokenRaw>(
     token_id: {
       type: String,
       required: true,
-      unique: [true, "This token already exists"],
+      unique: true,
     },
     userIDInApp: { type: Number, immutable: true },
     username: { type: String, immutable: true },
