@@ -1,2 +1,8 @@
 # [Lint] npm run format | https://github.com/dchege711/study_buddy/commit/3ce78c63dad9bf0321c0fe6003b955656a24e2ae
 3ce78c63dad9bf0321c0fe6003b955656a24e2ae
+
+# [Lint] Fix violations of prefer-const | https://github.com/dchege711/study_buddy/commit/a3b499b26a06dbe378e4a254414f2736817ff76b
+a3b499b26a06dbe378e4a254414f2736817ff76b
+
+# [Lint] Fix violations of `no-var` and `ban-types` | https://github.com/dchege711/study_buddy/commit/648b56c0da95dc8b3834d1ae42b19b682637f820
+648b56c0da95dc8b3834d1ae42b19b682637f820
