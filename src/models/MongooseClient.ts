@@ -19,15 +19,14 @@ import { connect, connection, disconnect } from "mongoose";
 import { IS_DEV, MONGO_URI } from "../config";
 
 // Already 5 by default, but I might need to increase it one day...
-const connectionOptions = { poolSize: 12, useNewUrlParser: true };
 let mongoServer: MongoMemoryServer | null = null;
 if (IS_DEV) {
   (async () => {
     mongoServer = await MongoMemoryServer.create();
-    await connect(mongoServer.getUri(), connectionOptions);
+    await connect(mongoServer.getUri());
   })();
 } else {
-  connect(MONGO_URI, connectionOptions);
+  connect(MONGO_URI);
 }
 
 // Get the default connection (this will be registered on mongoose)
