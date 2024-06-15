@@ -7,15 +7,14 @@
  */
 
 import * as trpcExpress from "@trpc/server/adapters/express";
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 
 import { IS_DEV } from "./config";
 import { createContext } from "./context";
 import { getDefaultTemplateVars } from "./controllers/ControllerUtilities";
-import * as allPaths from "./paths";
 import { inAppRouter } from "./routes/InAppRouter";
 import { populateDummyAccountWithCards } from "./tests/DummyAccountUtils";
-import { mergeRouters, publicProcedure, router } from "./trpc";
+import { mergeRouters } from "./trpc";
 
 const express = require("express");
 const session = require("express-session");
@@ -107,7 +106,7 @@ if (config.IS_TS_NODE) {
   app.use(express.static(newStaticsPath));
 }
 
-app.use(function(err: any, req: Request, res: Response, next: NextFunction) {
+app.use(function(err: any, req: Request, res: Response) {
   console.error(err.stack);
   res.status(500).render(
     "pages/5xx_error_page.ejs",
@@ -119,7 +118,7 @@ app.use(function(err: any, req: Request, res: Response, next: NextFunction) {
 });
 
 // Handling 404: https://expressjs.com/en/starter/faq.html
-app.use(function(req: Request, res: Response, next: NextFunction) {
+app.use(function(req: Request, res: Response) {
   res.status(404).render(
     "pages/4xx_error_page.ejs",
     {

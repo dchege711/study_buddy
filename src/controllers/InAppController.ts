@@ -1,10 +1,7 @@
 "use strict";
 
 import { Request, Response } from "express";
-import { StatusCodes } from "http-status-codes";
 
-import * as config from "../config";
-import * as CardsDB from "../models/CardsMongoDB";
 import * as loginUtilities from "../models/LogInUtilities";
 import * as MetadataDB from "../models/MetadataMongoDB";
 import { MiniICard } from "../models/mongoose_models/CardSchema";

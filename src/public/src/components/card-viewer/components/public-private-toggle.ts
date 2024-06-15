@@ -1,5 +1,5 @@
 import { css, html, LitElement } from "lit";
-import { customElement, property, query } from "lit/decorators.js";
+import { customElement, property } from "lit/decorators.js";
 import { CardChangedEvent } from "./card-changed-event.js";
 
 @customElement("cg-card-privacy-toggle")

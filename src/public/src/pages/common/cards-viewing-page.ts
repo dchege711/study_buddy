@@ -1,6 +1,6 @@
 import { provide } from "@lit/context";
-import { css, html, LitElement } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
+import { css, LitElement } from "lit";
+import { state } from "lit/decorators.js";
 
 import {
   cardsCarouselContext,
@@ -10,17 +10,12 @@ import {
 import {
   kSearchResultsChangedEventName,
   kSearchResultSelectedEventName,
-  SearchResultsChangedEvent,
   searchResultsContext,
-  SearchResultSelectedEvent,
 } from "../../context/search-results-context.js";
 import { tagsAutoCompleteContext } from "../../context/tags-auto-complete-context.js";
 import { AutoComplete } from "../../models/auto-complete.js";
-import {
-  CardsCarousel,
-  CardsCarouselBSTKey,
-} from "../../models/cards-carousel.js";
-import { Card, CardFetchEndpoint, CardSearchResult, trpc } from "../../trpc.js";
+import { CardsCarousel } from "../../models/cards-carousel.js";
+import { Card, CardFetchEndpoint, CardSearchResult } from "../../trpc.js";
 
 import "../../components/search-bar/search-bar.js";
 import "../../components/search-results/search-results.js";
