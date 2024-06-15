@@ -465,7 +465,7 @@ export async function authenticateByToken(
 export async function deleteSessionToken(
   sessionTokenID: string,
 ): Promise<void> {
-  await Token.findOneAndRemove({ token_id: sessionTokenID }).exec();
+  await Token.findOneAndDelete({ token_id: sessionTokenID }).exec();
 }
 
 export type ResetLinkParams = Pick<IUser, "email">;
