@@ -74,7 +74,7 @@
     "markdown-it": "^14.1.0",
     "markdown-it-texmath": "^1.0.0",
     "mongodb": "^4.17.2",
-    "mongoose": "^7.6.13",
+    "mongoose": "^8.4.1",
     "nodemailer": "^6.9.9",
     "path": "0.12.7",
     "sjcl": "1.0.7",
