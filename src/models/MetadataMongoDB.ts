@@ -11,11 +11,10 @@ import * as fs from "fs/promises";
 import { DeleteResult } from "mongodb";
 import { FilterQuery } from "mongoose";
 import { PUBLIC_USER_USERNAME } from "../config";
-import { BaseResponse } from "../types";
-import { Card, ICard } from "./mongoose_models/CardSchema";
+import { Card, ICard, ICardDocument } from "./mongoose_models/CardSchema";
 import {
   IMetadata,
-  IMetadataRaw,
+  IMetadataDocument,
   IStreak,
   Metadata,
 } from "./mongoose_models/MetadataCardSchema";
@@ -58,21 +57,21 @@ export async function create(
  */
 export function read(
   payload: Pick<IUser, "userIDInApp">,
-): Promise<IMetadataRaw[]> {
+): Promise<IMetadata[]> {
   return _readInternal(payload);
 }
 
 function _readInternal(
   payload: Pick<IUser, "userIDInApp">,
-): Promise<IMetadata[]> {
+): Promise<IMetadataDocument[]> {
   payload = sanitizeQuery(payload);
   return Metadata.find({ createdById: payload.userIDInApp }).exec();
 }
 
 type SortableCardAttribute = "urgency" | "numChildren";
 
-type SavedCardParams = {
-  card: ICard;
+export type SavedCardParams = {
+  card: ICardDocument;
   previousTags: string;
 };
 
@@ -98,7 +97,7 @@ export async function update(
   savedCards: SavedCardParams[],
   metadataQuery: FilterQuery<IMetadata> | null = null,
   attributeName: SortableCardAttribute = "urgency",
-): Promise<IMetadata> {
+): Promise<IMetadataDocument> {
   /*
    * How many cards before we need a new metadata JSON?
    * (400 + 150 * num_id_metadata) * 5 bytes/char <= 16MB
@@ -124,7 +123,7 @@ export async function update(
   savedCards.forEach(async (savedCard) => {
     await updateMetadataWithCardDetails(
       savedCard.card,
-      metadataDoc as IMetadata,
+      metadataDoc,
       savedCard.previousTags,
       attributeName,
     );
@@ -349,7 +348,7 @@ export async function deleteCardFromTrash(
  */
 async function removeCardFromMetadataTrash(
   cardIdentifier: Pick<ICard, "_id" | "createdById" | "metadataIndex">,
-): Promise<IMetadata> {
+): Promise<IMetadataDocument> {
   const metadataDoc = await Metadata.findOne({
     createdById: cardIdentifier.createdById,
     metadataIndex: cardIdentifier.metadataIndex,
@@ -419,10 +418,10 @@ export async function writeCardsToJSONFile(
  */
 function updateMetadataWithCardDetails(
   savedCard: ICard,
-  metadataDoc: IMetadata,
+  metadataDoc: IMetadataDocument,
   previousTags: string,
   attributeName: SortableCardAttribute,
-): Promise<IMetadata> {
+): Promise<IMetadataDocument> {
   const sortableAttribute = attributeName === "numChildren"
     ? savedCard.idsOfUsersWithCopy.split(", ").length
     : savedCard[attributeName];
@@ -523,7 +522,7 @@ export async function updateUserSettings(
     if (metadataDoc === null) {
       return Promise.reject("No metadata found. User settings not updated!");
     }
-    metadataDoc.streak.set("dailyTarget", newUserSettings.dailyTarget);
+    metadataDoc.streak.dailyTarget = newUserSettings.dailyTarget;
     metadataDoc.markModified("streak");
     // await metadataDoc.save();
   }
@@ -556,11 +555,11 @@ export function updateStreak(
         return Promise.reject("No metadata found. Streak not updated!");
       }
 
-      const idsReviewedCards = new Set(metadataDoc.streak.get("cardIDs"));
+      const idsReviewedCards = new Set(metadataDoc.streak.cardIDs);
       for (const cardID of streakUpdateObj.cardIDs) {
         idsReviewedCards.add(cardID);
       }
-      metadataDoc.streak.set("cardIDs", Array.from(idsReviewedCards));
+      metadataDoc.streak.cardIDs = Array.from(idsReviewedCards);
       metadataDoc.markModified("streak");
       return metadataDoc.save();
     })
@@ -572,7 +571,7 @@ export function updateStreak(
 /**
  * Read metadata for the public user.
  */
-export function readPublicMetadata(): Promise<IMetadataRaw[]> {
+export function readPublicMetadata(): Promise<IMetadata[]> {
   return User.findOne({ username: PUBLIC_USER_USERNAME })
     .then((publicUser) => {
       if (publicUser === null) {

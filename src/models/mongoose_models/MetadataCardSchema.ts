@@ -3,16 +3,16 @@
  *
  * @module
  */
-import { Document, model, Schema } from "mongoose";
+import { model, Schema } from "mongoose";
 
-export interface IStreakRaw {
+export interface IStreak {
   cardIDs: Array<string>;
   length: number;
   dailyTarget: number;
   timeStamp: number;
 }
 
-export type IStreak = IStreakRaw & Map<string, any>;
+export type IStreakMap = IStreak & Map<string, any>;
 
 interface IMetadataNodeInformationEntry {
   [id: string]: { urgency: number };
@@ -26,7 +26,7 @@ export interface IMetadataTrashedCardInformation {
   [id: string]: number;
 }
 
-export interface IMetadataRaw {
+export interface IMetadata {
   createdById: number;
   metadataIndex: number;
   node_information: Array<IMetadataNodeInformation>;
@@ -39,7 +39,7 @@ export interface IMetadataRaw {
 // Using SchemaTypes.Mixed produces unreliable write results
 // It's better to include the dictionary in an array.
 
-const metadataSchema = new Schema<IMetadataRaw>(
+const metadataSchema = new Schema<IMetadata>(
   {
     createdById: { type: Number, immutable: true },
     metadataIndex: { type: Number, immutable: true },
@@ -65,5 +65,5 @@ const metadataSchema = new Schema<IMetadataRaw>(
   },
 );
 
-export const Metadata = model<IMetadataRaw>("Metadata", metadataSchema);
-export type IMetadata = IMetadataRaw & Document<any, any, IMetadataRaw>;
+export const Metadata = model<IMetadata>("Metadata", metadataSchema);
+export type IMetadataDocument = ReturnType<(typeof Metadata)["hydrate"]>;

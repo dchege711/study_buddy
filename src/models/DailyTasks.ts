@@ -8,28 +8,23 @@
 
 import * as mongoDB from "mongodb";
 
-import {
-  IMetadataRaw,
-  IStreakRaw,
-  Metadata,
-} from "./mongoose_models/MetadataCardSchema";
+import { IStreak, Metadata } from "./mongoose_models/MetadataCardSchema";
 import { closeMongooseConnection } from "./MongooseClient";
 
 /**
  * @description Reset the daily card review streaks.
  */
-async function resetStreaks(): Promise<mongoDB.BulkWriteResult> {
-  const bulkWriteOps: mongoDB.AnyBulkWriteOperation<IMetadataRaw>[] = [];
+async function resetStreaks(): Promise<void> {
   const currentTimeStamp = Date.now();
   const todaysDate = (new Date(currentTimeStamp)).toDateString();
 
   const metadataDocs = await Metadata.find({ metadataIndex: 0 }).exec();
   for (const metadataDoc of metadataDocs) {
-    const streakObj: IStreakRaw = {
-      cardIDs: metadataDoc.streak.get("cardIDs") || [],
-      length: metadataDoc.streak.get("length") || 0,
-      dailyTarget: metadataDoc.streak.get("dailyTarget") || 25,
-      timeStamp: metadataDoc.streak.get("timeStamp") || Date.now(),
+    const streakObj: IStreak = {
+      cardIDs: metadataDoc.streak.cardIDs || [],
+      length: metadataDoc.streak.length || 0,
+      dailyTarget: metadataDoc.streak.dailyTarget || 25,
+      timeStamp: metadataDoc.streak.timeStamp || Date.now(),
     };
     const timeStampDate = (new Date(streakObj.timeStamp)).toDateString();
     if (todaysDate !== timeStampDate) {
@@ -41,28 +36,23 @@ async function resetStreaks(): Promise<mongoDB.BulkWriteResult> {
     }
     streakObj.cardIDs = [];
     streakObj.timeStamp = currentTimeStamp;
-    bulkWriteOps.push({
-      updateOne: {
-        filter: { _id: metadataDoc._id },
-        update: {
-          $set: {
-            "streak.cardIDs": streakObj.cardIDs,
-            "streak.length": streakObj.length,
-            "streak.timeStamp": streakObj.timeStamp,
-            "streak.dailyTarget": streakObj.dailyTarget,
-          },
-        },
+
+    await Metadata.findByIdAndUpdate(metadataDoc._id, {
+      $set: {
+        "streak.cardIDs": streakObj.cardIDs,
+        "streak.length": streakObj.length,
+        "streak.timeStamp": streakObj.timeStamp,
+        "streak.dailyTarget": streakObj.dailyTarget,
       },
     });
   }
-  return Metadata.bulkWrite(bulkWriteOps);
 }
 
 if (require.main === module) {
   resetStreaks()
-    .then((result) => {
+    .then(() => {
       console.log(
-        `Reset the streak counters for ${result.modifiedCount} documents`,
+        `Reset the streak counters for documents`,
       );
       return closeMongooseConnection();
     })

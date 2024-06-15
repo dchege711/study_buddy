@@ -4,11 +4,7 @@ import { expect } from "chai";
 
 import { mongooseConnection } from "../../../models/MongooseClient";
 
-import {
-  Card,
-  ICard,
-  ICardRaw,
-} from "../../../models/mongoose_models/CardSchema";
+import { Card, ICard } from "../../../models/mongoose_models/CardSchema";
 import { getDummyAccount } from "../../DummyAccountUtils";
 import { getRandomCards } from "../../SampleCards";
 
@@ -93,7 +89,7 @@ describe("Test CardsMongoDB\n", function() {
   });
 
   it("should only update mutable attributes of existing cards", async function() {
-    let card: ICardRaw = await CardsDB.create({
+    let card = await CardsDB.create({
       title: "A",
       description: "B",
       createdById: dummyUser.userIDInApp,
