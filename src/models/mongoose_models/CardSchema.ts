@@ -49,9 +49,9 @@ export interface ICard {
 
 const cardSchema = new Schema<ICard>(
   {
-    title: { type: String, trim: true, required: true },
-    description: { type: String, trim: true, required: true },
-    descriptionHTML: { type: String, trim: true, required: true },
+    title: { type: String, trim: true, default: "" },
+    description: { type: String, trim: true, default: "" },
+    descriptionHTML: { type: String, trim: true, default: "" },
     tags: { type: String, lowercase: true, trim: true, default: "" },
     urgency: { type: Number, default: 10 },
     metadataIndex: { type: Number, default: 0, immutable: true },
