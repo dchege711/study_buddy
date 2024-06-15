@@ -8,9 +8,8 @@
 
 import * as mongoDB from "mongodb";
 
-import { FilterQuery, UpdateQuery } from "mongoose";
 import {
-  IMetadata,
+  IMetadataRaw,
   IStreakRaw,
   Metadata,
 } from "./mongoose_models/MetadataCardSchema";
@@ -20,12 +19,7 @@ import { closeMongooseConnection } from "./MongooseClient";
  * @description Reset the daily card review streaks.
  */
 async function resetStreaks(): Promise<mongoDB.BulkWriteResult> {
-  const bulkWriteOps: {
-    updateOne: {
-      filter?: FilterQuery<IMetadata>;
-      update?: UpdateQuery<IMetadata>;
-    };
-  }[] = [];
+  const bulkWriteOps: mongoDB.AnyBulkWriteOperation<IMetadataRaw>[] = [];
   const currentTimeStamp = Date.now();
   const todaysDate = (new Date(currentTimeStamp)).toDateString();
 
@@ -50,7 +44,14 @@ async function resetStreaks(): Promise<mongoDB.BulkWriteResult> {
     bulkWriteOps.push({
       updateOne: {
         filter: { _id: metadataDoc._id },
-        update: { $set: { streak: streakObj } },
+        update: {
+          $set: {
+            "streak.cardIDs": streakObj.cardIDs,
+            "streak.length": streakObj.length,
+            "streak.timeStamp": streakObj.timeStamp,
+            "streak.dailyTarget": streakObj.dailyTarget,
+          },
+        },
       },
     });
   }
