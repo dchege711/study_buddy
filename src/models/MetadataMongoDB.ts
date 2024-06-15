@@ -322,7 +322,7 @@ export async function deleteCardFromTrash(
 ): Promise<string> {
   deleteCardArgs = sanitizeQuery(deleteCardArgs);
 
-  const card = await Card.findOneAndRemove({
+  const card = await Card.findOneAndDelete({
     _id: deleteCardArgs._id,
     createdById: deleteCardArgs.createdById,
   }).exec();
