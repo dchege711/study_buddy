@@ -198,11 +198,11 @@ export function search(
  * `arrays dynamic_programming iterative-algorithms dynamic programming iterative algorithms`
  */
 const splitTags = function(s: string): string {
-  const possibleTags = s.match(/[\w|\d]+(\_|-){1}[\w|\d]+/g);
+  const possibleTags = s.match(/[\w|\d]+(_|-){1}[\w|\d]+/g);
   if (possibleTags === null) { return s; }
 
   for (let i = 0; i < possibleTags.length; i++) {
-    s += " " + possibleTags[i].split(/[\_-]/g).join(" ");
+    s += " " + possibleTags[i].split(/[_-]/g).join(" ");
   }
   return s;
 };
