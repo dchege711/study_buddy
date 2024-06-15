@@ -3,10 +3,10 @@
  *
  * @module
  */
-import { Document, model, Schema } from "mongoose";
+import { model, Schema } from "mongoose";
 import validator from "validator";
 
-interface ITokenRaw {
+export interface IToken {
   token_id: string;
   userIDInApp: number;
   username: string;
@@ -14,7 +14,7 @@ interface ITokenRaw {
   user_reg_date: string;
 }
 
-const tokenSchema = new Schema<ITokenRaw>(
+const tokenSchema = new Schema<IToken>(
   {
     token_id: {
       type: String,
@@ -39,5 +39,5 @@ const tokenSchema = new Schema<ITokenRaw>(
   },
 );
 
-export const Token = model<ITokenRaw>("Token", tokenSchema);
-export type IToken = ITokenRaw & Document<any, any, ITokenRaw>;
+export const Token = model<IToken>("Token", tokenSchema);
+export type ITokenDocument = ReturnType<(typeof Token)["hydrate"]>;

@@ -7,9 +7,8 @@
  */
 
 import { FilterQuery, SortOrder } from "mongoose";
-import { BaseResponse } from "../types";
 import * as MetadataDB from "./MetadataMongoDB";
-import { Card, ICard, ICardRaw } from "./mongoose_models/CardSchema";
+import { Card, ICard, ICardDocument } from "./mongoose_models/CardSchema";
 import { sanitizeCard, sanitizeQuery } from "./SanitizationAndValidation";
 
 export type CreateCardParams = Pick<
@@ -48,15 +47,20 @@ export async function create(unsavedCard: CreateCardParams): Promise<ICard> {
  */
 export async function createMany(
   unsavedCards: CreateCardParams[],
-): Promise<ICard[]> {
+): Promise<Partial<ICard>[]> {
   const sanitizedCards = unsavedCards.map((card) => sanitizeCard(card));
   const cards = await Card.insertMany(sanitizedCards);
-  return Promise.all([
-    MetadataDB.update(cards.map((card) => ({ card, previousTags: "" }))),
-    MetadataDB.updatePublicUserMetadata(
-      cards.map((card) => ({ card, previousTags: "" })),
-    ),
-  ]).then(() => cards);
+  await MetadataDB.update(
+    cards.map((
+      card,
+    ) => ({ card, previousTags: "" } as MetadataDB.SavedCardParams)),
+  );
+  await MetadataDB.updatePublicUserMetadata(
+    cards.map((
+      card,
+    ) => ({ card, previousTags: "" } as MetadataDB.SavedCardParams)),
+  );
+  return cards;
 }
 
 export interface ReadCardParams {
@@ -79,7 +83,7 @@ export function read(
   payload: ReadCardParams,
   projection =
     "title description descriptionHTML tags urgency createdById isPublic",
-): Promise<ICardRaw | null> {
+): Promise<ICard | null> {
   payload = sanitizeQuery(payload);
   const query: FilterQuery<ICard> = { createdById: payload.userIDInApp };
   if (payload.cardID) { query._id = payload.cardID; }
@@ -92,7 +96,7 @@ export function read(
  *
  * @returns {Promise} resolves with the updated card.
  */
-export async function update(payload: Partial<ICard>): Promise<ICardRaw> {
+export async function update(payload: Partial<ICard>): Promise<ICard> {
   payload = sanitizeCard(payload);
   const oldCard = await Card.findByIdAndUpdate(
     payload._id,
@@ -126,7 +130,7 @@ export interface SearchCardParams {
   limit: number;
   creationStartDate?: Date;
   creationEndDate?: Date;
-  // TODO: Change this to Array<Pick<ICardRaw, "_id">>?
+  // TODO: Change this to Array<Pick<ICard, "_id">>?
   cardIDs?: string;
 }
 
@@ -147,7 +151,7 @@ interface CardQuery {
 }
 
 const kCardsSearchProjection = "title tags urgency";
-type CardsSearchResult = Pick<ICardRaw, "_id" | "title" | "tags" | "urgency">;
+type CardsSearchResult = Pick<ICard, "_id" | "title" | "tags" | "urgency">;
 
 /**
  * @description Search for cards with associated key words. Search should be
@@ -303,7 +307,7 @@ export type ReadPublicCardParams = Omit<ReadCardParams, "userIDInApp">;
  */
 export function readPublicCard(
   payload: ReadPublicCardParams,
-): Promise<ICardRaw | null> {
+): Promise<ICard | null> {
   return _readPublicCard(payload);
 }
 
@@ -316,7 +320,9 @@ export function readPublicCard(
  *
  * [1]: https://github.com/trpc/trpc/discussions/3661
  */
-function _readPublicCard(payload: ReadPublicCardParams): Promise<ICard | null> {
+function _readPublicCard(
+  payload: ReadPublicCardParams,
+): Promise<ICardDocument | null> {
   payload = sanitizeQuery(payload);
   if (payload.cardID === undefined) {
     return Promise.reject("cardID is undefined");
@@ -388,7 +394,7 @@ export interface FlagCardParams {
  * @returns {Promise} takes a JSON object with `success`, `status` and `message`
  * as its keys. If successful, the message will contain the saved card.
  */
-export async function flagCard(payload: FlagCardParams): Promise<ICardRaw> {
+export async function flagCard(payload: FlagCardParams): Promise<ICard> {
   payload = sanitizeQuery(payload);
   const flagsToUpdate: Partial<
     Pick<ICard, "numTimesMarkedAsDuplicate" | "numTimesMarkedForReview">

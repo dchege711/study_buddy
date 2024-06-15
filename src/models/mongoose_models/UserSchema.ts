@@ -4,10 +4,10 @@
  * @module
  */
 
-import { Document, model, Schema } from "mongoose";
+import { model, Schema } from "mongoose";
 import validator from "validator";
 
-interface IUserRaw {
+export interface IUser {
   username: string;
   salt: Array<number>;
   hash: Array<number>;
@@ -23,7 +23,7 @@ interface IUserRaw {
   updatedAt: Date;
 }
 
-const userSchema = new Schema<IUserRaw>(
+const userSchema = new Schema<IUser>(
   {
     username: {
       type: String,
@@ -62,4 +62,4 @@ const userSchema = new Schema<IUserRaw>(
 );
 
 export const User = model<IUser>("User", userSchema);
-export type IUser = IUserRaw & Document<any, any, IUserRaw>;
+export type IUserDocument = ReturnType<(typeof User)["hydrate"]>;

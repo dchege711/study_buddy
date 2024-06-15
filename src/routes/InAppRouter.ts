@@ -1,7 +1,7 @@
 import type { ReadPublicCardParams } from "../models/CardsMongoDB";
 import * as CardsDB from "../models/CardsMongoDB";
 import * as MetadataDB from "../models/MetadataMongoDB";
-import { ICardRaw } from "../models/mongoose_models/CardSchema";
+import { ICard } from "../models/mongoose_models/CardSchema";
 import { authedProcedure, publicProcedure, router } from "../trpc";
 
 export const inAppRouter = router({
@@ -45,7 +45,7 @@ export const inAppRouter = router({
     }),
 
   updateCard: authedProcedure
-    .input((params: unknown) => params as Partial<ICardRaw>)
+    .input((params: unknown) => params as Partial<ICard>)
     .mutation(({ input, ctx }) => {
       return CardsDB.update({ ...input, createdById: ctx.user.userIDInApp });
     }),

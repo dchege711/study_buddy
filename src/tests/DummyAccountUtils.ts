@@ -6,7 +6,6 @@ import * as config from "../config";
 import * as CardsDB from "../models/CardsMongoDB";
 import * as LogInUtilities from "../models/LogInUtilities";
 import { addPublicUser } from "../models/Miscellaneous";
-import { IUser } from "../models/mongoose_models/UserSchema";
 
 /**
  * @returns {Promise} resolves with a JSON representation of a logged in user.

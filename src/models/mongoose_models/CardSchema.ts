@@ -4,7 +4,7 @@
  * @module
  */
 
-import { Document, model, Schema, Types } from "mongoose";
+import { model, Schema } from "mongoose";
 
 /**
  * The schema for cards in the database
@@ -27,7 +27,7 @@ import { Document, model, Schema, Types } from "mongoose";
  *  If `false`, then the card is private. A private flashcard is only visible
  *  to its owner. It will not appear in the search results at the `/browse` page. In contrast, a public card will appear in the search results as a read-only card. Any user that adds the card to their own collection will get a separate copy of the card.
  */
-export interface ICardRaw {
+export interface ICard {
   _id: string;
   title: string;
   description: string;
@@ -47,11 +47,11 @@ export interface ICardRaw {
   updatedAt: Date;
 }
 
-const cardSchema = new Schema<ICardRaw>(
+const cardSchema = new Schema<ICard>(
   {
-    title: { type: String, default: "", trim: true },
-    description: { type: String, trim: true, default: "" },
-    descriptionHTML: { type: String, trim: true, default: "" },
+    title: { type: String, trim: true, required: true },
+    description: { type: String, trim: true, required: true },
+    descriptionHTML: { type: String, trim: true, required: true },
     tags: { type: String, lowercase: true, trim: true, default: "" },
     urgency: { type: Number, default: 10 },
     metadataIndex: { type: Number, default: 0, immutable: true },
@@ -101,8 +101,8 @@ cardSchema.index(
  * You create a new connection and call .model() on it to create the
  * documents on a different database.
  */
-export const Card = model<ICardRaw>("Card", cardSchema);
-export type ICard = ICardRaw & Document<any, any, ICardRaw>;
+export const Card = model<ICard>("Card", cardSchema);
+export type ICardDocument = ReturnType<(typeof Card)["hydrate"]>;
 
 export type MiniICard = Partial<
   Pick<ICard, "title" | "tags" | "urgency" | "_id">
