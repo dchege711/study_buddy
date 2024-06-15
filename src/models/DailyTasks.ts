@@ -6,8 +6,6 @@
  * @module
  */
 
-import * as mongoDB from "mongodb";
-
 import { IStreak, Metadata } from "./mongoose_models/MetadataCardSchema";
 import { closeMongooseConnection } from "./MongooseClient";
 

@@ -10,12 +10,6 @@ import { AuthenticateUser } from "../models/LogInUtilities";
 import { ICard } from "../models/mongoose_models/CardSchema";
 import * as allPaths from "../paths";
 
-const generic_500_msg = {
-  success: false,
-  status: 500,
-  message: "Internal Server Error",
-};
-
 interface TemplateVariables {
   APP_NAME: string;
   BASE_URL: string;

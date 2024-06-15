@@ -12,7 +12,6 @@ import * as stanfordCrypto from "sjcl";
 import * as config from "../config";
 import { APP_NAME } from "../config";
 import { UserRecoverableError } from "../errors";
-import { BaseResponse } from "../types";
 import { createMany } from "./CardsMongoDB";
 import * as Email from "./EmailClient";
 import { Card } from "./mongoose_models/CardSchema";
@@ -29,7 +28,7 @@ const UPPER_CASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
  * @description Clean up resources before exiting the script.
  */
 export function close() {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function(resolve) {
     Email.close();
     resolve(null);
   });
@@ -205,7 +204,7 @@ export async function sendAccountValidationLink(
     return `${payload.email} has already validated their account.`;
   }
 
-  const { userIDInApp, validationURI } = await getIdInAppAndValidationURI();
+  const { validationURI } = await getIdInAppAndValidationURI();
   user.account_validation_uri = validationURI;
   await user.save();
 
@@ -512,11 +511,6 @@ export async function sendResetLink(
 
   return `We've sent a reset link to ${userIdentifier.email} that is valid for 2 hours.`;
 }
-
-type PasswordResetLinkResponse = BaseResponse & {
-  message: string;
-  redirect_url?: string;
-};
 
 /**
  * Resolves the promise if `resetPasswordURI` is valid and hasn't expired.

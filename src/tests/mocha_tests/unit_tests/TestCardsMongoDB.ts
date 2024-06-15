@@ -19,7 +19,7 @@ describe("Test CardsMongoDB\n", function() {
   beforeEach(function(done) {
     LogInUtilities
       .deleteAllAccounts([config.PUBLIC_USER_USERNAME])
-      .then(function(_) {
+      .then(function() {
         return getDummyAccount();
       })
       .then(function(accountInfo) {
@@ -83,7 +83,7 @@ describe("Test CardsMongoDB\n", function() {
       .then(function(updatedCard) {
         done(updatedCard);
       })
-      .catch(function(_) {
+      .catch(function() {
         done();
       });
   });

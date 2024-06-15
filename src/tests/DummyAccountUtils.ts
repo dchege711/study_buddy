@@ -21,13 +21,13 @@ export async function getDummyAccount(): Promise<
 
   return LogInUtilities
     .deleteAllAccounts([])
-    .then((_) => {
+    .then(() => {
       return addPublicUser();
     })
-    .then((_) => {
+    .then(() => {
       return LogInUtilities.registerUserAndPassword(dummyAccountDetails);
     })
-    .then((_) => {
+    .then(() => {
       return LogInUtilities.authenticateUser({
         username_or_email: dummyAccountDetails.username,
         password: dummyAccountDetails.password,

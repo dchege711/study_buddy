@@ -1,6 +1,6 @@
 import { css, html, LitElement, nothing } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
-import { createRef, Ref, ref } from "lit/directives/ref.js";
+import { customElement, state } from "lit/decorators.js";
+import { createRef, Ref } from "lit/directives/ref.js";
 
 import { SearchResultsChangedEvent } from "../../context/search-results-context.js";
 import {

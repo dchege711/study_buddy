@@ -11,7 +11,6 @@
 import { createTransport } from "nodemailer";
 
 import Mail = require("nodemailer/lib/mailer");
-import SMTPPool = require("nodemailer/lib/smtp-pool");
 
 import {
   APP_NAME,
@@ -41,7 +40,7 @@ const transporter = createTransport({
  */
 export function sendEmail(mailOptions: Mail.Options): Promise<void> {
   mailOptions.from = `${APP_NAME} <${EMAIL_ADDRESS}>`;
-  return transporter.sendMail(mailOptions).then((_) => {});
+  return transporter.sendMail(mailOptions).then(() => {});
 }
 
 /**

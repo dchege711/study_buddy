@@ -129,7 +129,7 @@ export function registerUser(req: Request, res: Response) {
     });
 }
 
-export function loginUser(req: Request, res: Response, next: NextFunction) {
+export function loginUser(req: Request, res: Response) {
   LogInUtilities
     .authenticateUser(req.body)
     .then((user) => {

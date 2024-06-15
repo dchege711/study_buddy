@@ -28,7 +28,7 @@ describe("Test LoginUtilities\n", function() {
         .then(function(signupResult) {
           done(new Error(signupResult));
         })
-        .catch(function(_: Error) {
+        .catch(function() {
           done();
         });
     });
@@ -43,7 +43,7 @@ describe("Test LoginUtilities\n", function() {
         .then(function(signupResult) {
           done(new Error(signupResult));
         })
-        .catch(function(_: Error) {
+        .catch(function() {
           done();
         });
     });
@@ -71,7 +71,7 @@ describe("Test LoginUtilities\n", function() {
             .then(function(signupResult) {
               done(new Error(signupResult));
             })
-            .catch(function(_: Error) {
+            .catch(function() {
               done();
             });
         },
@@ -89,7 +89,7 @@ describe("Test LoginUtilities\n", function() {
             .then(function(signupResult) {
               done(new Error(signupResult));
             })
-            .catch(function(_: Error) {
+            .catch(function() {
               done();
             });
         },
