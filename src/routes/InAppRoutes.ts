@@ -36,4 +36,4 @@ router.get(DOWNLOAD_USER_DATA, rateLimiter, requireLogIn, downloadUserData);
 
 router.get(DELETE_ACCOUNT, rateLimiter, requireLogIn, deleteAccount);
 
-module.exports = router;
+export = router;

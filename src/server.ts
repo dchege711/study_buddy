@@ -7,44 +7,45 @@
  */
 
 import * as trpcExpress from "@trpc/server/adapters/express";
-import { Request, Response } from "express";
+import { json, urlencoded } from "body-parser";
+import MongoStore from "connect-mongo";
+import cookieParser from "cookie-parser";
+import express, { Request, Response } from "express";
+import session, { MemoryStore } from "express-session";
+import { HTTPS } from "express-sslify";
+import { join } from "path";
 
-import { IS_DEV } from "./config";
+import {
+  IS_DEV,
+  IS_TS_NODE,
+  MONGO_URI,
+  PORT,
+  STUDY_BUDDY_SESSION_SECRET_1,
+} from "./config";
 import { createContext } from "./context";
 import { getDefaultTemplateVars } from "./controllers/ControllerUtilities";
+import { addPublicUser } from "./models/Miscellaneous";
+import expressAuthRouter from "./routes/AuthenticationRoutes";
 import { inAppRouter } from "./routes/InAppRouter";
+import expressInAppRouter from "./routes/InAppRoutes";
 import { populateDummyAccountWithCards } from "./tests/DummyAccountUtils";
 import { mergeRouters } from "./trpc";
-
-const express = require("express");
-const session = require("express-session");
-const MongoStore = require("connect-mongo");
-const path = require("path");
-const bodyParser = require("body-parser");
-const cookieParser = require("cookie-parser");
-const enforce = require("express-sslify");
-const lusca = require("lusca");
-
-const AccountRoutes = require("./routes/AuthenticationRoutes");
-const InAppRoutes = require("./routes/InAppRoutes");
-const config = require("./config");
-const misc = require("./models/Miscellaneous");
 
 // Needed to get a Mongoose instance running for this process
 const dbConnection = require("./models/MongooseClient");
 
 // Set up the default account for publicly viewable cards
 (async () => {
-  await misc.addPublicUser();
+  await addPublicUser();
 })();
 
 const app = express();
-const port = config.PORT;
+const port = PORT;
 
 // In Heroku's honesty we trust. Beware otherwise as headers can be spoofed
 // https://github.com/florianheinemann/express-sslify
 if (process.env.NODE_ENV === "production") {
-  app.use(enforce.HTTPS({ trustProtoHeader: true }));
+  app.use(HTTPS({ trustProtoHeader: true }));
 }
 
 const appRouter = mergeRouters(
@@ -56,20 +57,22 @@ const appRouter = mergeRouters(
 export type AppRouter = typeof appRouter;
 
 app.use(session({
-  secret: [config.STUDY_BUDDY_SESSION_SECRET_1],
-  secure: true,
-  httpOnly: true,
+  secret: [STUDY_BUDDY_SESSION_SECRET_1],
+  cookie: {
+    secure: true,
+    httpOnly: true,
+  },
   resave: false,
   name: "c13u-study-buddy",
-  store: config.IS_DEV ? session.MemoryStore() : MongoStore.create({
-    mongoUrl: config.MONGO_URI,
+  store: IS_DEV ? new MemoryStore() : MongoStore.create({
+    mongoUrl: MONGO_URI,
     touchAfter: 24 * 3600,
   }),
   saveUninitialized: true,
 }));
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(urlencoded({ extended: true }));
+app.use(json());
+app.use(express.static(join(__dirname, "public")));
 app.use(cookieParser());
 
 /**
@@ -86,7 +89,7 @@ app.use(cookieParser());
  */
 // app.use(lusca.csrf());
 
-app.set("views", path.join(__dirname, "views"));
+app.set("views", join(__dirname, "views"));
 app.set("view engine", "ejs");
 
 app.use(
@@ -97,11 +100,11 @@ app.use(
   }),
 );
 
-app.use("/", AccountRoutes);
-app.use("/", InAppRoutes);
+app.use("/", expressAuthRouter);
+app.use("/", expressInAppRouter);
 
-if (config.IS_TS_NODE) {
-  const newStaticsPath = path.join(__dirname, "..", "dist", "public");
+if (IS_TS_NODE) {
+  const newStaticsPath = join(__dirname, "..", "dist", "public");
   console.log(`Detected ts-node: Using ${newStaticsPath} as the static path`);
   app.use(express.static(newStaticsPath));
 }
