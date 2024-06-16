@@ -29,3 +29,12 @@ declare module "express-session" {
     user: AuthenticateUser;
   }
 }
+
+declare global {
+  namespace NodeJS {
+    // https://github.com/TypeStrong/ts-node/issues/846#issuecomment-631830056
+    interface Process {
+      [s: symbol]: Register;
+    }
+  }
+}
