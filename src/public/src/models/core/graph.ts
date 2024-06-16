@@ -1,4 +1,8 @@
-import { MaxPriorityQueue } from "./max-priority-queue.js";
+import {
+  MaxPriorityQueue,
+  MaxPriorityQueueKey,
+  MaxPriorityQueueKeyAndWeight,
+} from "./max-priority-queue.js";
 
 /**
  * @description A minimal graph data type
@@ -45,12 +49,12 @@ export class UndirectedGraph {
    * values are the respective distances
    */
   kNearNeighbors(nodeIDs: string[], k: number = 7): string[] {
-    const kNeighbors: Map<MaxPriorityQueue.T, number> = new Map([]);
-    const alreadySeenIDs: Set<MaxPriorityQueue.T> = new Set(nodeIDs);
+    const kNeighbors: Map<MaxPriorityQueueKey, number> = new Map([]);
+    const alreadySeenIDs: Set<MaxPriorityQueueKey> = new Set(nodeIDs);
     let pq = new MaxPriorityQueue<string>();
 
     const enqueue = (
-      node: MaxPriorityQueue.T,
+      node: MaxPriorityQueueKey,
       currentPQ: MaxPriorityQueue<string>,
     ): void => {
       if (!this.adj[node]) { return; }
@@ -65,7 +69,7 @@ export class UndirectedGraph {
       enqueue(nodeID, pq);
     });
 
-    let nodeAndNegatedDistance: MaxPriorityQueue.KeyAndWeight | null;
+    let nodeAndNegatedDistance: MaxPriorityQueueKeyAndWeight | null;
     let nextPQ: MaxPriorityQueue<string>;
     while (kNeighbors.size < k && !pq.is_empty()) {
       nextPQ = new MaxPriorityQueue<string>();

@@ -6,15 +6,17 @@
  * @class
  */
 
-export module MaxPriorityQueue {
-  export type T = string | number;
-  export type KeyAndWeight = [T, number];
-}
+export type MaxPriorityQueueKey = string | number;
+export type MaxPriorityQueueWeight = number;
+export type MaxPriorityQueueKeyAndWeight = [
+  MaxPriorityQueueKey,
+  MaxPriorityQueueWeight,
+];
 
-export class MaxPriorityQueue<T extends MaxPriorityQueue.T> {
-  pq: MaxPriorityQueue.KeyAndWeight[] = [];
+export class MaxPriorityQueue<T extends MaxPriorityQueueKey> {
+  pq: MaxPriorityQueueKeyAndWeight[] = [];
   n = 0;
-  keys_insertion_order: { [key: MaxPriorityQueue.T]: number } = {};
+  keys_insertion_order: { [key: MaxPriorityQueueKey]: number } = {};
 
   /* An ever-increasing variable that allows stable sorting in the PQ */
   insert_order_id = 0; // We're not famous enough for an overflow problem
@@ -23,7 +25,7 @@ export class MaxPriorityQueue<T extends MaxPriorityQueue.T> {
    * @description Initialize the max PQ data structure.
    * @param {Array} keys_and_weights Array of (key, weight) tuples
    */
-  initialize(keys_and_weights: MaxPriorityQueue.KeyAndWeight[]) {
+  initialize(keys_and_weights: MaxPriorityQueueKeyAndWeight[]) {
     this.n = keys_and_weights.length;
     this.pq = Array(this.n + 1).fill([null, Number.NEGATIVE_INFINITY]);
 
@@ -69,7 +71,7 @@ export class MaxPriorityQueue<T extends MaxPriorityQueue.T> {
    * @param {Array} key_and_weight A tuple representing the key of the value
    * to be inserted, and its weight relative to what's in the PQ.
    */
-  insert(key_and_weight: MaxPriorityQueue.KeyAndWeight) {
+  insert(key_and_weight: MaxPriorityQueueKeyAndWeight) {
     if (this.n === this.pq.length - 1) { this.resize(2 * this.pq.length); }
 
     this.n += 1;
@@ -85,7 +87,7 @@ export class MaxPriorityQueue<T extends MaxPriorityQueue.T> {
   /**
    * @description Delete the item that has the most weight in the PQ.
    */
-  del_max(): MaxPriorityQueue.KeyAndWeight | null {
+  del_max(): MaxPriorityQueueKeyAndWeight | null {
     if (this.is_empty()) { return null; }
 
     const max = this.pq[1];
@@ -107,7 +109,7 @@ export class MaxPriorityQueue<T extends MaxPriorityQueue.T> {
    * @description Return the item at the top of the PQ, but don't
    * delete it.
    */
-  peek(): MaxPriorityQueue.KeyAndWeight | null {
+  peek(): MaxPriorityQueueKeyAndWeight | null {
     if (this.n === 0) { return null; }
     return this.pq[1];
   }
