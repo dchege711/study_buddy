@@ -1,5 +1,12 @@
 import { consume } from "@lit/context";
-import { css, html, LitElement, nothing, TemplateResult } from "lit";
+import {
+  css,
+  html,
+  LitElement,
+  nothing,
+  PropertyValues,
+  TemplateResult,
+} from "lit";
 import { property } from "lit/decorators.js";
 import { createRef, Ref, ref } from "lit/directives/ref.js";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
@@ -28,7 +35,7 @@ export interface CardDescription {
 
 export class CardViewer extends LitElement {
   @property({ type: Object })
-  protected card: Card | null = null;
+  public card: Card | null = null;
 
   @consume({ context: cardsCarouselContext, subscribe: true })
   protected cardsCarousel?: CardsCarousel;
@@ -49,13 +56,13 @@ export class CardViewer extends LitElement {
     return new Set(this.card.tags.split(" ").filter(Boolean));
   }
 
-  protected willUpdate(changedProperties: Map<string, any>) {
+  protected willUpdate(changedProperties: PropertyValues<this>) {
     if (changedProperties.has("card")) {
       this.updatePromptAndResponse();
     }
   }
 
-  updated(changedProperties: Map<string, any>) {
+  updated(changedProperties: PropertyValues<this>) {
     if (changedProperties.has("card")) {
       if (this.card) {
         this.cardDialogRef.value?.showModal();

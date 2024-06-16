@@ -1,4 +1,4 @@
-import { css, html, LitElement } from "lit";
+import { css, html, LitElement, PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 import { createRef, Ref, ref } from "lit/directives/ref.js";
 
@@ -20,7 +20,7 @@ export class EditableCardDescriptionElement extends LitElement {
 
   private descriptionRef: Ref<HTMLDivElement> = createRef();
 
-  protected willUpdate(changedProperties: Map<string, any>) {
+  protected willUpdate(changedProperties: PropertyValues<this>) {
     if (changedProperties.has("value") || changedProperties.has("canEdit")) {
       this.showOverlay = !this.canEdit && this.value
         && this.value.type === CardDescriptionType.Response;
