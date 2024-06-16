@@ -18,7 +18,6 @@ import { Card } from "./mongoose_models/CardSchema";
 import { Metadata } from "./mongoose_models/MetadataCardSchema";
 import { IToken, Token } from "./mongoose_models/Token";
 import { IUser, User } from "./mongoose_models/UserSchema";
-import { sanitizeQuery } from "./SanitizationAndValidation";
 
 const DIGITS = "0123456789";
 const LOWER_CASE = "abcdefghijklmnopqrstuvwxyz";
@@ -260,8 +259,6 @@ export type RegisterUserAndPasswordParams =
 export async function registerUserAndPassword(
   payload: RegisterUserAndPasswordParams,
 ): Promise<string> {
-  payload = sanitizeQuery(payload);
-
   const conflictingUser = await User.findOne({
     $or: [{ username: payload.username }, { email: payload.email }],
   }).exec();
