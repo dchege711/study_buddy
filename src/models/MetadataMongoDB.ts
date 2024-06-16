@@ -19,7 +19,6 @@ import {
   Metadata,
 } from "./mongoose_models/MetadataCardSchema";
 import { IUser, User } from "./mongoose_models/UserSchema";
-import { sanitizeQuery } from "./SanitizationAndValidation";
 
 type MetadataCreateParams =
   & Pick<IMetadata, "metadataIndex">
@@ -34,8 +33,6 @@ type MetadataCreateParams =
 export async function create(
   payload: MetadataCreateParams,
 ): Promise<IMetadata> {
-  payload = sanitizeQuery(payload);
-
   const preExistingMetadata = await Metadata.findOne({
     createdById: payload.userIDInApp,
     metadataIndex: payload.metadataIndex,
@@ -64,7 +61,6 @@ export function read(
 function _readInternal(
   payload: Pick<IUser, "userIDInApp">,
 ): Promise<IMetadataDocument[]> {
-  payload = sanitizeQuery(payload);
   return Metadata.find({ createdById: payload.userIDInApp }).exec();
 }
 
@@ -200,7 +196,6 @@ export async function updatePublicUserMetadata(
 export function deleteAllMetadata(
   payload: Pick<IUser, "userIDInApp">,
 ): Promise<DeleteResult> {
-  payload = sanitizeQuery(payload);
   return Metadata.deleteMany({ createdById: payload.userIDInApp }).exec();
 }
 
@@ -216,8 +211,6 @@ export type SendCardToTrashParams = Pick<ICard, "_id" | "createdById">;
 export async function sendCardToTrash(
   payload: SendCardToTrashParams,
 ): Promise<string> {
-  payload = sanitizeQuery(payload);
-
   const card = await Card.findOne({
     _id: payload._id,
     createdById: payload.createdById,
@@ -286,8 +279,6 @@ export type RestoreCardFromTrashParams = SendCardToTrashParams;
 export async function restoreCardFromTrash(
   restoreCardArgs: RestoreCardFromTrashParams,
 ): Promise<string> {
-  restoreCardArgs = sanitizeQuery(restoreCardArgs);
-
   const card = await Card.findOne({
     _id: restoreCardArgs._id,
     createdById: restoreCardArgs.createdById,
@@ -320,8 +311,6 @@ type DeleteCardFromTrashParams = SendCardToTrashParams;
 export async function deleteCardFromTrash(
   deleteCardArgs: DeleteCardFromTrashParams,
 ): Promise<string> {
-  deleteCardArgs = sanitizeQuery(deleteCardArgs);
-
   const card = await Card.findOneAndDelete({
     _id: deleteCardArgs._id,
     createdById: deleteCardArgs.createdById,
@@ -385,9 +374,8 @@ interface WriteCardsToJSONFileResult {
 export async function writeCardsToJSONFile(
   userIDInApp: number,
 ): Promise<WriteCardsToJSONFileResult> {
-  const query = sanitizeQuery({ userIDInApp: userIDInApp });
   const cards = await Card
-    .find({ createdById: query.userIDInApp })
+    .find({ createdById: userIDInApp })
     .select("title description tags urgency createdAt isPublic")
     .exec();
 
@@ -493,8 +481,6 @@ export type UpdateUserSettingsParams = Pick<
 export async function updateUserSettings(
   newUserSettings: UpdateUserSettingsParams,
 ): Promise<IUser> {
-  newUserSettings = sanitizeQuery(newUserSettings);
-
   const supportedChanges = new Set(["cardsAreByDefaultPrivate", "dailyTarget"]);
   const validChanges = Object.keys(newUserSettings).filter((setting) =>
     supportedChanges.has(setting)
@@ -545,8 +531,6 @@ export type UpdateStreakParams =
 export function updateStreak(
   streakUpdateObj: UpdateStreakParams,
 ): Promise<IStreak> {
-  streakUpdateObj = sanitizeQuery(streakUpdateObj);
-
   return Metadata
     .findOne({ createdById: streakUpdateObj.userIDInApp, metadataIndex: 0 })
     .exec()

@@ -100,15 +100,3 @@ export function sanitizeCard(card: Partial<ICard>): Partial<ICard> {
 
   return card;
 }
-
-/**
- * @description Prevent a NoSQL Injection in the search parameters. This is
- * achieved by deleting all query values that begin with `$`.
- */
-export function sanitizeQuery(query: any) {
-  const keys = Object.keys(query);
-  for (let i = 0; i < keys.length; i++) {
-    if (/^\$/.test(query[keys[i]])) { delete query[keys[i]]; }
-  }
-  return query;
-}

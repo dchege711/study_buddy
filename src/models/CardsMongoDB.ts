@@ -9,7 +9,7 @@
 import { FilterQuery, SortOrder } from "mongoose";
 import * as MetadataDB from "./MetadataMongoDB";
 import { Card, ICard, ICardDocument } from "./mongoose_models/CardSchema";
-import { sanitizeCard, sanitizeQuery } from "./SanitizationAndValidation";
+import { sanitizeCard } from "./SanitizationAndValidation";
 
 export type CreateCardParams = Pick<
   ICard,
@@ -84,7 +84,6 @@ export function read(
   projection =
     "title description descriptionHTML tags urgency createdById isPublic",
 ): Promise<ICard | null> {
-  payload = sanitizeQuery(payload);
   const query: FilterQuery<ICard> = { createdById: payload.userIDInApp };
   if (payload.cardID) { query._id = payload.cardID; }
   return Card.findOne(query).select(projection).exec();
@@ -179,7 +178,7 @@ export function search(
    */
   return collectSearchResults(
     computeInternalQueryFromClientQuery(
-      sanitizeQuery(payload),
+      payload,
       { createdById },
     ),
   );
@@ -290,7 +289,7 @@ export function publicSearch(
 ): Promise<CardsSearchResult[]> {
   return collectSearchResults(
     computeInternalQueryFromClientQuery(
-      sanitizeQuery(payload),
+      payload,
       { isPublic: true },
     ),
   );
@@ -323,7 +322,6 @@ export function readPublicCard(
 function _readPublicCard(
   payload: ReadPublicCardParams,
 ): Promise<ICardDocument | null> {
-  payload = sanitizeQuery(payload);
   if (payload.cardID === undefined) {
     return Promise.reject("cardID is undefined");
   }
@@ -350,7 +348,6 @@ export interface DuplicateCardParams {
 export async function duplicateCard(
   payload: DuplicateCardParams,
 ): Promise<ICard> {
-  payload = sanitizeQuery(payload);
   const originalCard = await _readPublicCard({ cardID: payload.cardID });
   if (originalCard === null) {
     return Promise.reject("Card not found!");
@@ -395,7 +392,6 @@ export interface FlagCardParams {
  * as its keys. If successful, the message will contain the saved card.
  */
 export async function flagCard(payload: FlagCardParams): Promise<ICard> {
-  payload = sanitizeQuery(payload);
   const flagsToUpdate: Partial<
     Pick<ICard, "numTimesMarkedAsDuplicate" | "numTimesMarkedForReview">
   > = {};
@@ -429,7 +425,6 @@ export type TagGroupings = string[][];
 export function getTagGroupings(
   payload: TagGroupingsParam,
 ): Promise<TagGroupings> {
-  payload = sanitizeQuery(payload);
   return Card
     .find({ createdById: payload.userIDInApp })
     .select("tags").exec()
