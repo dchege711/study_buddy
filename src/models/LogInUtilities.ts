@@ -483,15 +483,13 @@ export async function sendResetLink(
     return `No user found with the email address: ${userIdentifier.email}`;
   }
 
-  let resetPasswordURI = getRandomString(50, LOWER_CASE + DIGITS);
-  while (true) {
-    const conflictingUser = await User.findOne({
-      reset_password_uri: resetPasswordURI,
-    }).exec();
-    if (!conflictingUser) {
-      break;
-    }
+  let resetPasswordURI = "";
+  let hasConflictingUser = true;
+  while (hasConflictingUser) {
     resetPasswordURI = getRandomString(50, LOWER_CASE + DIGITS);
+    hasConflictingUser = (await User.exists({
+      reset_password_uri: resetPasswordURI,
+    }).exec()) !== null;
   }
 
   user.reset_password_uri = resetPasswordURI;
