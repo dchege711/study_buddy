@@ -63,7 +63,7 @@ export class MaxPriorityQueue<T extends MaxPriorityQueueKey> {
    * @param {String} key The key of the item being queried
    */
   contains_key(key: T): boolean {
-    return this.keys_insertion_order.hasOwnProperty(key);
+    return Object.prototype.hasOwnProperty.call(this.keys_insertion_order, key);
   }
 
   /**
@@ -75,7 +75,11 @@ export class MaxPriorityQueue<T extends MaxPriorityQueueKey> {
     if (this.n === this.pq.length - 1) { this.resize(2 * this.pq.length); }
 
     this.n += 1;
-    if (!this.keys_insertion_order.hasOwnProperty(key_and_weight[0])) {
+    const keyExists = Object.prototype.hasOwnProperty.call(
+      this.keys_insertion_order,
+      key_and_weight[0],
+    );
+    if (!keyExists) {
       this.keys_insertion_order[key_and_weight[0]] = this.insert_order_id;
       this.insert_order_id += 1;
     }
