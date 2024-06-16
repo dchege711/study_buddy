@@ -3,7 +3,7 @@ interface TSTNode {
   left: TSTNode | null;
   mid: TSTNode | null;
   right: TSTNode | null;
-  val: any;
+  val: boolean | null;
 }
 
 /**

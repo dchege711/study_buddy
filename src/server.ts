@@ -106,7 +106,7 @@ if (config.IS_TS_NODE) {
   app.use(express.static(newStaticsPath));
 }
 
-app.use(function(err: any, req: Request, res: Response) {
+app.use(function(err: Error, req: Request, res: Response) {
   console.error(err.stack);
   res.status(500).render(
     "pages/5xx_error_page.ejs",

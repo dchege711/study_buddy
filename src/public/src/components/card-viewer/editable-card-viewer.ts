@@ -1,4 +1,4 @@
-import { css, html, nothing } from "lit";
+import { css, html, nothing, PropertyValues } from "lit";
 import { customElement, property, state } from "lit/decorators.js";
 
 import { CardsCarouselUpdateCursorDirection } from "../../context/cards-carousel-context.js";
@@ -29,14 +29,14 @@ export class EditableCardViewer extends CardViewer {
   }
 
   @property({ type: Object })
-  protected card: PrivateCardResult = null;
+  public card: PrivateCardResult = null;
 
   @state()
   protected canEdit = false;
 
   private pendingChanges: PendingChanges = {};
 
-  protected willUpdate(changedProperties: Map<string, any>) {
+  protected willUpdate(changedProperties: PropertyValues<this>) {
     if (changedProperties.has("card")) {
       this.canEdit = false;
     }

@@ -17,7 +17,7 @@ enum FlagReason {
 @customElement("public-card-viewer")
 export class PublicCardViewer extends CardViewer {
   @property({ type: Object })
-  protected card: PublicCardResult = null;
+  public card: PublicCardResult = null;
 
   private flagCard(reason: FlagReason) {
     if (!this.card) {

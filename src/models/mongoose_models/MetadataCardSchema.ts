@@ -12,10 +12,14 @@ export interface IStreak {
   timeStamp: number;
 }
 
-export type IStreakMap = IStreak & Map<string, any>;
+export type IStreakMap = IStreak & Map<string, Array<string> | number>;
 
 interface IMetadataNodeInformationEntry {
   [id: string]: { urgency: number };
+}
+
+interface IMetadataNodeStatsEntry {
+  [id: string]: { urgency?: number };
 }
 
 export interface IMetadataNodeInformation {
@@ -31,7 +35,7 @@ export interface IMetadata {
   metadataIndex: number;
   node_information: Array<IMetadataNodeInformation>;
   trashed_cards: Array<IMetadataTrashedCardInformation>;
-  stats: Array<any>;
+  stats: Array<IMetadataNodeStatsEntry>;
   streak: IStreak;
   cardsAreByDefaultPrivate: boolean;
 }
