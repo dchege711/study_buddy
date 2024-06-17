@@ -10,12 +10,8 @@ describe("Test LoginUtilities\n", function() {
   describe("when signing up new users", function(this: Suite) {
     this.timeout(5000); // These tests may run slower than 2s in CI.
 
-    before(function() {
+    beforeEach(function() {
       return addPublicUser();
-    });
-
-    after(function() {
-      return LogInUtilities.deleteAllAccounts([]);
     });
 
     it("should reject an incorrect email address", function(done) {
@@ -49,7 +45,7 @@ describe("Test LoginUtilities\n", function() {
     });
 
     describe("when a valid user already exists", function() {
-      before(function() {
+      beforeEach(function() {
         return LogInUtilities
           .registerUserAndPassword({
             username: "alice",
