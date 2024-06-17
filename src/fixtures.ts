@@ -3,7 +3,8 @@ import { Runner } from "mocha";
 import { PORT } from "./config";
 import { close as closeEmailClient } from "./models/EmailClient";
 import { deleteAllAccounts } from "./models/LogInUtilities";
-import { app, dbConnection } from "./server";
+import { closeMongooseConnection } from "./models/MongooseClient";
+import { app } from "./server";
 
 /**
  * Root hooks are ran before (or after) every test in every file.
@@ -58,7 +59,7 @@ export async function mochaGlobalSetup(this: Runner) {
  */
 export async function mochaGlobalTeardown(this: Runner) {
   closeEmailClient();
-  await dbConnection.closeMongooseConnection();
+  await closeMongooseConnection();
   this.server.close();
 }
 
