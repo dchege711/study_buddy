@@ -1,0 +1,6 @@
+# https://mochajs.org/#configuring-mocha-nodejs
+# https://github.com/mochajs/mocha/blob/master/example/config/.mocharc.yml
+
+recursive: true
+spec:
+- "./dist/**/*.test.js"
