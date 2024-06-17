@@ -1,6 +1,8 @@
 import { Runner } from "mocha";
+
 import { PORT } from "./config";
 import { close as closeEmailClient } from "./models/EmailClient";
+import { deleteAllAccounts } from "./models/LogInUtilities";
 import { app, dbConnection } from "./server";
 
 /**
@@ -9,6 +11,13 @@ import { app, dbConnection } from "./server";
  * [1]: https://mochajs.org/#root-hook-plugins
  */
 export const mochaHooks = {
+  /**
+   * In both parallel and serial modes, runs before each test.
+   */
+  async beforeEach() {
+    await deleteAllAccounts([]);
+  },
+
   /**
    * In serial mode, run after all tests end, once only.
    *
