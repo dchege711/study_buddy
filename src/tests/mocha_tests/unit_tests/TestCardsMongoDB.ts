@@ -2,8 +2,6 @@
 
 import { expect } from "chai";
 
-import { mongooseConnection } from "../../../models/MongooseClient";
-
 import { Card, ICard } from "../../../models/mongoose_models/CardSchema";
 import { getDummyAccount } from "../../DummyAccountUtils";
 import { getRandomCards } from "../../SampleCards";
