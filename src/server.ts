@@ -131,10 +131,13 @@ app.use(function(req: Request, res: Response) {
   );
 });
 
-app.listen(port, function() {
+const server = app.listen(port, function() {
   console.log(`App is running on port ${port}`);
 });
 
 if (IS_DEV) {
   populateDummyAccountWithCards();
 }
+
+// Export app and mongoose connection for testing
+export { app, dbConnection, server };
