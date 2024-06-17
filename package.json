@@ -98,6 +98,7 @@
     "@types/sjcl": "^1.0.30",
     "@types/supertest": "^6.0.2",
     "@types/validator": "^13.11.9",
+    "@web/test-runner": "^0.18.2",
     "chai": "^4.3.7",
     "circular-dependency-plugin": "^5.0.2",
     "copy-webpack-plugin": "^11.0.0",
