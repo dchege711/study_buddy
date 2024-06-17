@@ -45,24 +45,3 @@ export async function addPublicUser(): Promise<IUser> {
 
   return user;
 }
-
-if (require.main === module) {
-  const dbConnection = require("./MongooseClient.js");
-
-  addPublicUser()
-    .then((confirmation) => {
-      console.log(confirmation);
-      return dbConnection.closeMongooseConnection();
-    })
-    .then(() => {
-      process.exit(0);
-    })
-    .catch((err) => {
-      console.error(err);
-      process.exit(1);
-    });
-
-  // ... So many pending promises. I'm not proud of calling `process.exit()`
-  // const whyIsNodeRunning = require("why-is-node-running");
-  // setTimeout(whyIsNodeRunning, 10000);
-}
