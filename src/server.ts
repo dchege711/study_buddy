@@ -32,7 +32,7 @@ import { populateDummyAccountWithCards } from "./tests/DummyAccountUtils";
 import { mergeRouters } from "./trpc";
 
 // Needed to get a Mongoose instance running for this process
-const dbConnection = require("./models/MongooseClient");
+import { mongooseConnection } from "./models/MongooseClient";
 
 const app = express();
 const port = PORT;
@@ -127,7 +127,7 @@ app.use(function(req: Request, res: Response) {
 });
 
 // Export app and mongoose connection for testing
-export { app, dbConnection };
+export { app, mongooseConnection };
 
 // Set up needed when running this file directly, e.g., in the server, as
 // opposed to when running tests.
