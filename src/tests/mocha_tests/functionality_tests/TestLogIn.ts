@@ -4,7 +4,6 @@ import { Suite } from "mocha";
 
 import * as LogInUtilities from "../../../models/LogInUtilities";
 import { addPublicUser } from "../../../models/Miscellaneous";
-import { mongooseConnection } from "../../../models/MongooseClient";
 
 describe("Test LoginUtilities\n", function() {
   describe("when signing up new users", function(this: Suite) {
