@@ -34,11 +34,6 @@ import { mergeRouters } from "./trpc";
 // Needed to get a Mongoose instance running for this process
 const dbConnection = require("./models/MongooseClient");
 
-// Set up the default account for publicly viewable cards
-(async () => {
-  await addPublicUser();
-})();
-
 const app = express();
 const port = PORT;
 
@@ -131,13 +126,22 @@ app.use(function(req: Request, res: Response) {
   );
 });
 
-const server = app.listen(port, function() {
-  console.log(`App is running on port ${port}`);
-});
-
-if (IS_DEV) {
-  populateDummyAccountWithCards();
-}
-
 // Export app and mongoose connection for testing
-export { app, dbConnection, server };
+export { app, dbConnection };
+
+// Set up needed when running this file directly, e.g., in the server, as
+// opposed to when running tests.
+if (require.main === module) {
+  app.listen(port, function() {
+    console.log(`App is running on port ${port}`);
+  });
+
+  // Set up the default account for publicly viewable cards
+  (async () => {
+    await addPublicUser();
+  })();
+
+  if (IS_DEV) {
+    populateDummyAccountWithCards();
+  }
+}
