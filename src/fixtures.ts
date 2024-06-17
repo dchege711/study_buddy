@@ -1,5 +1,7 @@
-import { close as closeLoginUtils } from "./models/LogInUtilities";
-import { dbConnection, server } from "./server";
+import { Runner } from "mocha";
+import { PORT } from "./config";
+import { close as closeEmailClient } from "./models/EmailClient";
+import { app, dbConnection } from "./server";
 
 /**
  * Root hooks are ran before (or after) every test in every file.
@@ -34,10 +36,21 @@ export const mochaHooks = {
  * [1]: https://mochajs.org/#global-fixtures
  */
 
-export async function mochaGlobalTeardown() {
-  await closeLoginUtils();
+/**
+ * Run once before all tests.
+ */
+export async function mochaGlobalSetup(this: Runner) {
+  this.server = app.listen(PORT);
+  console.log(`Server listening on port ${PORT}`);
+}
+
+/**
+ * Run once after all tests.
+ */
+export async function mochaGlobalTeardown(this: Runner) {
+  closeEmailClient();
   await dbConnection.closeMongooseConnection();
-  server.close();
+  this.server.close();
 }
 
 // In case the process doesn't close, run this to discover why
