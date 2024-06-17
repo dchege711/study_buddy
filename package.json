@@ -36,7 +36,7 @@
     "test": "npm run test:server && npm run test:client",
     "test:server": "npm run mocha_tests",
     "test:client": "cd src/public && npm run test && cd ../../",
-    "mocha_tests": "nyc ts-mocha --no-warnings --recursive --sort './src/tests/mocha_tests/*/*.ts' './src/**/*.test.ts' --exclude './src/public/**/*'",
+    "mocha_tests": "nyc ts-mocha --config ./.mocharc.yml",
     "webpack": "webpack --config ./webpack.config.cjs"
   },
   "repository": {

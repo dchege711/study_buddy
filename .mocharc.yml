@@ -1,0 +1,9 @@
+# https://mochajs.org/#configuring-mocha-nodejs
+# https://github.com/mochajs/mocha/blob/master/example/config/.mocharc.yml
+
+exclude: "./src/public/**/*"
+recursive: true
+require: "./src/fixtures.ts"
+spec:
+- "./src/tests/mocha_tests/*/*.ts"
+- "./src/**/*.test.ts"
