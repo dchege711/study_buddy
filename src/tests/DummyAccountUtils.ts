@@ -48,15 +48,3 @@ export function populateDummyAccountWithCards(): Promise<number> {
       return cards.length;
     });
 }
-
-if (require.main === module) {
-  const dbConnection = require("../models/MongooseClient.js");
-  populateDummyAccountWithCards()
-    .then((numCards) => {
-      console.log(`Created ${numCards} cards for sample user`);
-      return dbConnection.closeMongooseConnection();
-    })
-    .catch((err) => {
-      console.error(err);
-    });
-}
