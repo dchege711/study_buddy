@@ -38,3 +38,16 @@ declare global {
     }
   }
 }
+
+declare module "mocha" {
+  /**
+   * Global setup fixtures and global teardown fixtures share a context, which
+   * means we can add properties to the context object (`this`) in the setup
+   * fixture, and reference them later in the teardown fixture.
+   *
+   * [1]: https://mochajs.org/#global-setup-fixtures
+   */
+  interface Runner {
+    server: import("http").Server;
+  }
+}
