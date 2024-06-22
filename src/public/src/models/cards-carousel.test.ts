@@ -1,4 +1,4 @@
-import { expect } from "chai";
+import { expect } from "@esm-bundle/chai";
 
 import { CardsCarousel } from "./cards-carousel.js";
 

@@ -1,4 +1,4 @@
-import { expect } from "chai";
+import { expect } from "@esm-bundle/chai";
 
 import { MaxPriorityQueue } from "./max-priority-queue.js";
 
