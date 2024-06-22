@@ -100,7 +100,7 @@
     "@types/validator": "^13.11.9",
     "@web/dev-server-esbuild": "^1.0.2",
     "@web/test-runner": "^0.18.2",
-    "chai": "^4.3.7",
+    "chai": "npm:@esm-bundle/chai@^4.3.4-fix.0",
     "circular-dependency-plugin": "^5.0.2",
     "copy-webpack-plugin": "^11.0.0",
     "dprint": "^0.46.2",
