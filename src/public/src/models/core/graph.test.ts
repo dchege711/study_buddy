@@ -8,7 +8,7 @@ describe("Test Graph\n", function() {
     expect(graph.getEdgeWeight("a", "b")).to.be.null;
 
     graph.addEdge("a", "b", 2);
-    expect(graph.getEdgeWeight("a", "b")).equal(3);
+    expect(graph.getEdgeWeight("a", "b")).equal(2);
     expect(graph.getEdgeWeight("b", "a")).equal(2);
   });
 
