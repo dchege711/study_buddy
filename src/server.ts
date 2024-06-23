@@ -98,12 +98,6 @@ app.use(
 app.use("/", expressAuthRouter);
 app.use("/", expressInAppRouter);
 
-/** Let the test know when the server is ready. */
-let testServerReady = !IS_DEV;
-app.get("/test/ready", (_, res) => {
-  if (testServerReady) { res.sendStatus(200); }
-});
-
 if (IS_TS_NODE) {
   const newStaticsPath = join(__dirname, "..", "dist", "public");
   console.log(`Detected ts-node: Using ${newStaticsPath} as the static path`);
@@ -148,9 +142,6 @@ if (require.main === module) {
   })();
 
   if (IS_DEV) {
-    (async () => {
-      await populateDummyAccountWithCards();
-    })();
-    testServerReady = true;
+    populateDummyAccountWithCards();
   }
 }
