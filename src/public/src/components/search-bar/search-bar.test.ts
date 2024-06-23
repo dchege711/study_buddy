@@ -6,7 +6,7 @@ import {
   oneEvent,
   waitUntil,
 } from "@open-wc/testing";
-import { restore, spy } from "sinon";
+import { restore, SinonSpy, spy } from "sinon";
 
 import {
   kSearchResultsChangedEventName,
@@ -68,11 +68,13 @@ describe("search-bar", () => {
     expect(searchEndpointSpy.callCount).to.equal(0);
   });
 
-  it("should fetch results after the user types a word", async () => {
-    const { searchBar, searchEndpointSpy } = await testFixture();
+  describe("when showing search results", () => {
+    let searchBar: SearchBar;
+    let searchEndpointSpy: SinonSpy;
 
-    // Update visible results when the user presses space.
-    {
+    beforeEach(async () => {
+      ({ searchBar, searchEndpointSpy } = await testFixture());
+
       searchEndpointSpy.resetHistory();
       const textInputEvent = new TextInputEvent(
         "math",
@@ -85,10 +87,9 @@ describe("search-bar", () => {
 
       const displayedResults = await displayedSearchResults(searchBar);
       expect(displayedResults.length).to.be.greaterThan(0);
-    }
+    });
 
-    // Broadcast search results and reset when the user presses Enter.
-    {
+    it("broadcast search results and reset when the user presses Enter", async () => {
       searchEndpointSpy.resetHistory();
 
       setTimeout(() => {
@@ -110,30 +111,9 @@ describe("search-bar", () => {
 
       const displayedResults = await displayedSearchResults(searchBar);
       expect(displayedResults.length).to.be.equal(0);
-    }
-  });
+    });
 
-  it("should clear results on blur", async () => {
-    const { searchBar, searchEndpointSpy } = await testFixture();
-
-    // Update visible results when the user presses space.
-    {
-      searchEndpointSpy.resetHistory();
-      const textInputEvent = new TextInputEvent(
-        "math",
-        InputState.PressedSpace,
-      );
-      searchBar.dispatchEvent(textInputEvent);
-      expect(searchEndpointSpy.callCount).to.equal(1);
-
-      await nextFrame();
-
-      const displayedResults = await displayedSearchResults(searchBar);
-      expect(displayedResults.length).to.be.greaterThan(0);
-    }
-
-    // Clear results on blur after a timeout.
-    {
+    it("should clear results on blur", async () => {
       searchBar.dispatchEvent(new TextInputBlurEvent());
 
       await waitUntil(
@@ -143,6 +123,6 @@ describe("search-bar", () => {
         },
         "Did not clear search results after TextInputBlurEvent",
       );
-    }
+    });
   });
 });
