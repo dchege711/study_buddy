@@ -111,6 +111,7 @@
     "mocha": "^10.2.0",
     "mongodb-memory-server": "^8.9.3",
     "nyc": "^14.1.1",
+    "sinon": "^18.0.0",
     "source-map-loader": "^4.0.1",
     "supertest": "^7.0.0",
     "ts-loader": "^9.4.3",
