@@ -1,4 +1,4 @@
-import { expect } from "@esm-bundle/chai";
+import { expect } from "@open-wc/testing";
 
 import { TernarySearchTrie } from "./ternary-search-trie.js";
 

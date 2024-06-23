@@ -1,4 +1,4 @@
-import { expect } from "@esm-bundle/chai";
+import { expect } from "@open-wc/testing";
 
 import { MaxPriorityQueue } from "./max-priority-queue.js";
 
