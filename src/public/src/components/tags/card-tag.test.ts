@@ -1,6 +1,6 @@
 import { expect, fixture, html } from "@open-wc/testing";
 
-import "./card-tag";
+import "./card-tag.js";
 
 describe("card-tag", () => {
   it("should display the tag with prefix", async () => {
