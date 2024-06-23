@@ -4,7 +4,8 @@
   "version": "2.0.0",
   "scripts": {
     "build": "npm run typecheck && npm run webpack",
-    "test": "web-test-runner",
+    "test": "cd ../../ && start-server-and-test start:debug http://localhost:5000/test/ready test:client-post-server-start && cd src/public",
+    "test:web": "web-test-runner --watch",
     "typecheck": "tsc --project tsconfig.json",
     "webpack": "webpack --config ./webpack.config.cjs"
   }
