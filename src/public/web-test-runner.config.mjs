@@ -1,4 +1,5 @@
 import { esbuildPlugin } from "@web/dev-server-esbuild";
+import { importMapsPlugin } from '@web/dev-server-import-maps';
 import { fileURLToPath, URL } from "url";
 
 /**
@@ -32,6 +33,15 @@ export default {
       target: "auto",
       ts: true,
       tsconfig: fileURLToPath(new URL('./tsconfig.json', import.meta.url)),
-    })
+    }),
+    importMapsPlugin({
+      inject: {
+        importMap: {
+          imports: {
+            '/src/public/src/trpc.ts?wds-import-map=0': '/src/public/mocks/trpc.ts',
+          },
+        },
+      },
+    }),
   ],
 };
