@@ -143,9 +143,6 @@ describe("search-bar", () => {
         },
         "Did not clear search results after TextInputBlurEvent",
       );
-
-      const displayedResults = await displayedSearchResults(searchBar);
-      expect(displayedResults.length).to.be.equal(0);
     }
   });
 });
