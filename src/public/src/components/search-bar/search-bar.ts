@@ -120,7 +120,7 @@ export class SearchBar extends LitElement {
   }
 
   private clearResultsAfterTimeout() {
-    window.setTimeout(this.clearResults, 300);
+    window.setTimeout(this.clearResults.bind(this), 300);
   }
 
   private clearResults() {
