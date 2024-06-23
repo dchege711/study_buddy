@@ -99,6 +99,7 @@
     "@types/supertest": "^6.0.2",
     "@types/validator": "^13.11.9",
     "@web/dev-server-esbuild": "^1.0.2",
+    "@web/dev-server-import-maps": "^0.2.1",
     "@web/test-runner": "^0.18.2",
     "chai": "^4.3.7",
     "circular-dependency-plugin": "^5.0.2",
