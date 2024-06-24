@@ -1,5 +1,5 @@
 import { esbuildPlugin } from "@web/dev-server-esbuild";
-import { importMapsPlugin } from '@web/dev-server-import-maps';
+import { importMapsPlugin } from "@web/dev-server-import-maps";
 import { fileURLToPath, URL } from "url";
 
 /**
@@ -10,7 +10,7 @@ import { fileURLToPath, URL } from "url";
 export default {
   /** Test files glob patterns. */
   files: [
-    "./src/**/*.test.ts"
+    "./src/**/*.test.ts",
   ],
 
   /**
@@ -25,20 +25,21 @@ export default {
   /**
    * In a monorepo you need to set the root dir to resolve modules.
    */
-  rootDir: '../../',
+  rootDir: "../../",
 
   /** Plugins used by the server to serve or transform files. */
   plugins: [
     esbuildPlugin({
       target: "auto",
       ts: true,
-      tsconfig: fileURLToPath(new URL('./tsconfig.json', import.meta.url)),
+      tsconfig: fileURLToPath(new URL("./tsconfig.json", import.meta.url)),
     }),
     importMapsPlugin({
       inject: {
         importMap: {
           imports: {
-            '/src/public/src/trpc.ts?wds-import-map=0': '/src/public/mocks/trpc.ts',
+            "/src/public/src/trpc.ts?wds-import-map=0":
+              "/src/public/mocks/trpc.ts",
           },
         },
       },
