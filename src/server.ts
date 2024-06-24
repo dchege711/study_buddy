@@ -11,6 +11,7 @@ import { json, urlencoded } from "body-parser";
 import MongoStore from "connect-mongo";
 import cookieParser from "cookie-parser";
 import express, { Request, Response } from "express";
+import mongoSanitize from "express-mongo-sanitize";
 import session, { MemoryStore } from "express-session";
 import { HTTPS } from "express-sslify";
 import { join } from "path";
@@ -69,6 +70,7 @@ app.use(urlencoded({ extended: true }));
 app.use(json());
 app.use(express.static(join(__dirname, "public")));
 app.use(cookieParser());
+app.use(mongoSanitize());
 
 /**
  * Protections against CSRF attacks.
