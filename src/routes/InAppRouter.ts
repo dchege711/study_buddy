@@ -2,7 +2,12 @@ import type { ReadPublicCardParams } from "../models/CardsMongoDB";
 import * as CardsDB from "../models/CardsMongoDB";
 import * as MetadataDB from "../models/MetadataMongoDB";
 import { ICard } from "../models/mongoose_models/CardSchema";
-import { authedProcedure, publicProcedure, router } from "../trpc";
+import {
+  authedProcedure,
+  createCallerFactory,
+  publicProcedure,
+  router,
+} from "../trpc";
 
 export const inAppRouter = router({
   fetchPublicCard: publicProcedure
@@ -139,3 +144,5 @@ export const inAppRouter = router({
       });
     }),
 });
+
+export const createCaller = createCallerFactory(inAppRouter);
