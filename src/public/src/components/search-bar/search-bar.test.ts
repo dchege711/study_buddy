@@ -50,6 +50,16 @@ describe("search-bar", () => {
     return Array.from(displayedResults.querySelectorAll("li"));
   }
 
+  /**
+   * Snapshot tests are currently broken.
+   *
+   * [1]: https://github.com/modernweb-dev/web/issues/2127
+   */
+  it.skip("renders the empty state correctly", async () => {
+    const { searchBar } = await testFixture();
+    await expect(searchBar).shadowDom.to.equalSnapshot();
+  });
+
   it("should fetch initial results on load but not display them in the drop-down", async () => {
     const { searchBar, searchEndpointSpy } = await testFixture();
     expect(searchEndpointSpy.callCount).to.equal(1);
