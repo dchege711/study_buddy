@@ -18,21 +18,6 @@ export const mochaHooks = {
   async beforeEach() {
     await deleteAllAccounts([]);
   },
-
-  /**
-   * In serial mode, run after all tests end, once only.
-   *
-   * In parallel mode, run after all tests end, for each file.
-   */
-  async afterAll() {
-    // await closeLoginUtils();
-    // await dbConnection.closeMongooseConnection();
-
-    // const whyIsNodeRunning = require("why-is-node-running");
-    // setInterval(whyIsNodeRunning, 8000);
-
-    return Promise.resolve();
-  },
 };
 
 /**
