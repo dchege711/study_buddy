@@ -2,9 +2,21 @@ import { expect } from "chai";
 import { StatusCodes } from "http-status-codes";
 import request from "supertest";
 
-import { ReadPublicCardParams } from "../models/CardsMongoDB";
+import {
+  create as createCard,
+  publicSearch,
+  ReadPublicCardParams,
+} from "../models/CardsMongoDB";
+import { authenticateUser } from "../models/LogInUtilities";
 import { app } from "../server";
+import { dummyAccountDetails } from "../tests/DummyAccountUtils";
+import { sampleCards } from "../tests/SampleCards";
 import { createCaller } from "./InAppRouter";
+
+const authDetails = {
+  username_or_email: dummyAccountDetails.email,
+  password: dummyAccountDetails.password,
+};
 
 /**
  * Convert `payload` into a URL query string of the form expected by tRPC.
@@ -26,7 +38,31 @@ describe("tRPC helper", () => {
 });
 
 describe.only("fetchPublicCard", function() {
-  const caller = createCaller({ user: null });
+  let caller: ReturnType<typeof createCaller>;
+  let samplePublicCardId: string;
+
+  this.beforeEach(async () => {
+    const user = await authenticateUser(authDetails);
+    caller = createCaller({ user });
+
+    // Create some public and private cards.
+    expect(sampleCards.length).to.be.greaterThanOrEqual(4);
+    for (let i = 0; i < 4; ++i) {
+      await createCard({
+        ...sampleCards[i],
+        isPublic: i % 2 === 0,
+        createdById: user.userIDInApp,
+      });
+    }
+
+    // Ensure that there are public cards available.
+    const publicCards = await publicSearch({ queryString: "", limit: 5 });
+    expect(publicCards.length).to.be.greaterThan(1);
+    samplePublicCardId = publicCards[0]._id;
+
+    return Promise.resolve();
+  });
+
   /**
    * Compute the URL for a request to fetch a public card.
    */
@@ -36,7 +72,7 @@ describe.only("fetchPublicCard", function() {
 
   it("should avoid an injection attack (supertest)", async () => {
     const response = await request(app)
-      .get(computeRequestURL({ cardID: { $ne: "" } }))
+      .get(computeRequestURL({ cardID: { $ne: "000000000000000000000000" } }))
       .expect("Content-Type", /json/)
       .expect(StatusCodes.OK);
     expect(response.body).to.deep.equal([{ result: { data: null } }]);
@@ -45,15 +81,17 @@ describe.only("fetchPublicCard", function() {
   it("should avoid an injection attack", async () => {
     // Cast because we don't expect adversarial input to be typed.
     const card = await caller.fetchPublicCard(
-      { cardID: { $ne: "" } } as unknown as ReadPublicCardParams,
+      {
+        cardID: { $ne: "000000000000000000000000" },
+      } as unknown as ReadPublicCardParams,
     );
     expect(card).to.be.null;
   });
 
   it("should test tRPC route", async () => {
     const card = await caller.fetchPublicCard({
-      cardID: "5ad3777e398794001451704a",
+      cardID: samplePublicCardId,
     });
-    expect(card).to.be.null;
+    expect(card?._id).to.deep.equal(samplePublicCardId);
   });
 });
