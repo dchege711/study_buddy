@@ -144,6 +144,6 @@ if (require.main === module) {
   })();
 
   if (IS_DEV) {
-    populateDummyAccountWithCards();
+    populateDummyAccountWithCards(true);
   }
 }

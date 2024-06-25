@@ -7,18 +7,18 @@ import * as CardsDB from "../models/CardsMongoDB";
 import * as LogInUtilities from "../models/LogInUtilities";
 import { addPublicUser } from "../models/Miscellaneous";
 
+export const dummyAccountDetails = {
+  username: config.DEBUG_USERNAME,
+  password: config.DEBUG_PASSWORD,
+  email: config.DEBUG_EMAIL_ADDRESS,
+};
+
 /**
  * @returns {Promise} resolves with a JSON representation of a logged in user.
  */
 export async function getDummyAccount(): Promise<
   LogInUtilities.AuthenticateUser
 > {
-  const dummyAccountDetails = {
-    username: config.DEBUG_USERNAME as string,
-    password: config.DEBUG_PASSWORD as string,
-    email: config.DEBUG_EMAIL_ADDRESS as string,
-  };
-
   return LogInUtilities
     .deleteAllAccounts([])
     .then(() => {
@@ -35,7 +35,7 @@ export async function getDummyAccount(): Promise<
     });
 }
 
-export function populateDummyAccountWithCards(): Promise<number> {
+export function populateDummyAccountWithCards(log: boolean): Promise<number> {
   return getDummyAccount()
     .then((user) => {
       return getRandomCards(60, user.userIDInApp);
@@ -44,7 +44,9 @@ export function populateDummyAccountWithCards(): Promise<number> {
       return CardsDB.createMany(cards);
     })
     .then((cards) => {
-      console.log(`Created ${cards.length} cards for sample user`);
+      if (log) {
+        console.log(`Created ${cards.length} cards for sample user`);
+      }
       return cards.length;
     });
 }
