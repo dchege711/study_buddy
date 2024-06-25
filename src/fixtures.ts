@@ -2,9 +2,14 @@ import { Runner } from "mocha";
 
 import { PORT } from "./config";
 import { close as closeEmailClient } from "./models/EmailClient";
-import { deleteAllAccounts } from "./models/LogInUtilities";
+import {
+  deleteAllAccounts,
+  registerUserAndPassword,
+} from "./models/LogInUtilities";
+import { addPublicUser } from "./models/Miscellaneous";
 import { closeMongooseConnection } from "./models/MongooseClient";
 import { app } from "./server";
+import { dummyAccountDetails } from "./tests/DummyAccountUtils";
 
 /**
  * Root hooks are ran before (or after) every test in every file.
@@ -16,7 +21,9 @@ export const mochaHooks = {
    * In both parallel and serial modes, runs before each test.
    */
   async beforeEach() {
-    await deleteAllAccounts([]);
+    return deleteAllAccounts([])
+      .then(() => addPublicUser())
+      .then(() => registerUserAndPassword(dummyAccountDetails));
   },
 };
 
