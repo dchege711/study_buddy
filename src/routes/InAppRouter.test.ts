@@ -364,3 +364,24 @@ describe("streak", function() {
     });
   });
 });
+
+describe("settings", function() {
+  this.beforeEach(async () => {
+    const gUser = await authenticateUser(authDetails);
+    gCaller = createCaller({ user: gUser });
+    return Promise.resolve();
+  });
+
+  it("should install an input validator", function(done) {
+    gCaller.settings({
+      cardsAreByDefaultPrivate: "true" as unknown as boolean,
+      dailyTarget: "0x3" as unknown as number,
+    }).then((user) => {
+      done(
+        new Error(`Unvalidated input processed: Updated ${user}`),
+      );
+    }).catch((e) => {
+      passIfValidationError(e, done);
+    });
+  });
+});
