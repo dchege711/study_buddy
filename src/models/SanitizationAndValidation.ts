@@ -141,3 +141,26 @@ export const addCardParamsValidator = z.object({
     message: "Invalid card ID",
   }),
 });
+
+export const partialCardValidator = z.object({
+  _id: z.string().refine(isMongoId, {
+    message: "Invalid card ID",
+  }).optional(),
+  title: z.string().optional(),
+  description: z.string().optional(),
+  tags: z.string().optional(),
+  urgency: z.number().int().nonnegative().optional(),
+  metadataIndex: z.number().int().nonnegative().optional(),
+  createdById: z.number().int().optional(),
+  isPublic: z.boolean().optional(),
+  lastReviewed: z.date().optional(),
+  parent: z.string().refine(isMongoId, {
+    message: "Invalid card ID",
+  }).optional(),
+  numChildren: z.number().int().nonnegative().optional(),
+  idsOfUsersWithCopy: z.string().optional(),
+  numTimesMarkedAsDuplicate: z.number().int().nonnegative().optional(),
+  numTimesMarkedForReview: z.number().int().nonnegative().optional(),
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
+});
