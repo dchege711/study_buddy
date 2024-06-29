@@ -80,7 +80,8 @@
     "path": "0.12.7",
     "sjcl": "1.0.7",
     "validator": "^13.7.0",
-    "xss": "1.0.3"
+    "xss": "1.0.3",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.4.0",
