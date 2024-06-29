@@ -11,6 +11,7 @@ import {
   restoreCardFromTrashParamsValidator,
   searchOwnedCardsParamsValidator,
   searchPublicCardsParamsValidator,
+  streakParamsValidator,
   trashCardParamsValidator,
 } from "../models/SanitizationAndValidation";
 import {
@@ -122,9 +123,7 @@ export const inAppRouter = router({
     }),
 
   streak: authedProcedure
-    .input((params: unknown) =>
-      params as Omit<MetadataDB.UpdateStreakParams, "userIDInApp">
-    )
+    .input(streakParamsValidator)
     .mutation(({ input, ctx }) => {
       return MetadataDB.updateStreak({
         ...input,

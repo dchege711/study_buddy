@@ -185,3 +185,11 @@ export const restoreCardFromTrashParamsValidator = z.object({
     message: "Invalid card ID",
   }),
 });
+
+export const streakParamsValidator = z.object({
+  cardIDs: z.array(
+    z.string().refine(isMongoId, {
+      message: "Invalid card ID",
+    }),
+  ),
+});

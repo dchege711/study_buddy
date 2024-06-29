@@ -337,7 +337,27 @@ describe("restoreCardFromTrash", function() {
       _id: { $ne: "000000000000000000000000" } as unknown as string,
     }).then((result) => {
       done(
-        new Error(`Injection attack succeeded: Duplicated ${result}`),
+        new Error(`Injection attack succeeded: Restored ${result}`),
+      );
+    }).catch((e) => {
+      passIfValidationError(e, done);
+    });
+  });
+});
+
+describe("streak", function() {
+  this.beforeEach(async () => {
+    const gUser = await authenticateUser(authDetails);
+    gCaller = createCaller({ user: gUser });
+    return await createPublicAndPrivateCards(gUser);
+  });
+
+  it("should avoid an injection attack", function(done) {
+    gCaller.streak({
+      cardIDs: [{ $ne: "000000000000000000000000" }] as unknown as string[],
+    }).then((streak) => {
+      done(
+        new Error(`Injection attack succeeded: Streak ${streak}`),
       );
     }).catch((e) => {
       passIfValidationError(e, done);
