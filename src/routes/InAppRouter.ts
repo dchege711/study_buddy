@@ -2,6 +2,7 @@ import * as CardsDB from "../models/CardsMongoDB";
 import * as MetadataDB from "../models/MetadataMongoDB";
 import {
   addCardParamsValidator,
+  deleteCardParamsValidator,
   fetchCardParamsValidator,
   flagCardParamsValidator,
   partialCardValidator,
@@ -68,9 +69,7 @@ export const inAppRouter = router({
     }),
 
   deleteCard: authedProcedure
-    .input((params: unknown) =>
-      params as Omit<MetadataDB.SendCardToTrashParams, "createdById">
-    )
+    .input(deleteCardParamsValidator)
     .mutation(({ input, ctx }) => {
       return MetadataDB.deleteCardFromTrash({
         ...input,
