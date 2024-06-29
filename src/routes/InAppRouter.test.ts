@@ -18,6 +18,9 @@ const authDetails = {
   password: dummyAccountDetails.password,
 };
 
+let gUser: AuthenticateUser;
+let gCaller: ReturnType<typeof createCaller>;
+
 /**
  * Convert `payload` into a URL query string of the form expected by tRPC.
  */
@@ -68,15 +71,14 @@ async function createPublicAndPrivateCards(user: AuthenticateUser) {
 }
 
 describe("fetchPublicCard", function() {
-  let caller: ReturnType<typeof createCaller>;
   let samplePublicCardId: string;
   let samplePrivateCardId: string;
 
   this.beforeEach(async () => {
-    const user = await authenticateUser(authDetails);
-    caller = createCaller({ user });
+    gUser = await authenticateUser(authDetails);
+    gCaller = createCaller({ user: gUser });
     ({ samplePublicCardId, samplePrivateCardId } =
-      await createPublicAndPrivateCards(user));
+      await createPublicAndPrivateCards(gUser));
     return Promise.resolve();
   });
 
@@ -93,7 +95,7 @@ describe("fetchPublicCard", function() {
   });
 
   it("should not fetch a private card", async () => {
-    const result = await caller.fetchPublicCard({
+    const result = await gCaller.fetchPublicCard({
       cardID: samplePrivateCardId,
     });
     expect(result).to.be.null;
@@ -129,7 +131,7 @@ describe("fetchPublicCard", function() {
   });
 
   it("should return null for a nonexistent card", async () => {
-    const result = await caller.fetchPublicCard({
+    const result = await gCaller.fetchPublicCard({
       cardID: "000000000000000000000000",
     });
     expect(result).to.be.null;
@@ -142,8 +144,8 @@ describe("searchPublicCards", function() {
   }
 
   this.beforeEach(async () => {
-    const user = await authenticateUser(authDetails);
-    return await createPublicAndPrivateCards(user);
+    gUser = await authenticateUser(authDetails);
+    return await createPublicAndPrivateCards(gUser);
   });
 
   it("should avoid an injection attack", async () => {
@@ -159,8 +161,8 @@ describe("searchPublicCards", function() {
 
 describe("flagCard", function() {
   this.beforeEach(async () => {
-    const user = await authenticateUser(authDetails);
-    return await createPublicAndPrivateCards(user);
+    gUser = await authenticateUser(authDetails);
+    return await createPublicAndPrivateCards(gUser);
   });
 
   it("should avoid an injection attack", async () => {
@@ -169,5 +171,19 @@ describe("flagCard", function() {
       .send({ input: { cardID: { $ne: "000000000000000000000000" } } })
       .expect("Content-Type", /json/)
       .expect(StatusCodes.BAD_REQUEST);
+  });
+});
+
+describe("fetchCard", function() {
+  this.beforeEach(async () => {
+    const gUser = await authenticateUser(authDetails);
+    gCaller = createCaller({ user: gUser });
+    return await createPublicAndPrivateCards(gUser);
+  });
+
+  it("should avoid an injection attack", async () => {
+    expect(gCaller.fetchCard({
+      cardID: { $ne: "000000000000000000000000" } as unknown as string,
+    })).to.throw;
   });
 });

@@ -124,3 +124,9 @@ export const flagCardParamsValidator = z.object({
   markedForReview: z.boolean().optional(),
   markedAsDuplicate: z.boolean().optional(),
 });
+
+export const fetchCardParamsValidator = z.object({
+  cardID: z.string().refine(isMongoId, {
+    message: "Invalid card ID",
+  }),
+});
