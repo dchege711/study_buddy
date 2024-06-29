@@ -1,4 +1,5 @@
 import { expect } from "chai";
+import chaiAsPromised from "chai-as-promised";
 import { StatusCodes } from "http-status-codes";
 import request from "supertest";
 
@@ -12,6 +13,8 @@ import { app } from "../server";
 import { dummyAccountDetails } from "../tests/DummyAccountUtils";
 import { sampleCards } from "../tests/SampleCards";
 import { createCaller } from "./InAppRouter";
+
+chai.use(chaiAsPromised);
 
 const authDetails = {
   username_or_email: dummyAccountDetails.email,
@@ -185,5 +188,24 @@ describe("fetchCard", function() {
     expect(gCaller.fetchCard({
       cardID: { $ne: "000000000000000000000000" } as unknown as string,
     })).to.throw;
+  });
+});
+
+describe.only("addCard", function() {
+  this.beforeEach(async () => {
+    const gUser = await authenticateUser(authDetails);
+    gCaller = createCaller({ user: gUser });
+    return await createPublicAndPrivateCards(gUser);
+  });
+
+  it("should avoid an injection attack", async () => {
+    await gCaller.addCard({
+      title: "0; db.dropDatabase();",
+      description: "This is a test card",
+      urgency: 5,
+      tags: "test",
+      isPublic: true,
+      parent: { $ne: "000000000000000000000000" } as unknown as string,
+    }).should.be.rejectedWith(Error);
   });
 });
