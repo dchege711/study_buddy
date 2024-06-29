@@ -13,6 +13,7 @@ import katex from "katex";
 import type { KatexOptions } from "katex";
 import markdownit from "markdown-it";
 import texMath from "markdown-it-texmath";
+import { z } from "zod";
 
 import { ICard } from "./mongoose_models/CardSchema";
 
@@ -100,3 +101,7 @@ export function sanitizeCard(card: Partial<ICard>): Partial<ICard> {
 
   return card;
 }
+
+export const readPublicCardParamsValidator = z.object({
+  cardID: z.string().uuid(),
+});
