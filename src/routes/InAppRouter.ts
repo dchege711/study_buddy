@@ -1,7 +1,7 @@
-import type { ReadPublicCardParams } from "../models/CardsMongoDB";
 import * as CardsDB from "../models/CardsMongoDB";
 import * as MetadataDB from "../models/MetadataMongoDB";
 import { ICard } from "../models/mongoose_models/CardSchema";
+import { readPublicCardParamsValidator } from "../models/SanitizationAndValidation";
 import {
   authedProcedure,
   createCallerFactory,
@@ -11,7 +11,7 @@ import {
 
 export const inAppRouter = router({
   fetchPublicCard: publicProcedure
-    .input((params: unknown) => params as ReadPublicCardParams)
+    .input(readPublicCardParamsValidator)
     .query(({ input }) => {
       return CardsDB.readPublicCard(input);
     }),

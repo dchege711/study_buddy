@@ -295,7 +295,7 @@ export function publicSearch(
   );
 }
 
-export type ReadPublicCardParams = Omit<ReadCardParams, "userIDInApp">;
+export type ReadPublicCardParams = Pick<ReadCardParams, "cardID">;
 
 /**
  * @description Read a card that has been set to 'public'
