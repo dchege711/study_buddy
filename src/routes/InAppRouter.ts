@@ -3,6 +3,7 @@ import * as MetadataDB from "../models/MetadataMongoDB";
 import {
   addCardParamsValidator,
   deleteCardParamsValidator,
+  duplicateCardParamsValidator,
   fetchCardParamsValidator,
   flagCardParamsValidator,
   partialCardValidator,
@@ -90,9 +91,7 @@ export const inAppRouter = router({
     }),
 
   duplicateCard: authedProcedure
-    .input((params: unknown) =>
-      params as Pick<CardsDB.DuplicateCardParams, "cardID">
-    )
+    .input(duplicateCardParamsValidator)
     .mutation(({ input, ctx }) => {
       return CardsDB.duplicateCard({
         ...input,

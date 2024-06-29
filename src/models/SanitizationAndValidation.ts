@@ -173,3 +173,9 @@ export const trashCardParamsValidator = partialCardValidator.pick({
 }).required();
 
 export const deleteCardParamsValidator = trashCardParamsValidator;
+
+export const duplicateCardParamsValidator = z.object({
+  cardID: z.string().refine(isMongoId, {
+    message: "Invalid card ID",
+  }),
+});
