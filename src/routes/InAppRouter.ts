@@ -2,6 +2,7 @@ import * as CardsDB from "../models/CardsMongoDB";
 import * as MetadataDB from "../models/MetadataMongoDB";
 import { ICard } from "../models/mongoose_models/CardSchema";
 import {
+  fetchCardParamsValidator,
   flagCardParamsValidator,
   readPublicCardParamsValidator,
   searchPublicCardsParamsValidator,
@@ -38,9 +39,7 @@ export const inAppRouter = router({
     }),
 
   fetchCard: authedProcedure
-    .input((params: unknown) =>
-      params as Omit<CardsDB.ReadCardParams, "userIDInApp">
-    )
+    .input(fetchCardParamsValidator)
     .query(({ input, ctx }) => {
       return CardsDB.read({ ...input, userIDInApp: ctx.user.userIDInApp });
     }),
