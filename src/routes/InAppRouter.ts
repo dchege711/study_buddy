@@ -13,6 +13,7 @@ import {
   searchPublicCardsParamsValidator,
   streakParamsValidator,
   trashCardParamsValidator,
+  userSettingsParamsValidator,
 } from "../models/SanitizationAndValidation";
 import {
   authedProcedure,
@@ -132,9 +133,7 @@ export const inAppRouter = router({
     }),
 
   settings: authedProcedure
-    .input((params: unknown) =>
-      params as Omit<MetadataDB.UpdateUserSettingsParams, "userIDInApp">
-    )
+    .input(userSettingsParamsValidator)
     .mutation(({ input, ctx }) => {
       return MetadataDB.updateUserSettings({
         ...input,
