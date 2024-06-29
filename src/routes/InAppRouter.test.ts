@@ -54,7 +54,7 @@ describe.only("fetchPublicCard", function() {
     // Ensure that there are public cards available.
     const publicCards = await publicSearch({ queryString: "", limit: 5 });
     expect(publicCards.length).to.be.greaterThan(1);
-    samplePublicCardId = publicCards[0]._id;
+    samplePublicCardId = publicCards[0]._id.toString();
 
     return Promise.resolve();
   });
@@ -66,17 +66,17 @@ describe.only("fetchPublicCard", function() {
     return `/trpc/fetchPublicCard?${computeTRPCParams(payload)}`;
   }
 
-  it("should avoid an injection attack (supertest)", async () => {
+  it("should avoid an injection attack", async () => {
     await request(app)
       .get(computeRequestURL({ cardID: { $ne: "000000000000000000000000" } }))
       .expect("Content-Type", /json/)
       .expect(StatusCodes.BAD_REQUEST);
   });
 
-  it.skip("should test tRPC route", async () => {
+  it("should fetch an available public card", async () => {
     const card = await caller.fetchPublicCard({
       cardID: samplePublicCardId,
     });
-    expect(card?._id).to.deep.equal(samplePublicCardId);
+    expect(card?._id.toString()).to.equal(samplePublicCardId);
   });
 });

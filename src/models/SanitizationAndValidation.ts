@@ -13,6 +13,7 @@ import katex from "katex";
 import type { KatexOptions } from "katex";
 import markdownit from "markdown-it";
 import texMath from "markdown-it-texmath";
+import { isMongoId } from "validator";
 import { z } from "zod";
 
 import { ICard } from "./mongoose_models/CardSchema";
@@ -103,5 +104,7 @@ export function sanitizeCard(card: Partial<ICard>): Partial<ICard> {
 }
 
 export const readPublicCardParamsValidator = z.object({
-  cardID: z.string().uuid(),
+  cardID: z.string().refine(isMongoId, {
+    message: "Invalid card ID",
+  }),
 });
