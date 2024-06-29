@@ -7,6 +7,7 @@ import {
   flagCardParamsValidator,
   partialCardValidator,
   readPublicCardParamsValidator,
+  searchOwnedCardsParamsValidator,
   searchPublicCardsParamsValidator,
   trashCardParamsValidator,
 } from "../models/SanitizationAndValidation";
@@ -83,7 +84,7 @@ export const inAppRouter = router({
    * and isPublic in the latter.
    */
   searchCards: authedProcedure
-    .input((params: unknown) => params as CardsDB.SearchCardParams)
+    .input(searchOwnedCardsParamsValidator)
     .query(({ input, ctx }) => {
       return CardsDB.search(input, ctx.user.userIDInApp);
     }),

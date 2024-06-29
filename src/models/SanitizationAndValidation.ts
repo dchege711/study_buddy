@@ -109,13 +109,16 @@ export const readPublicCardParamsValidator = z.object({
   }),
 });
 
-export const searchPublicCardsParamsValidator = z.object({
+export const searchCardsParamsValidator = z.object({
   queryString: z.string(),
   limit: z.number().int().positive(),
   creationStartDate: z.date().optional(),
   creationEndDate: z.date().optional(),
   cardIDs: z.string().optional(),
 });
+
+export const searchPublicCardsParamsValidator = searchCardsParamsValidator;
+export const searchOwnedCardsParamsValidator = searchCardsParamsValidator;
 
 export const flagCardParamsValidator = z.object({
   cardID: z.string().refine(isMongoId, {
