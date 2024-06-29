@@ -168,3 +168,5 @@ export const partialCardValidator = z.object({
 export const trashCardParamsValidator = partialCardValidator.pick({
   _id: true,
 }).required();
+
+export const deleteCardParamsValidator = trashCardParamsValidator;

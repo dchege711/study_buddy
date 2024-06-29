@@ -248,7 +248,7 @@ describe("updateCard", function() {
   });
 });
 
-describe.only("trashCard", function() {
+describe("trashCard", function() {
   this.beforeEach(async () => {
     const gUser = await authenticateUser(authDetails);
     gCaller = createCaller({ user: gUser });
@@ -257,6 +257,24 @@ describe.only("trashCard", function() {
 
   it("should avoid an injection attack", function(done) {
     gCaller.trashCard({
+      _id: { $ne: "000000000000000000000000" } as unknown as string,
+    }).then((card) => {
+      done(new Error(`Injection attack succeeded: ${card}`));
+    }).catch((e) => {
+      passIfValidationError(e, done);
+    });
+  });
+});
+
+describe("deleteCard", function() {
+  this.beforeEach(async () => {
+    const gUser = await authenticateUser(authDetails);
+    gCaller = createCaller({ user: gUser });
+    return await createPublicAndPrivateCards(gUser);
+  });
+
+  it("should avoid an injection attack", function(done) {
+    gCaller.deleteCard({
       _id: { $ne: "000000000000000000000000" } as unknown as string,
     }).then((card) => {
       done(new Error(`Injection attack succeeded: ${card}`));
