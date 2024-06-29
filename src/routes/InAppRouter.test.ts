@@ -284,7 +284,7 @@ describe("deleteCard", function() {
   });
 });
 
-describe.only("searchCards", function() {
+describe("searchCards", function() {
   this.beforeEach(async () => {
     const gUser = await authenticateUser(authDetails);
     gCaller = createCaller({ user: gUser });
@@ -298,6 +298,26 @@ describe.only("searchCards", function() {
     }).then((cards) => {
       done(
         new Error(`Injection attack succeeded: ${cards.length} cards found.`),
+      );
+    }).catch((e) => {
+      passIfValidationError(e, done);
+    });
+  });
+});
+
+describe("duplicateCard", function() {
+  this.beforeEach(async () => {
+    const gUser = await authenticateUser(authDetails);
+    gCaller = createCaller({ user: gUser });
+    return await createPublicAndPrivateCards(gUser);
+  });
+
+  it("should avoid an injection attack", function(done) {
+    gCaller.duplicateCard({
+      cardID: { $ne: "000000000000000000000000" } as unknown as string,
+    }).then((card) => {
+      done(
+        new Error(`Injection attack succeeded: Duplicated ${card}`),
       );
     }).catch((e) => {
       passIfValidationError(e, done);
