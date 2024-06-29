@@ -133,7 +133,7 @@ describe("fetchPublicCard", function() {
     expect(result.body[0].result.data._id).to.equal(samplePublicCardId);
   });
 
-  it("should avoid an injection attack", async () => {
+  it("should install an input parser/validator", async () => {
     await request(app)
       .get(computeRequestURL({ cardID: { $ne: "000000000000000000000000" } }))
       .expect("Content-Type", /json/)
@@ -158,7 +158,7 @@ describe("searchPublicCards", function() {
     return await createPublicAndPrivateCards(gUser);
   });
 
-  it("should avoid an injection attack", async () => {
+  it("should install an input parser/validator", async () => {
     await request(app)
       .get(computeRequestURL({
         queryString: { $ne: "foobar" },
@@ -175,7 +175,7 @@ describe("flagCard", function() {
     return await createPublicAndPrivateCards(gUser);
   });
 
-  it("should avoid an injection attack", async () => {
+  it("should install an input parser/validator", async () => {
     await request(app)
       .post("/trpc/flagCard?batch=1")
       .send({ input: { cardID: { $ne: "000000000000000000000000" } } })
@@ -191,7 +191,7 @@ describe("fetchCard", function() {
     return await createPublicAndPrivateCards(gUser);
   });
 
-  it("should avoid an injection attack", function(done) {
+  it("should install an input parser/validator", function(done) {
     gCaller.fetchCard({
       cardID: { $ne: "000000000000000000000000" } as unknown as string,
     }).then((card) => {
@@ -209,7 +209,7 @@ describe("addCard", function() {
     return await createPublicAndPrivateCards(gUser);
   });
 
-  it("should avoid an injection attack", function(done) {
+  it("should install an input parser/validator", function(done) {
     gCaller.addCard({
       title: "foo; db.collection.drop();",
       description: "bar",
@@ -235,7 +235,7 @@ describe("updateCard", function() {
     return Promise.resolve();
   });
 
-  it("should avoid an injection attack", function(done) {
+  it("should install an input parser/validator", function(done) {
     gCaller.updateCard({
       _id: samplePrivateCardId,
       parent: { $ne: "000000000000000000000000" } as unknown as string,
@@ -255,7 +255,7 @@ describe("trashCard", function() {
     return await createPublicAndPrivateCards(gUser);
   });
 
-  it("should avoid an injection attack", function(done) {
+  it("should install an input parser/validator", function(done) {
     gCaller.trashCard({
       _id: { $ne: "000000000000000000000000" } as unknown as string,
     }).then((card) => {
@@ -273,7 +273,7 @@ describe("deleteCard", function() {
     return await createPublicAndPrivateCards(gUser);
   });
 
-  it("should avoid an injection attack", function(done) {
+  it("should install an input parser/validator", function(done) {
     gCaller.deleteCard({
       _id: { $ne: "000000000000000000000000" } as unknown as string,
     }).then((card) => {
@@ -291,7 +291,7 @@ describe("searchCards", function() {
     return await createPublicAndPrivateCards(gUser);
   });
 
-  it("should avoid an injection attack", function(done) {
+  it("should install an input parser/validator", function(done) {
     gCaller.searchCards({
       queryString: { $ne: "foobar" } as unknown as string,
       limit: 2,
@@ -312,7 +312,7 @@ describe("duplicateCard", function() {
     return await createPublicAndPrivateCards(gUser);
   });
 
-  it("should avoid an injection attack", function(done) {
+  it("should install an input parser/validator", function(done) {
     gCaller.duplicateCard({
       cardID: { $ne: "000000000000000000000000" } as unknown as string,
     }).then((card) => {
@@ -332,7 +332,7 @@ describe("restoreCardFromTrash", function() {
     return await createPublicAndPrivateCards(gUser);
   });
 
-  it("should avoid an injection attack", function(done) {
+  it("should install an input parser/validator", function(done) {
     gCaller.restoreCardFromTrash({
       _id: { $ne: "000000000000000000000000" } as unknown as string,
     }).then((result) => {
@@ -352,7 +352,7 @@ describe("streak", function() {
     return await createPublicAndPrivateCards(gUser);
   });
 
-  it("should avoid an injection attack", function(done) {
+  it("should install an input parser/validator", function(done) {
     gCaller.streak({
       cardIDs: [{ $ne: "000000000000000000000000" }] as unknown as string[],
     }).then((streak) => {
