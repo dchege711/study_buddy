@@ -283,3 +283,24 @@ describe("deleteCard", function() {
     });
   });
 });
+
+describe.only("searchCards", function() {
+  this.beforeEach(async () => {
+    const gUser = await authenticateUser(authDetails);
+    gCaller = createCaller({ user: gUser });
+    return await createPublicAndPrivateCards(gUser);
+  });
+
+  it("should avoid an injection attack", function(done) {
+    gCaller.searchCards({
+      queryString: { $ne: "foobar" } as unknown as string,
+      limit: 2,
+    }).then((cards) => {
+      done(
+        new Error(`Injection attack succeeded: ${cards.length} cards found.`),
+      );
+    }).catch((e) => {
+      passIfValidationError(e, done);
+    });
+  });
+});
