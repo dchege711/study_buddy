@@ -225,14 +225,14 @@ describe("addCard", function() {
   });
 });
 
-describe.only("updateCard", function() {
+describe("updateCard", function() {
   let samplePrivateCardId: string;
 
   this.beforeEach(async () => {
     const gUser = await authenticateUser(authDetails);
     gCaller = createCaller({ user: gUser });
     ({ samplePrivateCardId } = await createPublicAndPrivateCards(gUser));
-    return await createPublicAndPrivateCards(gUser);
+    return Promise.resolve();
   });
 
   it("should avoid an injection attack", function(done) {
@@ -240,6 +240,24 @@ describe.only("updateCard", function() {
       _id: samplePrivateCardId,
       parent: { $ne: "000000000000000000000000" } as unknown as string,
       title: "foo; db.collection.drop();",
+    }).then((card) => {
+      done(new Error(`Injection attack succeeded: ${card}`));
+    }).catch((e) => {
+      passIfValidationError(e, done);
+    });
+  });
+});
+
+describe.only("trashCard", function() {
+  this.beforeEach(async () => {
+    const gUser = await authenticateUser(authDetails);
+    gCaller = createCaller({ user: gUser });
+    return await createPublicAndPrivateCards(gUser);
+  });
+
+  it("should avoid an injection attack", function(done) {
+    gCaller.trashCard({
+      _id: { $ne: "000000000000000000000000" } as unknown as string,
     }).then((card) => {
       done(new Error(`Injection attack succeeded: ${card}`));
     }).catch((e) => {
