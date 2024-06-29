@@ -1,7 +1,11 @@
 import * as CardsDB from "../models/CardsMongoDB";
 import * as MetadataDB from "../models/MetadataMongoDB";
 import { ICard } from "../models/mongoose_models/CardSchema";
-import { readPublicCardParamsValidator } from "../models/SanitizationAndValidation";
+import {
+  flagCardParamsValidator,
+  readPublicCardParamsValidator,
+  searchPublicCardsParamsValidator,
+} from "../models/SanitizationAndValidation";
 import {
   authedProcedure,
   createCallerFactory,
@@ -17,7 +21,7 @@ export const inAppRouter = router({
     }),
 
   searchPublicCards: publicProcedure
-    .input((params: unknown) => params as CardsDB.SearchCardParams)
+    .input(searchPublicCardsParamsValidator)
     .query(({ input }) => {
       return CardsDB.publicSearch(input);
     }),
@@ -28,7 +32,7 @@ export const inAppRouter = router({
     }),
 
   flagCard: publicProcedure
-    .input((params: unknown) => params as CardsDB.FlagCardParams)
+    .input(flagCardParamsValidator)
     .mutation(({ input }) => {
       return CardsDB.flagCard(input);
     }),
