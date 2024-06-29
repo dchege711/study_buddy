@@ -2,7 +2,11 @@ import { expect } from "chai";
 import { StatusCodes } from "http-status-codes";
 import request from "supertest";
 
-import { create as createCard, publicSearch } from "../models/CardsMongoDB";
+import {
+  create as createCard,
+  publicSearch,
+  search as cardSearch,
+} from "../models/CardsMongoDB";
 import { authenticateUser } from "../models/LogInUtilities";
 import { app } from "../server";
 import { dummyAccountDetails } from "../tests/DummyAccountUtils";
@@ -36,6 +40,7 @@ describe("tRPC helper", () => {
 describe.only("fetchPublicCard", function() {
   let caller: ReturnType<typeof createCaller>;
   let samplePublicCardId: string;
+  let samplePrivateCardId: string;
 
   this.beforeEach(async () => {
     const user = await authenticateUser(authDetails);
@@ -56,6 +61,14 @@ describe.only("fetchPublicCard", function() {
     expect(publicCards.length).to.be.greaterThan(1);
     samplePublicCardId = publicCards[0]._id.toString();
 
+    // Ensure that there are private cards available.
+    const privateCards = await cardSearch(
+      { queryString: "", limit: 5 },
+      user.userIDInApp,
+    );
+    expect(privateCards.length).to.be.greaterThan(1);
+    samplePrivateCardId = privateCards[0]._id.toString();
+
     return Promise.resolve();
   });
 
@@ -66,6 +79,43 @@ describe.only("fetchPublicCard", function() {
     return `/trpc/fetchPublicCard?${computeTRPCParams(payload)}`;
   }
 
+  it("should fetch a public card", async () => {
+    const result = await request(app)
+      .get(computeRequestURL({ cardID: samplePublicCardId }))
+      .expect("Content-Type", /json/)
+      .expect(StatusCodes.OK);
+    expect(result.body[0].result.data._id).to.equal(samplePublicCardId);
+  });
+
+  it("should not fetch a private card", async () => {
+    const result = await caller.fetchPublicCard({
+      cardID: samplePrivateCardId,
+    });
+    expect(result).to.be.null;
+  });
+
+  it("should reject an empty request body", async () => {
+    await request(app)
+      .get(computeRequestURL({}))
+      .expect("Content-Type", /json/)
+      .expect(StatusCodes.BAD_REQUEST);
+  });
+
+  it("should reject a request body without mandatory params", async () => {
+    await request(app)
+      .get(computeRequestURL({ foo: "bar" }))
+      .expect("Content-Type", /json/)
+      .expect(StatusCodes.BAD_REQUEST);
+  });
+
+  it("should be resilient against extra parameters", async () => {
+    const result = await request(app)
+      .get(computeRequestURL({ cardID: samplePublicCardId, foo: "bar" }))
+      .expect("Content-Type", /json/)
+      .expect(StatusCodes.OK);
+    expect(result.body[0].result.data._id).to.equal(samplePublicCardId);
+  });
+
   it("should avoid an injection attack", async () => {
     await request(app)
       .get(computeRequestURL({ cardID: { $ne: "000000000000000000000000" } }))
@@ -73,10 +123,10 @@ describe.only("fetchPublicCard", function() {
       .expect(StatusCodes.BAD_REQUEST);
   });
 
-  it("should fetch an available public card", async () => {
-    const card = await caller.fetchPublicCard({
-      cardID: samplePublicCardId,
+  it("should return null for a nonexistent card", async () => {
+    const result = await caller.fetchPublicCard({
+      cardID: "000000000000000000000000",
     });
-    expect(card?._id.toString()).to.equal(samplePublicCardId);
+    expect(result).to.be.null;
   });
 });
