@@ -2,6 +2,7 @@ import * as CardsDB from "../models/CardsMongoDB";
 import * as MetadataDB from "../models/MetadataMongoDB";
 import { ICard } from "../models/mongoose_models/CardSchema";
 import {
+  addCardParamsValidator,
   fetchCardParamsValidator,
   flagCardParamsValidator,
   readPublicCardParamsValidator,
@@ -45,9 +46,7 @@ export const inAppRouter = router({
     }),
 
   addCard: authedProcedure
-    .input((params: unknown) =>
-      params as Omit<CardsDB.CreateCardParams, "createdById">
-    )
+    .input(addCardParamsValidator)
     .mutation(({ input, ctx }) => {
       return CardsDB.create({ ...input, createdById: ctx.user.userIDInApp });
     }),
