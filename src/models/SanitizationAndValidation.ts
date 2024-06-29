@@ -179,3 +179,9 @@ export const duplicateCardParamsValidator = z.object({
     message: "Invalid card ID",
   }),
 });
+
+export const restoreCardFromTrashParamsValidator = z.object({
+  _id: z.string().refine(isMongoId, {
+    message: "Invalid card ID",
+  }),
+});
