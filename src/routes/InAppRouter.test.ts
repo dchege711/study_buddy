@@ -7,7 +7,7 @@ import {
   publicSearch,
   search as cardSearch,
 } from "../models/CardsMongoDB";
-import { authenticateUser } from "../models/LogInUtilities";
+import { AuthenticateUser, authenticateUser } from "../models/LogInUtilities";
 import { app } from "../server";
 import { dummyAccountDetails } from "../tests/DummyAccountUtils";
 import { sampleCards } from "../tests/SampleCards";
@@ -37,7 +37,37 @@ describe("tRPC helper", () => {
   });
 });
 
-describe.only("fetchPublicCard", function() {
+async function createPublicAndPrivateCards(user: AuthenticateUser) {
+  // Create some public and private cards.
+  expect(sampleCards.length).to.be.greaterThanOrEqual(4);
+  for (let i = 0; i < 4; ++i) {
+    await createCard({
+      ...sampleCards[i],
+      isPublic: i % 2 === 0,
+      createdById: user.userIDInApp,
+    });
+  }
+
+  // Ensure that there are public cards available.
+  const publicCards = await publicSearch({ queryString: "", limit: 5 });
+  expect(publicCards.length).to.be.greaterThan(1);
+  const samplePublicCardId = publicCards[0]._id.toString();
+
+  // Ensure that there are private cards available.
+  const privateCards = await cardSearch(
+    { queryString: "", limit: 5 },
+    user.userIDInApp,
+  );
+  expect(privateCards.length).to.be.greaterThan(1);
+  const samplePrivateCardId = privateCards[0]._id.toString();
+
+  return {
+    samplePublicCardId,
+    samplePrivateCardId,
+  };
+}
+
+describe("fetchPublicCard", function() {
   let caller: ReturnType<typeof createCaller>;
   let samplePublicCardId: string;
   let samplePrivateCardId: string;
@@ -45,36 +75,11 @@ describe.only("fetchPublicCard", function() {
   this.beforeEach(async () => {
     const user = await authenticateUser(authDetails);
     caller = createCaller({ user });
-
-    // Create some public and private cards.
-    expect(sampleCards.length).to.be.greaterThanOrEqual(4);
-    for (let i = 0; i < 4; ++i) {
-      await createCard({
-        ...sampleCards[i],
-        isPublic: i % 2 === 0,
-        createdById: user.userIDInApp,
-      });
-    }
-
-    // Ensure that there are public cards available.
-    const publicCards = await publicSearch({ queryString: "", limit: 5 });
-    expect(publicCards.length).to.be.greaterThan(1);
-    samplePublicCardId = publicCards[0]._id.toString();
-
-    // Ensure that there are private cards available.
-    const privateCards = await cardSearch(
-      { queryString: "", limit: 5 },
-      user.userIDInApp,
-    );
-    expect(privateCards.length).to.be.greaterThan(1);
-    samplePrivateCardId = privateCards[0]._id.toString();
-
+    ({ samplePublicCardId, samplePrivateCardId } =
+      await createPublicAndPrivateCards(user));
     return Promise.resolve();
   });
 
-  /**
-   * Compute the URL for a request to fetch a public card.
-   */
   function computeRequestURL(payload: unknown) {
     return `/trpc/fetchPublicCard?${computeTRPCParams(payload)}`;
   }
@@ -128,5 +133,41 @@ describe.only("fetchPublicCard", function() {
       cardID: "000000000000000000000000",
     });
     expect(result).to.be.null;
+  });
+});
+
+describe("searchPublicCards", function() {
+  function computeRequestURL(payload: unknown) {
+    return `/trpc/searchPublicCards?${computeTRPCParams(payload)}`;
+  }
+
+  this.beforeEach(async () => {
+    const user = await authenticateUser(authDetails);
+    return await createPublicAndPrivateCards(user);
+  });
+
+  it("should avoid an injection attack", async () => {
+    await request(app)
+      .get(computeRequestURL({
+        queryString: { $ne: "foobar" },
+        limit: 2,
+      }))
+      .expect("Content-Type", /json/)
+      .expect(StatusCodes.BAD_REQUEST);
+  });
+});
+
+describe("flagCard", function() {
+  this.beforeEach(async () => {
+    const user = await authenticateUser(authDetails);
+    return await createPublicAndPrivateCards(user);
+  });
+
+  it("should avoid an injection attack", async () => {
+    await request(app)
+      .post("/trpc/flagCard?batch=1")
+      .send({ input: { cardID: { $ne: "000000000000000000000000" } } })
+      .expect("Content-Type", /json/)
+      .expect(StatusCodes.BAD_REQUEST);
   });
 });

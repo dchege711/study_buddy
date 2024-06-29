@@ -108,3 +108,19 @@ export const readPublicCardParamsValidator = z.object({
     message: "Invalid card ID",
   }),
 });
+
+export const searchPublicCardsParamsValidator = z.object({
+  queryString: z.string(),
+  limit: z.number().int().positive(),
+  creationStartDate: z.date().optional(),
+  creationEndDate: z.date().optional(),
+  cardIDs: z.string().optional(),
+});
+
+export const flagCardParamsValidator = z.object({
+  cardID: z.string().refine(isMongoId, {
+    message: "Invalid card ID",
+  }),
+  markedForReview: z.boolean().optional(),
+  markedAsDuplicate: z.boolean().optional(),
+});
