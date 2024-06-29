@@ -324,3 +324,23 @@ describe("duplicateCard", function() {
     });
   });
 });
+
+describe("restoreCardFromTrash", function() {
+  this.beforeEach(async () => {
+    const gUser = await authenticateUser(authDetails);
+    gCaller = createCaller({ user: gUser });
+    return await createPublicAndPrivateCards(gUser);
+  });
+
+  it("should avoid an injection attack", function(done) {
+    gCaller.restoreCardFromTrash({
+      _id: { $ne: "000000000000000000000000" } as unknown as string,
+    }).then((result) => {
+      done(
+        new Error(`Injection attack succeeded: Duplicated ${result}`),
+      );
+    }).catch((e) => {
+      passIfValidationError(e, done);
+    });
+  });
+});

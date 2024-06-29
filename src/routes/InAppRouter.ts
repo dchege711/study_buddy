@@ -8,6 +8,7 @@ import {
   flagCardParamsValidator,
   partialCardValidator,
   readPublicCardParamsValidator,
+  restoreCardFromTrashParamsValidator,
   searchOwnedCardsParamsValidator,
   searchPublicCardsParamsValidator,
   trashCardParamsValidator,
@@ -101,9 +102,7 @@ export const inAppRouter = router({
     }),
 
   restoreCardFromTrash: authedProcedure
-    .input((params: unknown) =>
-      params as Omit<MetadataDB.SendCardToTrashParams, "createdById">
-    )
+    .input(restoreCardFromTrashParamsValidator)
     .mutation(({ input, ctx }) => {
       return MetadataDB.restoreCardFromTrash({
         ...input,
