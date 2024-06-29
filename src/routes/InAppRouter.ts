@@ -5,6 +5,7 @@ import {
   addCardParamsValidator,
   fetchCardParamsValidator,
   flagCardParamsValidator,
+  partialCardValidator,
   readPublicCardParamsValidator,
   searchPublicCardsParamsValidator,
 } from "../models/SanitizationAndValidation";
@@ -52,7 +53,7 @@ export const inAppRouter = router({
     }),
 
   updateCard: authedProcedure
-    .input((params: unknown) => params as Partial<ICard>)
+    .input(partialCardValidator)
     .mutation(({ input, ctx }) => {
       return CardsDB.update({ ...input, createdById: ctx.user.userIDInApp });
     }),

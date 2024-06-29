@@ -1,6 +1,8 @@
+import { TRPCError } from "@trpc/server";
 import { expect } from "chai";
 import { StatusCodes } from "http-status-codes";
 import request from "supertest";
+import { ZodError } from "zod";
 
 import {
   create as createCard,
@@ -20,6 +22,14 @@ const authDetails = {
 
 let gUser: AuthenticateUser;
 let gCaller: ReturnType<typeof createCaller>;
+
+function passIfValidationError(e: unknown, done: Mocha.Done) {
+  if (e instanceof TRPCError && e.cause instanceof ZodError) {
+    done();
+  } else {
+    done(e);
+  }
+}
 
 /**
  * Convert `payload` into a URL query string of the form expected by tRPC.
@@ -186,8 +196,8 @@ describe("fetchCard", function() {
       cardID: { $ne: "000000000000000000000000" } as unknown as string,
     }).then((card) => {
       done(new Error(`Injection attack succeeded: ${card}`));
-    }).catch(() => {
-      done();
+    }).catch((e) => {
+      passIfValidationError(e, done);
     });
   });
 });
@@ -209,8 +219,31 @@ describe("addCard", function() {
       parent: { $ne: "000000000000000000000000" } as unknown as string,
     }).then((card) => {
       done(new Error(`Injection attack succeeded: ${card}`));
-    }).catch(() => {
-      done();
+    }).catch((e) => {
+      passIfValidationError(e, done);
+    });
+  });
+});
+
+describe.only("updateCard", function() {
+  let samplePrivateCardId: string;
+
+  this.beforeEach(async () => {
+    const gUser = await authenticateUser(authDetails);
+    gCaller = createCaller({ user: gUser });
+    ({ samplePrivateCardId } = await createPublicAndPrivateCards(gUser));
+    return await createPublicAndPrivateCards(gUser);
+  });
+
+  it("should avoid an injection attack", function(done) {
+    gCaller.updateCard({
+      _id: samplePrivateCardId,
+      parent: { $ne: "000000000000000000000000" } as unknown as string,
+      title: "foo; db.collection.drop();",
+    }).then((card) => {
+      done(new Error(`Injection attack succeeded: ${card}`));
+    }).catch((e) => {
+      passIfValidationError(e, done);
     });
   });
 });
