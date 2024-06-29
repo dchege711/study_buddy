@@ -181,9 +181,36 @@ describe("fetchCard", function() {
     return await createPublicAndPrivateCards(gUser);
   });
 
-  it("should avoid an injection attack", async () => {
-    expect(gCaller.fetchCard({
+  it("should avoid an injection attack", function(done) {
+    gCaller.fetchCard({
       cardID: { $ne: "000000000000000000000000" } as unknown as string,
-    })).to.throw;
+    }).then((card) => {
+      done(new Error(`Injection attack succeeded: ${card}`));
+    }).catch(() => {
+      done();
+    });
+  });
+});
+
+describe("addCard", function() {
+  this.beforeEach(async () => {
+    const gUser = await authenticateUser(authDetails);
+    gCaller = createCaller({ user: gUser });
+    return await createPublicAndPrivateCards(gUser);
+  });
+
+  it("should avoid an injection attack", function(done) {
+    gCaller.addCard({
+      title: "foo; db.collection.drop();",
+      description: "bar",
+      tags: "baz",
+      urgency: 5,
+      isPublic: true,
+      parent: { $ne: "000000000000000000000000" } as unknown as string,
+    }).then((card) => {
+      done(new Error(`Injection attack succeeded: ${card}`));
+    }).catch(() => {
+      done();
+    });
   });
 });

@@ -130,3 +130,14 @@ export const fetchCardParamsValidator = z.object({
     message: "Invalid card ID",
   }),
 });
+
+export const addCardParamsValidator = z.object({
+  title: z.string(),
+  description: z.string(),
+  tags: z.string(),
+  urgency: z.number().int().positive(),
+  isPublic: z.boolean(),
+  parent: z.string().refine(isMongoId, {
+    message: "Invalid card ID",
+  }),
+});
