@@ -1,6 +1,5 @@
 import * as CardsDB from "../models/CardsMongoDB";
 import * as MetadataDB from "../models/MetadataMongoDB";
-import { ICard } from "../models/mongoose_models/CardSchema";
 import {
   addCardParamsValidator,
   fetchCardParamsValidator,
@@ -8,6 +7,7 @@ import {
   partialCardValidator,
   readPublicCardParamsValidator,
   searchPublicCardsParamsValidator,
+  trashCardParamsValidator,
 } from "../models/SanitizationAndValidation";
 import {
   authedProcedure,
@@ -59,9 +59,7 @@ export const inAppRouter = router({
     }),
 
   trashCard: authedProcedure
-    .input((params: unknown) =>
-      params as Omit<MetadataDB.SendCardToTrashParams, "createdById">
-    )
+    .input(trashCardParamsValidator)
     .mutation(({ input, ctx }) => {
       return MetadataDB.sendCardToTrash({
         ...input,
