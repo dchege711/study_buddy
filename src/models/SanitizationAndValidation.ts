@@ -237,3 +237,6 @@ export const verificationPathValidator = z.string().length(48).refine(
     message: "Invalid verification link",
   },
 );
+
+export const resetPasswordRequestParamsValidator =
+  sendValidationEmailParamsValidator;

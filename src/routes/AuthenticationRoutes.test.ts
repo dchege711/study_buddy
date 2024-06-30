@@ -7,6 +7,7 @@ import {
   HOME,
   LOGIN,
   REGISTER_USER,
+  RESET_PASSWORD,
   ROOT,
   SEND_VALIDATION_EMAIL,
   VERIFY_ACCOUNT,
@@ -151,6 +152,33 @@ describe(VERIFY_ACCOUNT, function() {
   it("should use an input parser/validator", async function() {
     return request(app)
       .get(`${VERIFY_ACCOUNT}/not32characterslong`)
+      .expect(StatusCodes.BAD_REQUEST);
+  });
+});
+
+describe(RESET_PASSWORD, function() {
+  it("should show the reset password form", function() {
+    return request(app)
+      .get(RESET_PASSWORD)
+      .expect("Content-Type", /html/)
+      .expect(StatusCodes.OK)
+      .expect(/Type the email address associated with your account/);
+  });
+
+  it("should not redirect even if authenticated", async function() {
+    const agent = await logInAgent();
+    return agent
+      .get(RESET_PASSWORD)
+      .expect(StatusCodes.OK)
+      .expect(/Type the email address associated with your account/);
+  });
+
+  it("should use an input parser/validator", async function() {
+    return request(app)
+      .post(RESET_PASSWORD)
+      .send({
+        email: "not an email",
+      })
       .expect(StatusCodes.BAD_REQUEST);
   });
 });
