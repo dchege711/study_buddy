@@ -217,3 +217,6 @@ export const userRegistrationParamsValidator = z.object({
   email: z.string().email(),
   password: z.string().min(8),
 });
+
+export const sendValidationEmailParamsValidator =
+  userRegistrationParamsValidator.pick({ email: true }).required();
