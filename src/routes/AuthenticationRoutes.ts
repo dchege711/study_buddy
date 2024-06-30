@@ -15,6 +15,7 @@ import {
   verifyAccount,
 } from "../controllers/AuthenticationController";
 import {
+  pathValidationMiddleware,
   rateLimiter,
   validationMiddleware,
 } from "../controllers/ControllerUtilities";
@@ -22,6 +23,7 @@ import {
   sendValidationEmailParamsValidator,
   userLoginParamsValidator,
   userRegistrationParamsValidator,
+  verificationPathValidator,
 } from "../models/SanitizationAndValidation";
 import {
   LOGIN,
@@ -65,7 +67,11 @@ router.post(
   sendValidationEmailPost,
 );
 
-router.get(`${VERIFY_ACCOUNT}/*`, verifyAccount);
+router.get(
+  `${VERIFY_ACCOUNT}/*`,
+  pathValidationMiddleware(verificationPathValidator),
+  verifyAccount,
+);
 
 router.get(RESET_PASSWORD, resetPasswordGet);
 
