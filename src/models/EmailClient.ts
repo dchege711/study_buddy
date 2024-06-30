@@ -8,7 +8,7 @@
  * @module
  */
 
-import { createTransport } from "nodemailer";
+import { createTransport, SentMessageInfo } from "nodemailer";
 
 import Mail = require("nodemailer/lib/mailer");
 
@@ -19,7 +19,7 @@ import {
   MAILGUN_PASSWORD,
 } from "../config";
 
-const transporter = createTransport({
+export const transporter = createTransport({
   pool: true,
   host: "smtp.mailgun.org",
   port: 587,
@@ -38,9 +38,9 @@ const transporter = createTransport({
  *
  * @returns {Promise} takes a JSON with `success` and `message` as the keys
  */
-export function sendEmail(mailOptions: Mail.Options): Promise<void> {
+export function sendEmail(mailOptions: Mail.Options): Promise<SentMessageInfo> {
   mailOptions.from = `${APP_NAME} <${EMAIL_ADDRESS}>`;
-  return transporter.sendMail(mailOptions).then(() => {});
+  return transporter.sendMail(mailOptions);
 }
 
 /**

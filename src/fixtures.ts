@@ -1,7 +1,8 @@
 import { Runner } from "mocha";
+import { fake, replace } from "sinon";
 
 import { PORT } from "./config";
-import { close as closeEmailClient } from "./models/EmailClient";
+import { close as closeEmailClient, transporter } from "./models/EmailClient";
 import {
   deleteAllAccounts,
   registerUserAndPassword,
@@ -42,6 +43,10 @@ export const mochaHooks = {
  * Run once before all tests.
  */
 export async function mochaGlobalSetup(this: Runner) {
+  // Mock out the outgoing email. There doesn't seem to be a way to mock out
+  // ES6 exports.
+  replace(transporter, "sendMail", fake.resolves("Mocked out sendMail."));
+
   this.server = app.listen(PORT);
   console.log(`Server listening on port ${PORT}`);
 }
