@@ -18,7 +18,10 @@ import {
   rateLimiter,
   validationMiddleware,
 } from "../controllers/ControllerUtilities";
-import { userLoginParamsValidator } from "../models/SanitizationAndValidation";
+import {
+  userLoginParamsValidator,
+  userRegistrationParamsValidator,
+} from "../models/SanitizationAndValidation";
 import {
   LOGIN,
   LOGOUT,
@@ -47,7 +50,11 @@ router.get(LOGOUT, logoutUser);
 
 router.get(REGISTER_USER, rateLimiter, handleRegisterUser);
 
-router.post(REGISTER_USER, registerUser);
+router.post(
+  REGISTER_USER,
+  validationMiddleware(userRegistrationParamsValidator),
+  registerUser,
+);
 
 router.get(SEND_VALIDATION_EMAIL, sendValidationEmailGet);
 

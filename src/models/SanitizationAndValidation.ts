@@ -13,7 +13,7 @@ import katex from "katex";
 import type { KatexOptions } from "katex";
 import markdownit from "markdown-it";
 import texMath from "markdown-it-texmath";
-import { isMongoId } from "validator";
+import { isAlphanumeric, isMongoId } from "validator";
 import { z } from "zod";
 
 import { ICard } from "./mongoose_models/CardSchema";
@@ -208,4 +208,12 @@ export const userSettingsParamsValidator = z.object({
 export const userLoginParamsValidator = z.object({
   username_or_email: z.string(),
   password: z.string(),
+});
+
+export const userRegistrationParamsValidator = z.object({
+  username: z.string().refine(isAlphanumeric, {
+    message: "Username must be alphanumeric",
+  }),
+  email: z.string().email(),
+  password: z.string().min(8),
 });
