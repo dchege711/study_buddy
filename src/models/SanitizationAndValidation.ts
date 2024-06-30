@@ -204,3 +204,8 @@ export const userSettingsParamsValidator = z.object({
   cardsAreByDefaultPrivate: z.string().optional(),
   dailyTarget: z.number().int().positive(),
 });
+
+export const userLoginParamsValidator = z.object({
+  username_or_email: z.string(),
+  password: z.string(),
+});
