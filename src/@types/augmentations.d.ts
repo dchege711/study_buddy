@@ -5,13 +5,14 @@
  */
 
 import type { NextFunction, Request, Response } from "express";
+import type { Session } from "express-session";
 
 import type { AuthenticateUser } from "../models/LogInUtilities.js";
 import type { IUser } from "../models/mongoose_models/UserSchema.js";
 
 declare module "express" {
   interface Request {
-    session?: {
+    session?: Session & {
       message?: string;
       user?: AuthenticateUser;
     };
