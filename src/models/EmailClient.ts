@@ -15,6 +15,7 @@ import Mail = require("nodemailer/lib/mailer");
 import {
   APP_NAME,
   EMAIL_ADDRESS,
+  IS_PROD,
   MAILGUN_LOGIN,
   MAILGUN_PASSWORD,
 } from "../config";
@@ -40,7 +41,12 @@ export const transporter = createTransport({
  */
 export function sendEmail(mailOptions: Mail.Options): Promise<SentMessageInfo> {
   mailOptions.from = `${APP_NAME} <${EMAIL_ADDRESS}>`;
-  return transporter.sendMail(mailOptions);
+  if (IS_PROD) {
+    return transporter.sendMail(mailOptions);
+  } else {
+    console.log("Not sending email in development mode.");
+    return Promise.resolve({} as SentMessageInfo);
+  }
 }
 
 /**
