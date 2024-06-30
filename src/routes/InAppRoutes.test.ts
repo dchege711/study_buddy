@@ -51,7 +51,7 @@ describe(HOME, function() {
   });
 });
 
-describe.only(ACCOUNT, function() {
+describe(ACCOUNT, function() {
   it("should require authentication", function() {
     return request(app)
       .get(ACCOUNT)

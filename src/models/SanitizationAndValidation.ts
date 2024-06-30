@@ -193,3 +193,14 @@ export const streakParamsValidator = z.object({
     }),
   ),
 });
+
+export const userSettingsParamsValidator = z.object({
+  /**
+   * cardsAreByDefaultPrivate is a checkbox on the client, and the transmitted
+   * value is either "on" or undefined. [1]
+   *
+   * [1]: https://stackoverflow.com/questions/11424037/do-checkbox-inputs-only-post-data-if-theyre-checked
+   */
+  cardsAreByDefaultPrivate: z.string().optional(),
+  dailyTarget: z.number().int().positive(),
+});

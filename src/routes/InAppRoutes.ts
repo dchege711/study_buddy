@@ -1,7 +1,10 @@
 import { Router } from "express";
 
 import { requireLogIn } from "../controllers/AuthenticationController";
-import { rateLimiter } from "../controllers/ControllerUtilities";
+import {
+  rateLimiter,
+  validationMiddleware,
+} from "../controllers/ControllerUtilities";
 import {
   accountGet,
   browsePageGet,
@@ -11,6 +14,7 @@ import {
   updateUserSettings,
   wikiPage,
 } from "../controllers/InAppController";
+import { userSettingsParamsValidator } from "../models/SanitizationAndValidation";
 import {
   ACCOUNT,
   BROWSE,
@@ -30,7 +34,13 @@ router.get(BROWSE, browsePageGet);
 
 router.get(ACCOUNT, rateLimiter, requireLogIn, accountGet);
 
-router.post(ACCOUNT, rateLimiter, requireLogIn, updateUserSettings);
+router.post(
+  ACCOUNT,
+  rateLimiter,
+  validationMiddleware(userSettingsParamsValidator),
+  requireLogIn,
+  updateUserSettings,
+);
 
 router.get(DOWNLOAD_USER_DATA, rateLimiter, requireLogIn, downloadUserData);
 
