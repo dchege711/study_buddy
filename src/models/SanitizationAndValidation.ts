@@ -220,3 +220,20 @@ export const userRegistrationParamsValidator = z.object({
 
 export const sendValidationEmailParamsValidator =
   userRegistrationParamsValidator.pick({ email: true }).required();
+
+/**
+ * Validate the path of a verification link. The URI itself should be 32
+ * alphanumeric characters long, and the path should start with
+ * "/verify-account/".
+ */
+export const verificationPathValidator = z.string().length(48).refine(
+  (path) => {
+    if (!path.startsWith("/verify-account/")) {
+      return false;
+    }
+    return isAlphanumeric(path.split("/verify-account/")[1]);
+  },
+  {
+    message: "Invalid verification link",
+  },
+);

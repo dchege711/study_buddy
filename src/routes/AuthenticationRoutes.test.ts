@@ -9,6 +9,7 @@ import {
   REGISTER_USER,
   ROOT,
   SEND_VALIDATION_EMAIL,
+  VERIFY_ACCOUNT,
 } from "../paths";
 import { app } from "./../server";
 import { dummyAccountDetails } from "../tests/DummyAccountUtils";
@@ -135,6 +136,21 @@ describe(SEND_VALIDATION_EMAIL, function() {
       .send({
         email: "not an email",
       })
+      .expect(StatusCodes.BAD_REQUEST);
+  });
+});
+
+describe(VERIFY_ACCOUNT, function() {
+  it(`should redirect to ${SEND_VALIDATION_EMAIL} if link is stale`, function() {
+    return request(app)
+      .get(`${VERIFY_ACCOUNT}/32alphanumericcharsinlowercase32`)
+      .expect(StatusCodes.SEE_OTHER)
+      .expect("Location", SEND_VALIDATION_EMAIL);
+  });
+
+  it("should use an input parser/validator", async function() {
+    return request(app)
+      .get(`${VERIFY_ACCOUNT}/not32characterslong`)
       .expect(StatusCodes.BAD_REQUEST);
   });
 });
