@@ -20,6 +20,7 @@ import {
   validationMiddleware,
 } from "../controllers/ControllerUtilities";
 import {
+  resetPasswordRequestParamsValidator,
   sendValidationEmailParamsValidator,
   userLoginParamsValidator,
   userRegistrationParamsValidator,
@@ -75,7 +76,11 @@ router.get(
 
 router.get(RESET_PASSWORD, resetPasswordGet);
 
-router.post(RESET_PASSWORD, resetPasswordPost);
+router.post(
+  RESET_PASSWORD,
+  validationMiddleware(resetPasswordRequestParamsValidator),
+  resetPasswordPost,
+);
 
 router.get(`${RESET_PASSWORD_LINK}/*`, resetPasswordLinkGet);
 
