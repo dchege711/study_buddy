@@ -14,7 +14,11 @@ import {
   sendValidationEmailPost,
   verifyAccount,
 } from "../controllers/AuthenticationController";
-import { rateLimiter } from "../controllers/ControllerUtilities";
+import {
+  rateLimiter,
+  validationMiddleware,
+} from "../controllers/ControllerUtilities";
+import { userLoginParamsValidator } from "../models/SanitizationAndValidation";
 import {
   LOGIN,
   LOGOUT,
@@ -32,7 +36,12 @@ router.get(ROOT, rateLimiter, handleLogIn);
 
 router.get(LOGIN, rateLimiter, handleLogIn);
 
-router.post(LOGIN, rateLimiter, loginUser);
+router.post(
+  LOGIN,
+  rateLimiter,
+  validationMiddleware(userLoginParamsValidator),
+  loginUser,
+);
 
 router.get(LOGOUT, logoutUser);
 
