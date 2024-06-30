@@ -193,8 +193,3 @@ export const streakParamsValidator = z.object({
     }),
   ),
 });
-
-export const userSettingsParamsValidator = z.object({
-  cardsAreByDefaultPrivate: z.boolean(),
-  dailyTarget: z.number().int().nonnegative(),
-});
