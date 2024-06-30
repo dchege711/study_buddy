@@ -13,6 +13,7 @@ import cookieParser from "cookie-parser";
 import express, { Request, Response } from "express";
 import session, { MemoryStore } from "express-session";
 import { HTTPS } from "express-sslify";
+import { csrf } from "lusca";
 import { join } from "path";
 
 import {
@@ -83,7 +84,7 @@ app.use(cookieParser());
  *
  * TODO: Enable CSRF protection
  */
-// app.use(lusca.csrf());
+app.use(csrf());
 
 app.set("views", join(__dirname, "views"));
 app.set("view engine", "ejs");
