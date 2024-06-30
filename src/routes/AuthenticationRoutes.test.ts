@@ -8,6 +8,7 @@ import {
   LOGIN,
   REGISTER_USER,
   RESET_PASSWORD,
+  RESET_PASSWORD_LINK,
   ROOT,
   SEND_VALIDATION_EMAIL,
   VERIFY_ACCOUNT,
@@ -178,6 +179,34 @@ describe(RESET_PASSWORD, function() {
       .post(RESET_PASSWORD)
       .send({
         email: "not an email",
+      })
+      .expect(StatusCodes.BAD_REQUEST);
+  });
+});
+
+describe(RESET_PASSWORD_LINK, function() {
+  const url =
+    `${RESET_PASSWORD_LINK}/50alphanumericcharsinlowercase12345678901234567850`;
+
+  it("should show the reset password form", async function() {
+    return request(app)
+      .get(url)
+      .expect(StatusCodes.SEE_OTHER)
+      .expect("Location", url);
+  });
+
+  it("should use an input parser/validator in GET", async function() {
+    return request(app)
+      .get(`${RESET_PASSWORD_LINK}/not50characterslong`)
+      .expect(StatusCodes.BAD_REQUEST);
+  });
+
+  it("should use an input parser/validator in POST", async function() {
+    return request(app)
+      .post(url)
+      .send({
+        password_1: "this_password_is_not",
+        password_2: "the_same_as_this one",
       })
       .expect(StatusCodes.BAD_REQUEST);
   });

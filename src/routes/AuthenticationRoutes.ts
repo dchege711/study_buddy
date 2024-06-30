@@ -20,6 +20,8 @@ import {
   validationMiddleware,
 } from "../controllers/ControllerUtilities";
 import {
+  resetPasswordLinkPathValidator,
+  resetPasswordLinkPostParamsValidator,
   resetPasswordRequestParamsValidator,
   sendValidationEmailParamsValidator,
   userLoginParamsValidator,
@@ -82,8 +84,17 @@ router.post(
   resetPasswordPost,
 );
 
-router.get(`${RESET_PASSWORD_LINK}/*`, resetPasswordLinkGet);
+router.get(
+  `${RESET_PASSWORD_LINK}/*`,
+  pathValidationMiddleware(resetPasswordLinkPathValidator),
+  resetPasswordLinkGet,
+);
 
-router.post(`${RESET_PASSWORD_LINK}/*`, resetPasswordLinkPost);
+router.post(
+  `${RESET_PASSWORD_LINK}/*`,
+  pathValidationMiddleware(resetPasswordLinkPathValidator),
+  validationMiddleware(resetPasswordLinkPostParamsValidator),
+  resetPasswordLinkPost,
+);
 
 export = router;

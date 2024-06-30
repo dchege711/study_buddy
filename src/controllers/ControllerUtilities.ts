@@ -112,13 +112,19 @@ export const rateLimiter = rateLimit({
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 
+type ZodSchemaTypes =
+  | ReturnType<typeof z.object>
+  | ReturnType<typeof z.string>
+  | z.ZodEffects<z.ZodObject<z.ZodRawShape>>
+  | z.ZodEffects<z.ZodString>;
+
 /**
  * Helper function for validating that `req.body` matches the schema provided.
  * Adapted from [1].
  *
  * [1]: https://dev.to/osalumense/validating-request-data-in-expressjs-using-zod-a-comprehensive-guide-3a0j
  */
-export function validationMiddleware(schema: ReturnType<typeof z.object>) {
+export function validationMiddleware(schema: ZodSchemaTypes) {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
       schema.parse(req.body);
@@ -142,9 +148,7 @@ export function validationMiddleware(schema: ReturnType<typeof z.object>) {
 }
 
 // TODO: How to share code with `validationMiddleware` above?
-export function pathValidationMiddleware(
-  schema: z.ZodEffects<z.ZodString, string, string>,
-) {
+export function pathValidationMiddleware(schema: ZodSchemaTypes) {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
       schema.parse(req.path);
