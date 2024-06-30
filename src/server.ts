@@ -18,6 +18,7 @@ import { join } from "path";
 
 import {
   IS_DEV,
+  IS_PROD,
   IS_TS_NODE,
   MONGO_URI,
   PORT,
@@ -55,7 +56,7 @@ export type AppRouter = typeof appRouter;
 app.use(session({
   secret: [STUDY_BUDDY_SESSION_SECRET_1],
   cookie: {
-    secure: true,
+    secure: IS_PROD,
     httpOnly: true,
   },
   resave: false,
