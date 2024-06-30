@@ -1,9 +1,10 @@
 import { unlink } from "fs";
 
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { rateLimit } from "express-rate-limit";
-
 import { StatusCodes } from "http-status-codes";
+import { z, ZodError } from "zod";
+
 import * as config from "../config";
 import { UserRecoverableError } from "../errors";
 import { AuthenticateUser } from "../models/LogInUtilities";
@@ -110,3 +111,32 @@ export const rateLimiter = rateLimit({
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
+
+/**
+ * Helper function for validating that `req.body` matches the schema provided.
+ * Adapted from [1].
+ *
+ * [1]: https://dev.to/osalumense/validating-request-data-in-expressjs-using-zod-a-comprehensive-guide-3a0j
+ */
+export function validationMiddleware(schema: ReturnType<typeof z.object>) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    try {
+      schema.parse(req.body);
+      next();
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const errorMessages = error.errors.map((issue) => ({
+          message: `${issue.path.join(".")} is ${issue.message}`,
+        }));
+        res.status(StatusCodes.BAD_REQUEST).json({
+          error: "Invalid data",
+          details: errorMessages,
+        });
+      } else {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+          error: "Internal Server Error",
+        });
+      }
+    }
+  };
+}
