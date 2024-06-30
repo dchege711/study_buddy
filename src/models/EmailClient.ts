@@ -44,7 +44,6 @@ export function sendEmail(mailOptions: Mail.Options): Promise<SentMessageInfo> {
   if (IS_PROD) {
     return transporter.sendMail(mailOptions);
   } else {
-    console.log("Not sending email in development mode.");
     return Promise.resolve({} as SentMessageInfo);
   }
 }
