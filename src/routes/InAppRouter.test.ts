@@ -80,7 +80,7 @@ async function createPublicAndPrivateCards(user: AuthenticateUser) {
   };
 }
 
-describe("fetchPublicCard", function() {
+describe("/trpc/fetchPublicCard", function() {
   let samplePublicCardId: string;
   let samplePrivateCardId: string;
 
@@ -133,7 +133,7 @@ describe("fetchPublicCard", function() {
     expect(result.body[0].result.data._id).to.equal(samplePublicCardId);
   });
 
-  it("should install an input parser/validator", async () => {
+  it("should use an input parser/validator", async () => {
     await request(app)
       .get(computeRequestURL({ cardID: { $ne: "000000000000000000000000" } }))
       .expect("Content-Type", /json/)
@@ -148,7 +148,7 @@ describe("fetchPublicCard", function() {
   });
 });
 
-describe("searchPublicCards", function() {
+describe("/trpc/searchPublicCards", function() {
   function computeRequestURL(payload: unknown) {
     return `/trpc/searchPublicCards?${computeTRPCParams(payload)}`;
   }
@@ -158,7 +158,7 @@ describe("searchPublicCards", function() {
     return await createPublicAndPrivateCards(gUser);
   });
 
-  it("should install an input parser/validator", async () => {
+  it("should use an input parser/validator", async () => {
     await request(app)
       .get(computeRequestURL({
         queryString: { $ne: "foobar" },
@@ -169,13 +169,13 @@ describe("searchPublicCards", function() {
   });
 });
 
-describe("flagCard", function() {
+describe("/trpc/flagCard", function() {
   this.beforeEach(async () => {
     gUser = await authenticateUser(authDetails);
     return await createPublicAndPrivateCards(gUser);
   });
 
-  it("should install an input parser/validator", async () => {
+  it("should use an input parser/validator", async () => {
     await request(app)
       .post("/trpc/flagCard?batch=1")
       .send({ input: { cardID: { $ne: "000000000000000000000000" } } })
@@ -184,14 +184,14 @@ describe("flagCard", function() {
   });
 });
 
-describe("fetchCard", function() {
+describe("/trpc/fetchCard", function() {
   this.beforeEach(async () => {
     const gUser = await authenticateUser(authDetails);
     gCaller = createCaller({ user: gUser });
     return await createPublicAndPrivateCards(gUser);
   });
 
-  it("should install an input parser/validator", function(done) {
+  it("should use an input parser/validator", function(done) {
     gCaller.fetchCard({
       cardID: { $ne: "000000000000000000000000" } as unknown as string,
     }).then((card) => {
@@ -202,14 +202,14 @@ describe("fetchCard", function() {
   });
 });
 
-describe("addCard", function() {
+describe("/trpc/addCard", function() {
   this.beforeEach(async () => {
     const gUser = await authenticateUser(authDetails);
     gCaller = createCaller({ user: gUser });
     return await createPublicAndPrivateCards(gUser);
   });
 
-  it("should install an input parser/validator", function(done) {
+  it("should use an input parser/validator", function(done) {
     gCaller.addCard({
       title: "foo; db.collection.drop();",
       description: "bar",
@@ -225,7 +225,7 @@ describe("addCard", function() {
   });
 });
 
-describe("updateCard", function() {
+describe("/trpc/updateCard", function() {
   let samplePrivateCardId: string;
 
   this.beforeEach(async () => {
@@ -235,7 +235,7 @@ describe("updateCard", function() {
     return Promise.resolve();
   });
 
-  it("should install an input parser/validator", function(done) {
+  it("should use an input parser/validator", function(done) {
     gCaller.updateCard({
       _id: samplePrivateCardId,
       parent: { $ne: "000000000000000000000000" } as unknown as string,
@@ -248,14 +248,14 @@ describe("updateCard", function() {
   });
 });
 
-describe("trashCard", function() {
+describe("/trpc/trashCard", function() {
   this.beforeEach(async () => {
     const gUser = await authenticateUser(authDetails);
     gCaller = createCaller({ user: gUser });
     return await createPublicAndPrivateCards(gUser);
   });
 
-  it("should install an input parser/validator", function(done) {
+  it("should use an input parser/validator", function(done) {
     gCaller.trashCard({
       _id: { $ne: "000000000000000000000000" } as unknown as string,
     }).then((card) => {
@@ -266,14 +266,14 @@ describe("trashCard", function() {
   });
 });
 
-describe("deleteCard", function() {
+describe("/trpc/deleteCard", function() {
   this.beforeEach(async () => {
     const gUser = await authenticateUser(authDetails);
     gCaller = createCaller({ user: gUser });
     return await createPublicAndPrivateCards(gUser);
   });
 
-  it("should install an input parser/validator", function(done) {
+  it("should use an input parser/validator", function(done) {
     gCaller.deleteCard({
       _id: { $ne: "000000000000000000000000" } as unknown as string,
     }).then((card) => {
@@ -284,14 +284,14 @@ describe("deleteCard", function() {
   });
 });
 
-describe("searchCards", function() {
+describe("/trpc/searchCards", function() {
   this.beforeEach(async () => {
     const gUser = await authenticateUser(authDetails);
     gCaller = createCaller({ user: gUser });
     return await createPublicAndPrivateCards(gUser);
   });
 
-  it("should install an input parser/validator", function(done) {
+  it("should use an input parser/validator", function(done) {
     gCaller.searchCards({
       queryString: { $ne: "foobar" } as unknown as string,
       limit: 2,
@@ -305,14 +305,14 @@ describe("searchCards", function() {
   });
 });
 
-describe("duplicateCard", function() {
+describe("/trpc/duplicateCard", function() {
   this.beforeEach(async () => {
     const gUser = await authenticateUser(authDetails);
     gCaller = createCaller({ user: gUser });
     return await createPublicAndPrivateCards(gUser);
   });
 
-  it("should install an input parser/validator", function(done) {
+  it("should use an input parser/validator", function(done) {
     gCaller.duplicateCard({
       cardID: { $ne: "000000000000000000000000" } as unknown as string,
     }).then((card) => {
@@ -325,14 +325,14 @@ describe("duplicateCard", function() {
   });
 });
 
-describe("restoreCardFromTrash", function() {
+describe("/trpc/restoreCardFromTrash", function() {
   this.beforeEach(async () => {
     const gUser = await authenticateUser(authDetails);
     gCaller = createCaller({ user: gUser });
     return await createPublicAndPrivateCards(gUser);
   });
 
-  it("should install an input parser/validator", function(done) {
+  it("should use an input parser/validator", function(done) {
     gCaller.restoreCardFromTrash({
       _id: { $ne: "000000000000000000000000" } as unknown as string,
     }).then((result) => {
@@ -345,14 +345,14 @@ describe("restoreCardFromTrash", function() {
   });
 });
 
-describe("streak", function() {
+describe("/trpc/streak", function() {
   this.beforeEach(async () => {
     const gUser = await authenticateUser(authDetails);
     gCaller = createCaller({ user: gUser });
     return await createPublicAndPrivateCards(gUser);
   });
 
-  it("should install an input parser/validator", function(done) {
+  it("should use an input parser/validator", function(done) {
     gCaller.streak({
       cardIDs: [{ $ne: "000000000000000000000000" }] as unknown as string[],
     }).then((streak) => {
