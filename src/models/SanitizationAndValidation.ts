@@ -240,3 +240,27 @@ export const verificationPathValidator = z.string().length(48).refine(
 
 export const resetPasswordRequestParamsValidator =
   sendValidationEmailParamsValidator;
+
+/**
+ * Validate the path of a verification link. The URI itself should be 50
+ * alphanumeric characters long, and the path should start with
+ * "/reset-password-link/".
+ */
+export const resetPasswordLinkPathValidator = z.string().length(71).refine(
+  (path) => {
+    if (!path.startsWith("/reset-password-link/")) {
+      return false;
+    }
+    return isAlphanumeric(path.split("/reset-password-link/")[1]);
+  },
+  {
+    message: "Invalid password reset link",
+  },
+);
+
+export const resetPasswordLinkPostParamsValidator = z.object({
+  password_1: z.string().min(8),
+  password_2: z.string().min(8),
+}).refine((params) => params.password_1 === params.password_2, {
+  message: "Passwords do not match",
+});
