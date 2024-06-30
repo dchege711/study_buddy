@@ -17,6 +17,9 @@ import {
 
 import "../input/text-input.js";
 
+const kNumResultsWhenTyping = 7;
+const kNumResultsWhenEnter = 50;
+
 @customElement("search-bar")
 export class SearchBar extends LitElement {
   searchEndpoint: CardSearchEndpoint | null = null;
@@ -105,7 +108,7 @@ export class SearchBar extends LitElement {
     const stillTyping = event.state === InputState.PressedSpace;
 
     const cards = await this.fetchResults({
-      limit: stillTyping ? 7 : Infinity,
+      limit: stillTyping ? kNumResultsWhenTyping : kNumResultsWhenEnter,
       queryString: event.text,
     });
 
@@ -145,9 +148,11 @@ export class SearchBar extends LitElement {
       return;
     }
 
-    this.fetchResults({ limit: Infinity, queryString: "" }).then((results) => {
-      this.dispatchSearchResults(results);
-    });
+    this.fetchResults({ limit: kNumResultsWhenEnter, queryString: "" }).then(
+      (results) => {
+        this.dispatchSearchResults(results);
+      },
+    );
   }
 
   private fetchResults(searchQuery: CardSearchQuery) {
