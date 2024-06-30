@@ -3,7 +3,13 @@ import { StatusCodes } from "http-status-codes";
 import request from "supertest";
 
 import { authenticateUser } from "../models/LogInUtilities";
-import { HOME, LOGIN, ROOT, SEND_VALIDATION_EMAIL } from "../paths";
+import {
+  HOME,
+  LOGIN,
+  REGISTER_USER,
+  ROOT,
+  SEND_VALIDATION_EMAIL,
+} from "../paths";
 import { app } from "./../server";
 import { dummyAccountDetails } from "../tests/DummyAccountUtils";
 
@@ -72,6 +78,34 @@ describe(LOGIN, function() {
       .post(LOGIN)
       .send({
         username_or_email: { $ne: "" } as unknown as string,
+        password: "password",
+      })
+      .expect(StatusCodes.BAD_REQUEST);
+  });
+});
+
+describe(REGISTER_USER, function() {
+  it("should show the registration form", function() {
+    return request(app)
+      .get(REGISTER_USER)
+      .expect(StatusCodes.OK)
+      .expect(/Choose an alphanumeric username/);
+  });
+
+  it("should redirect to the home page if authenticated", async function() {
+    const agent = await logInAgent();
+    return agent
+      .get(REGISTER_USER)
+      .expect(StatusCodes.SEE_OTHER)
+      .expect("Location", HOME);
+  });
+
+  it("should use an input parser/validator", async function() {
+    return request(app)
+      .post(REGISTER_USER)
+      .send({
+        email: "not an email",
+        username: "not%&*alphanumeric",
         password: "password",
       })
       .expect(StatusCodes.BAD_REQUEST);
