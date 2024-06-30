@@ -13,7 +13,6 @@ import {
   searchPublicCardsParamsValidator,
   streakParamsValidator,
   trashCardParamsValidator,
-  userSettingsParamsValidator,
 } from "../models/SanitizationAndValidation";
 import {
   authedProcedure,
@@ -127,15 +126,6 @@ export const inAppRouter = router({
     .input(streakParamsValidator)
     .mutation(({ input, ctx }) => {
       return MetadataDB.updateStreak({
-        ...input,
-        userIDInApp: ctx.user.userIDInApp,
-      });
-    }),
-
-  settings: authedProcedure
-    .input(userSettingsParamsValidator)
-    .mutation(({ input, ctx }) => {
-      return MetadataDB.updateUserSettings({
         ...input,
         userIDInApp: ctx.user.userIDInApp,
       });
