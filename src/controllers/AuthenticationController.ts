@@ -37,7 +37,7 @@ function renderForm(
  * using certain URLs
  */
 export const requireLogIn: RequestHandler = (req, res, next) => {
-  if (!req.session?.user) {
+  if (!req.session?.user && !req.cookies.session_token) {
     res.redirect(StatusCodes.SEE_OTHER, allPaths.LOGIN);
   } else if (req.session?.user) {
     if (req.body && req.body.userIDInApp) {
@@ -46,7 +46,7 @@ export const requireLogIn: RequestHandler = (req, res, next) => {
     }
     next();
   } else if (req.cookies.session_token) {
-    logInBySessionToken(req.cookies.session_token, res, next);
+    logInBySessionToken(req, res, next);
   }
 };
 
