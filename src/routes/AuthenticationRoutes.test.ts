@@ -113,11 +113,28 @@ describe(REGISTER_USER, function() {
 });
 
 describe(SEND_VALIDATION_EMAIL, function() {
-  it("GET returns an HTML page", function() {
+  it("should show the validation form", function() {
     return request(app)
       .get(SEND_VALIDATION_EMAIL)
       .expect("Content-Type", /html/)
       .expect(StatusCodes.OK)
       .expect(/Send Validation URL/);
+  });
+
+  it("should not redirect even if authenticated", async function() {
+    const agent = await logInAgent();
+    return agent
+      .get(SEND_VALIDATION_EMAIL)
+      .expect(StatusCodes.OK)
+      .expect(/Send Validation URL/);
+  });
+
+  it("should use an input parser/validator", async function() {
+    return request(app)
+      .post(SEND_VALIDATION_EMAIL)
+      .send({
+        email: "not an email",
+      })
+      .expect(StatusCodes.BAD_REQUEST);
   });
 });

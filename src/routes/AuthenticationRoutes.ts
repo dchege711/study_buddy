@@ -19,6 +19,7 @@ import {
   validationMiddleware,
 } from "../controllers/ControllerUtilities";
 import {
+  sendValidationEmailParamsValidator,
   userLoginParamsValidator,
   userRegistrationParamsValidator,
 } from "../models/SanitizationAndValidation";
@@ -58,7 +59,11 @@ router.post(
 
 router.get(SEND_VALIDATION_EMAIL, sendValidationEmailGet);
 
-router.post(SEND_VALIDATION_EMAIL, sendValidationEmailPost);
+router.post(
+  SEND_VALIDATION_EMAIL,
+  validationMiddleware(sendValidationEmailParamsValidator),
+  sendValidationEmailPost,
+);
 
 router.get(`${VERIFY_ACCOUNT}/*`, verifyAccount);
 
