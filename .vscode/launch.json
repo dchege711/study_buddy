@@ -17,7 +17,7 @@
       "type": "node-terminal"
     },
     {
-      "command": "npx ts-mocha --config ./.mocharc.yml --timeout 0",
+      "command": "NODE_ENV=test npx ts-mocha --config ./.mocharc.yml --timeout 0",
       "name": "test:server",
       "request": "launch",
       "type": "node-terminal"

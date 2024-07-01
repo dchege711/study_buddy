@@ -3,12 +3,24 @@ import { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 
 import type { AppRouter } from "../../server.js";
 
+function getCSRFToken() {
+  return document.head.querySelector("meta[name='_csrf']")?.getAttribute(
+    "content",
+  )
+    || "";
+}
+
 // Pass `AppRouter` as generic here. This lets the `trpc` object know what
 // procedures are available on the server and their input/output types.
 export const trpc = createTRPCClient<AppRouter>({
   links: [
     httpBatchLink({
       url: "/trpc",
+      headers() {
+        return {
+          "x-csrf-token": getCSRFToken(),
+        };
+      },
     }),
   ],
 });

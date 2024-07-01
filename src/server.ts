@@ -13,11 +13,13 @@ import cookieParser from "cookie-parser";
 import express, { Request, Response } from "express";
 import session, { MemoryStore } from "express-session";
 import { HTTPS } from "express-sslify";
+import { csrf } from "lusca";
 import { join } from "path";
 
 import {
   IS_DEV,
   IS_PROD,
+  IS_TEST,
   IS_TS_NODE,
   MONGO_URI,
   PORT,
@@ -60,7 +62,7 @@ app.use(session({
   },
   resave: false,
   name: "c13u-study-buddy",
-  store: IS_DEV ? new MemoryStore() : MongoStore.create({
+  store: (IS_DEV || IS_TEST) ? new MemoryStore() : MongoStore.create({
     mongoUrl: MONGO_URI,
     touchAfter: 24 * 3600,
   }),
@@ -76,14 +78,17 @@ app.use(cookieParser());
  *
  * With csrf enabled, the CSRF token must be in the payload when modifying data
  * or the client will receive a 403 Forbidden. To send the token the client
- * needs to echo back the _csrf value you received from the previous request.
+ * needs to echo back the _csrf value received from the previous request.
  * Furthermore, parsers must be registered before lusca.
  *
  * [1]: https://github.com/krakenjs/lusca#readme
- *
- * TODO: Enable CSRF protection
  */
-// app.use(lusca.csrf());
+if (!IS_TEST) {
+  app.use(csrf());
+} else {
+  // Provide a fake CSRF token as the EJS templates expect it.
+  app.locals._csrf = "csrf_has_been_disabled_for_testing";
+}
 
 app.set("views", join(__dirname, "views"));
 app.set("view engine", "ejs");
