@@ -609,7 +609,7 @@ export async function deleteAccount(userIDInApp: number): Promise<void> {
 export function deleteAllAccounts(
   usernamesToSpare = [config.PUBLIC_USER_USERNAME],
 ): Promise<number> {
-  if (config.NODE_ENV !== "development") {
+  if (!(config.IS_DEV || config.IS_TEST)) {
     return Promise.reject(
       `Deleting all accounts isn't allowed in the ${config.NODE_ENV} environment`,
     );

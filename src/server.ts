@@ -19,6 +19,7 @@ import { join } from "path";
 import {
   IS_DEV,
   IS_PROD,
+  IS_TEST,
   IS_TS_NODE,
   MONGO_URI,
   PORT,
@@ -61,7 +62,7 @@ app.use(session({
   },
   resave: false,
   name: "c13u-study-buddy",
-  store: IS_DEV ? new MemoryStore() : MongoStore.create({
+  store: (IS_DEV || IS_TEST) ? new MemoryStore() : MongoStore.create({
     mongoUrl: MONGO_URI,
     touchAfter: 24 * 3600,
   }),

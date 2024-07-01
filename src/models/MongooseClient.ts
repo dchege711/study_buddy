@@ -16,11 +16,11 @@
 
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { connect, connection, disconnect } from "mongoose";
-import { IS_DEV, MONGO_URI } from "../config";
+import { IS_DEV, IS_TEST, MONGO_URI } from "../config";
 
 // Already 5 by default, but I might need to increase it one day...
 let mongoServer: MongoMemoryServer | null = null;
-if (IS_DEV) {
+if (IS_DEV || IS_TEST) {
   (async () => {
     mongoServer = await MongoMemoryServer.create();
     await connect(mongoServer.getUri());
