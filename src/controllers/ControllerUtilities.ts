@@ -16,6 +16,7 @@ interface TemplateVariables {
   BASE_URL: string;
   LOGGED_IN: boolean;
   SEARCH_ENDPOINT_URL?: string;
+  csrfToken: string;
   abbreviatedCards?: Array<Partial<ICard>>;
   account_info?: AuthenticateUser;
   message: string;
@@ -34,10 +35,16 @@ export function getDefaultTemplateVars(
   const message = req?.session?.message || "";
   if (req?.session) { req.session.message = ""; }
 
+  let csrfToken = "";
+  if (req !== null && req.csrfToken !== undefined) {
+    csrfToken = req.csrfToken();
+  }
+
   return {
     APP_NAME: config.APP_NAME,
     BASE_URL: config.BASE_URL,
     LOGGED_IN: req?.session?.user !== undefined,
+    csrfToken,
     message,
     ...allPaths,
   };

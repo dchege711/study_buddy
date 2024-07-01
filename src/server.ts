@@ -77,7 +77,7 @@ app.use(cookieParser());
  *
  * With csrf enabled, the CSRF token must be in the payload when modifying data
  * or the client will receive a 403 Forbidden. To send the token the client
- * needs to echo back the _csrf value you received from the previous request.
+ * needs to echo back the _csrf value received from the previous request.
  * Furthermore, parsers must be registered before lusca.
  *
  * [1]: https://github.com/krakenjs/lusca#readme
