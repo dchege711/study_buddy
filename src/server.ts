@@ -82,10 +82,13 @@ app.use(cookieParser());
  * Furthermore, parsers must be registered before lusca.
  *
  * [1]: https://github.com/krakenjs/lusca#readme
- *
- * TODO: Enable CSRF protection
  */
-app.use(csrf());
+if (!IS_TEST) {
+  app.use(csrf());
+} else {
+  // Provide a fake CSRF token as the EJS templates expect it.
+  app.locals._csrf = "csrf_has_been_disabled_for_testing";
+}
 
 app.set("views", join(__dirname, "views"));
 app.set("view engine", "ejs");
