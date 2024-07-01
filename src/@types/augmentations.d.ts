@@ -16,8 +16,6 @@ declare module "express" {
       message?: string;
       user?: AuthenticateUser;
     };
-    /** Set by lusca.csrf. */
-    csrfToken?: () => string;
   }
 
   interface Response {

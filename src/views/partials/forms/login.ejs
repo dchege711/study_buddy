@@ -1,5 +1,5 @@
 <form method="post" action="<%= LOGIN %>">
-  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+  <input type="hidden" name="_csrf" value="<%= _csrf %>">
   <label for="username"> Username or Email Address: </label>
   <input class="w3-input" type="text" name="username_or_email" required />
 
