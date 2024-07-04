@@ -109,7 +109,7 @@
     "circular-dependency-plugin": "^5.0.2",
     "copy-webpack-plugin": "^11.0.0",
     "dprint": "^0.46.2",
-    "ejs-lint": "^0.1.1",
+    "ejs-lint": "^2.0.0",
     "esbuild-loader": "^4.1.0",
     "eslint": "^8.57.0",
     "mocha": "^10.2.0",
