@@ -26,7 +26,7 @@
     "build": "npm run build:server && npm run build:client",
     "build:server": "tsc --project tsconfig.json && npm run webpack",
     "build:client": "cd src/public && npm run build && cd ../../",
-    "coverage:server": "nyc --nycrc-path=.nycrc.yml npm run test:server",
+    "coverage:server": "c8 npm run test:server",
     "start": "node dist/server.js",
     "debug": "ts-node-dev --files --transpile-only src/server.ts",
     "format": "dprint fmt",
