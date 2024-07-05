@@ -4,6 +4,7 @@
   "version": "2.0.0",
   "scripts": {
     "build": "npm run typecheck && npm run webpack",
+    "coverage": "web-test-runner --coverage",
     "test": "web-test-runner",
     "typecheck": "tsc --project tsconfig.json",
     "webpack": "webpack --config ./webpack.config.cjs"
