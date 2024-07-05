@@ -182,7 +182,7 @@ export async function updatePublicUserMetadata(
 
   metadataDoc.markModified("stats");
   metadataDoc.markModified("node_information");
-  // await metadataDoc.save();
+  await metadataDoc.save();
 
   return metadataDoc;
 }
@@ -262,7 +262,7 @@ export async function sendCardToTrash(
   metadataDoc.markModified("node_information");
   metadataDoc.markModified("trashed_cards");
 
-  // await metadataDoc.save();
+  await metadataDoc.save();
 
   return `Card moved to the trash. <span class="underline_bold_text clickable" onclick="restoreCardFromTrash('${card._id}', '${card.urgency}')">Undo Action</span>`;
 }
@@ -294,7 +294,7 @@ export async function restoreCardFromTrash(
     card.tags,
     "urgency",
   );
-  // await metadataDoc.save();
+  await metadataDoc.save();
 
   return `${card.title} has been restored!`;
 }
@@ -320,7 +320,7 @@ export async function deleteCardFromTrash(
   }
 
   const metadataDoc = await removeCardFromMetadataTrash(card);
-  // await metadataDoc.save();
+  await metadataDoc.save();
 
   return `${card.title} has been permanently deleted!`;
 }
@@ -350,7 +350,7 @@ async function removeCardFromMetadataTrash(
   if (cardIdentifier._id in metadataDoc.trashed_cards[0]) {
     delete metadataDoc.trashed_cards[0][cardIdentifier._id];
     metadataDoc.markModified("trashed_cards");
-    // await metadataDoc.save();
+    await metadataDoc.save();
     return metadataDoc;
   } else {
     return Promise.reject("Card wasn't found in the trash");
@@ -510,7 +510,7 @@ export async function updateUserSettings(
     }
     metadataDoc.streak.dailyTarget = newUserSettings.dailyTarget;
     metadataDoc.markModified("streak");
-    // await metadataDoc.save();
+    await metadataDoc.save();
   }
 
   return user.save();

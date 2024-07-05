@@ -249,10 +249,13 @@ describe("/trpc/updateCard", function() {
 });
 
 describe("/trpc/trashCard", function() {
+  let cardID: string;
+
   this.beforeEach(async () => {
     const gUser = await authenticateUser(authDetails);
     gCaller = createCaller({ user: gUser });
-    return await createPublicAndPrivateCards(gUser);
+    ({ samplePublicCardId: cardID } = await createPublicAndPrivateCards(gUser));
+    return Promise.resolve();
   });
 
   it("should use an input parser/validator", function(done) {
@@ -262,6 +265,43 @@ describe("/trpc/trashCard", function() {
       done(new Error(`Injection attack succeeded: ${card}`));
     }).catch((e) => {
       passIfValidationError(e, done);
+    });
+  });
+
+  describe("when a card is trashed", function() {
+    this.beforeEach(async () => {
+      {
+        const trashedCards = (await gCaller.metadata())[0].trashed_cards;
+        expect(trashedCards.length).equal(0);
+      }
+
+      await gCaller.trashCard({ _id: cardID });
+
+      {
+        const trashedCards = (await gCaller.metadata())[0].trashed_cards;
+        expect(trashedCards.length).equal(1);
+        expect(Object.keys(trashedCards[0])).contains(cardID);
+      }
+    });
+
+    it("should delete the card via /trpc/deleteCard", async () => {
+      await gCaller.deleteCard({ _id: cardID });
+
+      const trashedCards = (await gCaller.metadata())[0].trashed_cards;
+      expect(trashedCards).deep.equal([{}]);
+
+      const card = await gCaller.fetchCard({ cardID: cardID });
+      expect(card).to.be.null;
+    });
+
+    it("should restore the card via /trpc/restoreCardFromTrash", async () => {
+      await gCaller.restoreCardFromTrash({ _id: cardID });
+
+      const trashedCards = (await gCaller.metadata())[0].trashed_cards;
+      expect(trashedCards).deep.equal([{}]);
+
+      const card = await gCaller.fetchCard({ cardID: cardID });
+      expect(card?._id.toString()).to.equal(cardID);
     });
   });
 });
