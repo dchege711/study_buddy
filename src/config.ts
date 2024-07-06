@@ -2,6 +2,8 @@
  * @description Access point for sensitive/central information.
  */
 
+const someUnusedVariable = "CI should fail if this is not removed";
+
 export const APP_NAME = "Flashcards by c13u";
 export const PORT = process.env.PORT || 5000;
 
