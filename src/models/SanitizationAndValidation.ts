@@ -168,7 +168,9 @@ export const partialCardValidator = z.object({
   tags: commaDelimitedStrings.optional(),
   urgency: z.number().nonnegative().finite().optional(),
   isPublic: z.boolean().optional(),
-  lastReviewed: z.coerce.date().optional(),
+  lastReviewed: z.union([z.number(), z.string(), z.date()]).pipe(
+    z.coerce.date(),
+  ).optional(),
   parent: z.string().refine(isMongoId, {
     message: "Invalid card ID",
   }).optional(),

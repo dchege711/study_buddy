@@ -768,14 +768,34 @@ describe("Input Parsing", function() {
     });
 
     it("should accept valid lastReviewed", function() {
-      const lastReviewed = "2024-07-14T15:05:22.087Z";
-      const { data, error } = partialCardValidator.safeParse({
-        _id: "5f5b6c3e4b4f3c0020b7f3c0",
+      [
+        "2024-07-14T15:05:22.087Z",
+        Date.now(),
+        new Date(),
+        (new Date()).toString(),
+      ].forEach(function(
         lastReviewed,
+      ) {
+        const { data, error } = partialCardValidator.safeParse({
+          _id: "5f5b6c3e4b4f3c0020b7f3c0",
+          lastReviewed,
+        });
+        expect(data, error?.message).to.deep.equal({
+          _id: "5f5b6c3e4b4f3c0020b7f3c0",
+          lastReviewed: new Date(lastReviewed),
+        });
       });
-      expect(data, error?.message).to.deep.equal({
-        _id: "5f5b6c3e4b4f3c0020b7f3c0",
-        lastReviewed: new Date(lastReviewed),
+    });
+
+    it("should reject invalid lastReviewed", function() {
+      [null, "", JSON.stringify(new Date())].forEach(function(
+        lastReviewed,
+      ) {
+        const { error, data } = partialCardValidator.safeParse({
+          _id: "5f5b6c3e4b4f3c0020b7f3c0",
+          lastReviewed,
+        });
+        expect(error, JSON.stringify(data)).not.undefined;
       });
     });
 
