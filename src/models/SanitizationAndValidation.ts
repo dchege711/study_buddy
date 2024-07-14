@@ -109,12 +109,26 @@ export const readPublicCardParamsValidator = z.object({
   }),
 });
 
-export const searchCardsParamsValidator = z.object({
+const commaDelimitedStrings = z.string().refine(
+  (s) => s.length === 0 || s.split(",").every(_s => _s.length > 0),
+  {
+    message: "Expected comma-delimited strings",
+  },
+);
+
+const commaDelimitedMongoIDs = z.string().refine(
+  ids => ids.length === 0 || ids.split(",").every(isMongoId),
+  {
+    message: "Expected comma-delimited IDs",
+  },
+);
+
+const searchCardsParamsValidator = z.object({
   queryString: z.string(),
   limit: z.number().int().positive(),
   creationStartDate: z.date().optional(),
   creationEndDate: z.date().optional(),
-  cardIDs: z.string().optional(),
+  cardIDs: commaDelimitedMongoIDs.optional(),
 });
 
 export const searchPublicCardsParamsValidator = searchCardsParamsValidator;
@@ -137,7 +151,7 @@ export const fetchCardParamsValidator = z.object({
 export const addCardParamsValidator = z.object({
   title: z.string(),
   description: z.string(),
-  tags: z.string(),
+  tags: commaDelimitedStrings,
   urgency: z.number().int().positive(),
   isPublic: z.boolean(),
   parent: z.string().refine(isMongoId, {
@@ -148,24 +162,21 @@ export const addCardParamsValidator = z.object({
 export const partialCardValidator = z.object({
   _id: z.string().refine(isMongoId, {
     message: "Invalid card ID",
-  }).optional(),
+  }),
   title: z.string().optional(),
   description: z.string().optional(),
-  tags: z.string().optional(),
-  urgency: z.number().int().nonnegative().optional(),
-  metadataIndex: z.number().int().nonnegative().optional(),
-  createdById: z.number().int().optional(),
+  tags: commaDelimitedStrings.optional(),
+  urgency: z.number().nonnegative().finite().optional(),
   isPublic: z.boolean().optional(),
-  lastReviewed: z.date().optional(),
+  lastReviewed: z.union([z.number(), z.string(), z.date()]).pipe(
+    z.coerce.date(),
+  ).optional(),
   parent: z.string().refine(isMongoId, {
     message: "Invalid card ID",
   }).optional(),
-  numChildren: z.number().int().nonnegative().optional(),
-  idsOfUsersWithCopy: z.string().optional(),
-  numTimesMarkedAsDuplicate: z.number().int().nonnegative().optional(),
-  numTimesMarkedForReview: z.number().int().nonnegative().optional(),
-  createdAt: z.date().optional(),
-  updatedAt: z.date().optional(),
+  numChildren: z.number().int().nonnegative().finite().optional(),
+  numTimesMarkedAsDuplicate: z.number().int().nonnegative().finite().optional(),
+  numTimesMarkedForReview: z.number().int().nonnegative().finite().optional(),
 });
 
 export const trashCardParamsValidator = partialCardValidator.pick({
@@ -180,11 +191,7 @@ export const duplicateCardParamsValidator = z.object({
   }),
 });
 
-export const restoreCardFromTrashParamsValidator = z.object({
-  _id: z.string().refine(isMongoId, {
-    message: "Invalid card ID",
-  }),
-});
+export const restoreCardFromTrashParamsValidator = trashCardParamsValidator;
 
 export const streakParamsValidator = z.object({
   cardIDs: z.array(
@@ -201,21 +208,30 @@ export const userSettingsParamsValidator = z.object({
    *
    * [1]: https://stackoverflow.com/questions/11424037/do-checkbox-inputs-only-post-data-if-theyre-checked
    */
-  cardsAreByDefaultPrivate: z.string().optional(),
-  dailyTarget: z.number().int().positive(),
+  cardsAreByDefaultPrivate: z.literal("on").optional(),
+  dailyTarget: z.number().int().positive().optional(),
 });
 
+const userNameValidator = z.string().min(3).refine(isAlphanumeric, {
+  message: "Username must be alphanumeric",
+});
+
+const passwordValidator = z.string().min(8);
+
 export const userLoginParamsValidator = z.object({
-  username_or_email: z.string(),
-  password: z.string(),
+  username_or_email: z.string().refine(
+    s =>
+      z.string().email().safeParse(s).success
+      || userNameValidator.safeParse(s).success,
+    { message: "Invalid username or email" },
+  ),
+  password: passwordValidator,
 });
 
 export const userRegistrationParamsValidator = z.object({
-  username: z.string().refine(isAlphanumeric, {
-    message: "Username must be alphanumeric",
-  }),
+  username: userNameValidator,
   email: z.string().email(),
-  password: z.string().min(8),
+  password: passwordValidator,
 });
 
 export const sendValidationEmailParamsValidator =
@@ -259,8 +275,8 @@ export const resetPasswordLinkPathValidator = z.string().length(71).refine(
 );
 
 export const resetPasswordLinkPostParamsValidator = z.object({
-  password_1: z.string().min(8),
-  password_2: z.string().min(8),
+  password_1: passwordValidator,
+  password_2: passwordValidator,
 }).refine((params) => params.password_1 === params.password_2, {
   message: "Passwords do not match",
 });
