@@ -775,7 +775,7 @@ describe("Input Parsing", function() {
       });
       expect(data, error?.message).to.deep.equal({
         _id: "5f5b6c3e4b4f3c0020b7f3c0",
-        lastReviewed,
+        lastReviewed: new Date(lastReviewed),
       });
     });
 
