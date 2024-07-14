@@ -602,7 +602,7 @@ describe("Input Parsing", function() {
     });
   });
 
-  describe.only("partialCardValidator", function() {
+  describe("partialCardValidator", function() {
     it("should accept valid _id", function() {
       inputs.cardID.valid.forEach(function(_id) {
         const { data, error } = partialCardValidator.safeParse({ _id });
@@ -768,8 +768,7 @@ describe("Input Parsing", function() {
     });
 
     it("should accept valid lastReviewed", function() {
-      const lastReviewed = JSON.stringify(new Date());
-      // const lastReviewed = "2024-07-14T15:05:22.087Z";
+      const lastReviewed = "2024-07-14T15:05:22.087Z";
       const { data, error } = partialCardValidator.safeParse({
         _id: "5f5b6c3e4b4f3c0020b7f3c0",
         lastReviewed,
