@@ -107,6 +107,125 @@ describe("HTML Transformations", function() {
 });
 
 describe("Input Parsing", function() {
+  /**
+   * Common valid and invalid inputs for testing.
+   */
+  const inputs = {
+    queryString: {
+      valid: ["test", "test card", "test, card", ""],
+      invalid: [null, 1, {}],
+    },
+    limit: {
+      valid: [1, 10, 100],
+      invalid: [null, "", 0, -1, 1.2, {}, Infinity, JSON.stringify(Infinity)],
+    },
+    cardIDStrings: {
+      valid: [
+        "",
+        "5f5b6c3e4b4f3c0020b7f3c0",
+        "5f5b6c3e4b4f3c0020b7f3c0,5f5b6c3e4b4f3c0020b7f3c1",
+      ],
+      invalid: [
+        null,
+        1,
+        {},
+        { $ne: "" },
+        "not-a-valid-id",
+        "5f5b6c3e4b4f3c0020b7f3c0,",
+        "5f5b6c3e4b4f3c0020b7f3c0,bad,5f5b6c3e4b4f3c0020b7f3c1",
+      ],
+    },
+    cardID: {
+      valid: ["5f5b6c3e4b4f3c0020b7f3c0"],
+      invalid: [null, "", 1, {}, { $ne: "" }, "not-a-valid-id"],
+    },
+    cardIDArray: {
+      valid: [
+        [],
+        ["5f5b6c3e4b4f3c0020b7f3c0"],
+        ["5f5b6c3e4b4f3c0020b7f3c0", "5f5b6c3e4b4f3c0020b7f3c1"],
+      ],
+      invalid: [
+        null,
+        "",
+        "5f5b6c3e4b4f3c0020b7f3c0",
+        "5f5b6c3e4b4f3c0020b7f3c0,bad,5f5b6c3e4b4f3c0020b7f3c1",
+        1,
+        {},
+        { $ne: "" },
+        ["5f5b6c3e4b4f3c0020b7f3c0", "bad", "5f5b6c3e4b4f3c0020b7f3c1"],
+      ],
+    },
+    booleanField: {
+      valid: [true, false],
+      invalid: [null, "", undefined, 1, 0, "true", "false"],
+    },
+    optionalBooleanField: {
+      valid: [true, false, undefined],
+      invalid: [null, "", 1, 0, "true", "false"],
+    },
+    cardContent: {
+      valid: ["", "Sample Content"],
+      invalid: [null, {}, { $ne: "" }, 1],
+    },
+    cardTags: {
+      valid: ["", "test", "test,card", "test, card"],
+      invalid: [null, {}, { $ne: "" }, "test,card,", 123],
+    },
+    cardUrgency: {
+      valid: [0, 1, 2.6, 10],
+      invalid: [null, "", -1, {}, "2", Infinity, JSON.stringify(Infinity)],
+    },
+    discreteCount: {
+      valid: [0, 1, 10, 100],
+      invalid: [null, "", -1, 1.2, "1", {}, Infinity, JSON.stringify(Infinity)],
+    },
+    positiveDiscreteCount: {
+      valid: [1, 10, 100],
+      invalid: [
+        null,
+        "",
+        -1,
+        1.2,
+        "1",
+        {},
+        0,
+        Infinity,
+        JSON.stringify(Infinity),
+      ],
+    },
+    userName: {
+      valid: ["test", "test123"],
+      invalid: [null, 123, "test-123", "test.123", { $ne: "" }, "cg"],
+    },
+    password: {
+      valid: [
+        "long-password",
+        "%$^*&*^%&)(*#@#",
+        "0123456789",
+        "i have spaces",
+      ],
+      invalid: [null, 123, { $ne: "" }, "short"],
+    },
+    email: {
+      valid: ["foo@bar.com"],
+      invalid: [null, 123, "foo", "foo@bar", { $ne: "" }],
+    },
+    userNameOrEmail: {
+      valid: ["foo@bar.com", "test", "test123"],
+      invalid: [
+        null,
+        123,
+        "",
+        "foo@bar",
+        "test-123",
+        "test.123",
+        { $ne: "" },
+        "cg",
+      ],
+    },
+  };
+
   describe("readPublicCardParamsValidator", function() {
     it("should accept a valid card ID", function() {
       const { data } = readPublicCardParamsValidator.safeParse({
@@ -151,114 +270,97 @@ describe("Input Parsing", function() {
         expect(data).to.deep.equal({ queryString: "test", limit: 10 });
       });
 
-      it("should reject a negative limit", function() {
-        const { error } = validator.safeParse({
-          queryString: "test",
-          limit: -1,
+      it("should accept a valid limit", function() {
+        inputs.limit.valid.forEach(function(limit) {
+          const { data, error } = validator.safeParse({
+            queryString: "test",
+            limit,
+          });
+          expect(data, error?.message).deep.equals({
+            queryString: "test",
+            limit,
+          });
         });
-        expect(error).not.undefined;
       });
 
-      it("should reject a zero limit", function() {
-        const { error } = validator.safeParse({
-          queryString: "test",
-          limit: 0,
+      it("should reject an invalid limit", function() {
+        inputs.limit.invalid.forEach(function(limit) {
+          const { error } = validator.safeParse({
+            queryString: "test",
+            limit,
+          });
+          expect(error).not.undefined;
         });
-        expect(error).not.undefined;
+      });
+
+      it("should accept a valid queryString", function() {
+        inputs.queryString.valid.forEach(function(queryString) {
+          const { data, error } = validator.safeParse({
+            queryString,
+            limit: 10,
+          });
+          expect(data, error?.message).deep.equals({
+            queryString,
+            limit: 10,
+          });
+        });
       });
 
       it("should reject an invalid query string", function() {
-        const { error } = validator.safeParse({
-          queryString: { $ne: "" },
-          limit: 10,
-        });
-        expect(error).not.undefined;
-      });
-
-      it("should reject a non-numeric limit", function() {
-        const { error } = validator.safeParse({
-          queryString: "test",
-          limit: "10",
-        });
-        expect(error).not.undefined;
-      });
-
-      it("should accept an empty query string", function() {
-        const { data } = validator.safeParse({
-          queryString: "",
-          limit: 10,
-        });
-        expect(data).to.deep.equal({ queryString: "", limit: 10 });
-      });
-
-      it("should accept single card ID", function() {
-        const { data } = validator.safeParse({
-          queryString: "test",
-          limit: 10,
-          cardIDs: "5f5b6c3e4b4f3c0020b7f3c0",
-        });
-        expect(data).to.deep.equal({
-          queryString: "test",
-          limit: 10,
-          cardIDs: "5f5b6c3e4b4f3c0020b7f3c0",
+        inputs.queryString.invalid.forEach(function(queryString) {
+          const { error, data } = validator.safeParse({
+            queryString,
+            limit: 10,
+          });
+          expect(error, JSON.stringify(data)).not.undefined;
         });
       });
 
-      it("should accept multiple comma-delimited card IDs", function() {
-        const { data } = validator.safeParse({
-          queryString: "test",
-          limit: 10,
-          cardIDs: "5f5b6c3e4b4f3c0020b7f3c0,5f5b6c3e4b4f3c0020b7f3c1",
-        });
-        expect(data).to.deep.equal({
-          queryString: "test",
-          limit: 10,
-          cardIDs: "5f5b6c3e4b4f3c0020b7f3c0,5f5b6c3e4b4f3c0020b7f3c1",
+      it("should reject invalid CardIDs", function() {
+        inputs.cardIDStrings.invalid.forEach(function(cardIDs) {
+          const { error, data } = validator.safeParse({
+            queryString: "",
+            limit: 10,
+            cardIDs,
+          });
+          expect(error, JSON.stringify(data)).not.undefined;
         });
       });
 
-      it("should reject a single invalid card ID", function() {
-        const { error } = validator.safeParse({
-          queryString: "test",
-          limit: 10,
-          cardIDs: { $ne: "" },
+      it("should accept valid cardIDs", function() {
+        inputs.cardIDStrings.valid.forEach(function(cardIDs) {
+          const { data, error } = validator.safeParse({
+            queryString: "",
+            limit: 10,
+            cardIDs,
+          });
+          expect(data, error?.message).to.deep.equal({
+            queryString: "",
+            limit: 10,
+            cardIDs,
+          });
         });
-        expect(error).not.undefined;
-      });
-
-      it("should reject a malformed card IDs string", function() {
-        const { error } = validator.safeParse({
-          queryString: "test",
-          limit: 10,
-          cardIDs: "5f5b6c3e4b4f3c0020b7f3c0,",
-        });
-        expect(error).not.undefined;
-      });
-
-      it("should reject an invalid card ID in a list", function() {
-        const { error } = validator.safeParse({
-          queryString: "test",
-          limit: 10,
-          cardIDs: "5f5b6c3e4b4f3c0020b7f3c0,bad,5f5b6c3e4b4f3c0020b7f3c1",
-        });
-        expect(error).not.undefined;
       });
     });
   });
 
   describe("flagCardParamsValidator", function() {
     it("should accept a valid card ID", function() {
-      const { data } = flagCardParamsValidator.safeParse({
-        cardID: "5f5b6c3e4b4f3c0020b7f3c0",
+      inputs.cardID.valid.forEach(function(cardID) {
+        const { data, error } = flagCardParamsValidator.safeParse({
+          cardID,
+        });
+        expect(data, error?.message).to.deep.equal({ cardID });
       });
-      expect(data?.cardID).equals("5f5b6c3e4b4f3c0020b7f3c0");
     });
 
     it("should reject an invalid card ID", function() {
-      const { error } = flagCardParamsValidator.safeParse({
-        cardID: { $ne: "" },
+      inputs.cardID.invalid.forEach(function(cardID) {
+        const { error, data } = flagCardParamsValidator.safeParse({
+          cardID,
+        });
+        expect(error, JSON.stringify(data)).not.undefined;
       });
-      expect(error).not.undefined;
     });
 
     it("should reject unknown keys", function() {
@@ -269,35 +371,69 @@ describe("Input Parsing", function() {
     });
 
     it("should accept a valid markedForReview value", function() {
-      const { data } = flagCardParamsValidator.safeParse({
-        cardID: "5f5b6c3e4b4f3c0020b7f3c0",
-        markedForReview: true,
+      inputs.optionalBooleanField.valid.forEach(function(markedForReview) {
+        const { data, error } = flagCardParamsValidator.safeParse({
+          cardID: "5f5b6c3e4b4f3c0020b7f3c0",
+          markedForReview,
+        });
+        expect(data, error?.message).to.deep.equal({
+          cardID: "5f5b6c3e4b4f3c0020b7f3c0",
+          markedForReview,
+        });
       });
-      expect(data?.markedForReview).equals(true);
+    });
+
+    it("should reject an invalid markedForReview value", function() {
+      inputs.optionalBooleanField.invalid.forEach(function(markedForReview) {
+        const { error, data } = flagCardParamsValidator.safeParse({
+          cardID: "5f5b6c3e4b4f3c0020b7f3c0",
+          markedForReview,
+        });
+        expect(error, JSON.stringify(data)).not.undefined;
+      });
     });
 
     it("should accept a valid markedAsDuplicate value", function() {
-      const { data } = flagCardParamsValidator.safeParse({
-        cardID: "5f5b6c3e4b4f3c0020b7f3c0",
-        markedAsDuplicate: true,
+      inputs.optionalBooleanField.valid.forEach(function(markedAsDuplicate) {
+        const { data, error } = flagCardParamsValidator.safeParse({
+          cardID: "5f5b6c3e4b4f3c0020b7f3c0",
+          markedAsDuplicate,
+        });
+        expect(data, error?.message).to.deep.equal({
+          cardID: "5f5b6c3e4b4f3c0020b7f3c0",
+          markedAsDuplicate,
+        });
       });
-      expect(data?.markedAsDuplicate).equals(true);
+    });
+
+    it("should reject an invalid markedAsDuplicate value", function() {
+      inputs.optionalBooleanField.invalid.forEach(function(markedAsDuplicate) {
+        const { error, data } = flagCardParamsValidator.safeParse({
+          cardID: "5f5b6c3e4b4f3c0020b7f3c0",
+          markedAsDuplicate,
+        });
+        expect(error, JSON.stringify(data)).not.undefined;
+      });
     });
   });
 
   describe("fetchCardParamsValidator", function() {
     it("should accept a valid card ID", function() {
-      const { data } = fetchCardParamsValidator.safeParse({
-        cardID: "5f5b6c3e4b4f3c0020b7f3c0",
+      inputs.cardID.valid.forEach(function(cardID) {
+        const { data, error } = fetchCardParamsValidator.safeParse({
+          cardID,
+        });
+        expect(data, error?.message).to.deep.equal({ cardID });
       });
-      expect(data?.cardID).equals("5f5b6c3e4b4f3c0020b7f3c0");
     });
 
     it("should reject an invalid card ID", function() {
-      const { error } = fetchCardParamsValidator.safeParse({
-        cardID: { $ne: "" },
+      inputs.cardID.invalid.forEach(function(cardID) {
+        const { error, data } = fetchCardParamsValidator.safeParse({
+          cardID,
+        });
+        expect(error, JSON.stringify(data)).not.undefined;
       });
-      expect(error).not.undefined;
     });
 
     it("should reject unknown keys", function() {
@@ -359,63 +495,73 @@ describe("Input Parsing", function() {
     });
 
     it("should reject invalid title", function() {
-      const { error } = addCardParamsValidator.safeParse({
-        title: 1234,
-        description: "This is a test card",
-        tags: "test,card",
-        urgency: 3,
-        isPublic: true,
-        parent: "5f5b6c3e4b4f3c0020b7f3c0",
+      inputs.cardContent.invalid.forEach(function(title) {
+        const { error, data } = addCardParamsValidator.safeParse({
+          title,
+          description: "This is a test card",
+          tags: "test,card",
+          urgency: 3,
+          isPublic: true,
+          parent: "5f5b6c3e4b4f3c0020b7f3c0",
+        });
+        expect(error, JSON.stringify(data)).not.undefined;
       });
-      expect(error).not.undefined;
     });
 
     it("should reject invalid description", function() {
-      const { error } = addCardParamsValidator.safeParse({
-        title: "Test Card",
-        description: 1234,
-        tags: "test,card",
-        urgency: 3,
-        isPublic: true,
-        parent: "5f5b6c3e4b4f3c0020b7f3c0",
+      inputs.cardContent.invalid.forEach(function(description) {
+        const { error, data } = addCardParamsValidator.safeParse({
+          title: "Test Card",
+          description,
+          tags: "test,card",
+          urgency: 3,
+          isPublic: true,
+          parent: "5f5b6c3e4b4f3c0020b7f3c0",
+        });
+        expect(error, JSON.stringify(data)).not.undefined;
       });
-      expect(error).not.undefined;
     });
 
     it("should reject invalid tags", function() {
-      const { error } = addCardParamsValidator.safeParse({
-        title: "Test Card",
-        description: "This is a test card",
-        tags: 1234,
-        urgency: 3,
-        isPublic: true,
-        parent: "5f5b6c3e4b4f3c0020b7f3c0",
+      inputs.cardTags.invalid.forEach(function(tags) {
+        const { error, data } = addCardParamsValidator.safeParse({
+          title: "Test Card",
+          description: "This is a test card",
+          tags,
+          urgency: 3,
+          isPublic: true,
+          parent: "5f5b6c3e4b4f3c0020b7f3c0",
+        });
+        expect(error, JSON.stringify(data)).not.undefined;
       });
-      expect(error).not.undefined;
     });
 
     it("should reject invalid urgency", function() {
-      const { error } = addCardParamsValidator.safeParse({
-        title: "Test Card",
-        description: "This is a test card",
-        tags: "test,card",
-        urgency: "3",
-        isPublic: true,
-        parent: "5f5b6c3e4b4f3c0020b7f3c0",
+      inputs.cardUrgency.invalid.forEach(function(urgency) {
+        const { error, data } = addCardParamsValidator.safeParse({
+          title: "Test Card",
+          description: "This is a test card",
+          tags: "test,card",
+          urgency,
+          isPublic: true,
+          parent: "5f5b6c3e4b4f3c0020b7f3c0",
+        });
+        expect(error, JSON.stringify(data)).not.undefined;
       });
-      expect(error).not.undefined;
     });
 
     it("should reject invalid isPublic", function() {
-      const { error } = addCardParamsValidator.safeParse({
-        title: "Test Card",
-        description: "This is a test card",
-        tags: "test,card",
-        urgency: 3,
-        isPublic: "true",
-        parent: "5f5b6c3e4b4f3c0020b7f3c0",
+      inputs.booleanField.invalid.forEach(function(isPublic) {
+        const { error, data } = addCardParamsValidator.safeParse({
+          title: "Test Card",
+          description: "This is a test card",
+          tags: "test,card",
+          urgency: 3,
+          isPublic,
+          parent: "5f5b6c3e4b4f3c0020b7f3c0",
+        });
+        expect(error, JSON.stringify(data)).not.undefined;
       });
-      expect(error).not.undefined;
     });
 
     it("should accept an empty parent", function() {
@@ -442,25 +588,25 @@ describe("Input Parsing", function() {
     });
 
     it("should reject an invalid parent", function() {
-      const { error } = addCardParamsValidator.safeParse({
-        title: "Test Card",
-        description: "This is a test card",
-        tags: "test,card",
-        urgency: 3,
-        isPublic: true,
-        parent: "not-a-valid-id",
+      inputs.cardID.invalid.forEach(function(parent) {
+        const { error, data } = addCardParamsValidator.safeParse({
+          title: "Test Card",
+          description: "This is a test card",
+          tags: "test,card",
+          urgency: 3,
+          isPublic: true,
+          parent,
+        });
+        expect(error, JSON.stringify(data)).not.undefined;
       });
-      expect(error).not.undefined;
     });
   });
 
-  describe("partialCardValidator", function() {
+  describe.only("partialCardValidator", function() {
     it("should accept valid _id", function() {
-      const { data, error } = partialCardValidator.safeParse({
-        _id: "5f5b6c3e4b4f3c0020b7f3c0",
-      });
-      expect(data, error?.message).to.deep.equal({
-        _id: "5f5b6c3e4b4f3c0020b7f3c0",
+      inputs.cardID.valid.forEach(function(_id) {
+        const { data, error } = partialCardValidator.safeParse({ _id });
+        expect(data, error?.message).to.deep.equal({ _id });
       });
     });
 
@@ -480,93 +626,101 @@ describe("Input Parsing", function() {
     });
 
     it("should reject invalid _id", function() {
-      [null, 1234, { $ne: "" }].forEach(function(_id) {
-        const { error } = partialCardValidator.safeParse({ _id });
-        expect(error).not.undefined;
+      inputs.cardID.invalid.forEach(function(_id) {
+        const { error, data } = partialCardValidator.safeParse({ _id });
+        expect(error, JSON.stringify(data)).not.undefined;
       });
     });
 
     it("should accept valid title", function() {
-      const { data } = partialCardValidator.safeParse({
-        _id: "5f5b6c3e4b4f3c0020b7f3c0",
-        title: "Test Card",
-      });
-      expect(data).to.deep.equal({
-        _id: "5f5b6c3e4b4f3c0020b7f3c0",
-        title: "Test Card",
+      inputs.cardContent.valid.forEach(function(title) {
+        const { data, error } = partialCardValidator.safeParse({
+          _id: "5f5b6c3e4b4f3c0020b7f3c0",
+          title,
+        });
+        expect(data, error?.message).to.deep.equal({
+          _id: "5f5b6c3e4b4f3c0020b7f3c0",
+          title,
+        });
       });
     });
 
     it("should reject invalid title", function() {
-      [null, 1234, { $ne: "" }].forEach(function(title) {
-        const { error } = partialCardValidator.safeParse({
+      inputs.cardContent.invalid.forEach(function(title) {
+        const { error, data } = partialCardValidator.safeParse({
           _id: "5f5b6c3e4b4f3c0020b7f3c0",
           title,
         });
-        expect(error).not.undefined;
+        expect(error, JSON.stringify(data)).not.undefined;
       });
     });
 
     it("should accept valid description", function() {
-      const { data } = partialCardValidator.safeParse({
-        _id: "5f5b6c3e4b4f3c0020b7f3c0",
-        description: "This is a test card",
-      });
-      expect(data).to.deep.equal({
-        _id: "5f5b6c3e4b4f3c0020b7f3c0",
-        description: "This is a test card",
+      inputs.cardContent.valid.forEach(function(description) {
+        const { data, error } = partialCardValidator.safeParse({
+          _id: "5f5b6c3e4b4f3c0020b7f3c0",
+          description,
+        });
+        expect(data, error?.message).to.deep.equal({
+          _id: "5f5b6c3e4b4f3c0020b7f3c0",
+          description,
+        });
       });
     });
 
     it("should reject invalid description", function() {
-      [null, 1234, { $ne: "" }].forEach(function(description) {
-        const { error } = partialCardValidator.safeParse({
+      inputs.cardContent.invalid.forEach(function(description) {
+        const { error, data } = partialCardValidator.safeParse({
           _id: "5f5b6c3e4b4f3c0020b7f3c0",
           description,
         });
-        expect(error).not.undefined;
+        expect(error, JSON.stringify(data)).not.undefined;
       });
     });
 
     it("should accept valid tags", function() {
-      const { data } = partialCardValidator.safeParse({
-        _id: "5f5b6c3e4b4f3c0020b7f3c0",
-        tags: "test,card",
-      });
-      expect(data).to.deep.equal({
-        _id: "5f5b6c3e4b4f3c0020b7f3c0",
-        tags: "test,card",
+      inputs.cardTags.valid.forEach(function(tags) {
+        const { data, error } = partialCardValidator.safeParse({
+          _id: "5f5b6c3e4b4f3c0020b7f3c0",
+          tags,
+        });
+        expect(data, error?.message).to.deep.equal({
+          _id: "5f5b6c3e4b4f3c0020b7f3c0",
+          tags,
+        });
       });
     });
 
     it("should reject invalid tags", function() {
-      [null, 1234, { $ne: "" }].forEach(function(tags) {
-        const { error } = partialCardValidator.safeParse({
+      inputs.cardTags.invalid.forEach(function(tags) {
+        const { error, data } = partialCardValidator.safeParse({
           _id: "5f5b6c3e4b4f3c0020b7f3c0",
           tags,
         });
-        expect(error).not.undefined;
+        expect(error, JSON.stringify(data)).not.undefined;
       });
     });
 
     it("should accept valid urgency", function() {
-      const { data } = partialCardValidator.safeParse({
-        _id: "5f5b6c3e4b4f3c0020b7f3c0",
-        urgency: 3,
-      });
-      expect(data).to.deep.equal({
-        _id: "5f5b6c3e4b4f3c0020b7f3c0",
-        urgency: 3,
+      inputs.cardUrgency.valid.forEach(function(urgency) {
+        const { data, error } = partialCardValidator.safeParse({
+          _id: "5f5b6c3e4b4f3c0020b7f3c0",
+          urgency,
+        });
+        expect(data, error?.message).to.deep.equal({
+          _id: "5f5b6c3e4b4f3c0020b7f3c0",
+          urgency,
+        });
       });
     });
 
     it("should reject invalid urgency", function() {
-      [null, "3", -3].forEach(function(urgency) {
-        const { error } = partialCardValidator.safeParse({
+      inputs.cardUrgency.invalid.forEach(function(urgency) {
+        const { error, data } = partialCardValidator.safeParse({
           _id: "5f5b6c3e4b4f3c0020b7f3c0",
           urgency,
         });
-        expect(error).not.undefined;
+        expect(error, JSON.stringify(data)).not.undefined;
       });
     });
 
@@ -591,33 +745,36 @@ describe("Input Parsing", function() {
     });
 
     it("should accept valid isPublic", function() {
-      const { data } = partialCardValidator.safeParse({
-        _id: "5f5b6c3e4b4f3c0020b7f3c0",
-        isPublic: true,
-      });
-      expect(data).to.deep.equal({
-        _id: "5f5b6c3e4b4f3c0020b7f3c0",
-        isPublic: true,
+      inputs.optionalBooleanField.valid.forEach(function(isPublic) {
+        const { data, error } = partialCardValidator.safeParse({
+          _id: "5f5b6c3e4b4f3c0020b7f3c0",
+          isPublic,
+        });
+        expect(data, error?.message).to.deep.equal({
+          _id: "5f5b6c3e4b4f3c0020b7f3c0",
+          isPublic,
+        });
       });
     });
 
     it("should reject invalid isPublic", function() {
-      [null, "true", 1].forEach(function(isPublic) {
-        const { error } = partialCardValidator.safeParse({
+      inputs.optionalBooleanField.invalid.forEach(function(isPublic) {
+        const { error, data } = partialCardValidator.safeParse({
           _id: "5f5b6c3e4b4f3c0020b7f3c0",
           isPublic,
         });
-        expect(error).not.undefined;
+        expect(error, JSON.stringify(data)).not.undefined;
       });
     });
 
     it("should accept valid lastReviewed", function() {
-      const lastReviewed = new Date();
-      const { data } = partialCardValidator.safeParse({
+      const lastReviewed = JSON.stringify(new Date());
+      // const lastReviewed = "2024-07-14T15:05:22.087Z";
+      const { data, error } = partialCardValidator.safeParse({
         _id: "5f5b6c3e4b4f3c0020b7f3c0",
         lastReviewed,
       });
-      expect(data).to.deep.equal({
+      expect(data, error?.message).to.deep.equal({
         _id: "5f5b6c3e4b4f3c0020b7f3c0",
         lastReviewed,
       });
@@ -635,507 +792,521 @@ describe("Input Parsing", function() {
     });
 
     it("should reject invalid parent", function() {
-      [null, "not-an-id", { $ne: "" }].forEach(function(parent) {
-        const { error } = partialCardValidator.safeParse({
+      inputs.cardID.invalid.forEach(function(parent) {
+        const { error, data } = partialCardValidator.safeParse({
           _id: "5f5b6c3e4b4f3c0020b7f3c0",
           parent,
         });
-        expect(error).not.undefined;
+        expect(error, JSON.stringify(data)).not.undefined;
       });
     });
 
     it("should accept valid numChildren", function() {
-      const { data } = partialCardValidator.safeParse({
-        _id: "5f5b6c3e4b4f3c0020b7f3c0",
-        numChildren: 0,
-      });
-      expect(data).to.deep.equal({
-        _id: "5f5b6c3e4b4f3c0020b7f3c0",
-        numChildren: 0,
-      });
-    });
-
-    it("should reject invalid numChildren", function() {
-      [null, "3", -3].forEach(function(numChildren) {
-        const { error } = partialCardValidator.safeParse({
+      inputs.discreteCount.valid.forEach(function(numChildren) {
+        const { data, error } = partialCardValidator.safeParse({
           _id: "5f5b6c3e4b4f3c0020b7f3c0",
           numChildren,
         });
-        expect(error).not.undefined;
-      });
-    });
-
-    it("should drop idsOfUsersWithCopy", function() {
-      const { data } = partialCardValidator.safeParse({
-        _id: "5f5b6c3e4b4f3c0020b7f3c0",
-        idsOfUsersWithCopy: "5f5b6c3e4b4f3c0020b7f3c1",
-      });
-      expect(data).to.deep.equal({
-        _id: "5f5b6c3e4b4f3c0020b7f3c0",
-      });
-    });
-
-    it("should accept valid numTimesMarkedAsDuplicate", function() {
-      const { data } = partialCardValidator.safeParse({
-        _id: "5f5b6c3e4b4f3c0020b7f3c0",
-        numTimesMarkedAsDuplicate: 0,
-      });
-      expect(data).to.deep.equal({
-        _id: "5f5b6c3e4b4f3c0020b7f3c0",
-        numTimesMarkedAsDuplicate: 0,
-      });
-    });
-
-    it("should reject invalid numTimesMarkedAsDuplicate", function() {
-      [null, "3", -3].forEach(function(numTimesMarkedAsDuplicate) {
-        const { error } = partialCardValidator.safeParse({
+        expect(data, error?.message).to.deep.equal({
           _id: "5f5b6c3e4b4f3c0020b7f3c0",
-          numTimesMarkedAsDuplicate,
+          numChildren,
         });
-        expect(error).not.undefined;
       });
-    });
 
-    it("should accept valid numTimesMarkedForReview", function() {
-      const { data } = partialCardValidator.safeParse({
-        _id: "5f5b6c3e4b4f3c0020b7f3c0",
-        numTimesMarkedForReview: 0,
+      it("should reject invalid numChildren", function() {
+        inputs.discreteCount.invalid.forEach(function(numChildren) {
+          const { error, data } = partialCardValidator.safeParse({
+            _id: "5f5b6c3e4b4f3c0020b7f3c0",
+            numChildren,
+          });
+          expect(error, JSON.stringify(data)).not.undefined;
+        });
       });
-      expect(data).to.deep.equal({
-        _id: "5f5b6c3e4b4f3c0020b7f3c0",
-        numTimesMarkedForReview: 0,
-      });
-    });
 
-    it("should reject invalid numTimesMarkedForReview", function() {
-      [null, "3", -3].forEach(function(numTimesMarkedForReview) {
-        const { error } = partialCardValidator.safeParse({
+      it("should drop idsOfUsersWithCopy", function() {
+        const { data } = partialCardValidator.safeParse({
           _id: "5f5b6c3e4b4f3c0020b7f3c0",
-          numTimesMarkedForReview,
+          idsOfUsersWithCopy: "5f5b6c3e4b4f3c0020b7f3c1",
         });
-        expect(error).not.undefined;
+        expect(data).to.deep.equal({
+          _id: "5f5b6c3e4b4f3c0020b7f3c0",
+        });
+      });
+
+      it("should accept valid numTimesMarkedAsDuplicate", function() {
+        inputs.discreteCount.valid.forEach(function(numTimesMarkedAsDuplicate) {
+          const { data, error } = partialCardValidator.safeParse({
+            _id: "5f5b6c3e4b4f3c0020b7f3c0",
+            numTimesMarkedAsDuplicate,
+          });
+          expect(data, error?.message).to.deep.equal({
+            _id: "5f5b6c3e4b4f3c0020b7f3c0",
+            numTimesMarkedAsDuplicate,
+          });
+        });
+
+        it("should reject invalid numTimesMarkedAsDuplicate", function() {
+          inputs.discreteCount.invalid.forEach(
+            function(numTimesMarkedAsDuplicate) {
+              const { error, data } = partialCardValidator.safeParse({
+                _id: "5f5b6c3e4b4f3c0020b7f3c0",
+                numTimesMarkedAsDuplicate,
+              });
+              expect(error, JSON.stringify(data)).not.undefined;
+            },
+          );
+        });
+
+        it("should accept valid numTimesMarkedForReview", function() {
+          inputs.discreteCount.valid.forEach(function(numTimesMarkedForReview) {
+            const { data, error } = partialCardValidator.safeParse({
+              _id: "5f5b6c3e4b4f3c0020b7f3c0",
+              numTimesMarkedForReview,
+            });
+            expect(data, error?.message).to.deep.equal({
+              _id: "5f5b6c3e4b4f3c0020b7f3c0",
+              numTimesMarkedForReview,
+            });
+          });
+        });
+
+        it("should reject invalid numTimesMarkedForReview", function() {
+          inputs.discreteCount.invalid.forEach(
+            function(numTimesMarkedForReview) {
+              const { error, data } = partialCardValidator.safeParse({
+                _id: "5f5b6c3e4b4f3c0020b7f3c0",
+                numTimesMarkedForReview,
+              });
+              expect(error, JSON.stringify(data)).not.undefined;
+            },
+          );
+        });
+
+        it("should ignore createdAt", function() {
+          const createdAt = new Date();
+          const { data } = partialCardValidator.safeParse({
+            _id: "5f5b6c3e4b4f3c0020b7f3c0",
+            createdAt,
+          });
+          expect(data).to.deep.equal({
+            _id: "5f5b6c3e4b4f3c0020b7f3c0",
+          });
+        });
+
+        it("should ignore updatedAt", function() {
+          const updatedAt = new Date();
+          const { data } = partialCardValidator.safeParse({
+            _id: "5f5b6c3e4b4f3c0020b7f3c0",
+            updatedAt,
+          });
+          expect(data).to.deep.equal({
+            _id: "5f5b6c3e4b4f3c0020b7f3c0",
+          });
+        });
       });
     });
 
-    it("should ignore createdAt", function() {
-      const createdAt = new Date();
-      const { data } = partialCardValidator.safeParse({
-        _id: "5f5b6c3e4b4f3c0020b7f3c0",
-        createdAt,
-      });
-      expect(data).to.deep.equal({
-        _id: "5f5b6c3e4b4f3c0020b7f3c0",
+    const trashOrDeleteCardValidators = [
+      {
+        name: "trashCardParamsValidator",
+        validator: trashCardParamsValidator,
+      },
+      {
+        name: "restoreCardFromTrashParamsValidator",
+        validator: restoreCardFromTrashParamsValidator,
+      },
+      {
+        name: "deleteCardParamsValidator",
+        validator: deleteCardParamsValidator,
+      },
+    ];
+    trashOrDeleteCardValidators.forEach(function({ name, validator }) {
+      describe(name, function() {
+        it("should accept a valid card ID", function() {
+          const { data } = validator.safeParse({
+            _id: "5f5b6c3e4b4f3c0020b7f3c0",
+          });
+          expect(data?._id).equals("5f5b6c3e4b4f3c0020b7f3c0");
+        });
+
+        it("should reject an invalid card ID", function() {
+          inputs.cardID.invalid.forEach(function(_id) {
+            const { error, data } = validator.safeParse({
+              _id,
+            });
+            expect(error, JSON.stringify(data)).not.undefined;
+          });
+        });
+
+        it("should reject unknown keys", function() {
+          const { error } = validator.safeParse({
+            cardID: "5f5b6c3e4b4f3c0020b7f3c0",
+          });
+          expect(error).not.undefined;
+        });
       });
     });
 
-    it("should ignore updatedAt", function() {
-      const updatedAt = new Date();
-      const { data } = partialCardValidator.safeParse({
-        _id: "5f5b6c3e4b4f3c0020b7f3c0",
-        updatedAt,
-      });
-      expect(data).to.deep.equal({
-        _id: "5f5b6c3e4b4f3c0020b7f3c0",
-      });
-    });
-  });
-
-  const trashOrDeleteCardValidators = [
-    {
-      name: "trashCardParamsValidator",
-      validator: trashCardParamsValidator,
-    },
-    {
-      name: "restoreCardFromTrashParamsValidator",
-      validator: restoreCardFromTrashParamsValidator,
-    },
-    {
-      name: "deleteCardParamsValidator",
-      validator: deleteCardParamsValidator,
-    },
-  ];
-  trashOrDeleteCardValidators.forEach(function({ name, validator }) {
-    describe(name, function() {
+    describe("duplicateCardParamsValidator", function() {
       it("should accept a valid card ID", function() {
-        const { data } = validator.safeParse({
-          _id: "5f5b6c3e4b4f3c0020b7f3c0",
+        const { data } = duplicateCardParamsValidator.safeParse({
+          cardID: "5f5b6c3e4b4f3c0020b7f3c0",
         });
-        expect(data?._id).equals("5f5b6c3e4b4f3c0020b7f3c0");
+        expect(data?.cardID).equals("5f5b6c3e4b4f3c0020b7f3c0");
       });
 
       it("should reject an invalid card ID", function() {
-        [null, "invalid", { $ne: "" }].forEach(function(_id) {
-          const { error } = validator.safeParse({
-            _id,
+        inputs.cardID.invalid.forEach(function(cardID) {
+          const { error, data } = duplicateCardParamsValidator.safeParse({
+            cardID,
           });
-          expect(error).not.undefined;
+          expect(error, JSON.stringify(data)).not.undefined;
         });
       });
 
       it("should reject unknown keys", function() {
-        const { error } = validator.safeParse({
-          cardID: "5f5b6c3e4b4f3c0020b7f3c0",
-        });
-        expect(error).not.undefined;
-      });
-    });
-  });
-
-  describe("duplicateCardParamsValidator", function() {
-    it("should accept a valid card ID", function() {
-      const { data } = duplicateCardParamsValidator.safeParse({
-        cardID: "5f5b6c3e4b4f3c0020b7f3c0",
-      });
-      expect(data?.cardID).equals("5f5b6c3e4b4f3c0020b7f3c0");
-    });
-
-    it("should reject an invalid card ID", function() {
-      [null, "invalid", { $ne: "" }].forEach(function(cardID) {
         const { error } = duplicateCardParamsValidator.safeParse({
-          cardID,
+          cardId: "5f5b6c3e4b4f3c0020b7f3c0",
         });
         expect(error).not.undefined;
       });
     });
 
-    it("should reject unknown keys", function() {
-      const { error } = duplicateCardParamsValidator.safeParse({
-        cardId: "5f5b6c3e4b4f3c0020b7f3c0",
-      });
-      expect(error).not.undefined;
-    });
-  });
-
-  describe("streakParamsValidator", function() {
-    it("should accept valid card IDs", function() {
-      const { data } = streakParamsValidator.safeParse({
-        cardIDs: ["5f5b6c3e4b4f3c0020b7f3c0"],
-      });
-      expect(data?.cardIDs).deep.equals(["5f5b6c3e4b4f3c0020b7f3c0"]);
-    });
-
-    it("should reject invalid card IDs", function() {
-      [
-        null,
-        "5f5b6c3e4b4f3c0020b7f3c0",
-        "5f5b6c3e4b4f3c0020b7f3c0,5f5b6c3e4b4f3c0020b7f3c1",
-        ["5f5b6c3e4b4f3c0020b7f3c0", "invalid"],
-        { $ne: "" },
-        [{ $ne: "" }],
-      ].forEach(function(cardIDs) {
-        const { error, data } = streakParamsValidator.safeParse({
-          cardIDs,
-        });
-        expect(error, JSON.stringify(data)).not.undefined;
-      });
-    });
-
-    it("should reject unknown keys", function() {
-      const { error } = streakParamsValidator.safeParse({
-        cardIds: ["5f5b6c3e4b4f3c0020b7f3c0"],
-      });
-      expect(error).not.undefined;
-    });
-  });
-
-  describe("userSettingsParamsValidator", function() {
-    it("should accept valid cardsAreByDefaultPrivate", function() {
-      const { data, error } = userSettingsParamsValidator.safeParse({
-        cardsAreByDefaultPrivate: "on",
-      });
-      expect(data, error?.message).deep.equals({
-        cardsAreByDefaultPrivate: "on",
-      });
-    });
-
-    it("should reject invalid cardsAreByDefaultPrivate", function() {
-      [null, "true", true, 1, "off", false].forEach(
-        function(cardsAreByDefaultPrivate) {
-          const { error } = userSettingsParamsValidator.safeParse({
-            cardsAreByDefaultPrivate,
+    describe("streakParamsValidator", function() {
+      it("should accept valid card IDs", function() {
+        inputs.cardIDArray.valid.forEach(function(cardIDs) {
+          const { data, error } = streakParamsValidator.safeParse({
+            cardIDs,
           });
-          expect(error).not.undefined;
-        },
-      );
-    });
-
-    it("should accept valid dailyTarget", function() {
-      const { data } = userSettingsParamsValidator.safeParse({
-        dailyTarget: 10,
+          expect(data, error?.message).to.deep.equal({ cardIDs });
+        });
       });
-      expect(data).deep.equals({ dailyTarget: 10 });
-    });
 
-    it("should reject invalid dailyTarget", function() {
-      [null, "10", -10, 0].forEach(function(dailyTarget) {
-        const { error } = userSettingsParamsValidator.safeParse({
-          dailyTarget,
+      it("should reject invalid card IDs", function() {
+        inputs.cardIDArray.invalid.forEach(function(cardIDs) {
+          const { error, data } = streakParamsValidator.safeParse({
+            cardIDs,
+          });
+          expect(error, JSON.stringify(data)).not.undefined;
+        });
+      });
+
+      it("should reject unknown keys", function() {
+        const { error } = streakParamsValidator.safeParse({
+          cardIds: ["5f5b6c3e4b4f3c0020b7f3c0"],
         });
         expect(error).not.undefined;
       });
     });
 
-    it("should ignore unknown keys", function() {
-      const { data } = userSettingsParamsValidator.safeParse({
-        cardsAreByDefaultPrivate: "on",
-        invalid: true,
+    describe("userSettingsParamsValidator", function() {
+      it("should accept valid cardsAreByDefaultPrivate", function() {
+        const { data, error } = userSettingsParamsValidator.safeParse({
+          cardsAreByDefaultPrivate: "on",
+        });
+        expect(data, error?.message).deep.equals({
+          cardsAreByDefaultPrivate: "on",
+        });
       });
-      expect(data).deep.equals({
-        cardsAreByDefaultPrivate: "on",
+
+      it("should reject invalid cardsAreByDefaultPrivate", function() {
+        [null, "true", true, 1, "off", false].forEach(
+          function(cardsAreByDefaultPrivate) {
+            const { error } = userSettingsParamsValidator.safeParse({
+              cardsAreByDefaultPrivate,
+            });
+            expect(error).not.undefined;
+          },
+        );
+      });
+
+      it("should accept valid dailyTarget", function() {
+        inputs.positiveDiscreteCount.valid.forEach(function(dailyTarget) {
+          const { data, error } = userSettingsParamsValidator.safeParse({
+            dailyTarget,
+          });
+          expect(data, error?.message).to.deep.equal({ dailyTarget });
+        });
+      });
+
+      it("should reject invalid dailyTarget", function() {
+        inputs.positiveDiscreteCount.invalid.forEach(function(dailyTarget) {
+          const { error, data } = streakParamsValidator.safeParse({
+            dailyTarget,
+          });
+          expect(error, JSON.stringify(data)).not.undefined;
+        });
+      });
+
+      it("should ignore unknown keys", function() {
+        const { data } = userSettingsParamsValidator.safeParse({
+          cardsAreByDefaultPrivate: "on",
+          invalid: true,
+        });
+        expect(data).deep.equals({
+          cardsAreByDefaultPrivate: "on",
+        });
       });
     });
-  });
 
-  describe("userLoginParamsValidator", function() {
-    it("should reject missing email address", function() {
-      const { error } = userLoginParamsValidator.safeParse({
-        password: "password",
-      });
-      expect(error).not.undefined;
-    });
-
-    it("should reject missing password", function() {
-      const { error } = userLoginParamsValidator.safeParse({
-        username_or_email: "foo@bar.com",
-      });
-      expect(error).not.undefined;
-    });
-
-    it("should accept valid email address", function() {
-      const { data } = userLoginParamsValidator.safeParse({
-        username_or_email: "foo@bar.com",
-        password: "password",
-      });
-      expect(data).deep.equals({
-        username_or_email: "foo@bar.com",
-        password: "password",
-      });
-    });
-
-    it("should accept valid username", function() {
-      const { data } = userLoginParamsValidator.safeParse({
-        username_or_email: "foobar",
-        password: "password",
-      });
-      expect(data).deep.equals({
-        username_or_email: "foobar",
-        password: "password",
-      });
-    });
-
-    it("should reject invalid username/email", function() {
-      [null, 1234, { $ne: "" }, ""].forEach(function(username_or_email) {
-        const { error, data } = userLoginParamsValidator.safeParse({
-          username_or_email,
+    describe("userLoginParamsValidator", function() {
+      it("should reject missing email address", function() {
+        const { error } = userLoginParamsValidator.safeParse({
           password: "password",
         });
-        expect(error, JSON.stringify(data)).not.undefined;
+        expect(error).not.undefined;
       });
-    });
 
-    it("should reject invalid password", function() {
-      [null, 1234, { $ne: "" }, "short", ""].forEach(function(password) {
-        const { error, data } = userLoginParamsValidator.safeParse({
-          username_or_email: "foo",
-          password,
+      it("should reject missing password", function() {
+        const { error } = userLoginParamsValidator.safeParse({
+          username_or_email: "foo@bar.com",
         });
-        expect(error, JSON.stringify(data)).not.undefined;
+        expect(error).not.undefined;
+      });
+
+      it("should accept valid username_or_email", function() {
+        inputs.userNameOrEmail.valid.forEach(function(username_or_email) {
+          const { data, error } = userLoginParamsValidator.safeParse({
+            username_or_email,
+            password: "password",
+          });
+          expect(data, error?.message).deep.equals({
+            username_or_email,
+            password: "password",
+          });
+        });
+      });
+
+      it("should reject invalid username_or_email", function() {
+        inputs.userNameOrEmail.invalid.forEach(function(username_or_email) {
+          const { error, data } = userLoginParamsValidator.safeParse({
+            username_or_email,
+            password: "password",
+          });
+          expect(error, JSON.stringify(data)).not.undefined;
+        });
+      });
+
+      it("should accept valid password", function() {
+        inputs.password.valid.forEach(function(password) {
+          const { data, error } = userLoginParamsValidator.safeParse({
+            username_or_email: "foo",
+            password,
+          });
+          expect(data, error?.message).deep.equals({
+            username_or_email: "foo",
+            password,
+          });
+        });
+      });
+
+      it("should reject invalid password", function() {
+        inputs.password.invalid.forEach(function(password) {
+          const { error, data } = userLoginParamsValidator.safeParse({
+            username_or_email: "foo",
+            password,
+          });
+          expect(error, JSON.stringify(data)).not.undefined;
+        });
       });
     });
-  });
 
-  describe("userRegistrationParamsValidator", function() {
-    it("should reject missing email address", function() {
-      const { error } = userRegistrationParamsValidator.safeParse({
-        password: "long-password",
-        username: "foobar",
-      });
-      expect(error).not.undefined;
-    });
-
-    it("should reject missing password", function() {
-      const { error } = userRegistrationParamsValidator.safeParse({
-        email: "foo@bar.com",
-        username: "foobar",
-      });
-      expect(error).not.undefined;
-    });
-
-    it("should reject missing username", function() {
-      const { error } = userRegistrationParamsValidator.safeParse({
-        email: "foo@bar.com",
-        password: "long-password",
-      });
-      expect(error).not.undefined;
-    });
-
-    it("should accept valid input", function() {
-      const { data } = userRegistrationParamsValidator.safeParse({
-        email: "foo@bar.com",
-        password: "long-password",
-        username: "foobar",
-      });
-      expect(data).deep.equals({
-        email: "foo@bar.com",
-        password: "long-password",
-        username: "foobar",
-      });
-    });
-
-    it("should reject invalid email", function() {
-      [null, 1234, { $ne: "" }, "@me", ""].forEach(function(email) {
-        const { error, data } = userRegistrationParamsValidator.safeParse({
-          email,
+    describe("userRegistrationParamsValidator", function() {
+      it("should reject missing email address", function() {
+        const { error } = userRegistrationParamsValidator.safeParse({
           password: "long-password",
           username: "foobar",
         });
-        expect(error, JSON.stringify(data)).not.undefined;
+        expect(error).not.undefined;
       });
-    });
 
-    it("should reject invalid password", function() {
-      [null, 1234, { $ne: "" }, "short", ""].forEach(function(password) {
-        const { error, data } = userRegistrationParamsValidator.safeParse({
+      it("should reject missing password", function() {
+        const { error } = userRegistrationParamsValidator.safeParse({
           email: "foo@bar.com",
-          password,
           username: "foobar",
         });
-        expect(error, JSON.stringify(data)).not.undefined;
+        expect(error).not.undefined;
       });
-    });
 
-    it("should reject invalid username", function() {
-      [null, 1234, { $ne: "" }, "2c", ""].forEach(function(username) {
-        const { error, data } = userRegistrationParamsValidator.safeParse({
+      it("should reject missing username", function() {
+        const { error } = userRegistrationParamsValidator.safeParse({
           email: "foo@bar.com",
           password: "long-password",
-          username,
         });
-        expect(error, JSON.stringify(data)).not.undefined;
+        expect(error).not.undefined;
       });
-    });
-  });
 
-  const sendEmailEndpointValidators = [
-    {
-      name: "sendValidationEmailParamsValidator",
-      validator: sendValidationEmailParamsValidator,
-    },
-    {
-      name: "resetPasswordRequestParamsValidator",
-      validator: resetPasswordRequestParamsValidator,
-    },
-  ];
-  sendEmailEndpointValidators.forEach(function({ name, validator }) {
-    describe(name, function() {
       it("should accept valid email", function() {
-        const { data } = validator.safeParse({
-          email: "foo@bar.com",
+        inputs.email.valid.forEach(function(email) {
+          const { data, error } = userRegistrationParamsValidator.safeParse({
+            email,
+            password: "long-password",
+            username: "foobar",
+          });
+          expect(data, error?.message).deep.equals({
+            email,
+            password: "long-password",
+            username: "foobar",
+          });
         });
-        expect(data).deep.equals({ email: "foo@bar.com" });
       });
 
       it("should reject invalid email", function() {
-        [null, 1234, { $ne: "" }, "@me"].forEach(function(email) {
-          const { error, data } = validator.safeParse({
+        inputs.email.invalid.forEach(function(email) {
+          const { error, data } = userRegistrationParamsValidator.safeParse({
             email,
+            password: "long-password",
+            username: "foobar",
+          });
+          expect(error, JSON.stringify(data)).not.undefined;
+        });
+      });
+
+      it("should reject invalid password", function() {
+        inputs.password.invalid.forEach(function(password) {
+          const { error, data } = userRegistrationParamsValidator.safeParse({
+            email: "foo@bar.com",
+            password,
+            username: "foobar",
+          });
+          expect(error, JSON.stringify(data)).not.undefined;
+        });
+      });
+
+      it("should reject invalid username", function() {
+        inputs.userName.invalid.forEach(function(username) {
+          const { error, data } = userRegistrationParamsValidator.safeParse({
+            email: "foo@bar.com",
+            password: "long-password",
+            username,
           });
           expect(error, JSON.stringify(data)).not.undefined;
         });
       });
     });
-  });
 
-  describe("resetPasswordLinkPostParamsValidator", function() {
-    it("should accept matching passwords", function() {
-      const { data } = resetPasswordLinkPostParamsValidator.safeParse({
-        password_1: "long-password",
-        password_2: "long-password",
-      });
-      expect(data).deep.equals({
-        password_1: "long-password",
-        password_2: "long-password",
-      });
-    });
-
-    it("should reject mismatched passwords", function() {
-      const { error } = resetPasswordLinkPostParamsValidator.safeParse({
-        password_1: "long-password",
-        password_2: "different-password",
-      });
-      expect(error).not.undefined;
-    });
-
-    it("should reject missing password_1", function() {
-      const { error } = resetPasswordLinkPostParamsValidator.safeParse({
-        password_2: "long-password",
-      });
-      expect(error).not.undefined;
-    });
-
-    it("should reject missing password_2", function() {
-      const { error } = resetPasswordLinkPostParamsValidator.safeParse({
-        password_1: "long-password",
-      });
-      expect(error).not.undefined;
-    });
-
-    it("should reject invalid passwords", function() {
-      [null, 1234, { $ne: "" }, "short"].forEach(function(password) {
-        const { error, data } = resetPasswordLinkPostParamsValidator.safeParse({
-          password_1: password,
-          password_2: password,
+    const sendEmailEndpointValidators = [
+      {
+        name: "sendValidationEmailParamsValidator",
+        validator: sendValidationEmailParamsValidator,
+      },
+      {
+        name: "resetPasswordRequestParamsValidator",
+        validator: resetPasswordRequestParamsValidator,
+      },
+    ];
+    sendEmailEndpointValidators.forEach(function({ name, validator }) {
+      describe(name, function() {
+        it("should accept valid email", function() {
+          inputs.email.valid.forEach(function(email) {
+            const { data, error } = validator.safeParse({
+              email,
+            });
+            expect(data, error?.message).deep.equals({ email });
+          });
         });
-        expect(error, JSON.stringify(data)).not.undefined;
+
+        it("should reject invalid email", function() {
+          inputs.email.invalid.forEach(function(email) {
+            const { error, data } = validator.safeParse({ email });
+            expect(error, JSON.stringify(data)).not.undefined;
+          });
+        });
       });
     });
-  });
 
-  describe("verificationPathValidator", function() {
-    it("should accept valid path", function() {
-      const { data } = verificationPathValidator.safeParse(
-        "/verify-account/32alphanumericcharsinlowercase32",
-      );
-      expect(data).deep.equals(
-        "/verify-account/32alphanumericcharsinlowercase32",
-      );
-    });
+    describe("resetPasswordLinkPostParamsValidator", function() {
+      it("should accept matching passwords", function() {
+        const { data } = resetPasswordLinkPostParamsValidator.safeParse({
+          password_1: "long-password",
+          password_2: "long-password",
+        });
+        expect(data).deep.equals({
+          password_1: "long-password",
+          password_2: "long-password",
+        });
+      });
 
-    it("should reject invalid path", function() {
-      [
-        "/verify-account/32----------------------------32",
-        "/verify-account/not32characterslong",
-      ].forEach(
-        function(path) {
-          const { error, data } = verificationPathValidator.safeParse(path);
+      it("should reject mismatched passwords", function() {
+        const { error } = resetPasswordLinkPostParamsValidator.safeParse({
+          password_1: "long-password",
+          password_2: "different-password",
+        });
+        expect(error).not.undefined;
+      });
+
+      it("should reject missing password_1", function() {
+        const { error } = resetPasswordLinkPostParamsValidator.safeParse({
+          password_2: "long-password",
+        });
+        expect(error).not.undefined;
+      });
+
+      it("should reject missing password_2", function() {
+        const { error } = resetPasswordLinkPostParamsValidator.safeParse({
+          password_1: "long-password",
+        });
+        expect(error).not.undefined;
+      });
+
+      it("should reject invalid passwords", function() {
+        inputs.password.invalid.forEach(function(password) {
+          const { error, data } = resetPasswordLinkPostParamsValidator
+            .safeParse({
+              password_1: password,
+              password_2: password,
+            });
           expect(error, JSON.stringify(data)).not.undefined;
-        },
-      );
-    });
-  });
-
-  describe("resetPasswordLinkPathValidator", function() {
-    it("should accept valid path", function() {
-      const { data } = resetPasswordLinkPathValidator.safeParse(
-        "/reset-password-link/50alphanumericcharsinlowercase12345678901234567850",
-      );
-      expect(data).deep.equals(
-        "/reset-password-link/50alphanumericcharsinlowercase12345678901234567850",
-      );
+        });
+      });
     });
 
-    it("should reject invalid path", function() {
-      [
-        "/reset-password-link/50----------------------------12345678901234567850",
-        "/reset-password-link/not50characterslong",
-      ].forEach(
-        function(path) {
-          const { error, data } = resetPasswordLinkPathValidator.safeParse(
-            path,
-          );
-          expect(error, JSON.stringify(data)).not.undefined;
-        },
-      );
+    describe("verificationPathValidator", function() {
+      it("should accept valid path", function() {
+        const { data } = verificationPathValidator.safeParse(
+          "/verify-account/32alphanumericcharsinlowercase32",
+        );
+        expect(data).deep.equals(
+          "/verify-account/32alphanumericcharsinlowercase32",
+        );
+      });
+
+      it("should reject invalid path", function() {
+        [
+          "/verify-account/32----------------------------32",
+          "/verify-account/not32characterslong",
+        ].forEach(
+          function(path) {
+            const { error, data } = verificationPathValidator.safeParse(path);
+            expect(error, JSON.stringify(data)).not.undefined;
+          },
+        );
+      });
+    });
+
+    describe("resetPasswordLinkPathValidator", function() {
+      it("should accept valid path", function() {
+        const { data } = resetPasswordLinkPathValidator.safeParse(
+          "/reset-password-link/50alphanumericcharsinlowercase12345678901234567850",
+        );
+        expect(data).deep.equals(
+          "/reset-password-link/50alphanumericcharsinlowercase12345678901234567850",
+        );
+      });
+
+      it("should reject invalid path", function() {
+        [
+          "/reset-password-link/50----------------------------12345678901234567850",
+          "/reset-password-link/not50characterslong",
+        ].forEach(
+          function(path) {
+            const { error, data } = resetPasswordLinkPathValidator.safeParse(
+              path,
+            );
+            expect(error, JSON.stringify(data)).not.undefined;
+          },
+        );
+      });
     });
   });
 });

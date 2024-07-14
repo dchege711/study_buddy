@@ -110,14 +110,14 @@ export const readPublicCardParamsValidator = z.object({
 });
 
 const commaDelimitedStrings = z.string().refine(
-  (s) => s.split(",").every(_s => _s.length > 0),
+  (s) => s.length === 0 || s.split(",").every(_s => _s.length > 0),
   {
     message: "Expected comma-delimited strings",
   },
 );
 
 const commaDelimitedMongoIDs = z.string().refine(
-  ids => ids.split(",").every(isMongoId),
+  ids => ids.length === 0 || ids.split(",").every(isMongoId),
   {
     message: "Expected comma-delimited IDs",
   },
@@ -166,9 +166,9 @@ export const partialCardValidator = z.object({
   title: z.string().optional(),
   description: z.string().optional(),
   tags: commaDelimitedStrings.optional(),
-  urgency: z.number().int().nonnegative().optional(),
+  urgency: z.number().nonnegative().optional(),
   isPublic: z.boolean().optional(),
-  lastReviewed: z.date().optional(),
+  lastReviewed: z.string().datetime().optional(),
   parent: z.string().refine(isMongoId, {
     message: "Invalid card ID",
   }).optional(),
