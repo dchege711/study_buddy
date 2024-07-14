@@ -166,15 +166,15 @@ export const partialCardValidator = z.object({
   title: z.string().optional(),
   description: z.string().optional(),
   tags: commaDelimitedStrings.optional(),
-  urgency: z.number().nonnegative().optional(),
+  urgency: z.number().nonnegative().finite().optional(),
   isPublic: z.boolean().optional(),
   lastReviewed: z.string().datetime().optional(),
   parent: z.string().refine(isMongoId, {
     message: "Invalid card ID",
   }).optional(),
-  numChildren: z.number().int().nonnegative().optional(),
-  numTimesMarkedAsDuplicate: z.number().int().nonnegative().optional(),
-  numTimesMarkedForReview: z.number().int().nonnegative().optional(),
+  numChildren: z.number().int().nonnegative().finite().optional(),
+  numTimesMarkedAsDuplicate: z.number().int().nonnegative().finite().optional(),
+  numTimesMarkedForReview: z.number().int().nonnegative().finite().optional(),
 });
 
 export const trashCardParamsValidator = partialCardValidator.pick({

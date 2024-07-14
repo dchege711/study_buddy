@@ -720,7 +720,7 @@ describe("Input Parsing", function() {
           _id: "5f5b6c3e4b4f3c0020b7f3c0",
           urgency,
         });
-        expect(error, JSON.stringify(data)).not.undefined;
+        expect(error, `(${urgency}): ` + JSON.stringify(data)).not.undefined;
       });
     });
 
