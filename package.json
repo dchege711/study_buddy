@@ -65,7 +65,7 @@
     "connect-mongo": "^4.6.0",
     "cookie-parser": "^1.4.3",
     "ejs": "3.1.10",
-    "express": "^4.19.2",
+    "express": "^4.21.0",
     "express-rate-limit": "^7.3.1",
     "express-session": "1.15.6",
     "express-sslify": "^1.2.0",
