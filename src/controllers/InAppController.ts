@@ -11,30 +11,23 @@ import * as controllerUtils from "./ControllerUtilities";
 
 const maybeRenderError = controllerUtils.maybeRenderError;
 const deleteTempFile = controllerUtils.deleteTempFile;
-const getDefaultTemplateVars = controllerUtils.getDefaultTemplateVars;
 
 export function home(req: Request, res: Response) {
-  const templateVars = getDefaultTemplateVars(req);
-  templateVars.SEARCH_ENDPOINT_URL = "/search-cards";
-  res.render("pages/home.ejs", templateVars);
+  res.locals.SEARCH_ENDPOINT_URL = "/search-cards";
+  res.render("pages/home.ejs");
 }
 
 export function wikiPage(req: Request, res: Response) {
-  res.render("pages/wiki_page.ejs", getDefaultTemplateVars(req));
+  res.render("pages/wiki_page.ejs");
 }
 
 export function browsePageGet(req: Request, res: Response) {
-  res.render("pages/browse_cards_page.ejs", getDefaultTemplateVars(req));
+  res.render("pages/browse_cards_page.ejs");
 }
 
 export function accountGet(req: Request, res: Response) {
-  res.render(
-    "pages/account_page.ejs",
-    {
-      ...getDefaultTemplateVars(req),
-      account_info: req.session?.user,
-    },
-  );
+  res.locals.account_info = req.session?.user;
+  res.render("pages/account_page.ejs");
 }
 
 export function updateUserSettings(req: Request, res: Response) {

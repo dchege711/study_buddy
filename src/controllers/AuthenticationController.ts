@@ -7,7 +7,6 @@ import { UserRecoverableError } from "../errors";
 import * as LogInUtilities from "../models/LogInUtilities";
 import * as allPaths from "../paths";
 import {
-  getDefaultTemplateVars,
   maybeRenderError,
   redirectWithMessage,
   redirectWithRecoverableError,
@@ -25,11 +24,9 @@ function renderForm(
   formName: string,
   baseName: string,
 ) {
-  res.render("pages/forms_base_page", {
-    ...getDefaultTemplateVars(req),
-    formName: formName,
-    formPath: `../partials/forms/${baseName}.ejs`,
-  });
+  res.locals.formName = formName;
+  res.locals.formPath = `../partials/forms/${baseName}.ejs`;
+  res.render("pages/forms_base_page");
 }
 
 /**
