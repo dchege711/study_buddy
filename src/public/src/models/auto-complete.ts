@@ -26,7 +26,34 @@ export class AutoComplete {
   }
 
   keysWithPrefix(prefix: string): string[] {
-    return this.prefixTree.keysWithPrefix(prefix);
+    // Get results for the original prefix
+    const originalResults = this.prefixTree.keysWithPrefix(prefix);
+    
+    // If prefix is empty, return original results
+    if (prefix.length === 0) {
+      return originalResults;
+    }
+    
+    // Get results for lowercase prefix to make search case-insensitive
+    const lowercaseResults = this.prefixTree.keysWithPrefix(prefix.toLowerCase());
+    
+    // Get results for uppercase prefix
+    const uppercaseResults = this.prefixTree.keysWithPrefix(prefix.toUpperCase());
+    
+    // Get results for title case prefix (first letter uppercase, rest lowercase)
+    const titleCasePrefix = prefix.charAt(0).toUpperCase() + prefix.slice(1).toLowerCase();
+    const titleCaseResults = this.prefixTree.keysWithPrefix(titleCasePrefix);
+    
+    // Combine all results and remove duplicates
+    const allResults = [
+      ...originalResults,
+      ...lowercaseResults,
+      ...uppercaseResults,
+      ...titleCaseResults
+    ];
+    
+    // Remove duplicates by converting to Set and back to Array
+    return Array.from(new Set(allResults));
   }
 
   updatePrefixTree(word: string) {

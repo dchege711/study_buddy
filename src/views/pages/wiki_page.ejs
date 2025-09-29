@@ -176,9 +176,11 @@
                             shown first.
                             <br><br>
                             Tags are case-sensitive. When adding tags to a card, <%= APP_NAME %>
-                                offers an auto-complete feature in order to reduce the number of near-duplicate tags
+                                offers a case-insensitive auto-complete feature in order to reduce the number of near-duplicate tags
                                 like
                                 [<em>sorting_algorithms</em>, <em>sorting-algorithms</em>, <em>Sorting Algorithms</em>].
+                                The auto-complete will suggest matching tags regardless of case, so typing "sort" will suggest
+                                both "sorting_algorithms" and "Sorting_Algorithms" if they exist.
                                 <br><br>
                                 The importance of a tag is the sum of all the urgencies of the
                                 cards that bear that tag. For instance, suppose we have this set of cards:
