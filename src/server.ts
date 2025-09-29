@@ -83,12 +83,11 @@ app.use(cookieParser());
 // Middleware to populate res.locals with request-specific template variables
 app.use((req, res, next) => {
   // Message is meant to be displayed to the user, and then cleared.
-  const session = req.session as any; // Use any to work around TypeScript Session interface limitations
-  res.locals.message = session?.message || "";
-  if (session?.message) { session.message = ""; }
+  res.locals.message = req.session?.message || "";
+  if (req.session?.message) { req.session.message = ""; }
   
   // Set LOGGED_IN based on session state
-  res.locals.LOGGED_IN = session?.user !== undefined;
+  res.locals.LOGGED_IN = req.session?.user !== undefined;
   
   next();
 });
