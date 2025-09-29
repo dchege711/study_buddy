@@ -25,12 +25,13 @@ import {
   PORT,
   STUDY_BUDDY_SESSION_SECRET_1,
 } from "./config";
+import * as config from "./config";
 import { createContext } from "./context";
-import { getDefaultTemplateVars } from "./controllers/ControllerUtilities";
 import { addPublicUser } from "./models/Miscellaneous";
 import expressAuthRouter from "./routes/AuthenticationRoutes";
 import { inAppRouter } from "./routes/InAppRouter";
 import expressInAppRouter from "./routes/InAppRoutes";
+import * as allPaths from "./paths";
 import { populateDummyAccountWithCards } from "./tests/DummyAccountUtils";
 import { mergeRouters } from "./trpc";
 
@@ -39,6 +40,12 @@ import { mongooseConnection } from "./models/MongooseClient";
 
 const app = express();
 const port = PORT;
+
+// Set up app.locals with application-wide constants
+app.locals.APP_NAME = config.APP_NAME;
+app.locals.BASE_URL = config.BASE_URL;
+// Spread all path constants to app.locals
+Object.assign(app.locals, allPaths);
 
 // In Heroku's honesty we trust. Beware otherwise as headers can be spoofed
 // https://github.com/florianheinemann/express-sslify
@@ -72,6 +79,19 @@ app.use(urlencoded({ extended: true }));
 app.use(json());
 app.use(express.static(join(__dirname, "public")));
 app.use(cookieParser());
+
+// Middleware to populate res.locals with request-specific template variables
+app.use((req, res, next) => {
+  // Message is meant to be displayed to the user, and then cleared.
+  const session = req.session as any; // Use any to work around TypeScript Session interface limitations
+  res.locals.message = session?.message || "";
+  if (session?.message) { session.message = ""; }
+  
+  // Set LOGGED_IN based on session state
+  res.locals.LOGGED_IN = session?.user !== undefined;
+  
+  next();
+});
 
 /**
  * Protections against CSRF attacks.
@@ -115,7 +135,6 @@ app.use(function(err: Error, req: Request, res: Response) {
   res.status(500).render(
     "pages/5xx_error_page.ejs",
     {
-      ...getDefaultTemplateVars(req),
       message: "500: Internal Server Error",
     },
   );
@@ -126,7 +145,6 @@ app.use(function(req: Request, res: Response) {
   res.status(404).render(
     "pages/4xx_error_page.ejs",
     {
-      ...getDefaultTemplateVars(req),
       message: "404: Page Not Found",
     },
   );

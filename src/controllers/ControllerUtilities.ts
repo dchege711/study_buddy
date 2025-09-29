@@ -5,43 +5,7 @@ import { rateLimit } from "express-rate-limit";
 import { StatusCodes } from "http-status-codes";
 import { z, ZodError } from "zod";
 
-import * as config from "../config";
 import { UserRecoverableError } from "../errors";
-import { AuthenticateUser } from "../models/LogInUtilities";
-import { ICard } from "../models/mongoose_models/CardSchema";
-import * as allPaths from "../paths";
-
-interface TemplateVariables {
-  APP_NAME: string;
-  BASE_URL: string;
-  LOGGED_IN: boolean;
-  SEARCH_ENDPOINT_URL?: string;
-  abbreviatedCards?: Array<Partial<ICard>>;
-  account_info?: AuthenticateUser;
-  message: string;
-}
-
-/**
- * @param {Object} req The incoming HTTP request
- *
- * @return {JSON} The key-value pairs that should be provided to templates by
- * default.
- */
-export function getDefaultTemplateVars(
-  req: Request | null = null,
-): TemplateVariables {
-  // Message is meant to be displayed to the user, and then cleared.
-  const message = req?.session?.message || "";
-  if (req?.session) { req.session.message = ""; }
-
-  return {
-    APP_NAME: config.APP_NAME,
-    BASE_URL: config.BASE_URL,
-    LOGGED_IN: req?.session?.user !== undefined,
-    message,
-    ...allPaths,
-  };
-}
 
 /**
  * Redirect the user to `req.url` with and show `err.message` to the user.
@@ -92,10 +56,8 @@ export function maybeRenderError(err: Error, req: Request, res: Response) {
 
   console.error(err);
   res.type("html");
-  res.render(
-    "pages/5xx_error_page.ejs",
-    { ...getDefaultTemplateVars(req), message: err.toString() },
-  );
+  res.locals.message = err.toString();
+  res.render("pages/5xx_error_page.ejs");
 }
 
 export function deleteTempFile(filepath: string) {
